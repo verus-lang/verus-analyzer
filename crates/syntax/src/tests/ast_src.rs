@@ -69,6 +69,9 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "enum", "extern", "false", "fn", "for", "if", "impl", "in", "let", "loop", "macro",
         "match", "mod", "move", "mut", "pub", "ref", "return", "self", "Self", "static", "struct",
         "super", "trait", "true", "try", "type", "unsafe", "use", "where", "while", "yield",
+        //verus
+        "verus", "spec", "proof", "requires", "ensures",
+
     ],
     contextual_keywords: &["auto", "default", "existential", "union", "raw", "macro_rules"],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING"],
