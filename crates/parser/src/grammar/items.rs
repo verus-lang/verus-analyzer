@@ -39,9 +39,12 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![use],
     T![macro],
     T![;],
+    //verus
+    // T![proof],
 ]);
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+    
     let m = p.start();
     attributes::outer_attrs(p);
 
@@ -87,6 +90,8 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
 pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // test_err pub_expr
     // fn foo() { pub 92; }
+
+    dbg!("opt-item");
     let has_visibility = opt_visibility(p, false);
 
     let m = match opt_item_without_modifiers(p, m) {
@@ -232,6 +237,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         T![const] if (la == IDENT || la == T![_] || la == T![mut]) => consts::konst(p, m),
         T![static] if (la == IDENT || la == T![_] || la == T![mut]) => consts::static_(p, m),
 
+        T![proof] => {dbg!("hey"); panic!();}
         _ => return Err(m),
     };
     Ok(())
