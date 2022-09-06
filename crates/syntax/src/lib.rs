@@ -362,17 +362,17 @@ fn api_walkthrough() {
 fn verus_walkthrough() {
     use ast::{HasModuleItem, HasName};
 
-    let source_code = "
-    proof fn my_proof_fun(x: int, y: int)
-        requires
-            x < 100,
-            y < 100,
-        ensures
-            x + y < 200,
-        {
-            assert(x + y < 200);
-        }
-    ";
+    let source_code = "verus!{
+        proof fn my_proof_fun(x: int, y: int)
+            requires
+                x < 100,
+                y < 100,
+            ensures
+                x + y < 200,
+            {
+                assert(x + y < 200);
+            }
+    }";
     // `SourceFile` is the main entry point.
     //
     // The `parse` method returns a `Parse` -- a pair of syntax tree and a list

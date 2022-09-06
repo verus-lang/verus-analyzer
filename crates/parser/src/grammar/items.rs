@@ -101,7 +101,11 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
     let mut has_mods = false;
     let mut has_extern = false;
-
+    if p.at(T![verus]) {
+        dbg!("hi Verus"); 
+        p.eat(T![verus]);
+        p.eat(T![!]);
+    }
     // modifiers
     if p.at(T![const]) && p.nth(1) != T!['{'] {
         p.eat(T![const]);
@@ -231,13 +235,13 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         T![enum] => adt::enum_(p, m),
         IDENT if p.at_contextual_kw(T![union]) && p.nth(1) == IDENT => adt::union(p, m),
 
-        T![macro] => macro_def(p, m),
+        T![macro] => {dbg!("hey macro"); macro_def(p, m)},
         IDENT if p.at_contextual_kw(T![macro_rules]) && p.nth(1) == BANG => macro_rules(p, m),
 
         T![const] if (la == IDENT || la == T![_] || la == T![mut]) => consts::konst(p, m),
         T![static] if (la == IDENT || la == T![_] || la == T![mut]) => consts::static_(p, m),
 
-        T![proof] => {dbg!("hey"); panic!();}
+        // T![proof] => {dbg!("hey"); panic!();}
         _ => return Err(m),
     };
     Ok(())
