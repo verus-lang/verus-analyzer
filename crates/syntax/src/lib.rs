@@ -362,7 +362,8 @@ fn api_walkthrough() {
 fn verus_walkthrough() {
     use ast::{HasModuleItem, HasName};
 
-    let source_code = "verus!{
+    let source_code = 
+    "verus!{
         proof fn my_proof_fun(x: int, y: int)
             requires
                 x < 100,
@@ -372,6 +373,60 @@ fn verus_walkthrough() {
             {
                 assert(x + y < 200);
             }
+    }";
+    // `SourceFile` is the main entry point.
+    //
+    // The `parse` method returns a `Parse` -- a pair of syntax tree and a list
+    // of errors. That is, syntax tree is constructed even in presence of errors.
+    // dbg!(&source_code);
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    // uncommend this
+    // assert!(parse.errors().is_empty());
+    //
+
+    // The `tree` method returns an owned syntax node of type `SourceFile`.
+    // Owned nodes are cheap: inside, they are `Rc` handles to the underling data.
+    let file: SourceFile = parse.tree();
+
+    // `SourceFile` is the root of the syntax tree. We can iterate file's items.
+    // Let's fetch the `foo` function.
+    // let mut func = None;
+    for item in file.items() {
+        dbg!(&item);
+        // match item {
+        //     ast::Item::Fn(f) => func = Some(f),
+        //     _ => unreachable!(),
+        // }
+    }
+    // let func: ast::Fn = func.unwrap();
+
+}
+
+
+#[test]
+fn verus_walkthrough2() {
+    use ast::{HasModuleItem, HasName};
+
+    let source_code = 
+    "verus!{
+        proof fn my_proof_fun(x: int, y: int) -> (sum: int)
+            requires
+                x < 100,
+                y < 100,
+            ensures
+                sum < 200,
+        {
+            x + y
+        }    
+
+        spec fn my_spec_fun(x: int, y: int) -> int
+            recommends
+                x < 100,
+                y < 100,
+        {
+            x + y
+        }
     }";
     // `SourceFile` is the main entry point.
     //

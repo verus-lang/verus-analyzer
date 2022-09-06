@@ -112,7 +112,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         // m.abandon(p);
         return Ok(());
     }
-    
+
 
     if p.at(T![proof]) {
         dbg!("hi proof"); 
@@ -459,7 +459,20 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // test function_ret_type
     // fn foo() {}
     // fn bar() -> () {}
+    
     opt_ret_type(p);
+    // verus specific return naming
+    // if p.at(T![->]) {
+    //     let m = p.start();
+    //     p.bump(T![->]);
+    //     if p.at(T!['(']) {
+    //         params::param_list_fn_def(p);
+    //     } else {
+    //         types::type_no_bounds(p);
+    //     }
+    //     m.complete(p, RET_TYPE);
+    // } 
+
 
     // test function_where_clause
     // fn foo<T>() where T: Copy {}
@@ -474,7 +487,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 
         while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
             req_ens_clause(p);
-            dbg!("after req_ens");
+            dbg!("after ens clause");
             if p.at(T![ensures]) || p.at(T!['{']) {
                 break;
             }
@@ -487,6 +500,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         p.bump(T![ensures]);
         while !p.at(EOF) && !p.at(T!['{']) {
             req_ens_clause(p);
+            dbg!("after ens clause");
             if p.at(T!['{']) {
                 break;
             }
