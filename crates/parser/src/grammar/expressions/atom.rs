@@ -500,6 +500,7 @@ fn match_guard(p: &mut Parser<'_>) -> CompletedMarker {
 // fn d() { 1; 2 }
 pub(crate) fn block_expr(p: &mut Parser<'_>) {
     if !p.at(T!['{']) {
+        // panic!();
         p.error("expected a block");
         return;
     }

@@ -216,6 +216,8 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         // macro related
         "MACRO_ITEMS",
         "MACRO_STMTS",
+        // verus,
+        "REQ_ENS_CLAUSE",
     ],
 };
 

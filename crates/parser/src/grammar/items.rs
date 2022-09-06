@@ -103,9 +103,30 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     let mut has_extern = false;
     if p.at(T![verus]) {
         dbg!("hi Verus"); 
-        p.eat(T![verus]);
-        p.eat(T![!]);
+        p.bump(T![verus]);
+        p.bump(T![!]);
+        m.complete(p, VERUS_KW);
+        // p.bump(T!['{']);
+        // token_tree(p);
+        item_list(p);
+        // m.abandon(p);
+        return Ok(());
     }
+    
+
+    if p.at(T![proof]) {
+        dbg!("hi proof"); 
+        p.bump(T![proof]);
+        m.complete(p, PROOF_KW);
+        return Ok(());
+    }
+    if p.at(T![spec]) {
+        dbg!("hi spec"); 
+        p.bump(T![spec]);
+        m.complete(p, SPEC_KW);
+        return Ok(());
+    }
+
     // modifiers
     if p.at(T![const]) && p.nth(1) != T!['{'] {
         p.eat(T![const]);
@@ -235,7 +256,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         T![enum] => adt::enum_(p, m),
         IDENT if p.at_contextual_kw(T![union]) && p.nth(1) == IDENT => adt::union(p, m),
 
-        T![macro] => {dbg!("hey macro"); macro_def(p, m)},
+        T![macro] => {macro_def(p, m)},
         IDENT if p.at_contextual_kw(T![macro_rules]) && p.nth(1) == BANG => macro_rules(p, m),
 
         T![const] if (la == IDENT || la == T![_] || la == T![mut]) => consts::konst(p, m),
@@ -284,6 +305,31 @@ pub(crate) fn mod_item(p: &mut Parser<'_>, m: Marker) {
     }
     m.complete(p, MODULE);
 }
+
+// pub(crate) fn verus_item(p: &mut Parser<'_>, m: Marker) {
+//     p.bump(T![mod]);
+//     name(p);
+//     if p.at(T!['{']) {
+//         // test mod_item_curly
+//         // mod b { }
+//         item_list(p);
+//     } else if !p.eat(T![;]) {
+//         p.error("expected `;` or `{`");
+//     }
+//     m.complete(p, MODULE);
+
+
+//     if p.at(T![verus]) {
+//         dbg!("hi Verus"); 
+//         p.bump(T![verus]);
+//         p.bump(T![!]);
+//         p.bump(T!['{']);
+//         // token_tree(p);
+//         m.complete(p, VERUS_KW);
+//         return Ok(());
+//     }
+// }
+
 
 // test type_alias
 // type Foo = Bar;
@@ -390,6 +436,11 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_DEF);
 }
 
+// NOTE TO MYSELF(CHANHEE) -- GOOD PLACE TO LOOK AT
+// change this to take `requires` , `ensures`, etc
+//
+// 
+// 
 // test fn
 // fn foo() {}
 fn fn_(p: &mut Parser<'_>, m: Marker) {
@@ -414,6 +465,36 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // fn foo<T>() where T: Copy {}
     generic_params::opt_where_clause(p);
 
+
+    // optional parsing of `requires` and `ensures`
+    if p.at(T![requires]) {
+        let m = p.start();
+        dbg!("hi requires"); 
+        p.bump(T![requires]);
+
+        while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
+            req_ens_clause(p);
+            dbg!("after req_ens");
+            if p.at(T![ensures]) || p.at(T!['{']) {
+                break;
+            }
+        }
+        m.complete(p, REQUIRES_KW);
+    }
+    if p.at(T![ensures]) {
+        dbg!("hi ensures"); 
+        let m = p.start();
+        p.bump(T![ensures]);
+        while !p.at(EOF) && !p.at(T!['{']) {
+            req_ens_clause(p);
+            if p.at(T!['{']) {
+                break;
+            }
+        }
+        m.complete(p, ENSURES_KW);
+    }
+
+
     if p.at(T![;]) {
         // test fn_decl
         // trait T { fn foo(); }
@@ -423,6 +504,24 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     }
     m.complete(p, FN);
 }
+
+
+fn req_ens_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    while !p.at(EOF) && !p.at(T![,]) {
+        p.bump_any();
+        // if p.at(T![,]) {
+
+        //     break;
+        // }
+    }
+    p.expect(T![,]);
+    p.eat(T![,]);
+    m.complete(p, REQ_ENS_CLAUSE);
+}
+
+
+
 
 fn macro_call(p: &mut Parser<'_>) -> BlockLike {
     assert!(paths::is_use_path_start(p));
@@ -473,3 +572,4 @@ pub(crate) fn token_tree(p: &mut Parser<'_>) {
     p.expect(closing_paren_kind);
     m.complete(p, TOKEN_TREE);
 }
+
