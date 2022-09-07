@@ -465,19 +465,51 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
         // parse expression here
         expressions::expr(p);
     } else {
-        p.error("expected function arguments");
+        // assert forall|x: int, y: int| f1(x) + f1(y) == x + y + 2 by {
+        //     reveal(f1);
+        // }
+        expressions::expr(p);
+        if p.at(T![implies]) {
+            p.bump(T![implies]);
+            expressions::expr(p);
+        }
+        // p.error("expected function arguments");
     }
     
     // parse optional `by`
     // bit_vector, nonlinear_artih ...
+    if p.at(T![by]) {
+        p.expect(T![by]);
+        if p.at(T!['(']) {
+            p.expect(T!['(']);
+            p.bump_any();
+            p.expect(T![')']);
+        }
+    }
 
+    // parse optional 'requires`
+    if p.at(T![requires]) {
+        let m = p.start();
+        dbg!("hi requires"); 
+        p.bump(T![requires]);
+
+        while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
+            req_ens_clause(p);
+            dbg!("after req clause");
+            if p.at(T![ensures]) || p.at(T!['{']) {
+                break;
+            }
+        }
+        m.complete(p, REQUIRES_KW);
+    }
 
     if p.at(T![;]) {
         // test fn_decl
         // trait T { fn foo(); }
         p.bump(T![;]);
     } else {
-        p.error("expected ;");
+        // parse optional 'proof block'
+        expressions::block_expr(p);
     }
 
     m.complete(p, ASSERT_EXPR);

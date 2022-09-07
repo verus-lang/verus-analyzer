@@ -359,7 +359,7 @@ fn api_walkthrough() {
 
 
 #[test]
-fn verus_walkthrough() {
+fn verus_walkthrough1() {
     use ast::{HasModuleItem, HasName};
 
     let source_code = 
@@ -374,24 +374,11 @@ fn verus_walkthrough() {
                 assert(x + y < 200);
             }
     }";
-    // `SourceFile` is the main entry point.
-    //
-    // The `parse` method returns a `Parse` -- a pair of syntax tree and a list
-    // of errors. That is, syntax tree is constructed even in presence of errors.
-    // dbg!(&source_code);
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
-    // uncommend this
-    // assert!(parse.errors().is_empty());
-    //
-
-    // The `tree` method returns an owned syntax node of type `SourceFile`.
-    // Owned nodes are cheap: inside, they are `Rc` handles to the underling data.
+    assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
 
-    // `SourceFile` is the root of the syntax tree. We can iterate file's items.
-    // Let's fetch the `foo` function.
-    // let mut func = None;
     // dbg!(&file);
     for item in file.items() {
         dbg!(&item);
@@ -400,8 +387,6 @@ fn verus_walkthrough() {
         //     _ => unreachable!(),
         // }
     }
-    // let func: ast::Fn = func.unwrap();
-
 }
 
 
@@ -441,31 +426,82 @@ fn verus_walkthrough2() {
             x / 2 + y / 2
         }
     }";
-    // `SourceFile` is the main entry point.
-    //
-    // The `parse` method returns a `Parse` -- a pair of syntax tree and a list
-    // of errors. That is, syntax tree is constructed even in presence of errors.
-    // dbg!(&source_code);
+
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
-    // uncommend this
-    // assert!(parse.errors().is_empty());
-    //
-
-    // The `tree` method returns an owned syntax node of type `SourceFile`.
-    // Owned nodes are cheap: inside, they are `Rc` handles to the underling data.
+    assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
 
-    // `SourceFile` is the root of the syntax tree. We can iterate file's items.
-    // Let's fetch the `foo` function.
-    // let mut func = None;
     for item in file.items() {
         dbg!(&item);
-        // match item {
-        //     ast::Item::Fn(f) => func = Some(f),
-        //     _ => unreachable!(),
-        // }
     }
-    // let func: ast::Fn = func.unwrap();
 
+}
+
+
+#[test]
+fn verus_walkthrough3() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+        proof fn test5_bound_checking(x: u32, y: u32, z: u32)
+            requires
+                x <= 0xffff,
+                y <= 0xffff,
+                z <= 0xffff,
+        {
+            assert(x * z == mul(x, z)) by(nonlinear_arith)
+                requires
+                    x <= 0xffff,
+                    z <= 0xffff,
+            {
+                assert(0 <= x * z);
+                assert(x * z <= 0xffff * 0xffff);
+            }
+            assert(0 <= y < 100 ==> my_spec_fun(x, y) >= x);
+            assert(forall|x: int, y: int| 0 <= x < 100 && 0 <= y < 100 ==> my_spec_fun(x, y) >= x);
+        }
+        fn test_quantifier() {
+            assert(forall|x: int, y: int| 0 <= x < 100 && 0 <= y < 100 ==> my_spec_fun(x, y) >= x);
+            assert(my_spec_fun(10, 20) == 30);
+            assert(exists|x: int, y: int| my_spec_fun(x, y) == 30);
+        }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
+
+#[test]
+fn verus_walkthrough4() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+        fn test_assert_forall_by() {
+            assert forall|x: int, y: int| f1(x) + f1(y) == x + y + 2 by {
+                reveal(f1);
+            }
+            assert(f1(1) + f1(2) == 5);
+            assert(f1(3) + f1(4) == 9);
+
+            // to prove forall|...| P ==> Q, write assert forall|...| P implies Q by {...}
+            assert forall|x: int| x < 10 implies f1(x) < 11 by {
+                assert(x < 10);
+                reveal(f1);
+                assert(f1(x) < 11);
+            }
+            assert(f1(3) < 11);
+        }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    let file: SourceFile = parse.tree();
+    for item in file.items() {
+        dbg!(&item);
+    }
 }

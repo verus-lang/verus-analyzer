@@ -34,6 +34,7 @@ pub enum BinaryOp {
 pub enum LogicOp {
     And,
     Or,
+    Imply,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -67,6 +68,7 @@ impl fmt::Display for LogicOp {
         let res = match self {
             LogicOp::And => "&&",
             LogicOp::Or => "||",
+            LogicOp::Imply => "==>",
         };
         f.write_str(res)
     }
