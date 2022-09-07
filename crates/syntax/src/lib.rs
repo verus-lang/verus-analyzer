@@ -379,7 +379,7 @@ fn verus_walkthrough1() {
     assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
 
-    // dbg!(&file);
+    dbg!(&file);
     for item in file.items() {
         dbg!(&item);
         // match item {
@@ -431,7 +431,7 @@ fn verus_walkthrough2() {
     dbg!(&parse.errors);
     assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
-
+    dbg!(&file);
     for item in file.items() {
         dbg!(&item);
     }
@@ -513,7 +513,61 @@ fn verus_walkthrough4() {
     }";
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
+
+#[test]
+fn verus_walkthrough5() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+        fn test_single_trigger1() {
+            assume(forall|x: int, y: int| f1(x) < 100 && f1(y) < 100 ==> #[trigger] my_spec_fun(x, y) >= x);
+        }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
+
+// TODO
+// maybe I will get back to "full" parsing of Verus syntax
+#[test]
+fn verus_walkthrough6() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+        fn test_single_trigger2() {
+            // Use [f1(x), f1(y)] as the trigger
+            assume(forall|x: int, y: int| #[trigger] f1(x) < 100 && #[trigger] f1(y) < 100 ==> my_spec_fun(x, y) >= x);
+        }
+        /// To manually specify multiple triggers, use #![trigger]:
+        fn test_multiple_triggers() {
+            // Use both [my_spec_fun(x, y)] and [f1(x), f1(y)] as triggers
+            assume(forall|x: int, y: int|
+                #![trigger my_spec_fun(x, y)]
+                #![trigger f1(x), f1(y)]
+                f1(x) < 100 && f1(y) < 100 ==> my_spec_fun(x, y) >= x
+            );
+        }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
     for item in file.items() {
         dbg!(&item);
     }

@@ -70,6 +70,12 @@ pub(super) fn atom_expr(
     if paths::is_path_start(p) {
         return Some(path_expr(p, r));
     }
+
+    //verus #![triggers]
+    //verus #[triggers]
+    // attributes::inner_attrs(p);
+    // attributes::outer_attrs(p);
+ 
     let la = p.nth(1);
     let done = match p.current() {
         T!['('] => tuple_expr(p),
