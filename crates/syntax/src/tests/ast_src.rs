@@ -63,6 +63,14 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         (">>", "SHR"),
         ("<<=", "SHLEQ"),
         (">>=", "SHREQ"),
+        //verus
+        ("&&&"  , "BIGAND"),
+        ("|||"  , "BIGOR"),
+        ("<==>" , "EQUIV"),
+        ("==>"  , "IMPLY"),
+        ("<=="  , "EXPLY"),
+        ("==="  , "EQEQEQ"),
+        ("!=="  , "NEEQ"),
     ],
     keywords: &[
         "as", "async", "await", "box", "break", "const", "continue", "crate", "dyn", "else",
@@ -74,6 +82,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "recommends", "decreases",
          "exec", "open", "closed", "ghost", "tracked", 
         "invariant", "assert" , "assume"  , "implies" , "by"  ,"forall" , "exists"  , "choose",
+        // "bit_vector", "nonlinear_arith",
     ],
     contextual_keywords: &["auto", "default", "existential", "union", "raw", "macro_rules"],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING"],
@@ -220,6 +229,8 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "MACRO_STMTS",
         // verus,
         "REQ_ENS_CLAUSE",
+        "RECOMMENDS_CLAUSE",
+        "ASSERT_EXPR",
     ],
 };
 

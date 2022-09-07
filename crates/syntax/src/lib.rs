@@ -392,6 +392,7 @@ fn verus_walkthrough() {
     // `SourceFile` is the root of the syntax tree. We can iterate file's items.
     // Let's fetch the `foo` function.
     // let mut func = None;
+    // dbg!(&file);
     for item in file.items() {
         dbg!(&item);
         // match item {
@@ -426,6 +427,18 @@ fn verus_walkthrough2() {
                 y < 100,
         {
             x + y
+        }
+        pub(crate) open spec fn my_pub_spec_fun3(x: int, y: int) -> int {
+            // function and body visible to crate
+            x / 2 + y / 2
+        }
+        pub closed spec fn my_pub_spec_fun4(x: int, y: int) -> int {
+            // function visible to all, body visible to module
+            x / 2 + y / 2
+        }
+        pub(crate) closed spec fn my_pub_spec_fun5(x: int, y: int) -> int {
+            // function visible to crate, body visible to module
+            x / 2 + y / 2
         }
     }";
     // `SourceFile` is the main entry point.

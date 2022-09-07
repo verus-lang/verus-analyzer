@@ -101,6 +101,12 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
     let mut has_mods = false;
     let mut has_extern = false;
+
+    if p.at(T![assert]) {
+        assert(p,m);
+        return Ok(());
+    }
+
     if p.at(T![verus]) {
         dbg!("hi Verus"); 
         p.bump(T![verus]);
@@ -109,11 +115,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         // p.bump(T!['{']);
         // token_tree(p);
         item_list(p);
+        
         // m.abandon(p);
         return Ok(());
     }
-
-
     if p.at(T![proof]) {
         dbg!("hi proof"); 
         p.bump(T![proof]);
@@ -126,6 +131,20 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         m.complete(p, SPEC_KW);
         return Ok(());
     }
+    if p.at(T![open]) {
+        dbg!("hi open"); 
+        p.bump(T![open]);
+        m.complete(p, OPEN_KW);
+        return Ok(());
+    }
+    if p.at(T![closed]) {
+        dbg!("hi closed"); 
+        p.bump(T![closed]);
+        m.complete(p, CLOSED_KW);
+        return Ok(());
+    }
+
+
 
     // modifiers
     if p.at(T![const]) && p.nth(1) != T!['{'] {
@@ -436,6 +455,35 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_DEF);
 }
 
+// assert is just a function
+// but it needs dedicated syntax support
+// 
+fn assert(p: &mut Parser<'_>, m: Marker) {
+    p.expect(T![assert]);
+    
+    if p.at(T!['(']) {
+        // parse expression here
+        expressions::expr(p);
+    } else {
+        p.error("expected function arguments");
+    }
+    
+    // parse optional `by`
+    // bit_vector, nonlinear_artih ...
+
+
+    if p.at(T![;]) {
+        // test fn_decl
+        // trait T { fn foo(); }
+        p.bump(T![;]);
+    } else {
+        p.error("expected ;");
+    }
+
+    m.complete(p, ASSERT_EXPR);
+}
+
+
 // NOTE TO MYSELF(CHANHEE) -- GOOD PLACE TO LOOK AT
 // change this to take `requires` , `ensures`, etc
 //
@@ -460,18 +508,18 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // fn foo() {}
     // fn bar() -> () {}
     
-    opt_ret_type(p);
+    // opt_ret_type(p);
     // verus specific return naming
-    // if p.at(T![->]) {
-    //     let m = p.start();
-    //     p.bump(T![->]);
-    //     if p.at(T!['(']) {
-    //         params::param_list_fn_def(p);
-    //     } else {
-    //         types::type_no_bounds(p);
-    //     }
-    //     m.complete(p, RET_TYPE);
-    // } 
+    if p.at(T![->]) {
+        let m = p.start();
+        p.bump(T![->]);
+        if p.at(T!['(']) {
+            params::param_list_fn_def(p);
+        } else {
+            types::type_no_bounds(p);
+        }
+        m.complete(p, RET_TYPE);
+    } 
 
 
     // test function_where_clause
@@ -487,7 +535,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 
         while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
             req_ens_clause(p);
-            dbg!("after ens clause");
+            dbg!("after req clause");
             if p.at(T![ensures]) || p.at(T!['{']) {
                 break;
             }
@@ -506,6 +554,19 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
             }
         }
         m.complete(p, ENSURES_KW);
+    }
+    if p.at(T![recommends]) {
+        dbg!("hi recommends"); 
+        let m = p.start();
+        p.bump(T![recommends]);
+        while !p.at(EOF) && !p.at(T!['{']) {
+            recommends_clause(p);
+            dbg!("after recommend clause");
+            if p.at(T!['{']) {
+                break;
+            }
+        }
+        m.complete(p, RECOMMENDS_KW);
     }
 
 
@@ -532,6 +593,20 @@ fn req_ens_clause(p: &mut Parser<'_>) {
     p.expect(T![,]);
     p.eat(T![,]);
     m.complete(p, REQ_ENS_CLAUSE);
+}
+
+fn recommends_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    while !p.at(EOF) && !p.at(T![,]) {
+        p.bump_any();
+        // if p.at(T![,]) {
+
+        //     break;
+        // }
+    }
+    p.expect(T![,]);
+    p.eat(T![,]);
+    m.complete(p, RECOMMENDS_CLAUSE);
 }
 
 
