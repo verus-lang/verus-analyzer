@@ -143,6 +143,16 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         m.complete(p, CLOSED_KW);
         return Ok(());
     }
+    if p.at(T![assume]) {
+        p.bump(T![assume]);
+        if p.at(T!['(']) {
+            expressions::expr(p);
+        } else {
+            p.error("expected function arguments");
+        }
+        m.complete(p, ASSUME_KW);
+        return Ok(());
+    }
 
 
 

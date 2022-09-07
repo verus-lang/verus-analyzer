@@ -150,7 +150,7 @@ pub(super) fn atom_expr(
             m.complete(p, BLOCK_EXPR)
         }
 
-        T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] => closure_expr(p),
+        T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] | T![choose] => closure_expr(p),
         T![for] if la == T![<] => closure_expr(p),
         T![for] => for_expr(p, None),
 
@@ -254,7 +254,7 @@ fn array_expr(p: &mut Parser<'_>) -> CompletedMarker {
 // }
 fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(match p.current() {
-        T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] => true,
+        T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] | T![choose] => true,
         T![for] => p.nth(1) == T![<],
         _ => false,
     });
@@ -270,6 +270,7 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(T![move]);
     p.eat(T![forall]);
     p.eat(T![exists]);
+    p.eat(T![choose]);
 
     if !p.at(T![|]) {
         p.error("expected `|`");
