@@ -530,6 +530,10 @@ fn verus_walkthrough5() {
         fn test_single_trigger1() {
             assume(forall|x: int, y: int| f1(x) < 100 && f1(y) < 100 ==> #[trigger] my_spec_fun(x, y) >= x);
         }
+        
+        fn foo(x:int) -> int {
+            if x>0 {1} else {-1}
+        }
     }";
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);

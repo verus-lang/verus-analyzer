@@ -91,7 +91,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // test_err pub_expr
     // fn foo() { pub 92; }
 
-    dbg!("opt-item");
+    // dbg!("opt-item");
     let has_visibility = opt_visibility(p, false);
 
     let m = match opt_item_without_modifiers(p, m) {
@@ -595,7 +595,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         let m = p.start();
         p.bump(T![->]);
         if p.at(T!['(']) {
-            params::param_list_fn_def(p);
+            params::param_list_fn_def(p); // verus named param
         } else {
             types::type_no_bounds(p);
         }
