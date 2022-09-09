@@ -468,13 +468,13 @@ impl Use {
 pub struct Verus {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasAttrs for Verus {}
+impl ast::HasVisibility for Verus {}
 impl Verus {
     pub fn verus_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![verus]) }
     pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
-    pub fn l_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['{']) }
     pub fn item_list(&self) -> Option<ItemList> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-    pub fn r_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['}']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1588,6 +1588,7 @@ pub enum Item {
     Use(Use),
     Verus(Verus),
 }
+impl ast::HasAttrs for Item {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Stmt {
@@ -3979,6 +3980,7 @@ impl AstNode for AnyHasAttrs {
                 | TYPE_ALIAS
                 | UNION
                 | USE
+                | VERUS
                 | ITEM_LIST
                 | BLOCK_EXPR
                 | SELF_PARAM
@@ -4191,6 +4193,7 @@ impl AstNode for AnyHasVisibility {
                 | TYPE_ALIAS
                 | UNION
                 | USE
+                | VERUS
                 | RECORD_FIELD
                 | TUPLE_FIELD
                 | VARIANT

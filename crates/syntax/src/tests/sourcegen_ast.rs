@@ -794,6 +794,7 @@ fn extract_struct_traits(ast: &mut AstSrc) {
         "MacroRules",
         "MacroDef",
         "Use",
+        "Veurs",
     ];
 
     for node in &mut ast.nodes {

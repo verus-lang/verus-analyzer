@@ -118,9 +118,9 @@ Module =
   (ItemList | ';')
 
 Verus =
-  'verus' '!' '{' 
+  Attr* Visibility?
+  'verus' '!'  
   (ItemList | ';')
-  '}'
 
 ItemList =
   '{' Attr* Item* '}'
