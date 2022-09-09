@@ -111,11 +111,11 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         dbg!("hi Verus"); 
         p.bump(T![verus]);
         p.bump(T![!]);
-        m.complete(p, VERUS_KW);
+        item_list(p);
+        m.complete(p, VERUS);
         // p.bump(T!['{']);
         // token_tree(p);
-        item_list(p);
-        
+         
         // m.abandon(p);
         return Ok(());
     }

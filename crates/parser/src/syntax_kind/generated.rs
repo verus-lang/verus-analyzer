@@ -156,6 +156,7 @@ pub enum SyntaxKind {
     RET_TYPE,
     EXTERN_CRATE,
     MODULE,
+    VERUS,
     USE,
     STATIC,
     CONST,

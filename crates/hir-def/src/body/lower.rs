@@ -551,6 +551,7 @@ impl ExprCollector<'_> {
                 }
             }
             ast::Expr::UnderscoreExpr(_) => self.alloc_expr(Expr::Underscore, syntax_ptr),
+            ast::Expr::AssertExpr(_) => todo!(),
         })
     }
 

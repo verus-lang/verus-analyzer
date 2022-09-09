@@ -379,7 +379,7 @@ fn verus_walkthrough1() {
     assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
 
-    dbg!(&file);
+    // dbg!(&file);
     for item in file.items() {
         dbg!(&item);
         // match item {

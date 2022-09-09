@@ -96,6 +96,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "RET_TYPE",
         "EXTERN_CRATE",
         "MODULE",
+        "VERUS",
         "USE",
         "STATIC",
         "CONST",
