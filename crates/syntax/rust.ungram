@@ -358,6 +358,7 @@ Expr =
 | YieldExpr
 | LetExpr
 | UnderscoreExpr
+| AssertExpr
 
 MacroExpr =
   MacroCall
@@ -401,6 +402,7 @@ BinExpr =
   | '==' | '!=' | '<=' | '>=' | '<' | '>'
   | '+' | '*' | '-' | '/' | '%' | '<<' | '>>' | '^' | '|' | '&'
   | '=' | '+=' | '/=' | '*=' | '%=' | '>>=' | '<<=' | '-=' | '|=' | '&=' | '^='
+  | '==>'
   )
   rhs:Expr
 
@@ -511,6 +513,10 @@ AwaitExpr =
 
 BoxExpr =
   Attr* 'box' Expr
+
+AssertExpr =
+  'assert' '(' Expr ')'
+
 
 //*************************//
 //          Types          //

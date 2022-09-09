@@ -504,7 +504,7 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
         p.bump(T![requires]);
 
         while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
-            req_ens_clause(p);
+            req_clause(p);
             dbg!("after req clause");
             if p.at(T![ensures]) || p.at(T!['{']) {
                 break;
@@ -522,7 +522,7 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
         expressions::block_expr(p);
     }
 
-    m.complete(p, ASSERT_EXPR);
+    m.complete(p, ASSERT_BLOCK);
 }
 
 
@@ -576,26 +576,26 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         p.bump(T![requires]);
 
         while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
-            req_ens_clause(p);
+            req_clause(p);
             dbg!("after req clause");
             if p.at(T![ensures]) || p.at(T!['{']) {
                 break;
             }
         }
-        m.complete(p, REQUIRES_KW);
+        m.complete(p, REQUIRES_CLAUSE);
     }
     if p.at(T![ensures]) {
         dbg!("hi ensures"); 
         let m = p.start();
         p.bump(T![ensures]);
         while !p.at(EOF) && !p.at(T!['{']) {
-            req_ens_clause(p);
+            ens_clause(p);
             dbg!("after ens clause");
             if p.at(T!['{']) {
                 break;
             }
         }
-        m.complete(p, ENSURES_KW);
+        m.complete(p, ENSURES_CLAUSE);
     }
     if p.at(T![recommends]) {
         dbg!("hi recommends"); 
@@ -608,7 +608,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
                 break;
             }
         }
-        m.complete(p, RECOMMENDS_KW);
+        m.complete(p, RECOMMENDS_CLAUSE);
     }
 
 
@@ -623,7 +623,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 }
 
 
-fn req_ens_clause(p: &mut Parser<'_>) {
+fn req_clause(p: &mut Parser<'_>) {
     let m = p.start();
     while !p.at(EOF) && !p.at(T![,]) {
         p.bump_any();
@@ -634,7 +634,21 @@ fn req_ens_clause(p: &mut Parser<'_>) {
     }
     p.expect(T![,]);
     p.eat(T![,]);
-    m.complete(p, REQ_ENS_CLAUSE);
+    m.complete(p, REQUIRES_CLAUSE);
+}
+
+fn ens_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    while !p.at(EOF) && !p.at(T![,]) {
+        p.bump_any();
+        // if p.at(T![,]) {
+
+        //     break;
+        // }
+    }
+    p.expect(T![,]);
+    p.eat(T![,]);
+    m.complete(p, ENSURES_CLAUSE);
 }
 
 fn recommends_clause(p: &mut Parser<'_>) {

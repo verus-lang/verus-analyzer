@@ -228,9 +228,12 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "MACRO_ITEMS",
         "MACRO_STMTS",
         // verus,
-        "REQ_ENS_CLAUSE",
+        "REQUIRES_CLAUSE",
+        "ENSURES_CLAUSE",
         "RECOMMENDS_CLAUSE",
+        "ASSERT_BLOCK",
         "ASSERT_EXPR",
+        "ASSUME_BLOCK",
     ],
 };
 

@@ -283,9 +283,12 @@ pub enum SyntaxKind {
     TYPE_BOUND_LIST,
     MACRO_ITEMS,
     MACRO_STMTS,
-    REQ_ENS_CLAUSE,
+    REQUIRES_CLAUSE,
+    ENSURES_CLAUSE,
     RECOMMENDS_CLAUSE,
+    ASSERT_BLOCK,
     ASSERT_EXPR,
+    ASSUME_BLOCK,
     #[doc(hidden)]
     __LAST,
 }
