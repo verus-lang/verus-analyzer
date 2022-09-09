@@ -111,8 +111,16 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         dbg!("hi Verus"); 
         p.bump(T![verus]);
         p.bump(T![!]);
-        item_list(p);
-        m.complete(p, VERUS);
+        // item_list(p);
+        p.expect(T!['{']);
+        m.abandon(p);
+        while !p.at(EOF) && !(p.at(T!['}'])) {
+            item_or_macro(p, true);
+        }
+        let m = p.start();
+        p.expect(T!['}']);
+        m.abandon(p);
+        // m.complete(p, VERUS);
         // p.bump(T!['{']);
         // token_tree(p);
          

@@ -465,19 +465,6 @@ impl Use {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Verus {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasAttrs for Verus {}
-impl ast::HasVisibility for Verus {}
-impl Verus {
-    pub fn verus_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![verus]) }
-    pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
-    pub fn item_list(&self) -> Option<ItemList> { support::child(&self.syntax) }
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Visibility {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1586,9 +1573,9 @@ pub enum Item {
     TypeAlias(TypeAlias),
     Union(Union),
     Use(Use),
-    Verus(Verus),
 }
 impl ast::HasAttrs for Item {}
+impl ast::HasDocComments for Item {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Stmt {
@@ -2103,17 +2090,6 @@ impl AstNode for Union {
 }
 impl AstNode for Use {
     fn can_cast(kind: SyntaxKind) -> bool { kind == USE }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Verus {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == VERUS }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3600,9 +3576,6 @@ impl From<Union> for Item {
 impl From<Use> for Item {
     fn from(node: Use) -> Item { Item::Use(node) }
 }
-impl From<Verus> for Item {
-    fn from(node: Verus) -> Item { Item::Verus(node) }
-}
 impl AstNode for Item {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
@@ -3623,7 +3596,6 @@ impl AstNode for Item {
                 | TYPE_ALIAS
                 | UNION
                 | USE
-                | VERUS
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3644,7 +3616,6 @@ impl AstNode for Item {
             TYPE_ALIAS => Item::TypeAlias(TypeAlias { syntax }),
             UNION => Item::Union(Union { syntax }),
             USE => Item::Use(Use { syntax }),
-            VERUS => Item::Verus(Verus { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3667,7 +3638,6 @@ impl AstNode for Item {
             Item::TypeAlias(it) => &it.syntax,
             Item::Union(it) => &it.syntax,
             Item::Use(it) => &it.syntax,
-            Item::Verus(it) => &it.syntax,
         }
     }
 }
@@ -3980,7 +3950,6 @@ impl AstNode for AnyHasAttrs {
                 | TYPE_ALIAS
                 | UNION
                 | USE
-                | VERUS
                 | ITEM_LIST
                 | BLOCK_EXPR
                 | SELF_PARAM
@@ -4193,7 +4162,6 @@ impl AstNode for AnyHasVisibility {
                 | TYPE_ALIAS
                 | UNION
                 | USE
-                | VERUS
                 | RECORD_FIELD
                 | TUPLE_FIELD
                 | VARIANT
@@ -4435,11 +4403,6 @@ impl std::fmt::Display for Union {
     }
 }
 impl std::fmt::Display for Use {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Verus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

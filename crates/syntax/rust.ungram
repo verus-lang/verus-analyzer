@@ -100,7 +100,6 @@ Item =
 | TypeAlias
 | Union
 | Use
-| Verus
 
 MacroRules =
   Attr* Visibility?
@@ -115,11 +114,6 @@ MacroDef =
 Module =
   Attr* Visibility?
   'mod' Name
-  (ItemList | ';')
-
-Verus =
-  Attr* Visibility?
-  'verus' '!'  
   (ItemList | ';')
 
 ItemList =
