@@ -101,6 +101,7 @@ pub(super) fn atom_expr(
         T![yield] => yield_expr(p),
         T![continue] => continue_expr(p),
         T![break] => break_expr(p, r),
+        // T![requires] => requires(p),
 
         LIFETIME_IDENT if la == T![:] => {
             let m = p.start();

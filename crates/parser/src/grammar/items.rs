@@ -130,25 +130,29 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     if p.at(T![proof]) {
         dbg!("hi proof"); 
         p.bump(T![proof]);
-        m.complete(p, PROOF_KW);
+        // m.complete(p, PROOF_KW);
+        m.abandon(p);
         return Ok(());
     }
     if p.at(T![spec]) {
         dbg!("hi spec"); 
         p.bump(T![spec]);
-        m.complete(p, SPEC_KW);
+        // m.complete(p, SPEC_KW);
+        m.abandon(p);
         return Ok(());
     }
     if p.at(T![open]) {
         dbg!("hi open"); 
         p.bump(T![open]);
-        m.complete(p, OPEN_KW);
+        // m.complete(p, OPEN_KW);
+        m.abandon(p);
         return Ok(());
     }
     if p.at(T![closed]) {
         dbg!("hi closed"); 
         p.bump(T![closed]);
-        m.complete(p, CLOSED_KW);
+        // m.complete(p, CLOSED_KW);
+        m.abandon(p);
         return Ok(());
     }
     if p.at(T![assume]) {
@@ -449,6 +453,44 @@ fn macro_rules(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_RULES);
 }
 
+fn requires(p: &mut Parser<'_>) -> CompletedMarker {
+    
+    let m = p.start();
+    p.expect(T![requires]);
+
+    while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
+        cond_comma(p);
+        if p.at(T![ensures]) || p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, REQUIRES_CLAUSE)
+}
+
+fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
+    
+    let m = p.start();
+    p.expect(T![ensures]);
+
+    while !p.at(EOF) && !p.at(T!['{']) {
+        cond_comma(p);
+        if p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, ENSURES_CLAUSE)
+}
+
+
+fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    while !p.at(EOF) && !p.at(T![,]) {
+        expressions::expr(p);
+    }
+    p.expect(T![,]);
+    m.complete(p, COND_AND_COMMA)
+}
+
 // test macro_def
 // macro m($i:ident) {}
 fn macro_def(p: &mut Parser<'_>, m: Marker) {
@@ -507,18 +549,7 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
 
     // parse optional 'requires`
     if p.at(T![requires]) {
-        let m = p.start();
-        dbg!("hi requires"); 
-        p.bump(T![requires]);
-
-        while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
-            req_clause(p);
-            dbg!("after req clause");
-            if p.at(T![ensures]) || p.at(T!['{']) {
-                break;
-            }
-        }
-        m.complete(p, REQUIRES_KW);
+        requires(p);
     }
 
     if p.at(T![;]) {
@@ -579,31 +610,21 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 
     // optional parsing of `requires` and `ensures`
     if p.at(T![requires]) {
-        let m = p.start();
-        dbg!("hi requires"); 
-        p.bump(T![requires]);
-
-        while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
-            req_clause(p);
-            dbg!("after req clause");
-            if p.at(T![ensures]) || p.at(T!['{']) {
-                break;
-            }
-        }
-        m.complete(p, REQUIRES_CLAUSE);
+        requires(p);
     }
     if p.at(T![ensures]) {
-        dbg!("hi ensures"); 
-        let m = p.start();
-        p.bump(T![ensures]);
-        while !p.at(EOF) && !p.at(T!['{']) {
-            ens_clause(p);
-            dbg!("after ens clause");
-            if p.at(T!['{']) {
-                break;
-            }
-        }
-        m.complete(p, ENSURES_CLAUSE);
+        ensures(p);
+        // dbg!("hi ensures"); 
+        // let m = p.start();
+        // p.bump(T![ensures]);
+        // while !p.at(EOF) && !p.at(T!['{']) {
+        //     ens_clause(p);
+        //     dbg!("after ens clause");
+        //     if p.at(T!['{']) {
+        //         break;
+        //     }
+        // }
+        // m.complete(p, ENSURES_CLAUSE);
     }
     if p.at(T![recommends]) {
         dbg!("hi recommends"); 
@@ -631,33 +652,34 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 }
 
 
-fn req_clause(p: &mut Parser<'_>) {
-    let m = p.start();
-    while !p.at(EOF) && !p.at(T![,]) {
-        p.bump_any();
-        // if p.at(T![,]) {
+// fn req_clause(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     while !p.at(EOF) && !p.at(T![,]) {
+//         p.bump_any();
+//         expr_no_struct(p);
+//         // if p.at(T![,]) {
 
-        //     break;
-        // }
-    }
-    p.expect(T![,]);
-    p.eat(T![,]);
-    m.complete(p, REQUIRES_CLAUSE);
-}
+//         //     break;
+//         // }
+//     }
+//     p.expect(T![,]);
+//     p.eat(T![,]);
+//     m.complete(p, REQUIRES_CLAUSE);
+// }
 
-fn ens_clause(p: &mut Parser<'_>) {
-    let m = p.start();
-    while !p.at(EOF) && !p.at(T![,]) {
-        p.bump_any();
-        // if p.at(T![,]) {
+// fn ens_clause(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     while !p.at(EOF) && !p.at(T![,]) {
+//         p.bump_any();
+//         // if p.at(T![,]) {
 
-        //     break;
-        // }
-    }
-    p.expect(T![,]);
-    p.eat(T![,]);
-    m.complete(p, ENSURES_CLAUSE);
-}
+//         //     break;
+//         // }
+//     }
+//     p.expect(T![,]);
+//     p.eat(T![,]);
+//     m.complete(p, ENSURES_CLAUSE);
+// }
 
 fn recommends_clause(p: &mut Parser<'_>) {
     let m = p.start();

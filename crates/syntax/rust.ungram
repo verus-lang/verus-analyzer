@@ -140,7 +140,7 @@ UseTreeList =
 Fn =
  Attr* Visibility?
  'default'? 'const'? 'async'? 'unsafe'? Abi?
- 'fn' Name GenericParamList? ParamList RetType? WhereClause?
+ 'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
  (body:BlockExpr | ';')
 
 Abi =
@@ -293,6 +293,15 @@ WhereClause =
 
 WherePred =
   ('for' GenericParamList)?  (Lifetime | Type) ':' TypeBoundList?
+
+CondAndComma =
+  condition:Expr ','
+
+RequiresClause =
+  'requires' CondAndComma*
+
+EnsuresClause =
+  'ensures' CondAndComma*
 
 Visibility =
   'pub' ('(' 'in'? Path ')')?
