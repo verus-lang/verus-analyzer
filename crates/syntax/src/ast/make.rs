@@ -423,6 +423,15 @@ pub fn expr_if(
     };
     expr_from_text(&format!("if {condition} {then_branch} {else_branch}"))
 }
+
+pub fn expr_assert_by(
+    condition: ast::Expr,
+) -> ast::Expr {
+    dbg!(&format!("assert({condition}) by {{ assert({condition}); }}"));
+    ast_from_text(&format!("assert({condition}) by {{ assert({condition}); }}"))
+}
+
+
 pub fn expr_for_loop(pat: ast::Pat, expr: ast::Expr, block: ast::BlockExpr) -> ast::Expr {
     expr_from_text(&format!("for {pat} in {expr} {block}"))
 }

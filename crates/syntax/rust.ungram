@@ -524,7 +524,7 @@ BoxExpr =
   Attr* 'box' Expr
 
 AssertExpr =
-  'assert' '(' Expr ')'
+  'assert' '(' Expr ')' ('by' BlockExpr)?
 
 
 //*************************//

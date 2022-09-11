@@ -523,7 +523,9 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
     
     if p.at(T!['(']) {
         // parse expression here
+        p.expect(T!['(']);
         expressions::expr(p);
+        p.expect(T![')']);
     } else {
         // assert forall|x: int, y: int| f1(x) + f1(y) == x + y + 2 by {
         //     reveal(f1);
@@ -539,6 +541,7 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
     // parse optional `by`
     // bit_vector, nonlinear_artih ...
     if p.at(T![by]) {
+        dbg!("consume by");
         p.expect(T![by]);
         if p.at(T!['(']) {
             p.expect(T!['(']);
@@ -548,20 +551,22 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
     }
 
     // parse optional 'requires`
-    if p.at(T![requires]) {
-        requires(p);
-    }
+    // if p.at(T![requires]) {
+    //     requires(p);
+    // }
 
     if p.at(T![;]) {
         // test fn_decl
         // trait T { fn foo(); }
-        p.bump(T![;]);
+        dbg!("getting ;, but ignoring");
+        // p.bump(T![;]);
     } else {
+        dbg!("proof block ;");
         // parse optional 'proof block'
         expressions::block_expr(p);
     }
 
-    m.complete(p, ASSERT_BLOCK);
+    m.complete(p, ASSERT_EXPR);
 }
 
 
