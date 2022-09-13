@@ -11,6 +11,7 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     let body = func.body()?;
     let stmt_list = body.stmt_list()?;
     let tail_expr = stmt_list.tail_expr()?;
+    let r_curly = stmt_list.r_curly_token()?;
     let ensures = func.ensures_clause()?; // .cond_and_commas();
     let ensures_keyword = ensures.ensures_token()?;
     let mut ensures_clauses = ensures.cond_and_commas();
@@ -36,7 +37,8 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
         "Add assert for ensures",
         tail_expr.syntax().text_range(),
         |builder| {
-            builder.replace(tail_expr.syntax().text_range(), &format!("{}\n{}", tail_expr, intro_enss));
+            builder.insert(r_curly.text_range().start(), &format!("{}\n", intro_enss));
+            // builder.replace(tail_expr.syntax().text_range(), &format!("{}\n{}", tail_expr, intro_enss));
         },
     )
 }
@@ -73,8 +75,10 @@ proof fn my_proof_fun(x: int, y: int)
         y < 100,
     ensures
         x + y < 200,
+        x + y < 400,
 {
     assert(x + y < 600);
+
     assert(x + y < 200);
     assert(x + y < 400);
 }
