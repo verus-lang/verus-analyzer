@@ -38,6 +38,8 @@ pub(crate) fn assert_by(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()
     
     let assert_range = assert_keyword.text_range();
     let cursor_in_range = assert_range.contains_range(ctx.selection_trimmed());
+    // TODO: make sure that 'by' does not exist.
+    // apply this `assert_by` only for "assert(P);"
     if !cursor_in_range {
         return None;
     }

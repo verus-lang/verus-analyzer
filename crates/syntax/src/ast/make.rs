@@ -427,7 +427,7 @@ pub fn expr_if(
 pub fn expr_assert_by(
     condition: ast::Expr,
 ) -> ast::Expr {
-    dbg!(&format!("assert({condition}) by {{ assert({condition}); }}"));
+    // dbg!(&format!("assert({condition}) by {{\n assert({condition}); \n}}"));
     ast_from_text(&format!("assert({condition}) by {{ assert({condition}); }}"))
 }
 
