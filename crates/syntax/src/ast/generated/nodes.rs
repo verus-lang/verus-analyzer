@@ -94,7 +94,12 @@ pub struct RetType {
 }
 impl RetType {
     pub fn thin_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![->]) }
+    pub fn tracked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tracked]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -295,11 +300,13 @@ impl ast::HasVisibility for Fn {}
 impl ast::HasGenericParams for Fn {}
 impl ast::HasDocComments for Fn {}
 impl Fn {
+    pub fn publish(&self) -> Option<Publish> { support::child(&self.syntax) }
     pub fn default_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![default]) }
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn unsafe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![unsafe]) }
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
+    pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
@@ -522,11 +529,29 @@ impl UseTreeList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Publish {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Publish {
+    pub fn closed_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![closed]) }
+    pub fn open_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![open]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Abi {
     pub(crate) syntax: SyntaxNode,
 }
 impl Abi {
     pub fn extern_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![extern]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FnMode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FnMode {
+    pub fn spec_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![spec]) }
+    pub fn proof_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![proof]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2186,8 +2211,30 @@ impl AstNode for UseTreeList {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Publish {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PUBLISH }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for Abi {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ABI }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for FnMode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == FN_MODE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4497,7 +4544,17 @@ impl std::fmt::Display for UseTreeList {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Publish {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for Abi {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for FnMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

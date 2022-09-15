@@ -291,6 +291,8 @@ pub enum SyntaxKind {
     ASSERT_EXPR,
     ASSUME_BLOCK,
     COND_AND_COMMA,
+    PUBLISH,
+    FN_MODE,
     #[doc(hidden)]
     __LAST,
 }

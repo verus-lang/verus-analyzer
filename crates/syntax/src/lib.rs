@@ -553,6 +553,33 @@ fn verus_walkthrough6() {
     use ast::{HasModuleItem, HasName};
     let source_code = 
     "verus!{
+        proof fn my_proof_fun(x: int, y: int) -> (sum: int)
+            requires
+                x < 100,
+                y < 100,
+            ensures
+                sum < 200,
+        {
+            x + y
+        }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
+// TODO
+// maybe I will get back to "full" parsing of Verus syntax
+#[test]
+fn verus_walkthrough7() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
         fn test_single_trigger2() {
             // Use [f1(x), f1(y)] as the trigger
             assume(forall|x: int, y: int| #[trigger] f1(x) < 100 && #[trigger] f1(y) < 100 ==> my_spec_fun(x, y) >= x);

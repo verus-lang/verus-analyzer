@@ -137,14 +137,21 @@ UseTree =
 UseTreeList =
   '{' (UseTree (',' UseTree)* ','?)? '}'
 
+// see verus/dependencies/syn/src/items.rs, impl parse for Signature
 Fn =
- Attr* Visibility?
- 'default'? 'const'? 'async'? 'unsafe'? Abi?
+ Attr* Visibility? Publish?
+ 'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
  'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
  (body:BlockExpr | ';')
 
 Abi =
   'extern' 'string'?
+
+Publish = 
+  ('closed' | 'open' )
+
+FnMode = 
+  ('spec' | 'proof' )  
 
 ParamList =
   '('(
@@ -167,7 +174,7 @@ Param =
   )
 
 RetType =
-  '->' Type
+  '->' 'tracked'? ( ('(' Pat ':' Type ')') | Type)
 
 TypeAlias =
   Attr* Visibility?

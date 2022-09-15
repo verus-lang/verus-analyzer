@@ -599,8 +599,16 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     if p.at(T![->]) {
         let m = p.start();
         p.bump(T![->]);
+        if p.at(T![tracked]) {
+            p.expect(T![tracked]);
+        }
         if p.at(T!['(']) {
-            params::param_list_fn_def(p); // verus named param
+            // verus named param    
+            p.expect(T!['(']);
+            patterns::pattern(p); 
+            p.expect(T![:]);   
+            types::type_no_bounds(p);
+            p.expect(T![')']);
         } else {
             types::type_no_bounds(p);
         }

@@ -1,4 +1,3 @@
-use hir::HirDisplay;
 use syntax::{ast, match_ast, AstNode, SyntaxKind, SyntaxToken, TextRange, TextSize};
 
 use crate::{AssistContext, AssistId, AssistKind, Assists};
@@ -12,10 +11,9 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     let stmt_list = body.stmt_list()?;
     let tail_expr = stmt_list.tail_expr()?;
     let r_curly = stmt_list.r_curly_token()?;
-    let ensures = func.ensures_clause()?; // .cond_and_commas();
+    let ensures = func.ensures_clause()?; 
     let ensures_keyword = ensures.ensures_token()?;
     let mut ensures_clauses = ensures.cond_and_commas();
-
 
     let ensures_range = ensures_keyword.text_range();
     let cursor_in_range = ensures_range.contains_range(ctx.selection_trimmed());
@@ -34,7 +32,7 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
 
     acc.add(
         AssistId("intro_ensures", AssistKind::RefactorRewrite),
-        "Add assert for ensures",
+        "Intro ensures",
         tail_expr.syntax().text_range(),
         |builder| {
             builder.insert(r_curly.text_range().start(), &format!("{}\n", intro_enss));
