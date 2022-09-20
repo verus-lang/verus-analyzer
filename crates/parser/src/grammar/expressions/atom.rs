@@ -163,6 +163,10 @@ pub(super) fn atom_expr(
 
         _ => {
             dbg!("hey atom_expr");
+            dbg!(p.current());
+            dbg!(p.nth(1));
+            dbg!(p.nth(2));
+            dbg!(p.nth(3));
             p.err_recover("expected expression", EXPR_RECOVERY_SET);
             return None;
         }

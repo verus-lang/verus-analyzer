@@ -719,7 +719,7 @@ fn requires(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(T![requires]);
 
-    while !p.at(EOF) && !p.at(T![recommends]) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{']) {
+    while !p.at(EOF) && !p.at(T![recommends]) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
         cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
@@ -733,7 +733,7 @@ fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("recommends");
     let m = p.start();
     p.expect(T![recommends]);
-    while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{']) {
+    while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
         cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
@@ -748,7 +748,7 @@ fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(T![ensures]);
 
-    while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{']) {
+    while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
         cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
@@ -762,7 +762,7 @@ fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(T![decreases]);
     patterns::pattern(p); 
-    while !p.at(EOF) && !p.at(T!['{']) {
+    while !p.at(EOF) && !p.at(T!['{'])  && !p.at(T![;]) {
         comma_pat(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
