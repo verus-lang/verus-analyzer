@@ -770,6 +770,49 @@ impl CondAndComma {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InvariantClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl InvariantClause {
+    pub fn invariant_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![invariant])
+    }
+    pub fn cond_and_commas(&self) -> AstChildren<CondAndComma> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RecommendsClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RecommendsClause {
+    pub fn recommends_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![recommends])
+    }
+    pub fn cond_and_commas(&self) -> AstChildren<CondAndComma> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndPat {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndPat {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DecreasesClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DecreasesClause {
+    pub fn decreases_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![decreases])
+    }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    pub fn comma_and_pats(&self) -> AstChildren<CommaAndPat> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Meta {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2460,6 +2503,50 @@ impl AstNode for WherePred {
 }
 impl AstNode for CondAndComma {
     fn can_cast(kind: SyntaxKind) -> bool { kind == COND_AND_COMMA }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for InvariantClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for RecommendsClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == RECOMMENDS_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndPat {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_PAT }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for DecreasesClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4686,6 +4773,26 @@ impl std::fmt::Display for WherePred {
     }
 }
 impl std::fmt::Display for CondAndComma {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for InvariantClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for RecommendsClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndPat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for DecreasesClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

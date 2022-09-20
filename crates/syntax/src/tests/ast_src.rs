@@ -231,15 +231,20 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         // verus,
         "REQUIRES_CLAUSE",
         "ENSURES_CLAUSE",
+        "DECREASES_CLAUSE",
         "RECOMMENDS_CLAUSE",
-        "ASSERT_BLOCK",
+        "INVARIANT_CLAUSE",
+
         "ASSERT_EXPR",
-        "ASSUME_BLOCK",
-        "COND_AND_COMMA",       // change this to 'specification'
-        "PUBLISH",
-        "FN_MODE",
         "ASSUME_EXPR",
 
+        "ASSERT_BLOCK",     // what is this?
+        "ASSUME_BLOCK",     // what is this?
+
+        "COND_AND_COMMA",       // change this to 'specification'
+        "COMMA_AND_PAT",
+        "PUBLISH",
+        "FN_MODE",
     ],
 };
 

@@ -310,6 +310,18 @@ RequiresClause =
 EnsuresClause =
   'ensures' CondAndComma*
 
+InvariantClause =
+  'invariant' CondAndComma*
+
+RecommendsClause =
+  'recommends' CondAndComma*
+
+CommaAndPat = 
+    ',' Pat
+
+DecreasesClause = 
+  'decreases' Pat CommaAndPat*  
+
 Visibility =
   'pub' ('(' 'in'? Path ')')?
 
