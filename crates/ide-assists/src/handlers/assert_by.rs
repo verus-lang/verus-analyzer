@@ -32,6 +32,7 @@ use crate::{
 //}
 // ```
 pub(crate) fn assert_by(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
+    dbg!("assert_by");
     let assert_keyword = ctx.find_token_syntax_at_offset(T![assert])?;
     let expr = ast::AssertExpr::cast(assert_keyword.parent()?)?;
     dbg!(&expr);

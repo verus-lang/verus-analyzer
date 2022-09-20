@@ -91,7 +91,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // test_err pub_expr
     // fn foo() { pub 92; }
 
-    // dbg!("opt-item");
+    dbg!("opt-item");
     let has_visibility = opt_visibility(p, false);
 
     let m = match opt_item_without_modifiers(p, m) {
@@ -715,12 +715,13 @@ pub(crate) fn token_tree(p: &mut Parser<'_>) {
 
 
 fn requires(p: &mut Parser<'_>) -> CompletedMarker {
+    dbg!("requires");
     let m = p.start();
     p.expect(T![requires]);
 
     while !p.at(EOF) && !p.at(T![recommends]) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{']) {
         cond_comma(p);
-        if p.at(T![ensures]) || p.at(T!['{']) {
+        if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
     }
@@ -729,11 +730,12 @@ fn requires(p: &mut Parser<'_>) -> CompletedMarker {
 
 
 fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
+    dbg!("recommends");
     let m = p.start();
     p.expect(T![recommends]);
     while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{']) {
         cond_comma(p);
-        if p.at(T!['{']) {
+        if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
     }
@@ -742,12 +744,13 @@ fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
 
 
 fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
+    dbg!("ensures");
     let m = p.start();
     p.expect(T![ensures]);
 
     while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{']) {
         cond_comma(p);
-        if p.at(T!['{']) {
+        if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
     }
@@ -755,12 +758,13 @@ fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
+    dbg!("decreases");
     let m = p.start();
     p.expect(T![decreases]);
     patterns::pattern(p); 
     while !p.at(EOF) && !p.at(T!['{']) {
         comma_pat(p);
-        if p.at(T!['{']) {
+        if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
     }
@@ -770,9 +774,7 @@ fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    while !p.at(EOF) && !p.at(T![,]) {
-        expressions::expr(p);
-    }
+    expressions::expr(p);
     p.expect(T![,]);
     m.complete(p, COND_AND_COMMA)
 }

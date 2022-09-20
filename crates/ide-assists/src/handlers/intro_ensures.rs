@@ -20,6 +20,7 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     }
     let mut intro_enss = String::new();
     while let Some(ens) = ensures_clauses.next() {
+        dbg!("intro_ensures");
         let ens_without_comma = ens.condition()?;
         intro_enss = format!("{intro_enss}\n    assert({ens_without_comma});");
     }
