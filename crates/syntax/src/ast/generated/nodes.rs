@@ -1141,6 +1141,7 @@ impl UnderscoreExpr {
 pub struct AssertExpr {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasAttrs for AssertExpr {}
 impl ast::HasName for AssertExpr {}
 impl AssertExpr {
     pub fn assert_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assert]) }
@@ -4106,6 +4107,7 @@ impl AstNode for AnyHasAttrs {
                 | YIELD_EXPR
                 | LET_EXPR
                 | UNDERSCORE_EXPR
+                | ASSERT_EXPR
                 | STMT_LIST
                 | RECORD_EXPR_FIELD_LIST
                 | RECORD_EXPR_FIELD
