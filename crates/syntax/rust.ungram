@@ -531,7 +531,7 @@ BoxExpr =
   Attr* 'box' Expr
 
 AssertExpr =
-  'assert' '(' Expr ')' ('by' BlockExpr)?
+  'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
 
 
 //*************************//

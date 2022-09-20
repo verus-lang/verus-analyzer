@@ -1141,12 +1141,14 @@ impl UnderscoreExpr {
 pub struct AssertExpr {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasName for AssertExpr {}
 impl AssertExpr {
     pub fn assert_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assert]) }
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
     pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
+    pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn block_expr(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
 }
 
@@ -4224,6 +4226,7 @@ impl AstNode for AnyHasName {
                 | VARIANT
                 | CONST_PARAM
                 | TYPE_PARAM
+                | ASSERT_EXPR
                 | IDENT_PAT
         )
     }
