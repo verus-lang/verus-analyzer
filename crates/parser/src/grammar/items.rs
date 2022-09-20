@@ -443,43 +443,7 @@ fn macro_rules(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_RULES);
 }
 
-fn requires(p: &mut Parser<'_>) -> CompletedMarker {
-    
-    let m = p.start();
-    p.expect(T![requires]);
 
-    while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T!['{']) {
-        cond_comma(p);
-        if p.at(T![ensures]) || p.at(T!['{']) {
-            break;
-        }
-    }
-    m.complete(p, REQUIRES_CLAUSE)
-}
-
-fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
-    
-    let m = p.start();
-    p.expect(T![ensures]);
-
-    while !p.at(EOF) && !p.at(T!['{']) {
-        cond_comma(p);
-        if p.at(T!['{']) {
-            break;
-        }
-    }
-    m.complete(p, ENSURES_CLAUSE)
-}
-
-
-fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
-    let m = p.start();
-    while !p.at(EOF) && !p.at(T![,]) {
-        expressions::expr(p);
-    }
-    p.expect(T![,]);
-    m.complete(p, COND_AND_COMMA)
-}
 
 // test macro_def
 // macro m($i:ident) {}
@@ -579,6 +543,7 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
 //  (body:BlockExpr | ';')
 //
 // TODO: parse properly 'publish', 'fnmode'
+// Note: requires -> recommends -> ensures -> decreases 
 // 
 // test fn
 // fn foo() {}
@@ -626,37 +591,21 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     generic_params::opt_where_clause(p);
 
 
+    // Note: requires -> recommends -> ensures -> decreases 
     // optional parsing of `requires` and `ensures`
     if p.at(T![requires]) {
         requires(p);
     }
+    if p.at(T![recommends]) {
+        recommends(p);
+    }
     if p.at(T![ensures]) {
         ensures(p);
-        // dbg!("hi ensures"); 
-        // let m = p.start();
-        // p.bump(T![ensures]);
-        // while !p.at(EOF) && !p.at(T!['{']) {
-        //     ens_clause(p);
-        //     dbg!("after ens clause");
-        //     if p.at(T!['{']) {
-        //         break;
-        //     }
-        // }
-        // m.complete(p, ENSURES_CLAUSE);
     }
-    if p.at(T![recommends]) {
-        dbg!("hi recommends"); 
-        let m = p.start();
-        p.bump(T![recommends]);
-        while !p.at(EOF) && !p.at(T!['{']) {
-            recommends_clause(p);
-            dbg!("after recommend clause");
-            if p.at(T!['{']) {
-                break;
-            }
-        }
-        m.complete(p, RECOMMENDS_CLAUSE);
+    if p.at(T![decreases]) {
+        decreases(p);
     }
+
 
 
     if p.at(T![;]) {
@@ -699,19 +648,6 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 //     m.complete(p, ENSURES_CLAUSE);
 // }
 
-fn recommends_clause(p: &mut Parser<'_>) {
-    let m = p.start();
-    while !p.at(EOF) && !p.at(T![,]) {
-        p.bump_any();
-        // if p.at(T![,]) {
-
-        //     break;
-        // }
-    }
-    p.expect(T![,]);
-    p.eat(T![,]);
-    m.complete(p, RECOMMENDS_CLAUSE);
-}
 
 
 
@@ -766,3 +702,98 @@ pub(crate) fn token_tree(p: &mut Parser<'_>) {
     m.complete(p, TOKEN_TREE);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+fn requires(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![requires]);
+
+    while !p.at(EOF) && !p.at(T![recommends]) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{']) {
+        cond_comma(p);
+        if p.at(T![ensures]) || p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, REQUIRES_CLAUSE)
+}
+
+
+fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![recommends]);
+    while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{']) {
+        cond_comma(p);
+        if p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, RECOMMENDS_CLAUSE)
+}
+
+
+fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![ensures]);
+
+    while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{']) {
+        cond_comma(p);
+        if p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, ENSURES_CLAUSE)
+}
+
+fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![decreases]);
+    patterns::pattern(p); 
+    while !p.at(EOF) && !p.at(T!['{']) {
+        comma_pat(p);
+        if p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, DECREASES_CLAUSE)
+}
+
+
+fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    while !p.at(EOF) && !p.at(T![,]) {
+        expressions::expr(p);
+    }
+    p.expect(T![,]);
+    m.complete(p, COND_AND_COMMA)
+}
+
+fn comma_pat(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![,]);
+    patterns::pattern(p); 
+    m.complete(p, COMMA_AND_PAT)
+}
+
+// fn recommends_clause(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     while !p.at(EOF) && !p.at(T![,]) {
+//         p.bump_any();
+//         // if p.at(T![,]) {
+
+//         //     break;
+//         // }
+//     }
+//     p.expect(T![,]);
+//     p.eat(T![,]);
+//     m.complete(p, RECOMMENDS_CLAUSE);
+// }

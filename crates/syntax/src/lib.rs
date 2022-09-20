@@ -546,8 +546,6 @@ fn verus_walkthrough5() {
 }
 
 
-// TODO
-// maybe I will get back to "full" parsing of Verus syntax
 #[test]
 fn verus_walkthrough6() {
     use ast::{HasModuleItem, HasName};
@@ -561,6 +559,14 @@ fn verus_walkthrough6() {
                 sum < 200,
         {
             x + y
+        }
+
+        spec fn sum2(i: int, j: int) -> int
+            recommends
+                0 <= i < 10,
+                0 <= j < 10,
+        {
+            i + j
         }
     }";
     let parse = SourceFile::parse(source_code);
