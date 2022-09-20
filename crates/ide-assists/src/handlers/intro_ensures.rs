@@ -5,8 +5,6 @@ use crate::{AssistContext, AssistId, AssistKind, Assists};
 
 pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
     let func = ctx.find_node_at_offset::<ast::Fn>()?;
-
-
     let body = func.body()?;
     let stmt_list = body.stmt_list()?;
     let tail_expr = stmt_list.tail_expr()?;
@@ -20,7 +18,6 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     if !cursor_in_range {
         return None;
     }
-
     let mut intro_enss = String::new();
     while let Some(ens) = ensures_clauses.next() {
         let ens_without_comma = ens.condition()?;
@@ -28,17 +25,41 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     }
     dbg!(&intro_enss);
 
-    //TODO: if there's named return value, should introduce `let binding` before assertion, and also return the value 
+    match func.ret_type() {
+        // if there's named return value, should introduce `let binding` before assertion, and also return the value 
+        // REVIEW: it is assumed that ret_type is "named" if this function is returning something
+        Some(ret_type) => {
+           
+            dbg!(&ret_type);
+            let ret_name = ret_type.pat()?;
+            match ret_name {
+                ast::Pat::IdentPat(ident) => {
+                    let intro_let_ens = format!("let {ident} = {tail_expr};{intro_enss}\n    {ident}");
+                    dbg!(&intro_let_ens);
+                    return acc.add(
+                        AssistId("intro_ensures", AssistKind::RefactorRewrite),
+                        "Intro ensures",
+                        tail_expr.syntax().text_range(),
+                        |builder| {
+                            builder.replace(tail_expr.syntax().text_range(), &format!("{}\n", intro_let_ens));
+                        },
+                    )
+                },
+                _ => return None,
+            };
+        }
+        None => {
+            acc.add(
+                AssistId("intro_ensures", AssistKind::RefactorRewrite),
+                "Intro ensures",
+                tail_expr.syntax().text_range(),
+                |builder| {
+                    builder.insert(r_curly.text_range().start(), &format!("{}\n", intro_enss));
+                },
+            )
 
-    acc.add(
-        AssistId("intro_ensures", AssistKind::RefactorRewrite),
-        "Intro ensures",
-        tail_expr.syntax().text_range(),
-        |builder| {
-            builder.insert(r_curly.text_range().start(), &format!("{}\n", intro_enss));
-            // builder.replace(tail_expr.syntax().text_range(), &format!("{}\n{}", tail_expr, intro_enss));
-        },
-    )
+        }
+    }
 }
 
 
@@ -49,7 +70,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn infer_return_type_cursor_at_return_type_pos() {
+    fn intro_ensure_easy() {
         cov_mark::check!(cursor_in_ret_position);
         check_assist(
             intro_ensures,
@@ -79,6 +100,39 @@ proof fn my_proof_fun(x: int, y: int)
 
     assert(x + y < 200);
     assert(x + y < 400);
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn intro_ensure_ret_arg() {
+        cov_mark::check!(cursor_in_ret_position);
+        check_assist(
+            intro_ensures,
+            r#"
+proof fn my_proof_fun(x: int, y: int) -> (sum: int)
+    requires
+        x < 100,
+        y < 100,
+    ens$0ures
+        sum < 200,
+{
+    x + y
+}
+"#,
+            r#"
+            
+proof fn my_proof_fun(x: int, y: int) -> (sum: int)
+    requires
+        x < 100,
+        y < 100,
+    ensures
+        sum < 200,
+{
+    let sum = x + y;
+    assert(sum<200);
+    sum
 }
 "#,
         );
