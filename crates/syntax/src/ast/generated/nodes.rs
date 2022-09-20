@@ -770,6 +770,15 @@ impl CondAndComma {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PatAndComma {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PatAndComma {
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InvariantClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -792,15 +801,6 @@ impl RecommendsClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommaAndPat {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CommaAndPat {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DecreasesClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -808,8 +808,7 @@ impl DecreasesClause {
     pub fn decreases_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![decreases])
     }
-    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
-    pub fn comma_and_pats(&self) -> AstChildren<CommaAndPat> { support::children(&self.syntax) }
+    pub fn pat_and_commas(&self) -> AstChildren<PatAndComma> { support::children(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2512,6 +2511,17 @@ impl AstNode for CondAndComma {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for PatAndComma {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PAT_AND_COMMA }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for InvariantClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -2525,17 +2535,6 @@ impl AstNode for InvariantClause {
 }
 impl AstNode for RecommendsClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == RECOMMENDS_CLAUSE }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for CommaAndPat {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_PAT }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4777,17 +4776,17 @@ impl std::fmt::Display for CondAndComma {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for PatAndComma {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for InvariantClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
 impl std::fmt::Display for RecommendsClause {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for CommaAndPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

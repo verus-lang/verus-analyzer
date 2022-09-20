@@ -761,9 +761,8 @@ fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("decreases");
     let m = p.start();
     p.expect(T![decreases]);
-    patterns::pattern(p); 
     while !p.at(EOF) && !p.at(T!['{'])  && !p.at(T![;]) {
-        comma_pat(p);
+        pat_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
@@ -779,11 +778,11 @@ fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, COND_AND_COMMA)
 }
 
-fn comma_pat(p: &mut Parser<'_>) -> CompletedMarker {
+fn pat_comma(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    p.expect(T![,]);
     patterns::pattern(p); 
-    m.complete(p, COMMA_AND_PAT)
+    p.expect(T![,]);
+    m.complete(p, PAT_AND_COMMA)
 }
 
 // fn recommends_clause(p: &mut Parser<'_>) {

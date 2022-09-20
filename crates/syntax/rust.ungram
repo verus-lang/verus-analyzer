@@ -304,6 +304,9 @@ WherePred =
 CondAndComma =
   condition:Expr ','
 
+PatAndComma = 
+  Pat ',' 
+
 RequiresClause =
   'requires' CondAndComma*
 
@@ -316,11 +319,8 @@ InvariantClause =
 RecommendsClause =
   'recommends' CondAndComma*
 
-CommaAndPat = 
-    ',' Pat
-
 DecreasesClause = 
-  'decreases' Pat CommaAndPat*  
+  'decreases' PatAndComma*  
 
 Visibility =
   'pub' ('(' 'in'? Path ')')?

@@ -294,7 +294,7 @@ pub enum SyntaxKind {
     ASSERT_BLOCK,
     ASSUME_BLOCK,
     COND_AND_COMMA,
-    COMMA_AND_PAT,
+    PAT_AND_COMMA,
     PUBLISH,
     FN_MODE,
     #[doc(hidden)]
