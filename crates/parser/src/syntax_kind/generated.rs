@@ -293,6 +293,7 @@ pub enum SyntaxKind {
     COND_AND_COMMA,
     PUBLISH,
     FN_MODE,
+    ASSUME_EXPR,
     #[doc(hidden)]
     __LAST,
 }

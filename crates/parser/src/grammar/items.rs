@@ -102,11 +102,6 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     let mut has_mods = false;
     let mut has_extern = false;
 
-    if p.at(T![assert]) {
-        assert(p,m);
-        return Ok(());
-    }
-
     if p.at(T![verus]) {
         dbg!("hi Verus"); 
         p.bump(T![verus]);
@@ -128,41 +123,36 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         return Ok(());
     }
     if p.at(T![proof]) {
-        dbg!("hi proof"); 
         p.bump(T![proof]);
         // m.complete(p, PROOF_KW);
         m.abandon(p);
         return Ok(());
     }
     if p.at(T![spec]) {
-        dbg!("hi spec"); 
         p.bump(T![spec]);
         // m.complete(p, SPEC_KW);
         m.abandon(p);
         return Ok(());
     }
     if p.at(T![open]) {
-        dbg!("hi open"); 
         p.bump(T![open]);
         // m.complete(p, OPEN_KW);
         m.abandon(p);
         return Ok(());
     }
     if p.at(T![closed]) {
-        dbg!("hi closed"); 
         p.bump(T![closed]);
         // m.complete(p, CLOSED_KW);
         m.abandon(p);
         return Ok(());
     }
+
+    if p.at(T![assert]) {
+        assert(p,m);
+        return Ok(());
+    }
     if p.at(T![assume]) {
-        p.bump(T![assume]);
-        if p.at(T!['(']) {
-            expressions::expr(p);
-        } else {
-            p.error("expected function arguments");
-        }
-        m.complete(p, ASSUME_KW);
+        assume(p, m);
         return Ok(());
     }
 
@@ -515,9 +505,17 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_DEF);
 }
 
+
+fn assume(p: &mut Parser<'_>, m: Marker) {
+    p.expect(T![assume]);
+    p.expect(T!['(']);
+    expressions::expr(p);
+    p.expect(T![')']);
+    m.complete(p, ASSUME_EXPR);
+}
+
 // AssertExpr =
 //   'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
-
 fn assert(p: &mut Parser<'_>, m: Marker) {
     p.expect(T![assert]);
     
@@ -572,10 +570,15 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
 }
 
 
-// NOTE TO MYSELF(CHANHEE) -- GOOD PLACE TO LOOK AT
-// change this to take `requires` , `ensures`, etc
+
+// see verus/dependencies/syn/src/items.rs, impl parse for Signature
+// Fn =
+//  Attr* Visibility? Publish?
+//  'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+//  'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
+//  (body:BlockExpr | ';')
 //
-// 
+// TODO: parse properly 'publish', 'fnmode'
 // 
 // test fn
 // fn foo() {}

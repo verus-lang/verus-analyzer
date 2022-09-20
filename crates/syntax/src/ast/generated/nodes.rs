@@ -1154,6 +1154,18 @@ impl AssertExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssumeExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for AssumeExpr {}
+impl AssumeExpr {
+    pub fn assume_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assume]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StmtList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1613,6 +1625,7 @@ pub enum Expr {
     LetExpr(LetExpr),
     UnderscoreExpr(UnderscoreExpr),
     AssertExpr(AssertExpr),
+    AssumeExpr(AssumeExpr),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2852,6 +2865,17 @@ impl AstNode for AssertExpr {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for AssumeExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ASSUME_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for StmtList {
     fn can_cast(kind: SyntaxKind) -> bool { kind == STMT_LIST }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3527,6 +3551,9 @@ impl From<UnderscoreExpr> for Expr {
 impl From<AssertExpr> for Expr {
     fn from(node: AssertExpr) -> Expr { Expr::AssertExpr(node) }
 }
+impl From<AssumeExpr> for Expr {
+    fn from(node: AssumeExpr) -> Expr { Expr::AssumeExpr(node) }
+}
 impl AstNode for Expr {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
@@ -3564,6 +3591,7 @@ impl AstNode for Expr {
                 | LET_EXPR
                 | UNDERSCORE_EXPR
                 | ASSERT_EXPR
+                | ASSUME_EXPR
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3601,6 +3629,7 @@ impl AstNode for Expr {
             LET_EXPR => Expr::LetExpr(LetExpr { syntax }),
             UNDERSCORE_EXPR => Expr::UnderscoreExpr(UnderscoreExpr { syntax }),
             ASSERT_EXPR => Expr::AssertExpr(AssertExpr { syntax }),
+            ASSUME_EXPR => Expr::AssumeExpr(AssumeExpr { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3640,6 +3669,7 @@ impl AstNode for Expr {
             Expr::LetExpr(it) => &it.syntax,
             Expr::UnderscoreExpr(it) => &it.syntax,
             Expr::AssertExpr(it) => &it.syntax,
+            Expr::AssumeExpr(it) => &it.syntax,
         }
     }
 }
@@ -4108,6 +4138,7 @@ impl AstNode for AnyHasAttrs {
                 | LET_EXPR
                 | UNDERSCORE_EXPR
                 | ASSERT_EXPR
+                | ASSUME_EXPR
                 | STMT_LIST
                 | RECORD_EXPR_FIELD_LIST
                 | RECORD_EXPR_FIELD
@@ -4835,6 +4866,11 @@ impl std::fmt::Display for UnderscoreExpr {
     }
 }
 impl std::fmt::Display for AssertExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AssumeExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

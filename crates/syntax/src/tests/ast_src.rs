@@ -238,7 +238,8 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "COND_AND_COMMA",       // change this to 'specification'
         "PUBLISH",
         "FN_MODE",
-        
+        "ASSUME_EXPR",
+
     ],
 };
 

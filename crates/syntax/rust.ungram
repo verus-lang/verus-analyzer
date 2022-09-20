@@ -375,6 +375,7 @@ Expr =
 | LetExpr
 | UnderscoreExpr
 | AssertExpr
+| AssumeExpr
 //| AssertForallExpr
 
 MacroExpr =
@@ -533,6 +534,9 @@ BoxExpr =
 
 AssertExpr =
   Attr* 'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
+
+AssumeExpr = 
+  Attr* 'assume' '(' Expr ')' 
 
 //AssertForallExpr =
 //  Attr* 'assert' 'forall' '|' Param (',' Param)* '|' Expr ('implies' Expr)? 'by' BlockExpr?
