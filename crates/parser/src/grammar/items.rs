@@ -91,7 +91,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // test_err pub_expr
     // fn foo() { pub 92; }
 
-    dbg!("opt-item");
+    // dbg!("opt-item");
     let has_visibility = opt_visibility(p, false);
 
     let m = match opt_item_without_modifiers(p, m) {
@@ -522,10 +522,10 @@ fn assert(p: &mut Parser<'_>, m: Marker) {
     if p.at(T![;]) {
         // test fn_decl
         // trait T { fn foo(); }
-        dbg!("getting ;, but ignoring");
+        // dbg!("getting ;, but ignoring");
         // p.bump(T![;]);
     } else {
-        dbg!("proof block ;");
+        dbg!("proof block");
         // parse optional 'proof block'
         expressions::block_expr(p);
     }

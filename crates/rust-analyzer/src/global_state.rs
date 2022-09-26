@@ -105,6 +105,12 @@ pub(crate) struct GlobalState {
         OpQueue<(Arc<Vec<ProjectWorkspace>>, Vec<anyhow::Result<WorkspaceBuildScripts>>)>,
 
     pub(crate) prime_caches_queue: OpQueue<()>,
+
+
+    // verus
+    // running Verus for all file takes too much time
+    // only run Verus for the saved file 
+    // pub recent_saved_file: uri;
 }
 
 /// An immutable snapshot of the world's state at a point in time.
