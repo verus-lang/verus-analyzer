@@ -307,6 +307,8 @@ impl<'a> Printer<'a> {
                     ast::UnaryOp::Deref => "*",
                     ast::UnaryOp::Not => "!",
                     ast::UnaryOp::Neg => "-",
+                    ast::UnaryOp::BigAnd => "&&&",
+                    ast::UnaryOp::BigOr => "|||",
                 };
                 w!(self, "{}", op);
                 self.print_expr(*expr);

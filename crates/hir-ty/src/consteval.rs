@@ -210,6 +210,8 @@ pub fn eval_const(
                         None,
                     )))
                 }
+                hir_def::expr::UnaryOp::BigAnd => todo!(),
+                hir_def::expr::UnaryOp::BigOr => todo!(),
             }
         }
         &Expr::BinaryOp { lhs, rhs, op } => {

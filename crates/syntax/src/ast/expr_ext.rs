@@ -130,6 +130,8 @@ impl ast::PrefixExpr {
             T![*] => UnaryOp::Deref,
             T![!] => UnaryOp::Not,
             T![-] => UnaryOp::Neg,
+            T![&&&] => UnaryOp::BigAnd,
+            T![|||] => UnaryOp::BigOr,
             _ => return None,
         };
         Some(res)
@@ -150,6 +152,7 @@ impl ast::BinExpr {
                 T![!==] => BinaryOp::LogicOp(LogicOp::NeEq),
                 T![<==] => BinaryOp::LogicOp(LogicOp::Exply),
                 T![==>] => BinaryOp::LogicOp(LogicOp::Imply),
+                T![===] => BinaryOp::LogicOp(LogicOp::EqEqEq),
 
                 T![||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&] => BinaryOp::LogicOp(LogicOp::And),

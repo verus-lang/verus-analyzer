@@ -318,6 +318,8 @@ impl SourceAnalyzer {
             ast::UnaryOp::Deref => name![deref],
             ast::UnaryOp::Not => name![not],
             ast::UnaryOp::Neg => name![neg],
+            ast::UnaryOp::BigAnd => todo!(),
+            ast::UnaryOp::BigOr => todo!(),
         };
         let ty = self.ty_of_expr(db, &prefix_expr.expr()?.into())?;
 
