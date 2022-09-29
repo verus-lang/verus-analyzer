@@ -133,7 +133,7 @@ fn punctuation(
         (T![|=] | T![&=] | T![^=] | T![>>=] | T![<<=], BIN_EXPR) => {
             Highlight::from(HlOperator::Bitwise) | HlMod::Mutable
         }
-        (T![&&] | T![||], BIN_EXPR) => HlOperator::Logical.into(),
+        (T![&&] | T![||] | T![==>], BIN_EXPR) => HlOperator::Logical.into(),
         (T![>] | T![<] | T![==] | T![>=] | T![<=] | T![!=], BIN_EXPR) => {
             HlOperator::Comparison.into()
         }

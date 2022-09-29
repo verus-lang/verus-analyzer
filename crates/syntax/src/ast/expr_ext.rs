@@ -145,9 +145,15 @@ impl ast::BinExpr {
         self.syntax().children_with_tokens().filter_map(|it| it.into_token()).find_map(|c| {
             #[rustfmt::skip]
             let bin_op = match c.kind() {
+                T![|||] => BinaryOp::LogicOp(LogicOp::BigOr),
+                T![&&&] => BinaryOp::LogicOp(LogicOp::BigAnd),
+                T![!==] => BinaryOp::LogicOp(LogicOp::NeEq),
+                T![<==] => BinaryOp::LogicOp(LogicOp::Exply),
+                T![==>] => BinaryOp::LogicOp(LogicOp::Imply),
+
                 T![||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&] => BinaryOp::LogicOp(LogicOp::And),
-                T![==>] => BinaryOp::LogicOp(LogicOp::Imply),
+                
 
                 T![==] => BinaryOp::CmpOp(CmpOp::Eq { negated: false }),
                 T![!=] => BinaryOp::CmpOp(CmpOp::Eq { negated: true }),

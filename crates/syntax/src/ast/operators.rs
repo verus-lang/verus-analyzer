@@ -34,7 +34,11 @@ pub enum BinaryOp {
 pub enum LogicOp {
     And,
     Or,
-    Imply,
+    Imply,  // ==>  Verus
+    Exply,  // <==  Verus
+    BigAnd, // &&&  Verus
+    BigOr,  // |||  Verus
+    NeEq,   // !==  Verus
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -69,6 +73,10 @@ impl fmt::Display for LogicOp {
             LogicOp::And => "&&",
             LogicOp::Or => "||",
             LogicOp::Imply => "==>",
+            LogicOp::Exply => "<==",
+            LogicOp::BigAnd => "&&&",
+            LogicOp::BigOr => "|||",
+            LogicOp::NeEq => "!==",
         };
         f.write_str(res)
     }

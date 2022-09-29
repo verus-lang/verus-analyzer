@@ -176,6 +176,7 @@ struct Restrictions {
 fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
     const NOT_AN_OP: (u8, SyntaxKind) = (0, T![@]);
     match p.current() {
+        T![|] if p.at(T![|||])  => (2,  T![|||]),           // verus
         T![|] if p.at(T![||])  => (3,  T![||]),
         T![|] if p.at(T![|=])  => (1,  T![|=]),
         T![|]                  => (6,  T![|]),
@@ -186,9 +187,12 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
 
         T![=] if p.at(T![=>])  => NOT_AN_OP,
         T![=] if p.at(T![==>]) => (2, T![==>]),       //verus
+        T![=] if p.at(T![===]) => (2, T![===]),       //verus
+
         T![=] if p.at(T![==])  => (5,  T![==]),
 
         T![=]                  => (1,  T![=]),
+        T![<] if p.at(T![<==])  => (2,  T![<==]),             // verus
         T![<] if p.at(T![<=])  => (5,  T![<=]),
         T![<] if p.at(T![<<=]) => (1,  T![<<=]),
         T![<] if p.at(T![<<])  => (9,  T![<<]),
@@ -199,8 +203,10 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![^]                  => (7,  T![^]),
         T![%] if p.at(T![%=])  => (1,  T![%=]),
         T![%]                  => (11, T![%]),
+
         T![&] if p.at(T![&=])  => (1,  T![&=]),
         // If you update this, remember to update `expr_let()` too.
+        T![&] if p.at(T![&&&])  => (2,  T![&&&]),           // verus
         T![&] if p.at(T![&&])  => (4,  T![&&]),
         T![&]                  => (8,  T![&]),
         T![/] if p.at(T![/=])  => (1,  T![/=]),
