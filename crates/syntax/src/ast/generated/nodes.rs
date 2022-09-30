@@ -1147,6 +1147,8 @@ pub struct WhileExpr {
 impl ast::HasAttrs for WhileExpr {}
 impl WhileExpr {
     pub fn while_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![while]) }
+    pub fn invariant_clause(&self) -> Option<InvariantClause> { support::child(&self.syntax) }
+    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

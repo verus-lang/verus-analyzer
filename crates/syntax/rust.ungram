@@ -500,7 +500,7 @@ ForExpr =
   loop_body:BlockExpr
 
 WhileExpr =
-  Attr* Label? 'while' condition:Expr
+  Attr* Label? 'while' condition:Expr InvariantClause? DecreasesClause?
   loop_body:BlockExpr
 
 Label =
