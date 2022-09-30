@@ -168,7 +168,7 @@ SelfParam =
 
 Param =
   Attr* (
-    Pat (':' Type)?
+    'tracked'? Pat (':' Type)?
   | Type
   | '...'
   )
