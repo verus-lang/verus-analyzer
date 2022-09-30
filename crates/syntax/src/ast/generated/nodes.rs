@@ -941,6 +941,8 @@ impl ClosureExpr {
     pub fn static_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![static]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn move_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![move]) }
+    pub fn forall_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![forall]) }
+    pub fn exists_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![exists]) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<Expr> { support::child(&self.syntax) }

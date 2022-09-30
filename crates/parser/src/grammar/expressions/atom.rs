@@ -274,6 +274,11 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
         _ => false,
     });
 
+    let is_quant = match p.current() {
+        T![forall] | T![exists] | T![choose] => true,
+        _ => false,
+    };
+
     let m = p.start();
 
     if p.at(T![for]) {
@@ -297,6 +302,9 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
         // fn main() { || -> i32 { 92 }(); }
         block_expr(p);
     } else if p.at_ts(EXPR_FIRST) {
+        expr(p);
+    } else if is_quant {
+        attributes::inner_attrs(p);
         expr(p);
     } else {
         p.error("expected expression");

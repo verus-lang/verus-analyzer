@@ -734,7 +734,35 @@ fn binary_search(v: &Vec<u64>, k: u64) -> (r: usize)
     i1
 }
 
-    
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+ 
+
+#[test]
+fn verus_walkthrough12() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+fn pop_test(t: Vec<u64>)
+requires
+    t.len() > 0,
+    forall|i: int| #![auto] 0 <= i < t.len() ==> uninterp_fn(t[i]),
+{
+let mut t = t;
+let x = t.pop();
+
+assert(uninterp_fn(x));
+assert(forall|i: int| #![auto] 0 <= i < t.len() ==> uninterp_fn(t[i]));
+}
+
     }";
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
