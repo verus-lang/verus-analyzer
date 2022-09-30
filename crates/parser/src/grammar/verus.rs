@@ -107,6 +107,21 @@ pub(crate)  fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ENSURES_CLAUSE)
 }
 
+pub(crate)  fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
+    dbg!("invariants");
+    let m = p.start();
+    p.expect(T![invariant]);
+
+    while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
+        cond_comma(p);
+        if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
+            break;
+        }
+    }
+    m.complete(p, INVARIANT_CLAUSE)
+}
+
+
 pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("decreases");
     let m = p.start();

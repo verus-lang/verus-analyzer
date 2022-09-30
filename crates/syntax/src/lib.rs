@@ -685,6 +685,55 @@ fn verus_walkthrough10() {
             assert(s[1] == 20);
         }
     }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+ 
+
+
+ 
+#[test]
+fn verus_walkthrough11() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+fn binary_search(v: &Vec<u64>, k: u64) -> (r: usize)
+    requires
+        forall|i:int, j:int| 0 <= i <= j < v.len() ==> v[i] <= v[j],
+        exists|i:int| 0 <= i < v.len() && k == v[i],
+    ensures
+        r < v.len(),
+        k == v[r as int],
+{
+    let mut i1: usize = 0;
+    let mut i2: usize = v.len() - 1;
+    while i1 != i2
+        invariant
+            i2 < v.len(),
+            exists|i:int| i1 <= i <= i2 && k == v[i],
+            forall|i:int, j:int| 0 <= i <= j < v.len() ==> v[i] <= v[j],
+    {
+        //let d: Ghost<int> = ghost(i2 - i1);
+
+        let ix = i1 + (i2 - i1) / 2;
+        if *v.index(ix) < k {
+            i1 = ix + 1;
+        } else {
+            i2 = ix;
+        }
+
+        assert(i2 - i1 < d@);
+    }
+    i1
+}
+
     
     }";
     let parse = SourceFile::parse(source_code);

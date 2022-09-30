@@ -1,3 +1,7 @@
+use verus::decreases;
+
+use crate::grammar::verus::invariants;
+
 use super::*;
 
 // test expr_literals
@@ -362,6 +366,12 @@ fn while_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(T![while]);
     expr_no_struct(p);
+    if p.at(T![invariant]) {
+        invariants(p);
+    }
+    if p.at(T![decreases]) {
+        decreases(p);
+    }
     block_expr(p);
     m.complete(p, WHILE_EXPR)
 }
