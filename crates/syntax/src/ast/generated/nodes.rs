@@ -1181,6 +1181,16 @@ impl UnderscoreExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ViewExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for ViewExpr {}
+impl ViewExpr {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn at_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![@]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssertExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1667,6 +1677,7 @@ pub enum Expr {
     YieldExpr(YieldExpr),
     LetExpr(LetExpr),
     UnderscoreExpr(UnderscoreExpr),
+    ViewExpr(ViewExpr),
     AssertExpr(AssertExpr),
     AssumeExpr(AssumeExpr),
 }
@@ -2941,6 +2952,17 @@ impl AstNode for UnderscoreExpr {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for ViewExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == VIEW_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for AssertExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ASSERT_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3635,6 +3657,9 @@ impl From<LetExpr> for Expr {
 impl From<UnderscoreExpr> for Expr {
     fn from(node: UnderscoreExpr) -> Expr { Expr::UnderscoreExpr(node) }
 }
+impl From<ViewExpr> for Expr {
+    fn from(node: ViewExpr) -> Expr { Expr::ViewExpr(node) }
+}
 impl From<AssertExpr> for Expr {
     fn from(node: AssertExpr) -> Expr { Expr::AssertExpr(node) }
 }
@@ -3677,6 +3702,7 @@ impl AstNode for Expr {
                 | YIELD_EXPR
                 | LET_EXPR
                 | UNDERSCORE_EXPR
+                | VIEW_EXPR
                 | ASSERT_EXPR
                 | ASSUME_EXPR
         )
@@ -3715,6 +3741,7 @@ impl AstNode for Expr {
             YIELD_EXPR => Expr::YieldExpr(YieldExpr { syntax }),
             LET_EXPR => Expr::LetExpr(LetExpr { syntax }),
             UNDERSCORE_EXPR => Expr::UnderscoreExpr(UnderscoreExpr { syntax }),
+            VIEW_EXPR => Expr::ViewExpr(ViewExpr { syntax }),
             ASSERT_EXPR => Expr::AssertExpr(AssertExpr { syntax }),
             ASSUME_EXPR => Expr::AssumeExpr(AssumeExpr { syntax }),
             _ => return None,
@@ -3755,6 +3782,7 @@ impl AstNode for Expr {
             Expr::YieldExpr(it) => &it.syntax,
             Expr::LetExpr(it) => &it.syntax,
             Expr::UnderscoreExpr(it) => &it.syntax,
+            Expr::ViewExpr(it) => &it.syntax,
             Expr::AssertExpr(it) => &it.syntax,
             Expr::AssumeExpr(it) => &it.syntax,
         }
@@ -4224,6 +4252,7 @@ impl AstNode for AnyHasAttrs {
                 | YIELD_EXPR
                 | LET_EXPR
                 | UNDERSCORE_EXPR
+                | VIEW_EXPR
                 | ASSERT_EXPR
                 | ASSUME_EXPR
                 | STMT_LIST
@@ -4968,6 +4997,11 @@ impl std::fmt::Display for LetExpr {
     }
 }
 impl std::fmt::Display for UnderscoreExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ViewExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

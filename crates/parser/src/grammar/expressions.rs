@@ -397,6 +397,7 @@ fn postfix_expr(
                 }
             },
             T![?] => try_expr(p, lhs),
+            T![@] => view_expr(p, lhs),
             _ => break,
         };
         allow_calls = true;
@@ -508,6 +509,13 @@ fn try_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     let m = lhs.precede(p);
     p.bump(T![?]);
     m.complete(p, TRY_EXPR)
+}
+
+fn view_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+    assert!(p.at(T![@]));
+    let m = lhs.precede(p);
+    p.bump(T![@]);
+    m.complete(p, VIEW_EXPR)
 }
 
 // test cast_expr

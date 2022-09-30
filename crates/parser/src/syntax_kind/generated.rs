@@ -234,6 +234,7 @@ pub enum SyntaxKind {
     AWAIT_EXPR,
     TRY_EXPR,
     CAST_EXPR,
+    VIEW_EXPR,
     REF_EXPR,
     PREFIX_EXPR,
     RANGE_EXPR,

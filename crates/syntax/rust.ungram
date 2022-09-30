@@ -386,6 +386,7 @@ Expr =
 | YieldExpr
 | LetExpr
 | UnderscoreExpr
+| ViewExpr
 | AssertExpr
 | AssumeExpr
 //| AssertForallExpr
@@ -417,6 +418,9 @@ RefExpr =
 
 TryExpr =
   Attr* Expr '?'
+
+ViewExpr =
+  Attr* Expr '@'
 
 BlockExpr =
   Attr* Label? ('try' | 'unsafe' | 'async' | 'const') StmtList

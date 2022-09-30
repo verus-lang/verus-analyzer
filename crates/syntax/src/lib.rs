@@ -657,7 +657,7 @@ fn verus_walkthrough9() {
       ) -> tracked TrackedAndGhost<(int, int), int> {
        
     }
-    
+
     }";
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
@@ -669,7 +669,34 @@ fn verus_walkthrough9() {
     }
 }
 
-  
+ 
+#[test]
+fn verus_walkthrough10() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+    fn test_views() {
+        let mut v: Vec<u8> = Vec::new();
+        v.push(10);
+        v.push(20);
+        proof {
+            let s: Seq<u8> = v@; // v@ is equivalent to v.view()
+            assert(s[0] == 10);
+            assert(s[1] == 20);
+        }
+    }
+    
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+ 
 
 // "verus! {
 

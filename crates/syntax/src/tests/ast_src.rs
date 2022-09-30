@@ -176,6 +176,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "AWAIT_EXPR",
         "TRY_EXPR",
         "CAST_EXPR",
+        "VIEW_EXPR",
         // unary
         "REF_EXPR",
         "PREFIX_EXPR",
