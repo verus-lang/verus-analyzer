@@ -573,6 +573,28 @@ impl GlobalState {
                         }
                         (Progress::End, None)
                     }
+                    flycheck::Progress::VerusResult(msg) => {
+                        // this is hacky
+                        dbg!("reporting verus result");
+                        if msg.starts_with("verification results::") {
+                            if msg.contains("errors: 0") {
+                                self.send_notification::<lsp_types::notification::ShowMessage>(
+                                    lsp_types::ShowMessageParams { typ: lsp_types::MessageType::INFO, message: msg},
+                                );
+                            } else {
+                                self.send_notification::<lsp_types::notification::ShowMessage>(
+                                    lsp_types::ShowMessageParams { typ: lsp_types::MessageType::ERROR, message: msg},
+                                );
+                            }
+                            return;
+                        } else {
+                            self.show_and_log_error(
+                                "unexpected verus result report".to_string(),
+                                Some(msg),
+                            );
+                            return;
+                        }
+                    }
                 };
 
                 // When we're running multiple flychecks, we have to include a disambiguator in
