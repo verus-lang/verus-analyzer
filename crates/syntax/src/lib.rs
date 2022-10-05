@@ -817,9 +817,6 @@ fn verus_walkthrough14() {
     use ast::{HasModuleItem, HasName};
     let source_code = 
     "verus!{
-
-
-
 fn exec_with_decreases(n: u64) -> u64
     decreases 100 - n,
 {
@@ -829,7 +826,6 @@ fn exec_with_decreases(n: u64) -> u64
         n
     }
 }
-
     }";
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
@@ -841,6 +837,30 @@ fn exec_with_decreases(n: u64) -> u64
     }
 }
  
+#[test]
+fn verus_walkthrough15() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+
+spec(checked) fn my_spec_fun2(x: int, y: int) -> int
+    recommends
+        x < 100,
+        y < 100,
+{
+    // Because of spec(checked), Verus checks that my_spec_fun's recommends clauses are satisfied here:
+    my_spec_fun(x, y)
+}
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
 // "verus! {
 
 //     /// functions may be declared exec (default), proof, or spec, which contain

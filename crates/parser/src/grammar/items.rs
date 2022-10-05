@@ -10,7 +10,7 @@ pub(crate) use self::{
     use_item::use_tree_list,
     verus::{assume, assert, requires, recommends, ensures, decreases,},
 };
-use super::*;
+use super::{*, verus::{fn_mode, publish}};
 
 // test mod_contents
 // fn foo() {}
@@ -123,31 +123,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         // m.abandon(p);
         return Ok(());
     }
-    if p.at(T![proof]) {
-        p.bump(T![proof]);
-        // m.complete(p, PROOF_KW);
-        m.abandon(p);
-        return Ok(());
-    }
-    if p.at(T![spec]) {
-        p.bump(T![spec]);
-        // m.complete(p, SPEC_KW);
-        m.abandon(p);
-        return Ok(());
-    }
-    if p.at(T![open]) {
-        p.bump(T![open]);
-        // m.complete(p, OPEN_KW);
-        m.abandon(p);
-        return Ok(());
-    }
-    if p.at(T![closed]) {
-        p.bump(T![closed]);
-        // m.complete(p, CLOSED_KW);
-        m.abandon(p);
-        return Ok(());
-    }
-
+    
     if p.at(T![assert]) {
         assert(p,m);
         return Ok(());
@@ -157,7 +133,15 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         return Ok(());
     }
 
+    // Fn =
+    // Attr* Visibility? Publish?
+    // 'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+    // 'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
+    // (body:BlockExpr | ';')
 
+    if p.at(T![open]) || p.at(T![closed]) {
+        publish(p);
+    }
 
     // modifiers
     if p.at(T![const]) && p.nth(1) != T!['{'] {
@@ -184,11 +168,18 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         has_mods = true;
         abi(p);
     }
+
+    if p.at(T![spec]) || p.at(T![proof]) || p.at(T![exec]) {
+        fn_mode(p);
+    }
+
     if p.at_contextual_kw(T![auto]) && p.nth(1) == T![trait] {
         p.bump_remap(T![auto]);
         has_mods = true;
     }
 
+
+   
     // test default_item
     // default impl T for Foo {}
     if p.at_contextual_kw(T![default]) {

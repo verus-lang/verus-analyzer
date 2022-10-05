@@ -1,4 +1,4 @@
-use ide_db::syntax_helpers::node_ext::is_pattern_cond;
+// use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use syntax::{
     ast::{self, AstNode, make::expr_assert_by},
     T,
@@ -6,7 +6,7 @@ use syntax::{
 
 use crate::{
     assist_context::{AssistContext, Assists},
-    utils::invert_boolean_expression,
+    // utils::invert_boolean_expression,
     AssistId, AssistKind,
 };
 

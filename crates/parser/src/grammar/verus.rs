@@ -1,7 +1,55 @@
 use super::{*, items::ITEM_RECOVERY_SET};
 
+// as of now...
+// Publish = 
+//   ('closed' | 'open' )
 
-pub(crate)  fn assume(p: &mut Parser<'_>, m: Marker) {
+// FnMode = 
+//   ('spec' | 'proof' | 'exec' | ModeSpecChecked )  
+
+
+
+pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    if p.at(T![open]) {
+        p.bump(T![open]);
+        m.complete(p, PUBLISH)
+    }
+    else if p.at(T![closed]) {
+        p.bump(T![closed]);
+        m.complete(p, PUBLISH)
+    } else {
+        p.error("TODO: expected open or closed or publish.");
+        m.complete(p, ERROR)  
+    }
+}
+
+
+pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    if p.at(T![proof]) {
+        p.bump(T![proof]);
+        m.complete(p, FN_MODE)
+    }
+    else if p.at(T![exec]) {
+        p.bump(T![exec]);
+        m.complete(p, FN_MODE)
+    }
+    else if p.at(T![spec]) {
+        p.bump(T![spec]);
+        if p.at(T!['(']) {
+            p.expect(T!['(']);
+            p.expect(T![checked]);
+            p.expect(T![')']);
+        }
+        m.complete(p, FN_MODE)
+    } else {
+        p.error("Expected spec/spec(checked)/proof/exec.");
+        m.complete(p, ERROR)  
+    }
+}
+
+pub(crate) fn assume(p: &mut Parser<'_>, m: Marker) {
     p.expect(T![assume]);
     p.expect(T!['(']);
     expressions::expr(p);
@@ -170,19 +218,19 @@ fn comma_expr(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, COMMA_AND_EXPR)
 }
 
-fn comma_pat(p: &mut Parser<'_>) -> CompletedMarker {
-    let m = p.start();
-    p.expect(T![,]);
-    patterns::pattern(p); 
-    m.complete(p, COMMA_AND_PAT)
-}
+// fn comma_pat(p: &mut Parser<'_>) -> CompletedMarker {
+//     let m = p.start();
+//     p.expect(T![,]);
+//     patterns::pattern(p); 
+//     m.complete(p, COMMA_AND_PAT)
+// }
 
-fn comma_name(p: &mut Parser<'_>) -> CompletedMarker {
-    let m = p.start();
-    p.expect(T![,]);
-    name(p); 
-    m.complete(p, COMMA_AND_NAME)
-}
+// fn comma_name(p: &mut Parser<'_>) -> CompletedMarker {
+//     let m = p.start();
+//     p.expect(T![,]);
+//     name(p); 
+//     m.complete(p, COMMA_AND_NAME)
+// }
 // fn pat_comma(p: &mut Parser<'_>) -> CompletedMarker {
 //     let m = p.start();
 //     patterns::pattern(p); 
