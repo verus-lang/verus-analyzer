@@ -551,9 +551,10 @@ impl ExprCollector<'_> {
                 }
             }
             ast::Expr::UnderscoreExpr(_) => self.alloc_expr(Expr::Underscore, syntax_ptr),
-            ast::Expr::AssertExpr(_) => todo!(), 
-            ast::Expr::ViewExpr(_) => todo!(), 
-            ast::Expr::AssumeExpr(_) => todo!(),
+            // Verus-hir
+            ast::Expr::AssertExpr(_) => self.alloc_expr(Expr::Missing, syntax_ptr),
+            ast::Expr::ViewExpr(_) => self.alloc_expr(Expr::Missing, syntax_ptr),
+            ast::Expr::AssumeExpr(_) => self.alloc_expr(Expr::Missing, syntax_ptr),
         })
     }
 

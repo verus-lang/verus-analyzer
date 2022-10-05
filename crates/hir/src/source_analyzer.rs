@@ -317,9 +317,10 @@ impl SourceAnalyzer {
         let lang_item_name = match prefix_expr.op_kind()? {
             ast::UnaryOp::Deref => name![deref],
             ast::UnaryOp::Not => name![not],
+            // Verus-hir
             ast::UnaryOp::Neg => name![neg],
-            ast::UnaryOp::BigAnd => todo!(),
-            ast::UnaryOp::BigOr => todo!(),
+            ast::UnaryOp::BigAnd => name![neg], // FIXME
+            ast::UnaryOp::BigOr => name![neg], // FIXME
         };
         let ty = self.ty_of_expr(db, &prefix_expr.expr()?.into())?;
 

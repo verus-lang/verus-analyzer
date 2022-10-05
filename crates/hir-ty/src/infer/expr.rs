@@ -598,8 +598,9 @@ impl<'a> InferenceContext<'a> {
                                 .resolve_associated_type(inner_ty, self.resolve_ops_not_output()),
                         }
                     }
-                    UnaryOp::BigAnd => todo!(),
-                    UnaryOp::BigOr => todo!(),
+                    // verus-hir
+                    UnaryOp::BigAnd => inner_ty,
+                    UnaryOp::BigOr => inner_ty,
                 }
             }
             Expr::BinaryOp { lhs, rhs, op } => match op {
