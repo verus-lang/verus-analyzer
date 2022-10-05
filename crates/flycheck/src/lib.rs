@@ -346,7 +346,7 @@ impl FlycheckActor {
                     Some(path) => {
                         //  insert current-saved filename here
                         let mut args = args.to_vec();
-                        args = args.iter().map(|x| {if x == "${file}"  {filepath.as_ref().unwrap().clone()} else {x.clone()} }).collect();
+                        args = args.iter().map(|x| {if x == "${file}"  {path.clone()} else {x.clone()} }).collect();
                         let mut cmd = Command::new(command);
                         cmd.args(args);
                         cmd
