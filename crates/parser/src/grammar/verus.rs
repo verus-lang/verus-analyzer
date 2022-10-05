@@ -139,13 +139,17 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
 fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     expressions::expr(p);
-    p.expect(T![,]);
+    if p.at(T![,]){
+        p.expect(T![,]);
+    }
     m.complete(p, COND_AND_COMMA)
 }
 
 fn pat_comma(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     patterns::pattern(p); 
-    p.expect(T![,]);
+    if p.at(T![,]){
+        p.expect(T![,]);
+    }
     m.complete(p, PAT_AND_COMMA)
 }

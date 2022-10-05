@@ -301,11 +301,11 @@ WhereClause =
 WherePred =
   ('for' GenericParamList)?  (Lifetime | Type) ':' TypeBoundList?
 
-CondAndComma =
-  condition:Expr ','
-
 PatAndComma = 
-  Pat ',' 
+  Pat ','? 
+
+CondAndComma =
+  condition:Expr ','?
 
 RequiresClause =
   'requires' CondAndComma*

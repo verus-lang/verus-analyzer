@@ -763,19 +763,19 @@ impl WherePred {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CondAndComma {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CondAndComma {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PatAndComma {
     pub(crate) syntax: SyntaxNode,
 }
 impl PatAndComma {
     pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CondAndComma {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CondAndComma {
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
@@ -2516,8 +2516,8 @@ impl AstNode for WherePred {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for CondAndComma {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COND_AND_COMMA }
+impl AstNode for PatAndComma {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PAT_AND_COMMA }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2527,8 +2527,8 @@ impl AstNode for CondAndComma {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for PatAndComma {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == PAT_AND_COMMA }
+impl AstNode for CondAndComma {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COND_AND_COMMA }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4805,12 +4805,12 @@ impl std::fmt::Display for WherePred {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for CondAndComma {
+impl std::fmt::Display for PatAndComma {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for PatAndComma {
+impl std::fmt::Display for CondAndComma {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
