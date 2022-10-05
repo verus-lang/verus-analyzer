@@ -21,23 +21,23 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     }
     let mut intro_enss = String::new();
     while let Some(ens) = ensures_clauses.next() {
-        dbg!("intro_ensures");
+        // dbg!("intro_ensures");
         let ens_without_comma = ens.condition()?;
         intro_enss = format!("{intro_enss}\n    assert({ens_without_comma});");
     }
-    dbg!(&intro_enss);
+    // dbg!(&intro_enss);
 
     match func.ret_type() {
         // if there's named return value, should introduce `let binding` before assertion, and also return the value 
         // REVIEW: it is assumed that ret_type is "named" if this function is returning something
         Some(ret_type) => {
            
-            dbg!(&ret_type);
+            // dbg!(&ret_type);
             let ret_name = ret_type.pat()?;
             match ret_name {
                 ast::Pat::IdentPat(ident) => {
                     let intro_let_ens = format!("let {ident} = {tail_expr};{intro_enss}\n    {ident}");
-                    dbg!(&intro_let_ens);
+                    // dbg!(&intro_let_ens);
                     return acc.add(
                         AssistId("intro_ensures", AssistKind::RefactorRewrite),
                         "Intro ensures",

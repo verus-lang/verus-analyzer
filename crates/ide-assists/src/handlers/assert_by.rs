@@ -32,10 +32,10 @@ use crate::{
 //}
 // ```
 pub(crate) fn assert_by(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
-    dbg!("assert_by");
+    // dbg!("assert_by");
     let assert_keyword = ctx.find_token_syntax_at_offset(T![assert])?;
     let expr = ast::AssertExpr::cast(assert_keyword.parent()?)?;
-    dbg!(&expr);
+    // dbg!(&expr);
     
     let assert_range = assert_keyword.text_range();
     let cursor_in_range = assert_range.contains_range(ctx.selection_trimmed());
@@ -45,13 +45,13 @@ pub(crate) fn assert_by(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()
         return None;
     }
 
-    dbg!("let's add acc");
+    // dbg!("let's add acc");
     acc.add(AssistId("assert_by", AssistKind::RefactorRewrite), "Assert by", assert_range, |edit| {
         // let flip_expr = invert_boolean_expression(syntax::ast::Expr::AssertExpr(expr.clone()));
         let assert_inner = expr.clone().expr().unwrap(); // TODO: unwrap
-        dbg!(&assert_inner);
+        // dbg!(&assert_inner);
         let assert_by = expr_assert_by(assert_inner);
-        dbg!(&assert_by);
+        // dbg!(&assert_by);
 
         // let's do assert_by
         // let if_cond = invert_boolean_expression(while_cond);

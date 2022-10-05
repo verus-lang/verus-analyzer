@@ -81,7 +81,7 @@ impl FlycheckHandle {
         dbg!("restart for", &self.id);
         match filepath {
             Some(path) => {dbg!("verus"); self.sender.send(Restart::Verus(path)).unwrap()},
-            None => {dbg!("not verus"); self.sender.send(Restart::Yes);}, // FIXME 
+            None => {dbg!("not verus"); self.sender.send(Restart::Yes).unwrap();}, // normal cargo check
         };
     }
 
@@ -448,7 +448,8 @@ impl CargoActor {
         // erroneous output.
 
         dbg!("cargo actor run");
-        let mut error = String::new();
+        let error = String::new(); //FIXME proper error 
+        // let mut error = String::new();
         let mut read_at_least_one_stdout = false;
         let mut read_at_least_one_stderr = false;
         let output = streaming_output(
