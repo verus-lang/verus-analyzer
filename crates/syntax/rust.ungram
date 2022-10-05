@@ -301,8 +301,14 @@ WhereClause =
 WherePred =
   ('for' GenericParamList)?  (Lifetime | Type) ':' TypeBoundList?
 
-PatAndComma = 
-  Pat ','? 
+CommaAndName = 
+  ',' Name 
+
+CommaAndPat = 
+  ',' Pat
+
+CommaAndExpr = 
+  ',' Expr
 
 CondAndComma =
   condition:Expr ','?
@@ -320,7 +326,7 @@ RecommendsClause =
   'recommends' CondAndComma*
 
 DecreasesClause = 
-  'decreases' PatAndComma*  
+  'decreases' Expr CommaAndExpr* ','?
 
 Visibility =
   'pub' ('(' 'in'? Path ')')?

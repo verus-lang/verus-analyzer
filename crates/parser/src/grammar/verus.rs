@@ -126,11 +126,29 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("decreases");
     let m = p.start();
     p.expect(T![decreases]);
+    expressions::expr(p);
+    dbg!(p.current());
+    dbg!(p.nth(1));
     while !p.at(EOF) && !p.at(T!['{'])  && !p.at(T![;]) {
-        pat_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
+            dbg!("break at");
             break;
         }
+        if p.at(T![,]) {
+            if p.nth_at(1, T![recommends]) || p.nth_at(1,T![ensures]) || p.nth_at(1,T![decreases]) || p.nth_at(1,T!['{']) {
+                dbg!("break at2");
+                break;
+            } else {
+                comma_expr(p);
+            }
+        } else {
+            dbg!("decreases error");
+            p.error("TODO: please add COMMA after each decreases clause.");
+            return m.complete(p, ERROR);       
+        }
+    }
+    if p.at(T![,]) {
+        p.expect(T![,]);
     }
     m.complete(p, DECREASES_CLAUSE)
 }
@@ -145,11 +163,33 @@ fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, COND_AND_COMMA)
 }
 
-fn pat_comma(p: &mut Parser<'_>) -> CompletedMarker {
+fn comma_expr(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    patterns::pattern(p); 
-    if p.at(T![,]){
-        p.expect(T![,]);
-    }
-    m.complete(p, PAT_AND_COMMA)
+    p.expect(T![,]);
+    expressions::expr(p);
+    m.complete(p, COMMA_AND_EXPR)
 }
+
+fn comma_pat(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![,]);
+    patterns::pattern(p); 
+    m.complete(p, COMMA_AND_PAT)
+}
+
+fn comma_name(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![,]);
+    name(p); 
+    m.complete(p, COMMA_AND_NAME)
+}
+// fn pat_comma(p: &mut Parser<'_>) -> CompletedMarker {
+//     let m = p.start();
+//     patterns::pattern(p); 
+//     if p.at(T![,]){
+//         p.expect(T![,]);
+//     }
+//     m.complete(p, PAT_AND_COMMA)
+// }
+
+

@@ -775,6 +775,72 @@ assert(forall|i: int| #![auto] 0 <= i < t.len() ==> uninterp_fn(t[i]));
 }
  
 
+#[test]
+fn verus_walkthrough13() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+
+    proof fn arith_sum_int_nonneg(i: nat)
+        ensures
+            arith_sum_int(i as int) >= 0,
+        decreases
+            i,
+    {
+        if i > 0 {
+            arith_sum_int_nonneg((i - 1) as nat);
+        }
+    }
+    
+
+
+
+    spec fn arith_sum_int(i: int) -> int
+    decreases i
+{
+    if i <= 0 { 0 } else { i + arith_sum_int(i - 1) }
+}
+
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+ 
+#[test]
+fn verus_walkthrough14() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+
+
+
+fn exec_with_decreases(n: u64) -> u64
+    decreases 100 - n,
+{
+    if n < 100 {
+        exec_with_decreases(n + 1)
+    } else {
+        n
+    }
+}
+
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+ 
 // "verus! {
 
 //     /// functions may be declared exec (default), proof, or spec, which contain

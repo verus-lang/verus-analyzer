@@ -763,12 +763,30 @@ impl WherePred {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PatAndComma {
+pub struct CommaAndName {
     pub(crate) syntax: SyntaxNode,
 }
-impl PatAndComma {
-    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+impl ast::HasName for CommaAndName {}
+impl CommaAndName {
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndPat {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndPat {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndExpr {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -809,7 +827,9 @@ impl DecreasesClause {
     pub fn decreases_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![decreases])
     }
-    pub fn pat_and_commas(&self) -> AstChildren<PatAndComma> { support::children(&self.syntax) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_exprs(&self) -> AstChildren<CommaAndExpr> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2516,8 +2536,30 @@ impl AstNode for WherePred {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for PatAndComma {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == PAT_AND_COMMA }
+impl AstNode for CommaAndName {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_NAME }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndPat {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_PAT }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4379,6 +4421,7 @@ impl AstNode for AnyHasName {
                 | VARIANT
                 | CONST_PARAM
                 | TYPE_PARAM
+                | COMMA_AND_NAME
                 | ASSERT_EXPR
                 | IDENT_PAT
         )
@@ -4805,7 +4848,17 @@ impl std::fmt::Display for WherePred {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for PatAndComma {
+impl std::fmt::Display for CommaAndName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndPat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

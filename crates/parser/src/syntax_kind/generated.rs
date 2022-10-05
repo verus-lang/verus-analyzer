@@ -295,6 +295,9 @@ pub enum SyntaxKind {
     ASSUME_BLOCK,
     COND_AND_COMMA,
     PAT_AND_COMMA,
+    COMMA_AND_EXPR,
+    COMMA_AND_PAT,
+    COMMA_AND_NAME,
     PUBLISH,
     FN_MODE,
     #[doc(hidden)]
