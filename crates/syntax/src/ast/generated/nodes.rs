@@ -374,6 +374,7 @@ impl ast::HasVisibility for Module {}
 impl ast::HasDocComments for Module {}
 impl Module {
     pub fn mod_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![mod]) }
+    pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
     pub fn item_list(&self) -> Option<ItemList> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
 }

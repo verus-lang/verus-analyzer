@@ -431,7 +431,7 @@ fn verus_walkthrough2() {
     dbg!(&parse.errors);
     assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
-    dbg!(&file);
+    // dbg!(&file);
     for item in file.items() {
         dbg!(&item);
     }

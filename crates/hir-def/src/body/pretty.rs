@@ -423,7 +423,13 @@ impl<'a> Printer<'a> {
                     });
                 }
                 w!(self, "}}");
-            }
+            },
+            // verus --- add "assert"
+            Expr::Assert { predicate } => {
+                w!(self, "assert(");
+                self.print_expr(*predicate);
+                w!(self, ")");
+            },
         }
     }
 

@@ -45,6 +45,13 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
 ]);
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+    // if p.at(T![verus]) {
+    //     let m = p.start();
+    //     p.expect(T![verus]);
+    //     p.expect(T![!]);
+    //     p.expect(T!['{']);
+    //     m.abandon(p);
+    // }
     
     let m = p.start();
     attributes::outer_attrs(p);
@@ -103,25 +110,22 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     let mut has_mods = false;
     let mut has_extern = false;
 
-    if p.at(T![verus]) {
-        dbg!("hi Verus"); 
-        p.bump(T![verus]);
-        p.bump(T![!]);
-        // item_list(p);
-        p.expect(T!['{']);
-        m.abandon(p);
-        while !p.at(EOF) && !(p.at(T!['}'])) {
-            item_or_macro(p, true);
-        }
-        let m = p.start();
-        p.expect(T!['}']);
-        m.abandon(p);
-        // m.complete(p, VERUS);
-        // p.bump(T!['{']);
-        // token_tree(p);
-         
-        // m.abandon(p);
+    if p.at(IDENT) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+        // check if ident is verus
+        mod_item(p, m);
         return Ok(());
+        // dbg!("hi Verus"); 
+        // p.bump(T![verus]);
+        // p.bump(T![!]);
+        // p.expect(T!['{']);
+        // m.abandon(p);
+        // while !p.at(EOF) && !(p.at(T!['}'])) {
+        //     item_or_macro(p, true);
+        // }
+        // let m = p.start();
+        // p.expect(T!['}']);
+        // m.abandon(p);
+        // return Ok(());
     }
     
     if p.at(T![assert]) {
@@ -317,8 +321,23 @@ fn extern_crate(p: &mut Parser<'_>, m: Marker) {
 // test mod_item
 // mod a;
 pub(crate) fn mod_item(p: &mut Parser<'_>, m: Marker) {
-    p.bump(T![mod]);
+    dbg!(p.current());
+    if p.at(T![mod]) {
+        p.bump(T![mod]);
+    }
+    dbg!(p.current());
+    
+    // if p.at(T![verus]) {
+    //     p.expect(T![verus]);
+    //     p.expect(T![!]);
+    // } else {
+    //     name(p);
+    // }
     name(p);
+    if p.at(T![!]) {
+        p.expect(T![!]);
+    }
+
     if p.at(T!['{']) {
         // test mod_item_curly
         // mod b { }

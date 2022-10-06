@@ -411,6 +411,7 @@ impl<'a> Ctx<'a> {
 
     fn lower_module(&mut self, module: &ast::Module) -> Option<FileItemTreeId<Mod>> {
         let name = module.name()?.as_name();
+        dbg!(&name);
         let visibility = self.lower_visibility(module);
         let kind = if module.semicolon_token().is_some() {
             ModKind::Outline
@@ -511,6 +512,7 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_macro_call(&mut self, m: &ast::MacroCall) -> Option<FileItemTreeId<MacroCall>> {
+        // verus?
         let path = Interned::new(ModPath::from_src(self.db.upcast(), m.path()?, self.hygiene())?);
         let ast_id = self.source_ast_id_map.ast_id(m);
         let expand_to = hir_expand::ExpandTo::from_call_site(m);
