@@ -574,7 +574,9 @@ impl RequiresClause {
     pub fn requires_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![requires])
     }
-    pub fn cond_and_commas(&self) -> AstChildren<CondAndComma> { support::children(&self.syntax) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -583,7 +585,9 @@ pub struct EnsuresClause {
 }
 impl EnsuresClause {
     pub fn ensures_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ensures]) }
-    pub fn cond_and_commas(&self) -> AstChildren<CondAndComma> { support::children(&self.syntax) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -795,6 +799,14 @@ impl CommaAndPat {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndCond {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndCond {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CommaAndExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -819,7 +831,9 @@ impl InvariantClause {
     pub fn invariant_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![invariant])
     }
-    pub fn cond_and_commas(&self) -> AstChildren<CondAndComma> { support::children(&self.syntax) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -830,7 +844,9 @@ impl RecommendsClause {
     pub fn recommends_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![recommends])
     }
-    pub fn cond_and_commas(&self) -> AstChildren<CondAndComma> { support::children(&self.syntax) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -842,7 +858,7 @@ impl DecreasesClause {
         support::token(&self.syntax, T![decreases])
     }
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_exprs(&self) -> AstChildren<CommaAndExpr> { support::children(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
@@ -2574,6 +2590,17 @@ impl AstNode for CommaAndName {
 }
 impl AstNode for CommaAndPat {
     fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_PAT }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndCond {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_COND }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4884,6 +4911,11 @@ impl std::fmt::Display for CommaAndName {
     }
 }
 impl std::fmt::Display for CommaAndPat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndCond {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

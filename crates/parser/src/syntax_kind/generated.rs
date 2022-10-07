@@ -294,6 +294,7 @@ pub enum SyntaxKind {
     ASSERT_BLOCK,
     ASSUME_BLOCK,
     COND_AND_COMMA,
+    COMMA_AND_COND,
     PAT_AND_COMMA,
     COMMA_AND_EXPR,
     COMMA_AND_PAT,

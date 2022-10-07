@@ -310,26 +310,30 @@ CommaAndName =
 CommaAndPat = 
   ',' Pat
 
+CommaAndCond = 
+  ',' condition:Expr
+
 CommaAndExpr = 
   ',' Expr
+
 
 CondAndComma =
   condition:Expr ','?
 
 RequiresClause =
-  'requires' CondAndComma*
+  'requires' Expr CommaAndCond* ','?
 
 EnsuresClause =
-  'ensures' CondAndComma*
+  'ensures' Expr CommaAndCond* ','?
 
 InvariantClause =
-  'invariant' CondAndComma*
+  'invariant' Expr CommaAndCond* ','?
 
 RecommendsClause =
-  'recommends' CondAndComma*
+  'recommends' Expr CommaAndCond* ','?
 
 DecreasesClause = 
-  'decreases' Expr CommaAndExpr* ','?
+  'decreases' Expr CommaAndCond* ','?
 
 Visibility =
   'pub' ('(' 'in'? Path ')')?

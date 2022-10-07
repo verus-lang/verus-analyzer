@@ -879,3 +879,9 @@ impl ast::CondAndComma {
         support::child(&self.syntax)
     }
 }
+
+impl ast::CommaAndCond {
+    pub fn condition(&self) -> Option<ast::Expr> {
+        support::child(&self.syntax)
+    }
+}

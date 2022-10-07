@@ -166,8 +166,8 @@ pub(super) fn atom_expr(
         T![for] => for_expr(p, None),
 
         _ => {
-            dbg!("hey atom_expr");
-            dbg!(p.current());
+            // dbg!("hey atom_expr");
+            // dbg!(p.current());
             // dbg!(p.nth(1));
             // dbg!(p.nth(2));
             // dbg!(p.nth(3));
@@ -532,8 +532,12 @@ fn match_guard(p: &mut Parser<'_>) -> CompletedMarker {
 // fn c() { 1; 2; }
 // fn d() { 1; 2 }
 pub(crate) fn block_expr(p: &mut Parser<'_>) {
+    dbg!("block_expr");
+    // panic!();
     if !p.at(T!['{']) {
         // panic!();
+        dbg!(p.current());
+        dbg!(p.nth(1));
         p.error("expected a block");
         return;
     }

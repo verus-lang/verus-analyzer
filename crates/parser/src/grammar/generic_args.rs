@@ -87,7 +87,7 @@ pub(super) fn const_arg_expr(p: &mut Parser<'_>) {
         // test const_arg_block
         // type T = S<{90 + 2}>;
         T!['{'] => {
-            expressions::block_expr(p);
+             expressions::block_expr(p);
         }
         // test const_arg_literal
         // type T = S<"hello", 0xdeadbeef>;

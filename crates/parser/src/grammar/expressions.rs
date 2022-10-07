@@ -27,7 +27,7 @@ pub(super) fn expr_stmt(
     expr_bp(p, m, r, 1)
 }
 
-fn expr_no_struct(p: &mut Parser<'_>) {
+pub(crate) fn expr_no_struct(p: &mut Parser<'_>) {
     let r = Restrictions { forbid_structs: true, prefer_stmt: false };
     expr_bp(p, None, r, 1);
 }
@@ -143,6 +143,7 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
     attributes::inner_attrs(p);
+    dbg!("expr_block_contents");
 
     while !p.at(EOF) && !p.at(T!['}']) {
         // test nocontentexpr

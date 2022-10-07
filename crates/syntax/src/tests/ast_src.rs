@@ -245,6 +245,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "ASSUME_BLOCK",     // what is this?
 
         "COND_AND_COMMA",       // change this to 'specification'
+        "COMMA_AND_COND",       // change this to 'specification'
         "PAT_AND_COMMA",
         "COMMA_AND_EXPR",
         "COMMA_AND_PAT",

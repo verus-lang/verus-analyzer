@@ -379,9 +379,9 @@ fn verus_walkthrough1() {
     assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
 
-    // dbg!(&file);
+    dbg!(&file);
     for item in file.items() {
-        dbg!(&item);
+        // dbg!(&item);
         // match item {
         //     ast::Item::Fn(f) => func = Some(f),
         //     _ => unreachable!(),
@@ -515,7 +515,7 @@ fn verus_walkthrough4() {
     dbg!(&parse.errors);
     assert!(parse.errors().is_empty());
     let file: SourceFile = parse.tree();
-    dbg!(&file);
+    // dbg!(&file);
     for item in file.items() {
         dbg!(&item);
     }

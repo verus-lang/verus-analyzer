@@ -12,14 +12,14 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     let r_curly = stmt_list.r_curly_token()?;
     let ensures = func.ensures_clause()?; 
     let ensures_keyword = ensures.ensures_token()?;
-    let mut ensures_clauses = ensures.cond_and_commas();
-
+    let first_ens = ensures.expr()?;
+    let mut ensures_clauses = ensures.comma_and_conds();
     let ensures_range = ensures_keyword.text_range();
     let cursor_in_range = ensures_range.contains_range(ctx.selection_trimmed());
     if !cursor_in_range {
         return None;
     }
-    let mut intro_enss = String::new();
+    let mut intro_enss = format!("\n    assert({first_ens});");
     while let Some(ens) = ensures_clauses.next() {
         // dbg!("intro_ensures");
         let ens_without_comma = ens.condition()?;

@@ -116,12 +116,26 @@ pub(crate)  fn requires(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("requires");
     let m = p.start();
     p.expect(T![requires]);
+    expressions::expr_no_struct(p);
 
     while !p.at(EOF) && !p.at(T![recommends]) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
-        cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
+        if p.at(T![,]) {
+            if p.nth_at(1, T![recommends]) || p.nth_at(1,T![ensures]) || p.nth_at(1,T![decreases]) || p.nth_at(1,T!['{']) {
+                break;
+            } else {
+                comma_cond(p);
+            }
+        } else {
+            dbg!("requires parse error");
+            p.error("TODO: please add COMMA after each requires clause.");
+            return m.complete(p, ERROR);       
+        }
+    }
+    if p.at(T![,]) {
+        p.expect(T![,]);
     }
     m.complete(p, REQUIRES_CLAUSE)
 }
@@ -131,11 +145,25 @@ pub(crate)  fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("recommends");
     let m = p.start();
     p.expect(T![recommends]);
+    expressions::expr_no_struct(p);
     while !p.at(EOF) && !p.at(T![ensures]) && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
-        cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
+        if p.at(T![,]) {
+            if p.nth_at(1, T![recommends]) || p.nth_at(1,T![ensures]) || p.nth_at(1,T![decreases]) || p.nth_at(1,T!['{']) {
+                break;
+            } else {
+                comma_cond(p);
+            }
+        } else {
+            dbg!("recommends parse error");
+            p.error("TODO: please add COMMA after each recommends clause.");
+            return m.complete(p, ERROR);       
+        }
+    }
+    if p.at(T![,]) {
+        p.expect(T![,]);
     }
     m.complete(p, RECOMMENDS_CLAUSE)
 }
@@ -145,12 +173,26 @@ pub(crate)  fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("ensures");
     let m = p.start();
     p.expect(T![ensures]);
+    expressions::expr_no_struct(p);
 
     while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
-        cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
+        if p.at(T![,]) {
+            if p.nth_at(1, T![recommends]) || p.nth_at(1,T![ensures]) || p.nth_at(1,T![decreases]) || p.nth_at(1,T!['{']) {
+                break;
+            } else {
+                comma_cond(p);
+            }
+        } else {
+            dbg!("ensures parse error");
+            p.error("TODO: please add COMMA after each ensures clause.");
+            return m.complete(p, ERROR);       
+        }
+    }
+    if p.at(T![,]) {
+        p.expect(T![,]);
     }
     m.complete(p, ENSURES_CLAUSE)
 }
@@ -159,12 +201,26 @@ pub(crate)  fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("invariants");
     let m = p.start();
     p.expect(T![invariant]);
+    expressions::expr_no_struct(p);
 
     while !p.at(EOF)  && !p.at(T![decreases]) && !p.at(T!['{'])  && !p.at(T![;])  {
-        cond_comma(p);
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
+        if p.at(T![,]) {
+            if p.nth_at(1, T![recommends]) || p.nth_at(1,T![ensures]) || p.nth_at(1,T![decreases]) || p.nth_at(1,T!['{']) {
+                break;
+            } else {
+                comma_cond(p);
+            }
+        } else {
+            dbg!("invariants parse error");
+            p.error("TODO: please add COMMA after each invariants clause.");
+            return m.complete(p, ERROR);       
+        }
+    }
+    if p.at(T![,]) {
+        p.expect(T![,]);
     }
     m.complete(p, INVARIANT_CLAUSE)
 }
@@ -174,7 +230,7 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
     dbg!("decreases");
     let m = p.start();
     p.expect(T![decreases]);
-    expressions::expr(p);
+    expressions::expr_no_struct(p);
     dbg!(p.current());
     dbg!(p.nth(1));
     while !p.at(EOF) && !p.at(T!['{'])  && !p.at(T![;]) {
@@ -187,10 +243,10 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
                 dbg!("break at2");
                 break;
             } else {
-                comma_expr(p);
+                comma_cond(p);
             }
         } else {
-            dbg!("decreases error");
+            dbg!("decreases parsing error");
             p.error("TODO: please add COMMA after each decreases clause.");
             return m.complete(p, ERROR);       
         }
@@ -202,28 +258,16 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 
-fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
-    let m = p.start();
-    expressions::expr(p);
-    if p.at(T![,]){
-        p.expect(T![,]);
-    }
-    m.complete(p, COND_AND_COMMA)
-}
 
-fn comma_expr(p: &mut Parser<'_>) -> CompletedMarker {
+fn comma_cond(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(T![,]);
-    expressions::expr(p);
-    m.complete(p, COMMA_AND_EXPR)
+    expressions::expr_no_struct(p);
+    m.complete(p, COMMA_AND_COND)
 }
 
-// fn comma_pat(p: &mut Parser<'_>) -> CompletedMarker {
-//     let m = p.start();
-//     p.expect(T![,]);
-//     patterns::pattern(p); 
-//     m.complete(p, COMMA_AND_PAT)
-// }
+
+
 
 // fn comma_name(p: &mut Parser<'_>) -> CompletedMarker {
 //     let m = p.start();
@@ -238,6 +282,26 @@ fn comma_expr(p: &mut Parser<'_>) -> CompletedMarker {
 //         p.expect(T![,]);
 //     }
 //     m.complete(p, PAT_AND_COMMA)
+// }
+
+// fn cond_comma(p: &mut Parser<'_>) -> CompletedMarker {
+//     dbg!("cond comma");
+//     dbg!(p.current());
+//     dbg!(p.nth(1));
+//     let m = p.start();
+//     expressions::expr(p);
+//     if p.at(T![,]){
+//         p.expect(T![,]);
+//     }
+//     m.complete(p, COND_AND_COMMA)
+// }
+
+// fn comma_expr(p: &mut Parser<'_>) -> CompletedMarker {
+//     dbg!("comma_expr");
+//     let m = p.start();
+//     p.expect(T![,]);
+//     expressions::expr_no_struct(p);
+//     m.complete(p, COMMA_AND_EXPR)
 // }
 
 
