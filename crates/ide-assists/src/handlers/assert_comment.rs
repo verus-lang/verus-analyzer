@@ -58,16 +58,6 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
     dbg!(&output);
 
-    if output.status.success() {
-        dbg!("success");
-        dbg!("continue code action");
-    } else {
-        dbg!("fail");
-        return None;        
-    }
-
-    
-
     let expr = ast::AssertExpr::cast(assert_keyword.parent()?)?;
     
     
@@ -77,15 +67,34 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     if !cursor_in_range {
         return None;
     }
-    // TODO should comment out whole "assertExpr" not only one line
-    acc.add(
-        AssistId("assert_comment", AssistKind::RefactorRewrite),
-        "Assert comment",
-        assert_range,
-        |builder| {
-            builder.insert(assert_keyword.text_range().start(), &format!("// "));
-        },
-    )
+
+    if output.status.success() {
+        dbg!("success");
+        dbg!("continue code action");
+        // TODO should comment out whole "assertExpr" not only one line
+        acc.add(
+            AssistId("assert_comment", AssistKind::RefactorRewrite),
+            "Confirm if assert necessary",
+            assert_range,
+            |builder| {
+                builder.insert(assert_keyword.text_range().start(), &format!("// "));
+            },
+        )
+    } else {
+        // TODO should comment out whole "assertExpr" not only one line
+        let assert_stmt = expr.syntax().parent()?;
+        acc.add(
+            AssistId("assert_comment", AssistKind::RefactorRewrite),
+            "Confirm if assert necessary",
+            assert_range,
+            |builder| {
+                builder.insert(assert_stmt.text_range().end(), &format!(" // OBSERVE"));
+            },
+        )       
+    }
+
+
+
 
 }
 
@@ -210,7 +219,7 @@ verus! {
     ensures
         offset < 1000
     {
-        assert(offset < 10);
+        assert(offset < 10); // OBSERVE
     }
 } // verus!
 "#,
