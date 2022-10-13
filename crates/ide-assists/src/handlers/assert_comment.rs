@@ -16,19 +16,30 @@ use crate::{
     AssistId, AssistKind,
 };
 
-// Assist: invert_if
-//
+
 
 pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
     dbg!("assert_comment");
     let assert_keyword = ctx.find_token_syntax_at_offset(T![assert])?;
+    dbg!(ctx.offset());
+    dbg!(assert_keyword.text_range().start());
     let mut temp_text_string = String::new();
 
+    
     for par in assert_keyword.parent_ancestors() {
         dbg!(&par.text());
         temp_text_string = String::from(par.text());
     }
+
+    let assert_start_offset = assert_keyword.text_range().start();
+    temp_text_string.insert_str(usize::from(assert_start_offset), "// ");
+    
+    // find the offset and add "//"
     dbg!(&temp_text_string);
+
+
+
+    
 
 
     // TODO: instead of writing to a file, consider
@@ -191,9 +202,9 @@ verus! {
     requires    
         offset < 1000
     ensures
-        offset < 1000
+        offset & offset < 1000
     {
-        ass$0ert(offset < 10);
+        ass$0ert(offset & offset == offset) by(bit_vector);
     }
 } // verus!
 "#,
@@ -217,9 +228,9 @@ verus! {
     requires    
         offset < 1000
     ensures
-        offset < 1000
+        offset & offset < 1000
     {
-        assert(offset < 10); // OBSERVE
+        assert(offset & offset == offset) by(bit_vector); // OBSERVE
     }
 } // verus!
 "#,
