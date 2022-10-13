@@ -18,30 +18,28 @@ use std::collections::hash_map::DefaultHasher;
 
 
 pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
-    dbg!("assert_comment");
     let assert_keyword = ctx.find_token_syntax_at_offset(T![assert])?;
     let now = Instant::now();
-    dbg!(ctx.offset());
-    dbg!(assert_keyword.text_range().start());
-    dbg!(now);
     let mut temp_text_string = String::new();
 
-    
+    // get the text of the most grand parent
     for par in assert_keyword.parent_ancestors() {
-        dbg!(&par.text());
         temp_text_string = String::from(par.text());
     }
-
+    // find the offset starting of "assert"
     let assert_start_offset = assert_keyword.text_range().start();
+
+    // insert "//" in front of "assert"
     temp_text_string.insert_str(usize::from(assert_start_offset), "// ");
+
+    /* 
+    TODO: actually, I need "replace_ast" to the copied file
+    maybe I will copy the whole context-syntax-tree, and then try to replace the AST, and then write to a temp file
     
-    // find the offset and add "//"
-    dbg!(&temp_text_string);
-
-
-
+    or similarly, find the offset and length that I need to remove,
+    and find the offset and text that I need to insert
+    */ 
     
-
 
     // TODO: instead of writing to a file, consider
     // 1) dev/shm 
@@ -59,14 +57,13 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
         Ok(file) => file,
     };
 
-    // Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
+    // Write the modified verus program to `file`, returns `io::Result<()>`
     match file.write_all(temp_text_string.as_bytes()) {
         Err(why) => panic!("couldn't write to {}: {}", display, why),
         Ok(_) => dbg!("successfully wrote to {}", display),
     };
 
     let verus_exec_path = "/Users/chanhee/Works/secure-foundations/verus/source/verus-log.sh";
-
     let output = Command::new(verus_exec_path)
     .arg(path)
     .output().ok()?;
@@ -74,8 +71,6 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     dbg!(&output);
 
     let expr = ast::AssertExpr::cast(assert_keyword.parent()?)?;
-    
-    
     let assert_range = assert_keyword.text_range();
     let cursor_in_range = assert_range.contains_range(ctx.selection_trimmed());
 
@@ -109,8 +104,6 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     }
 
 
-
-
 }
 
 #[cfg(test)]
@@ -119,63 +112,63 @@ mod tests {
     use crate::tests::{check_assist, check_assist_not_applicable};
 
 
-//     #[test]
-//     fn assert_comment_success() {
-//         check_assist(
-//             assert_comment,
-// r#"
-// #[allow(unused_imports)]
-// use builtin_macros::*;
-// #[allow(unused_imports)]
-// use builtin::*;
+    #[test]
+    fn assert_comment_success() {
+        check_assist(
+            assert_comment,
+r#"
+#[allow(unused_imports)]
+use builtin_macros::*;
+#[allow(unused_imports)]
+use builtin::*;
 
-// mod pervasive;
-// #[allow(unused_imports)]
-// use crate::pervasive::{modes::*, seq::*, vec::*};
+mod pervasive;
+#[allow(unused_imports)]
+use crate::pervasive::{modes::*, seq::*, vec::*};
 
-// #[verifier(external)]
-// fn main() {
-// }
+#[verifier(external)]
+fn main() {
+}
 
-// verus! {
-//     proof fn proof_index(a: u16, offset: u16)
-//     requires    
-//         offset < 16
-//     ensures
-//         offset < 16
-//     {
-//         ass$0ert(offset < 16);
-//     }
-// } // verus!
-// "#,
+verus! {
+    proof fn proof_index(a: u16, offset: u16)
+    requires    
+        offset < 16
+    ensures
+        offset < 16
+    {
+        ass$0ert(offset < 16);
+    }
+} // verus!
+"#,
 
-// r#"
-// #[allow(unused_imports)]
-// use builtin_macros::*;
-// #[allow(unused_imports)]
-// use builtin::*;
+r#"
+#[allow(unused_imports)]
+use builtin_macros::*;
+#[allow(unused_imports)]
+use builtin::*;
 
-// mod pervasive;
-// #[allow(unused_imports)]
-// use crate::pervasive::{modes::*, seq::*, vec::*};
+mod pervasive;
+#[allow(unused_imports)]
+use crate::pervasive::{modes::*, seq::*, vec::*};
 
-// #[verifier(external)]
-// fn main() {
-// }
+#[verifier(external)]
+fn main() {
+}
 
-// verus! {
-//     proof fn proof_index(a: u16, offset: u16)
-//     requires    
-//         offset < 16
-//     ensures
-//         offset < 16
-//     {
-//         // assert(offset < 16);
-//     }
-// } // verus!
-// "#,
-//         );
-//     }
+verus! {
+    proof fn proof_index(a: u16, offset: u16)
+    requires    
+        offset < 16
+    ensures
+        offset < 16
+    {
+        // assert(offset < 16);
+    }
+} // verus!
+"#,
+        );
+    }
 
 
 
