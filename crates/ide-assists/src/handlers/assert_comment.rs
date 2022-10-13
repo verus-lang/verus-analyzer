@@ -4,25 +4,26 @@ use syntax::{
     ast::{self, AstNode, make::expr_assert_by},
     T,
 };
-use std::process::Command;
+use std::{process::Command, hash::{Hash, Hasher}};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-
-
+use std::time::{Duration, Instant};
 use crate::{
     assist_context::{AssistContext, Assists},
     // utils::invert_boolean_expression,
     AssistId, AssistKind,
 };
-
+use std::collections::hash_map::DefaultHasher;
 
 
 pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
     dbg!("assert_comment");
     let assert_keyword = ctx.find_token_syntax_at_offset(T![assert])?;
+    let now = Instant::now();
     dbg!(ctx.offset());
     dbg!(assert_keyword.text_range().start());
+    dbg!(now);
     let mut temp_text_string = String::new();
 
     
@@ -45,8 +46,11 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     // TODO: instead of writing to a file, consider
     // 1) dev/shm 
     // OR
-    // 2) man memfd_create 
-    let path = Path::new("/tmp/testing_verus_action.rs");
+    // 2) man memfd_create
+    let mut hasher = DefaultHasher::new();
+    now.hash(&mut hasher);
+    let tmp_name = format!("/tmp/testing_verus_action_{:?}_.rs", hasher.finish());
+    let path = Path::new(&tmp_name);
     let display = path.display();
 
     // Open a file in write-only mode, returns `io::Result<File>`
