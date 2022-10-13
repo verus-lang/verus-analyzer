@@ -61,6 +61,16 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
         return;
     }
 
+    if p.at(T![assert]) {
+        let m1 = p.start();
+        verus::assert(p, m1);
+        if p.at(T![;]){
+            p.expect(T![;]);
+        }
+        m.complete(p, EXPR_STMT);
+        return;
+    }
+
     // test block_items
     // fn a() { fn b() {} }
     let m = match items::opt_item(p, m) {
@@ -98,6 +108,7 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
                 }
                 Semicolon::Forbidden => (),
             }
+            dbg!("expr_stmt!");
             m.complete(p, EXPR_STMT);
         }
     }

@@ -128,10 +128,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         // return Ok(());
     }
     
-    if p.at(T![assert]) {
-        assert(p,m);
-        return Ok(());
-    }
+    // if p.at(T![assert]) {
+    //     assert(p,m);
+    //     return Ok(());
+    // }
     if p.at(T![assume]) {
         assume(p, m);
         return Ok(());

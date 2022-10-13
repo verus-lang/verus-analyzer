@@ -390,6 +390,48 @@ fn verus_walkthrough1() {
 }
 
 
+
+#[test]
+fn verus_walkthrough1_1() {
+    use ast::{HasModuleItem, HasName};
+
+    let source_code = 
+    "
+verus! {
+    spec fn identity(x: u32) -> u32 {
+        x
+    }
+
+    proof fn proof_index(a: u32, offset: u32)
+    requires    
+        offset < 1000,
+    ensures
+        offset < 1000,
+    {
+        let mut x:u32 = 10;
+        x = identity(x);
+        assert(offset < 100);
+    }
+}
+";
+
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // match item {
+        //     ast::Item::Fn(f) => func = Some(f),
+        //     _ => unreachable!(),
+        // }
+    }
+}
+
+
+
 #[test]
 fn verus_walkthrough2() {
     use ast::{HasModuleItem, HasName};
