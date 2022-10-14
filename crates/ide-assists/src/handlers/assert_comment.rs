@@ -1,14 +1,13 @@
-use ide_db::base_db::SourceDatabaseExt;
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use syntax::{
-    ast::{self, AstNode, make::expr_assert_by},
+    ast::{self, AstNode},
     T,
 };
 use std::{process::Command, hash::{Hash, Hasher}};
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 use crate::{
     assist_context::{AssistContext, Assists},
     // utils::invert_boolean_expression,
@@ -47,7 +46,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     // 2) man memfd_create
     let mut hasher = DefaultHasher::new();
     now.hash(&mut hasher);
-    let tmp_name = format!("/tmp/testing_verus_action_{:?}_.rs", hasher.finish());
+    let tmp_name = format!("/Users/chanhee/Works/rust-analyzer/tmp/testing_verus_action_{:?}_.rs", hasher.finish());
     let path = Path::new(&tmp_name);
     let display = path.display();
 
@@ -67,6 +66,10 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     let output = Command::new(verus_exec_path)
     .arg(path)
     .output().ok()?;
+
+
+    // TODO: remove this temporary file!
+    
 
     dbg!(&output);
 

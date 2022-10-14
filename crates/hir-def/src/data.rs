@@ -34,6 +34,11 @@ pub struct FunctionData {
     pub abi: Option<Interned<str>>,
     pub legacy_const_generics_indices: Box<[u32]>,
     flags: FnFlags,
+    // verus
+    // this seems like place to add 
+    // pub requires
+    // pub ensures
+    // ...more
 }
 
 impl FunctionData {

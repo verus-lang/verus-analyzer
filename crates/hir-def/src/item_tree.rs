@@ -593,6 +593,11 @@ pub struct Function {
     pub async_ret_type: Option<Interned<TypeRef>>,
     pub ast_id: FileAstId<ast::Fn>,
     pub(crate) flags: FnFlags,
+    // verus
+    // this seems like place to add 
+    // pub requires
+    // pub ensures
+    // ...more
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

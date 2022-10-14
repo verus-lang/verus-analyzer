@@ -251,6 +251,8 @@ impl<'a> Ctx<'a> {
         Some(res)
     }
 
+    // verus
+    // this is the way
     fn lower_function(&mut self, func: &ast::Fn) -> Option<FileItemTreeId<Function>> {
         let visibility = self.lower_visibility(func);
         let name = func.name()?.as_name();
