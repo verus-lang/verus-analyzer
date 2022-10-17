@@ -81,9 +81,14 @@ impl<'a> InferenceContext<'a> {
 
         let ty = match &self.body[tgt_expr] {
             Expr::Missing => self.err_ty(),
-            Expr::Assert { predicate } => {
+            Expr::Assert { condition } => {
                 let bool_ty = self.result.standard_types.bool_.clone();
-                self.infer_expr_coerce(*predicate, &Expectation::HasType(bool_ty.clone()));
+                self.infer_expr_coerce(*condition, &Expectation::HasType(bool_ty.clone()));
+                bool_ty
+            },
+            Expr::Assume { condition } => {
+                let bool_ty = self.result.standard_types.bool_.clone();
+                self.infer_expr_coerce(*condition, &Expectation::HasType(bool_ty.clone()));
                 bool_ty
             },
             &Expr::If { condition, then_branch, else_branch } => {

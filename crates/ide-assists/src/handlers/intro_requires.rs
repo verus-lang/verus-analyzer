@@ -234,6 +234,24 @@ fn inline(
             .unwrap_or_default()
             .into_iter()
     };
+    dbg!(params);
+
+    for (pat, _, param) in params {
+        if !matches!(pat, ast::Pat::IdentPat(pat) if pat.is_simple_ident()) {
+            panic!();
+        }
+        // FIXME: we need to fetch all locals declared in the parameter here
+        // not only the local if it is a simple binding
+        match param.as_local(sema.db) {
+            Some(l) => {dbg!(usages_for_locals(l)); panic!()},
+               
+            None => panic!(),
+        }
+    };
+    panic!();
+
+
+
     let param_use_nodes: Vec<Vec<_>> = params
         .iter()
         .map(|(pat, _, param)| {
@@ -358,7 +376,7 @@ mod tests {
         check_assist(
             intro_requires,
             r#"
-proof fn my_proof_fun(x: int, y: int)
+proof fn my_proof_fun(x: u32, y: u32)
     requires
         x > 0,
         y > 0,
@@ -368,7 +386,7 @@ proof fn my_proof_fun(x: int, y: int)
     let multiplied = x * y;
 }
 
-proof fn call_fun(a: int, b: int)
+proof fn call_fun(a: u32, b: u32)
     requires
         a > 0,
         b > 0,
@@ -379,7 +397,7 @@ proof fn call_fun(a: int, b: int)
 }
 "#,
             r#"
-proof fn my_proof_fun(x: int, y: int)
+proof fn my_proof_fun(x: u32, y: u32)
     requires
         x > 0,
         y > 0,
@@ -389,7 +407,7 @@ proof fn my_proof_fun(x: int, y: int)
     let multiplied = x * y;
 }
 
-proof fn call_fun(a: int, b: int)
+proof fn call_fun(a: u32, b: u32)
     requires
         a > 0,
         b > 0,
