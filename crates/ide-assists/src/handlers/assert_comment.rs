@@ -18,6 +18,13 @@ use std::collections::hash_map::DefaultHasher;
 
 pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
     let assert_keyword = ctx.find_token_syntax_at_offset(T![assert])?;
+    let assert_range = assert_keyword.text_range();
+    let cursor_in_range = assert_range.contains_range(ctx.selection_trimmed());
+
+    if !cursor_in_range {
+        return None;
+    }
+    
     let now = Instant::now();
     let mut temp_text_string = String::new();
 
@@ -74,12 +81,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     dbg!(&output);
 
     let expr = ast::AssertExpr::cast(assert_keyword.parent()?)?;
-    let assert_range = assert_keyword.text_range();
-    let cursor_in_range = assert_range.contains_range(ctx.selection_trimmed());
 
-    if !cursor_in_range {
-        return None;
-    }
 
     if output.status.success() {
         dbg!("success");
@@ -112,7 +114,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{check_assist, check_assist_not_applicable};
+    use crate::tests::check_assist;
 
 
     #[test]
