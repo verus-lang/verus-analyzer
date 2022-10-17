@@ -67,7 +67,7 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::{check_assist, check_assist_not_applicable};
+    use crate::tests::check_assist;
 
     use super::*;
 

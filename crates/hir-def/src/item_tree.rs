@@ -67,7 +67,7 @@ use crate::{
     path::{path, AssociatedTypeBinding, GenericArgs, ImportAlias, ModPath, Path, PathKind},
     type_ref::{Mutability, TraitRef, TypeBound, TypeRef},
     visibility::RawVisibility,
-    BlockId,
+    BlockId, expr::ExprId,
 };
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -594,6 +594,7 @@ pub struct Function {
     pub ast_id: FileAstId<ast::Fn>,
     pub(crate) flags: FnFlags,
     // verus
+    // pub requires: Vec<ExprId>,
     // this seems like place to add 
     // pub requires
     // pub ensures
@@ -616,6 +617,8 @@ bitflags::bitflags! {
         const HAS_ASYNC_KW = 1 << 4;
         const HAS_UNSAFE_KW = 1 << 5;
         const IS_VARARGS = 1 << 6;
+        // Verus
+        const HAS_REQUIRES = 1 << 7;
     }
 }
 

@@ -92,6 +92,7 @@ pub(super) fn lower(
             block_scopes: Vec::new(),
             _c: Count::new(),
             or_pats: Default::default(),
+            // requires: Vec::new(),
         },
         expander,
         name_to_pat_grouping: Default::default(),

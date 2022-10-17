@@ -79,7 +79,7 @@ pub(crate) fn assert_by(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()
 mod tests {
     use super::*;
 
-    use crate::tests::{check_assist, check_assist_not_applicable};
+    use crate::tests::check_assist;
 
     #[test]
     fn assert_by_composite_condition() {

@@ -355,6 +355,12 @@ impl<'a> Ctx<'a> {
         if func.unsafe_token().is_some() {
             flags |= FnFlags::HAS_UNSAFE_KW;
         }
+        // verus
+        let mut requires:Vec<ExprId> = vec![];
+        if func.requires_clause().is_some() {
+            flags |= FnFlags::HAS_REQUIRES;
+        }
+        // end verus
 
         let mut res = Function {
             name,
@@ -366,6 +372,7 @@ impl<'a> Ctx<'a> {
             async_ret_type: async_ret_type.map(Interned::new),
             ast_id,
             flags,
+            // requires,
         };
         res.explicit_generic_params =
             self.lower_generic_params(GenericsOwner::Function(&res), func);

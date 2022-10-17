@@ -11,7 +11,7 @@ use ide_db::{
 use itertools::izip;
 use syntax::{
     ast::{self, edit_in_place::Indent, HasArgList, PathExpr, make::block_expr_from_predicates},
-    ted, AstNode, NodeOrToken, SyntaxKind,
+    ted, AstNode, SyntaxKind,
 };
 
 use crate::{
