@@ -334,6 +334,19 @@ pub fn block_expr(
     ast_from_text(&format!("fn f() {buf}"))
 }
 
+// verus
+pub fn block_expr_from_predicates(
+    exp_vec: &Vec<ast::Expr>,
+) -> ast::BlockExpr {
+    let mut buf = "{\n".to_string();
+    for e in exp_vec {
+        format_to!(buf, "    assert({e});\n");
+    }
+    buf += "}";
+    ast_from_text(&format!("fn f() {buf}"))
+}
+
+
 /// Ideally this function wouldn't exist since it involves manual indenting.
 /// It differs from `make::block_expr` by also supporting comments.
 ///
