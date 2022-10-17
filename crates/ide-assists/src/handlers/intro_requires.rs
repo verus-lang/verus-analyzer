@@ -7,10 +7,11 @@ use ide_db::{
     search::FileReference,
     syntax_helpers::{insert_whitespace_into_node::insert_ws_into, node_ext::expr_as_name_ref},
     RootDatabase,
+    imports::insert_use::{ImportGranularity, InsertUseConfig},
 };
 use itertools::izip;
 use syntax::{
-    ast::{self, edit_in_place::Indent, HasArgList, PathExpr, make::block_expr_from_predicates},
+    ast::{self, edit_in_place::Indent, HasArgList, PathExpr, make::block_expr_from_predicates, HasModuleItem, Fn},
     ted, AstNode, SyntaxKind,
 };
 
@@ -21,6 +22,21 @@ use crate::{
 
 use hir::db::DefDatabase;
 use ide_db::base_db::SourceDatabaseExt;
+use ide_db::SnippetCap;
+use crate::AssistConfig;
+use syntax::T;
+
+pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
+    snippet_cap: SnippetCap::new(true),
+    allowed: None,
+    insert_use: InsertUseConfig {
+        granularity: ImportGranularity::Crate,
+        prefix_kind: hir::PrefixKind::Plain,
+        enforce_granularity: true,
+        group: true,
+        skip_glob_imports: true,
+    },
+};
 
 
 pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
@@ -100,8 +116,6 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     ted::replace(temp_fn.body()?.syntax(), req_as_body.syntax().clone_for_update());
 
     dbg!(&temp_fn);
-    
-
     // if self.body().is_none() {
     //     let body = make::ext::empty_block_expr().clone_for_update();
     //     match self.semicolon_token() {
@@ -115,19 +129,30 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
 // option1: make shitty version -- using existing code in inline function
     let mut temp_fn_str = temp_fn.to_string();
-    temp_fn_str.push_str("$0");
+    temp_fn_str.insert_str(0,"$0");
     let (mut db, file_with_caret_id, range_or_offset) = RootDatabase::with_range_or_offset(&temp_fn_str);
     db.set_enable_proc_attr_macros(true);
     let text_without_caret = db.file_text(file_with_caret_id).to_string();
-    // let frange = FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
+    let frange = FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
     let sema = Semantics::new(&db);
+    let config = TEST_CONFIG;
+    let tmp_ctx = AssistContext::new(sema, &config, frange);
+    let tmp_foo = tmp_ctx.find_node_at_offset::<ast::Fn>()?;
+    dbg!(&tmp_foo);
 
 
+    let tmp_body = tmp_foo.body()?;
 
+    
+    let tmp_param_list = tmp_foo.param_list()?;
+    
+    let tmp_function = tmp_ctx.sema.to_def(&tmp_foo)?;
+    dbg!(&tmp_function);
+    let tmp_params = get_fn_params(tmp_ctx.db(), tmp_function , &tmp_param_list)?;
+
+    // let params = get_fn_params(ctx.sema.db, function, &param_list)?;
 
 // option2: make a function text, build a db, sema from it, and use existing inline function 
-    
-
 
 
     acc.add(
@@ -137,14 +162,18 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
         |builder| {
             dbg!(&req_as_body);
             // let replacement = inline(&ctx.sema, file_id, function, &req_as_body, &params, &call_info);
-            let replacement = inline(&sema, file_with_caret_id, function, &req_as_body, &params, &call_info);
+            let replacement = inline(&tmp_ctx.sema, file_with_caret_id, tmp_function, &tmp_body, &tmp_params, &call_info);
 
-            builder.replace_ast(
-                match call_info.node {
-                    ast::CallableExpr::Call(it) => ast::Expr::CallExpr(it),
-                    ast::CallableExpr::MethodCall(it) => ast::Expr::MethodCallExpr(it),
-                },
-                replacement,
+            // builder.replace_ast(
+            //     match call_info.node {
+            //         ast::CallableExpr::Call(it) => ast::Expr::CallExpr(it),
+            //         ast::CallableExpr::MethodCall(it) => ast::Expr::MethodCallExpr(it),
+            //     },
+            //     replacement,
+            // );
+            builder.insert(
+                call_info.node.syntax().text_range().start(),
+                replacement.to_string(),
             );
         },
     )
@@ -236,21 +265,22 @@ fn inline(
     };
     dbg!(params);
 
-    for (pat, _, param) in params {
-        if !matches!(pat, ast::Pat::IdentPat(pat) if pat.is_simple_ident()) {
-            panic!();
-        }
-        // FIXME: we need to fetch all locals declared in the parameter here
-        // not only the local if it is a simple binding
-        match param.as_local(sema.db) {
-            Some(l) => {dbg!(usages_for_locals(l)); panic!()},
+    // for (pat, _, param) in params {
+    //     if !matches!(pat, ast::Pat::IdentPat(pat) if pat.is_simple_ident()) {
+    //         panic!();
+    //     }
+    //     // FIXME: we need to fetch all locals declared in the parameter here
+    //     // not only the local if it is a simple binding
+    //     match param.as_local(sema.db) {
+    //         Some(l) => {dbg!(usages_for_locals(l)); panic!()},
                
-            None => panic!(),
-        }
-    };
-    panic!();
+    //         None => panic!(),
+    //     }
+    // };
+    // panic!();
 
 
+    
 
     let param_use_nodes: Vec<Vec<_>> = params
         .iter()
@@ -326,13 +356,7 @@ fn inline(
             }
         }
     }
-    if let Some(generic_arg_list) = generic_arg_list.clone() {
-        if let Some((target, source)) = &sema.scope(node.syntax()).zip(sema.scope(fn_body.syntax()))
-        {
-            PathTransform::function_call(target, source, function, generic_arg_list)
-                .apply(body.syntax());
-        }
-    }
+
 
     let original_indentation = match node {
         ast::CallableExpr::Call(it) => it.indent_level(),
