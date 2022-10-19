@@ -73,10 +73,13 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
     dbg!("hey4");
     let FileRange { file_id, range } = fn_source.syntax().original_file_range(ctx.sema.db);
-    if file_id == ctx.file_id() && range.contains(ctx.offset()) {
-        cov_mark::hit!(inline_call_recursive);
-        return None;
-    }
+    // allow recursive...
+    // if file_id == ctx.file_id() && range.contains(ctx.offset()) {
+    //     cov_mark::hit!(inline_call_recursive);
+    //     return None;
+    // }
+    
+
     let params = get_fn_params(ctx.sema.db, function, &param_list)?;
 
     if call_info.arguments.len() != params.len() {
@@ -154,6 +157,19 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
 // option2: make a function text, build a db, sema from it, and use existing inline function 
 
+    let mut where_to_insert = call_info.node.syntax().text_range().start();
+    for ancestor in  call_info.node.syntax().ancestors() {
+        match ancestor.kind() {
+            SyntaxKind::EXPR_STMT | SyntaxKind::LET_STMT => {
+                where_to_insert = ancestor.text_range().start();
+                break;
+            }
+            _ => (),
+        }
+        dbg!(ancestor.kind());
+    }
+
+
 
     acc.add(
         AssistId("intro_requires", AssistKind::RefactorInline),
@@ -172,7 +188,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
             //     replacement,
             // );
             builder.insert(
-                call_info.node.syntax().text_range().start(),
+                where_to_insert,
                 replacement.to_string(),
             );
         },
@@ -253,7 +269,7 @@ fn inline(
     CallInfo { node, arguments, generic_arg_list }: &CallInfo,
 ) -> ast::Expr {
     let body = fn_body.clone_for_update();
-    
+    dbg!("inline 1");
     let usages_for_locals = |local| {
         Definition::Local(local)
             .usages(sema)
@@ -263,25 +279,8 @@ fn inline(
             .unwrap_or_default()
             .into_iter()
     };
-    dbg!(params);
 
-    // for (pat, _, param) in params {
-    //     if !matches!(pat, ast::Pat::IdentPat(pat) if pat.is_simple_ident()) {
-    //         panic!();
-    //     }
-    //     // FIXME: we need to fetch all locals declared in the parameter here
-    //     // not only the local if it is a simple binding
-    //     match param.as_local(sema.db) {
-    //         Some(l) => {dbg!(usages_for_locals(l)); panic!()},
-               
-    //         None => panic!(),
-    //     }
-    // };
-    // panic!();
-
-
-    
-
+    dbg!("inline2");
     let param_use_nodes: Vec<Vec<_>> = params
         .iter()
         .map(|(pat, _, param)| {
@@ -308,7 +307,7 @@ fn inline(
         })
         .collect();
 
-
+    dbg!("inline 3");
     // Inline parameter expressions or generate `let` statements depending on whether inlining works or not.
     for ((pat, param_ty, _), usages, expr) in izip!(params, param_use_nodes, arguments).rev() {
         let inline_direct = |usage, replacement: &ast::Expr| {
@@ -339,16 +338,18 @@ fn inline(
             }
             // inline direct local arguments
             [_, ..] if expr_as_name_ref(expr).is_some() => {
+                dbg!("inline 3-1");
                 cov_mark::hit!(inline_call_inline_locals);
                 usages.iter().for_each(|usage| inline_direct(usage, expr));
             }
             // can't inline, emit a let statement
             _ => {
-                let ty =
-                    sema.type_of_expr(expr).filter(TypeInfo::has_adjustment).and(param_ty.clone());
+                dbg!("inline 3-2");
+                // let ty =
+                //     sema.type_of_expr(expr).filter(TypeInfo::has_adjustment).and(param_ty.clone());
                 if let Some(stmt_list) = body.stmt_list() {
                     stmt_list.push_front(
-                        make::let_stmt(pat.clone(), ty, Some(expr.clone()))
+                        make::let_stmt(pat.clone(), None, Some(expr.clone()))
                             .clone_for_update()
                             .into(),
                     )
@@ -356,14 +357,14 @@ fn inline(
             }
         }
     }
-
+    dbg!("inline 4");
 
     let original_indentation = match node {
         ast::CallableExpr::Call(it) => it.indent_level(),
         ast::CallableExpr::MethodCall(it) => it.indent_level(),
     };
     body.reindent_to(original_indentation);
-
+    dbg!("inline 5");
     match body.tail_expr() {
         Some(expr) if body.statements().next().is_none() => expr,
         _ => match node
@@ -446,6 +447,76 @@ proof fn call_fun(a: u32, b: u32)
         );
     }
 
+
+
+
+
+
+
+
+
+    
+    #[test]
+    fn intro_requires_recursive() {
+        check_assist(
+            intro_requires,
+            r#"
+spec fn fibo(n: nat) -> nat
+    decreases n
+{
+    if n == 0 { 0 } else if n == 1 { 1 }
+    else { fibo((n - 2) as nat) + fibo((n - 1) as nat) }
+}
+
+proof fn lemma_fibo_is_monotonic(i: nat, j: nat)
+    requires
+        i <= j,
+    ensures
+        fibo(i) <= fibo(j),
+    decreases j - i
+{
+    if i < 2 && j < 2 {
+    } else if i == j {
+    } else if i == j - 1 {
+        reveal_with_fuel(fibo, 2);
+        lemma_fibo_is_monotonic$0(i, (j - 1) as nat);
+    } else {
+        lemma_fibo_is_monotonic(i, (j - 1) as nat);
+        lemma_fibo_is_monotonic(i, (j - 2) as nat);
+    }
+}   
+"#,
+            r#"
+spec fn fibo(n: nat) -> nat
+    decreases n
+{
+    if n == 0 { 0 } else if n == 1 { 1 }
+    else { fibo((n - 2) as nat) + fibo((n - 1) as nat) }
+}
+
+proof fn lemma_fibo_is_monotonic(i: nat, j: nat)
+    requires
+        i <= j,
+    ensures
+        fibo(i) <= fibo(j),
+    decreases j - i
+{
+    if i < 2 && j < 2 {
+    } else if i == j {
+    } else if i == j - 1 {
+        reveal_with_fuel(fibo, 2);
+        lemma_fibo_is_monotonic(i, (j - 1) as nat);
+    } else {
+        lemma_fibo_is_monotonic(i, (j - 1) as nat);
+        lemma_fibo_is_monotonic(i, (j - 2) as nat);
+    }
+}   
+            
+
+
+"#,
+        );
+    }
 
 
 }
