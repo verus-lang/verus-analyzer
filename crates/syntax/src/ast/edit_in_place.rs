@@ -600,6 +600,14 @@ fn get_or_insert_comma_after(syntax: &SyntaxNode) -> SyntaxToken {
     comma
 }
 
+//verus
+impl ast::AssertExpr {
+    pub fn make_by_keyword(&self) {
+        let by = ast::make::token(T![by]);
+        ted::insert(Position::after(self.r_paren_token().unwrap()), &by);
+    }
+}
+
 impl ast::StmtList {
     pub fn push_front(&self, statement: ast::Stmt) {
         ted::insert(Position::after(self.l_curly_token().unwrap()), statement.syntax());

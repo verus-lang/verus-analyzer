@@ -340,9 +340,9 @@ pub fn block_expr_from_predicates(
 ) -> ast::BlockExpr {
     let mut buf = "{\n".to_string();
     for e in exp_vec {
-        format_to!(buf, "    assert({e});\n");
+        format_to!(buf, "        assert({e});\n");
     }
-    buf += "}";
+    buf += "    }";
     ast_from_text(&format!("fn f() {buf}"))
 }
 
@@ -857,7 +857,7 @@ pub mod tokens {
 
     pub(super) static SOURCE_FILE: Lazy<Parse<SourceFile>> = Lazy::new(|| {
         SourceFile::parse(
-            "const C: <()>::Item = (1 != 1, 2 == 2, 3 < 3, 4 <= 4, 5 > 5, 6 >= 6, !true, *p)\n;\n\n",
+            "by const C: <()>::Item = (1 != 1, 2 == 2, 3 < 3, 4 <= 4, 5 > 5, 6 >= 6, !true, *p)\n;\n\n",
         )
     });
 
