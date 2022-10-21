@@ -683,6 +683,13 @@ pub fn expr_stmt(expr: ast::Expr) -> ast::ExprStmt {
     ast_from_text(&format!("fn f() {{ {expr}{semi} (); }}"))
 }
 
+pub fn assert_stmt_from_predicate(expr: ast::Expr) -> ast::ExprStmt {
+    // let assert_expr = expr_from_text(&format!("assert({expr})"));
+    // dbg!(&assert_expr);
+    // expr_stmt(assert_expr)
+    ast_from_text(&format!("fn f() {{ assert({expr});  (); }}"))
+}
+
 pub fn item_const(
     visibility: Option<ast::Visibility>,
     name: ast::Name,

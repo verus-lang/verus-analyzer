@@ -1,4 +1,4 @@
-use syntax::{ast, AstNode};
+use syntax::{ast::{self, make::{assert_stmt_from_predicate, let_stmt, ext::ident_path, expr_path}}, AstNode};
 // use syntax::{ast, match_ast, AstNode, SyntaxKind, SyntaxToken, TextRange, TextSize};
 
 use crate::{AssistContext, AssistId, AssistKind, Assists};
@@ -6,63 +6,69 @@ use crate::{AssistContext, AssistId, AssistKind, Assists};
 
 pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
     let func = ctx.find_node_at_offset::<ast::Fn>()?;
-    let body = func.body()?;
-    let stmt_list = body.stmt_list()?;
-    let tail_expr = stmt_list.tail_expr()?;
-    let r_curly = stmt_list.r_curly_token()?;
     let ensures = func.ensures_clause()?; 
     let ensures_keyword = ensures.ensures_token()?;
-    let first_ens = ensures.expr()?;
-    let mut ensures_clauses = ensures.comma_and_conds();
     let ensures_range = ensures_keyword.text_range();
     let cursor_in_range = ensures_range.contains_range(ctx.selection_trimmed());
     if !cursor_in_range {
         return None;
     }
-    let mut intro_enss = format!("\n    assert({first_ens});");
-    while let Some(ens) = ensures_clauses.next() {
-        // dbg!("intro_ensures");
-        let ens_without_comma = ens.condition()?;
-        intro_enss = format!("{intro_enss}\n    assert({ens_without_comma});");
-    }
-    // dbg!(&intro_enss);
+    let new_func = code_transformer_intro_ensures(func.clone())?;
+    acc.add(AssistId("intro_ensures", AssistKind::RefactorRewrite), "Copy ensures to last", ensures_range, |edit| {
+        edit.replace_ast(func , new_func );
+    })
+}
 
-    match func.ret_type() {
-        // if there's named return value, should introduce `let binding` before assertion, and also return the value 
+pub(crate) fn code_transformer_intro_ensures(func: ast::Fn) -> Option<ast::Fn> {
+    let func = func.clone_for_update();
+    let ensures = func.ensures_clause()?; 
+    let mut ensures_clauses = ensures.comma_and_conds();
+
+    let stmt_list = func.body()?.stmt_list()?;
+    
+    match stmt_list.tail_expr() {
         // REVIEW: it is assumed that ret_type is "named" if this function is returning something
-        Some(ret_type) => {
-           
-            // dbg!(&ret_type);
-            let ret_name = ret_type.pat()?;
-            match ret_name {
-                ast::Pat::IdentPat(ident) => {
-                    let intro_let_ens = format!("let {ident} = {tail_expr};{intro_enss}\n    {ident}");
-                    // dbg!(&intro_let_ens);
-                    return acc.add(
-                        AssistId("intro_ensures", AssistKind::RefactorRewrite),
-                        "Intro ensures",
-                        tail_expr.syntax().text_range(),
-                        |builder| {
-                            builder.replace(tail_expr.syntax().text_range(), &format!("{}\n", intro_let_ens));
-                        },
-                    )
-                },
-                _ => return None,
-            };
+        Some(ret_expr) => {
+            let ret_name = func.ret_type()?.pat()?.clone();
+            let ret_id = 
+                match ret_name {
+                    ast::Pat::IdentPat(ref id) => id.clone(),
+                    _ => return None,
+                };
+
+            let let_stmt = syntax::ast::Stmt::LetStmt(let_stmt(ret_name, None, Some(ret_expr.clone())));
+            stmt_list.push_back(let_stmt.clone_for_update());
+
+            let first_ens = ensures.expr()?;    
+            let first_assert = syntax::ast::Stmt::ExprStmt(assert_stmt_from_predicate(first_ens));                
+            stmt_list.push_back(first_assert.clone_for_update());
+        
+            while let Some(ens) = ensures_clauses.next() {
+                let ens_without_comma = ens.condition()?;
+                let assert_stmt = syntax::ast::Stmt::ExprStmt(assert_stmt_from_predicate(ens_without_comma));
+                stmt_list.push_back(assert_stmt.clone_for_update());
+            }
+
+            let id_expr = expr_path(ident_path(&format!("{ret_id}").as_str()));
+            stmt_list.set_tail_expr(id_expr.clone_for_update());
+
+            return Some(func); 
         }
         None => {
-            acc.add(
-                AssistId("intro_ensures", AssistKind::RefactorRewrite),
-                "Intro ensures",
-                tail_expr.syntax().text_range(),
-                |builder| {
-                    builder.insert(r_curly.text_range().start(), &format!("{}\n", intro_enss));
-                },
-            )
-
+            let first_ens = ensures.expr()?;    
+            let first_assert = syntax::ast::Stmt::ExprStmt(assert_stmt_from_predicate(first_ens));
+            dbg!(&first_assert);
+            stmt_list.push_back(first_assert.clone_for_update());
+            while let Some(ens) = ensures_clauses.next() {
+                let ens_without_comma = ens.condition()?;
+                let assert_stmt = syntax::ast::Stmt::ExprStmt(assert_stmt_from_predicate(ens_without_comma));
+                stmt_list.push_back(assert_stmt.clone_for_update());
+            }
+            return Some(func);
         }
     }
 }
+
 
 
 #[cfg(test)]

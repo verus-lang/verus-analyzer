@@ -1,6 +1,6 @@
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use syntax::{
-    ast::{self, AstNode, make::{expr_assert_by, block_expr_from_predicates, ext::empty_block_expr}},
+    ast::{self, AstNode, make::{block_expr_from_predicates, ext::empty_block_expr}},
     T, ted,
 };
 

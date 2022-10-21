@@ -612,6 +612,23 @@ impl ast::StmtList {
     pub fn push_front(&self, statement: ast::Stmt) {
         ted::insert(Position::after(self.l_curly_token().unwrap()), statement.syntax());
     }
+    pub fn push_back(&self, statement: ast::Stmt) {
+        match self.tail_expr() {
+            Some(e) => {
+                ted::insert(Position::before(e.syntax()), statement.syntax());
+            },
+            None => ted::insert(Position::before(self.r_curly_token().unwrap()), statement.syntax()),
+        };
+    }
+    pub fn set_tail_expr(&self, expr: ast::Expr) {
+        match self.tail_expr() {
+            Some(e) => {
+                ted::replace(e.syntax(), expr.syntax());
+            },
+            None => ted::insert(Position::before(self.r_curly_token().unwrap()), expr.syntax()),
+        };
+        
+    }
 }
 
 impl ast::VariantList {
