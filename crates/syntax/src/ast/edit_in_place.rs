@@ -631,6 +631,12 @@ impl ast::StmtList {
     }
 }
 
+impl ast::Stmt {
+    pub fn remove(&self) {
+        ted::remove(self.syntax());
+    }
+}
+
 impl ast::VariantList {
     pub fn add_variant(&self, variant: ast::Variant) {
         let (indent, position) = match self.variants().last() {
