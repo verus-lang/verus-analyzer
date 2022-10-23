@@ -8,7 +8,7 @@ pub(crate) use self::{
     expressions::{match_arm_list, record_expr_field_list},
     traits::assoc_item_list,
     use_item::use_tree_list,
-    verus::{assume, assert, requires, recommends, ensures, decreases,},
+    verus::{assume, requires, recommends, ensures, decreases,},
 };
 use super::{*, verus::{fn_mode, publish}};
 

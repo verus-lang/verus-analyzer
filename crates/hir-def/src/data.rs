@@ -20,7 +20,7 @@ use crate::{
     visibility::RawVisibility,
     AssocItemId, AstIdWithPath, ConstId, ConstLoc, FunctionId, FunctionLoc, HasModule, ImplId,
     Intern, ItemContainerId, ItemLoc, Lookup, Macro2Id, MacroRulesId, ModuleId, ProcMacroId,
-    StaticId, TraitId, TypeAliasId, TypeAliasLoc, expr::ExprId,
+    StaticId, TraitId, TypeAliasId, TypeAliasLoc, 
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 use hir::{DefWithBody, Semantics};
 use ide_db::base_db::FilePosition;
 use ide_db::RootDatabase;
-use syntax::{algo::find_node_at_offset, ast::{self, HasModuleItem}, AstNode};
+use syntax::{algo::find_node_at_offset, ast, AstNode};
 
 // Feature: View Hir
 //

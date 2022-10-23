@@ -67,7 +67,7 @@ use crate::{
     path::{path, AssociatedTypeBinding, GenericArgs, ImportAlias, ModPath, Path, PathKind},
     type_ref::{Mutability, TraitRef, TypeBound, TypeRef},
     visibility::RawVisibility,
-    BlockId, expr::ExprId,
+    BlockId,
 };
 
 #[derive(Copy, Clone, Eq, PartialEq)]

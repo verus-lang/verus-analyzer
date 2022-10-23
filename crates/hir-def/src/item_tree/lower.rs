@@ -356,7 +356,7 @@ impl<'a> Ctx<'a> {
             flags |= FnFlags::HAS_UNSAFE_KW;
         }
         // verus
-        let mut requires:Vec<ExprId> = vec![];
+        // let requires:Vec<ExprId> = vec![];
         if func.requires_clause().is_some() {
             flags |= FnFlags::HAS_REQUIRES;
         }

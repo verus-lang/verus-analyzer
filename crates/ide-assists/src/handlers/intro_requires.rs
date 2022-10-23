@@ -10,7 +10,7 @@ use ide_db::{
 };
 use itertools::izip;
 use syntax::{
-    ast::{self, edit_in_place::Indent, HasArgList, PathExpr, make::block_expr_from_predicates, HasModuleItem, Fn},
+    ast::{self, edit_in_place::Indent, HasArgList, PathExpr, make::block_expr_from_predicates},
     ted, AstNode, SyntaxKind,
 };
 
@@ -38,11 +38,8 @@ pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
 
 
 pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
-    dbg!("hey1");
     let name_ref: ast::NameRef = ctx.find_node_at_offset()?;
-    dbg!("hey11");
     let call_info = CallInfo::from_name_ref(name_ref.clone())?;
-    dbg!("hey2");
     let (function, _label) = match &call_info.node {
         ast::CallableExpr::Call(call) => {
             let path = match call.expr()? {
@@ -61,22 +58,10 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
             return None;
         }
     };
-    dbg!("hey3");
 
     let fn_source = ctx.sema.source(function)?;
-    let fn_body = fn_source.value.body()?;
     let param_list = fn_source.value.param_list()?;
 
-
-
-    dbg!("hey4");
-    // let FileRange { file_id, range } = fn_source.syntax().original_file_range(ctx.sema.db);
-    // allow recursive...
-    // if file_id == ctx.file_id() && range.contains(ctx.offset()) {
-    //     cov_mark::hit!(inline_call_recursive);
-    //     return None;
-    // }
-    
 
     let params = get_fn_params(ctx.sema.db, function, &param_list)?;
 
@@ -88,22 +73,19 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     }
 
     let syntax = call_info.node.syntax().clone();
-    dbg!("hey5");
-
-
 
 
 
     let requires = fn_source.value.requires_clause()?;
     let first_req = requires.expr()?;
-    dbg!(&first_req);
+    // dbg!(&first_req);
     let mut req_vec = vec![first_req.clone()];
 
 
     let mut requires_clauses = requires.comma_and_conds();
     while let Some(req) = requires_clauses.next() {
         let req_without_comma = req.condition()?;
-        dbg!(&req_without_comma);
+        // dbg!(&req_without_comma);
         req_vec.push(req_without_comma.clone());
     }
 
@@ -114,7 +96,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     // clone_subtree
     // clone_for_update
     // let mut temp_fn = fn_source.value.clone_subtree(); // is this deep copy????
-    let mut temp_fn = fn_source.value.clone_for_update();
+    let temp_fn = fn_source.value.clone_for_update();
     ted::replace(temp_fn.body()?.syntax(), req_as_body.syntax().clone_for_update());
 
     dbg!(&temp_fn);
@@ -133,13 +115,13 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     temp_fn_str.insert_str(0,"$0");
     let (mut db, file_with_caret_id, range_or_offset) = RootDatabase::with_range_or_offset(&temp_fn_str);
     db.set_enable_proc_attr_macros(true);
-    let text_without_caret = db.file_text(file_with_caret_id).to_string();
+    // let text_without_caret = db.file_text(file_with_caret_id).to_string();
     let frange = FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
     let sema = Semantics::new(&db);
     let config = TEST_CONFIG;
     let tmp_ctx = AssistContext::new(sema, &config, frange);
     let tmp_foo = tmp_ctx.find_node_at_offset::<ast::Fn>()?;
-    dbg!(&tmp_foo);
+    // dbg!(&tmp_foo);
 
 
     let tmp_body = tmp_foo.body()?;
@@ -148,7 +130,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     let tmp_param_list = tmp_foo.param_list()?;
     
     let tmp_function = tmp_ctx.sema.to_def(&tmp_foo)?;
-    dbg!(&tmp_function);
+    // dbg!(&tmp_function);
     let tmp_params = get_fn_params(tmp_ctx.db(), tmp_function , &tmp_param_list)?;
 
     // let params = get_fn_params(ctx.sema.db, function, &param_list)?;
