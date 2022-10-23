@@ -532,7 +532,7 @@ fn match_guard(p: &mut Parser<'_>) -> CompletedMarker {
 // fn c() { 1; 2; }
 // fn d() { 1; 2 }
 pub(crate) fn block_expr(p: &mut Parser<'_>) {
-    dbg!("block_expr");
+    // dbg!("block_expr");
     // panic!();
     if !p.at(T!['{']) {
         // panic!();

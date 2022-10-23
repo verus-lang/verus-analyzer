@@ -560,7 +560,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         // trait T { fn foo(); }
         p.bump(T![;]);
     } else {
-        dbg!("parse fn body");
+        // dbg!("parse fn body");
         expressions::block_expr(p);
     }
     m.complete(p, FN);

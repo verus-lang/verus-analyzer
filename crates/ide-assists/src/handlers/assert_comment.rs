@@ -26,7 +26,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     let func = ctx.find_node_at_offset::<ast::Fn>()?;
     let assert_expr = ast::AssertExpr::cast(assert_keyword.parent()?)?;
     let assert_stmt = ast::Stmt::ExprStmt(ast::ExprStmt::cast(assert_expr.syntax().parent()?)?);
-    let assert_removed_fn = code_transformer_remove_expr_stmt(func, assert_stmt.clone_for_update())?;
+    let assert_removed_fn = code_transformer_remove_expr_stmt(func, assert_stmt.clone())?;
 
     if run_verus_for_ast(assert_removed_fn.fn_token()?)? {
         dbg!("still success");
@@ -36,8 +36,8 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
             "Confirm if assert necessary",
             assert_range,
             |builder| {
-                builder.insert(assert_stmt.syntax().text_range().start(), &format!(" /* "));
-                builder.insert(assert_stmt.syntax().text_range().end(), &format!(" */ "));
+                builder.insert(assert_stmt.syntax().text_range().start(), &format!("/* "));
+                builder.insert(assert_stmt.syntax().text_range().end(), &format!(" */"));
             },
         )
     } else {
@@ -196,7 +196,7 @@ verus! {
     ensures
         offset < 16
     {
-        // assert(offset < 16);
+        /* assert(offset < 16); */
     }
 } // verus!
 "#,

@@ -4,7 +4,7 @@ use ide_db::{
     base_db::{FileId, FileRange, fixture::WithFixture},
     defs::Definition,
     search::FileReference,
-    syntax_helpers::{insert_whitespace_into_node::insert_ws_into, node_ext::expr_as_name_ref},
+    syntax_helpers::node_ext::expr_as_name_ref,
     RootDatabase,
     imports::insert_use::{ImportGranularity, InsertUseConfig},
 };

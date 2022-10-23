@@ -108,7 +108,7 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
                 }
                 Semicolon::Forbidden => (),
             }
-            dbg!("expr_stmt!");
+            // dbg!("expr_stmt!");
             m.complete(p, EXPR_STMT);
         }
     }
@@ -154,7 +154,6 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
     attributes::inner_attrs(p);
-    dbg!("expr_block_contents");
 
     while !p.at(EOF) && !p.at(T!['}']) {
         // test nocontentexpr
