@@ -59,6 +59,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 // a code action that removes a chosen assertion
 pub(crate) fn code_transformer_remove_expr_stmt(func:ast::Fn, assert_stmt: ast::Stmt) -> Option<ast::Fn> {
     let mut func = func;
+    let assert_stmt = assert_stmt.clone_for_update();
     for ancestor in  assert_stmt.syntax().ancestors() {
         match ancestor.kind() {
             SyntaxKind::FN => {

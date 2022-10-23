@@ -1,9 +1,8 @@
 use ast::make;
-use hir::{db::HirDatabase, PathResolution, Semantics, TypeInfo};
+use hir::{db::HirDatabase, PathResolution, Semantics};
 use ide_db::{
     base_db::{FileId, FileRange, fixture::WithFixture},
     defs::Definition,
-    path_transform::PathTransform,
     search::FileReference,
     syntax_helpers::{insert_whitespace_into_node::insert_ws_into, node_ext::expr_as_name_ref},
     RootDatabase,
@@ -24,7 +23,6 @@ use hir::db::DefDatabase;
 use ide_db::base_db::SourceDatabaseExt;
 use ide_db::SnippetCap;
 use crate::AssistConfig;
-use syntax::T;
 
 pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
     snippet_cap: SnippetCap::new(true),
@@ -45,7 +43,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     dbg!("hey11");
     let call_info = CallInfo::from_name_ref(name_ref.clone())?;
     dbg!("hey2");
-    let (function, label) = match &call_info.node {
+    let (function, _label) = match &call_info.node {
         ast::CallableExpr::Call(call) => {
             let path = match call.expr()? {
                 ast::Expr::PathExpr(path) => path.path(),
@@ -58,7 +56,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
             (function, format!("Inline `{}`", path))
         }
         // for now dont care
-        ast::CallableExpr::MethodCall(call) => {
+        ast::CallableExpr::MethodCall(_call) => {
             // (ctx.sema.resolve_method_call(call)?, format!("Inline `{}`", name_ref))
             return None;
         }
@@ -72,7 +70,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
 
     dbg!("hey4");
-    let FileRange { file_id, range } = fn_source.syntax().original_file_range(ctx.sema.db);
+    // let FileRange { file_id, range } = fn_source.syntax().original_file_range(ctx.sema.db);
     // allow recursive...
     // if file_id == ctx.file_id() && range.contains(ctx.offset()) {
     //     cov_mark::hit!(inline_call_recursive);
