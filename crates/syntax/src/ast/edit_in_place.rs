@@ -606,6 +606,9 @@ impl ast::AssertExpr {
         let by = ast::make::token(T![by]);
         ted::insert(Position::after(self.r_paren_token().unwrap()), &by);
     }
+    pub fn register_proof_block(&self, block: ast::BlockExpr) {
+        ted::insert(Position::last_child_of(self.syntax()), block.syntax());
+    }
 }
 
 impl ast::StmtList {

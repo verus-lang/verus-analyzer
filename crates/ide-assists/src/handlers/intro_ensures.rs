@@ -86,7 +86,7 @@ pub(crate) fn code_transformer_intro_ensures(func: ast::Fn) -> Option<ast::Fn> {
                 let ens_without_comma = ens.condition()?;
                 let assert_stmt_without_indent = assert_stmt_from_predicate(ens_without_comma).clone_for_update();
                 ted::insert(ted::Position::first_child_of(assert_stmt_without_indent.syntax()), ast::make::tokens::whitespace(&format!("\n{}", indent_level)));
-               let assert_stmt = syntax::ast::Stmt::ExprStmt(assert_stmt_without_indent);
+                let assert_stmt = syntax::ast::Stmt::ExprStmt(assert_stmt_without_indent);
                 stmt_list.push_back(assert_stmt);
             }
             ted::insert(ted::Position::before(stmt_list.r_curly_token()?), ast::make::tokens::single_newline());

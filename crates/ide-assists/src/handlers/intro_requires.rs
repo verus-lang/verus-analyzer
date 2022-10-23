@@ -109,6 +109,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
     let req_as_body = block_expr_from_predicates(&req_vec);
 
+
     // clone
     // clone_subtree
     // clone_for_update
@@ -128,7 +129,6 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     //     }
     // }
 
-// option1: make shitty version -- using existing code in inline function
     let mut temp_fn_str = temp_fn.to_string();
     temp_fn_str.insert_str(0,"$0");
     let (mut db, file_with_caret_id, range_or_offset) = RootDatabase::with_range_or_offset(&temp_fn_str);
@@ -153,7 +153,6 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
     // let params = get_fn_params(ctx.sema.db, function, &param_list)?;
 
-// option2: make a function text, build a db, sema from it, and use existing inline function 
 
     let mut where_to_insert = call_info.node.syntax().text_range().start();
     for ancestor in  call_info.node.syntax().ancestors() {
