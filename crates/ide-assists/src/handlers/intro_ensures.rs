@@ -5,7 +5,7 @@ use crate::{AssistContext, AssistId, AssistKind, Assists};
 use syntax::ted;
 
 pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
-    dbg!("intro_ensures");
+    // dbg!("intro_ensures");
     let func = ctx.find_node_at_offset::<ast::Fn>()?;
     let ensures = func.ensures_clause()?; 
     let ensures_keyword = ensures.ensures_token()?;
@@ -14,9 +14,9 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     if !cursor_in_range {
         return None;
     }
-    dbg!("intro_ensures calculate diff");
+    // dbg!("intro_ensures calculate diff");
     let new_func = code_transformer_intro_ensures(func.clone())?;
-    dbg!("intro_ensures register");
+    // dbg!("intro_ensures register");
     acc.add(AssistId("intro_ensures", AssistKind::RefactorRewrite), "Copy ensures to the end", ensures_range, |edit| {
         edit.replace_ast(func , new_func );
     })

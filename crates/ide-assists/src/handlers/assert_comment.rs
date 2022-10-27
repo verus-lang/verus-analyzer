@@ -1,6 +1,6 @@
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use syntax::{
-    ast::{self, AstNode},
+    ast::{self, AstNode, HasName},
     T, SyntaxToken, SyntaxKind,
 };
 use std::{process::Command, hash::{Hash, Hasher}};
@@ -28,7 +28,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     let assert_stmt = ast::Stmt::ExprStmt(ast::ExprStmt::cast(assert_expr.syntax().parent()?)?);
     let assert_removed_fn = code_transformer_remove_expr_stmt(func, assert_stmt.clone())?;
 
-    if run_verus_for_ast(assert_removed_fn.fn_token()?)? {
+    if run_verus_for(assert_removed_fn.fn_token()?)? {
         dbg!("still success");
         // TODO: comment out using // rather than /* */
         acc.add(
@@ -76,11 +76,25 @@ pub(crate) fn code_transformer_remove_expr_stmt(func:ast::Fn, assert_stmt: ast::
 
 // TODO: change output type ---- could give Verus error code
 // TODO: get function name, and include "--verify-function" flag
-pub(crate) fn run_verus_for_ast(token: SyntaxToken) -> Option<bool> {
+pub fn run_verus_for(token: SyntaxToken) -> Option<bool> {
     let mut temp_text_string = String::new();
+    let verify_func_flag = "--verify-function";
+    let verify_root_flag = "--verify-root"; // TODO TODO
+    let mut func_name = String::new();
+
     // get the text of the most grand parent
-    for par in token.parent_ancestors() {
-        temp_text_string = String::from(par.text());
+    for ancestor in token.parent_ancestors() {
+        temp_text_string = String::from(ancestor.text());
+        match ancestor.kind() {
+            SyntaxKind::FN => {
+                if func_name.len() > 0 {
+                    panic!(); // func inside func?
+                }
+                let func = ast::Fn::cast(ancestor)?;
+                func_name = func.name()?.to_string();
+            }
+            _ => (),
+        }
     }
 
     // TODO: instead of writing to a file, consider
@@ -111,6 +125,9 @@ pub(crate) fn run_verus_for_ast(token: SyntaxToken) -> Option<bool> {
     let verus_exec_path = "/Users/chanhee/Works/secure-foundations/verus/source/verus-log.sh";
     let output = Command::new(verus_exec_path)
     .arg(path)
+    .arg(verify_root_flag)
+    .arg(verify_func_flag)
+    .arg(func_name)
     .output().ok()?;
     // TODO: remove this temporary file!
     dbg!(&output);

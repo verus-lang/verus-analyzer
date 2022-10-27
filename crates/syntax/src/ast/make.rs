@@ -318,7 +318,7 @@ pub fn record_field(
     ast_from_text(&format!("struct S {{ {visibility}{name}: {ty}, }}"))
 }
 
-// TODO
+
 pub fn block_expr(
     stmts: impl IntoIterator<Item = ast::Stmt>,
     tail_expr: Option<ast::Expr>,
@@ -683,10 +683,8 @@ pub fn expr_stmt(expr: ast::Expr) -> ast::ExprStmt {
     ast_from_text(&format!("fn f() {{ {expr}{semi} (); }}"))
 }
 
+// verus
 pub fn assert_stmt_from_predicate(expr: ast::Expr) -> ast::ExprStmt {
-    // let assert_expr = expr_from_text(&format!("assert({expr})"));
-    // dbg!(&assert_expr);
-    // expr_stmt(assert_expr)
     ast_from_text(&format!("fn f() {{ assert({expr});(); }}"))
 }
 
