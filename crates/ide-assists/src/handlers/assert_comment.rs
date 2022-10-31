@@ -10,7 +10,6 @@ use std::path::Path;
 use std::time::{Instant};
 use crate::{
     assist_context::{AssistContext, Assists},
-    // utils::invert_boolean_expression,
     AssistId, AssistKind,
 };
 use std::collections::hash_map::DefaultHasher;
@@ -28,7 +27,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     let assert_stmt = ast::Stmt::ExprStmt(ast::ExprStmt::cast(assert_expr.syntax().parent()?)?);
     let assert_removed_fn = code_transformer_remove_expr_stmt(func, assert_stmt.clone())?;
 
-    if run_verus_for(assert_removed_fn.fn_token()?)? {
+    if run_verus_for(ctx.config.verus_path.clone(), assert_removed_fn.fn_token()?)? {
         dbg!("still success");
         // TODO: comment out using // rather than /* */
         acc.add(
@@ -76,7 +75,7 @@ pub(crate) fn code_transformer_remove_expr_stmt(func:ast::Fn, assert_stmt: ast::
 
 // TODO: change output type ---- could give Verus error code
 // TODO: get function name, and include "--verify-function" flag
-pub fn run_verus_for(token: SyntaxToken) -> Option<bool> {
+pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool> {
     let mut temp_text_string = String::new();
     let verify_func_flag = "--verify-function";
     let verify_root_flag = "--verify-root"; // TODO TODO
@@ -121,8 +120,6 @@ pub fn run_verus_for(token: SyntaxToken) -> Option<bool> {
         Ok(_) => dbg!("successfully wrote to {}", display),
     };
 
-    // TODO - get path from `settings.json` or other source
-    let verus_exec_path = "/Users/chanhee/Works/secure-foundations/verus/source/verus-log.sh";
     let output = Command::new(verus_exec_path)
     .arg(path)
     .arg(verify_root_flag)

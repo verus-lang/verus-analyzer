@@ -34,6 +34,7 @@ pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
         group: true,
         skip_glob_imports: true,
     },
+    verus_path: String::new(),
 };
 
 
@@ -371,7 +372,7 @@ fn path_expr_as_record_field(usage: &PathExpr) -> Option<ast::RecordExprField> {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::{check_assist, check_assist_not_applicable};
+    use crate::tests::check_assist;
 
     use super::*;
 

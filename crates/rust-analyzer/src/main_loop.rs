@@ -580,6 +580,11 @@ impl GlobalState {
                         // this is hacky
                         dbg!("reporting verus result");
                         if msg.starts_with("verification results::") {
+                            // if msg.contains("verified: 0 errors: 0") {
+                            //     self.send_notification::<lsp_types::notification::ShowMessage>(
+                            //         lsp_types::ShowMessageParams { typ: lsp_types::MessageType::WARNING, message: msg},
+                            //     );
+                            // } else 
                             if msg.contains("errors: 0") {
                                 self.send_notification::<lsp_types::notification::ShowMessage>(
                                     lsp_types::ShowMessageParams { typ: lsp_types::MessageType::INFO, message: msg},

@@ -1152,10 +1152,20 @@ impl Config {
     }
 
     pub fn assist(&self) -> AssistConfig {
+        let verus_path = match &self.data.checkOnSave_overrideCommand {
+            Some(args) if !args.is_empty() => {
+                let mut args = args.clone();
+                let command = args.remove(0);
+                command
+            }
+            _ => {String::new()}
+        };
+
         AssistConfig {
             snippet_cap: SnippetCap::new(self.experimental("snippetTextEdit")),
             allowed: None,
             insert_use: self.insert_use_config(),
+            verus_path,
         }
     }
 
