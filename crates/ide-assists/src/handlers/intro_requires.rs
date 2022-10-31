@@ -337,14 +337,12 @@ fn inline(
             }
         }
     }
-    dbg!("inline 4");
 
     let original_indentation = match node {
         ast::CallableExpr::Call(it) => it.indent_level(),
         ast::CallableExpr::MethodCall(it) => it.indent_level(),
     };
     body.reindent_to(original_indentation);
-    dbg!("inline 5");
     match body.tail_expr() {
         Some(expr) if body.statements().next().is_none() => expr,
         _ => match node

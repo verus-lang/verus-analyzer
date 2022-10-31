@@ -683,6 +683,29 @@ fn verus_walkthrough8() {
     }
 }
 
+#[test]
+fn verus_walkthrough9_0() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+    fn test_is_variant_1(v: Vehicle2<u64>) {
+        match v {
+            Vehicle2::Car(_) => assert(v.is_Car()),
+            Vehicle2::Train(_) => assert(v.is_Train()),
+        };
+    }
+
+
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
 
 
 

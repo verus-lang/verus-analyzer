@@ -23,6 +23,15 @@ pub(super) fn expr_stmt(
     p: &mut Parser<'_>,
     m: Option<Marker>,
 ) -> Option<(CompletedMarker, BlockLike)> {
+    if p.at(T![assert]) {
+        let m = m.unwrap_or_else(|| {
+            let m = p.start();
+            attributes::outer_attrs(p);
+            m
+        });
+        let assert_expr = verus::assert(p, m);
+        return Some((assert_expr,  BlockLike::NotBlock));
+    }
     let r = Restrictions { forbid_structs: false, prefer_stmt: true };
     expr_bp(p, m, r, 1)
 }

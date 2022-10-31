@@ -59,7 +59,7 @@ pub(crate) fn assume(p: &mut Parser<'_>, m: Marker) {
 
 // AssertExpr =
 //   'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
-pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) {
+pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     p.expect(T![assert]);
     
     if p.at(T!['(']) {
@@ -98,7 +98,7 @@ pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) {
         requires(p);
     }
 
-    if p.at(T![;]) {
+    if p.at(T![;]) || p.at(T![,]) {
         // test fn_decl
         // trait T { fn foo(); }
         // dbg!("getting ;, but ignoring");
@@ -109,7 +109,7 @@ pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) {
         expressions::block_expr(p);
     }
 
-    m.complete(p, ASSERT_EXPR);
+    m.complete(p, ASSERT_EXPR)
 }
 
 pub(crate)  fn requires(p: &mut Parser<'_>) -> CompletedMarker {
