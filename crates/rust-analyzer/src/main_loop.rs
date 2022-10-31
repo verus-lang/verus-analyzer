@@ -529,7 +529,7 @@ impl GlobalState {
     fn handle_flycheck_msg(&mut self, message: flycheck::Message) {
         match message {
             flycheck::Message::AddDiagnostic { id, workspace_root, diagnostic } => {
-                dbg!(&diagnostic);
+                // dbg!(&diagnostic);
                 let snap = self.snapshot();
                 let diagnostics = crate::diagnostics::to_proto::map_rust_diagnostic_to_lsp(
                     &self.config.diagnostics_map(),
@@ -578,13 +578,13 @@ impl GlobalState {
                     }
                     flycheck::Progress::VerusResult(msg) => {
                         // this is hacky
-                        dbg!("reporting verus result");
+                        // dbg!("reporting verus result");
                         if msg.starts_with("verification results::") {
-                            // if msg.contains("verified: 0 errors: 0") {
-                            //     self.send_notification::<lsp_types::notification::ShowMessage>(
-                            //         lsp_types::ShowMessageParams { typ: lsp_types::MessageType::WARNING, message: msg},
-                            //     );
-                            // } else 
+                            if msg.contains("verified: 0 errors: 0") {
+                                self.send_notification::<lsp_types::notification::ShowMessage>(
+                                    lsp_types::ShowMessageParams { typ: lsp_types::MessageType::WARNING, message: msg},
+                                );
+                            } else 
                             if msg.contains("errors: 0") {
                                 self.send_notification::<lsp_types::notification::ShowMessage>(
                                     lsp_types::ShowMessageParams { typ: lsp_types::MessageType::INFO, message: msg},
@@ -596,10 +596,13 @@ impl GlobalState {
                             }
                             return;
                         } else {
-                            self.show_and_log_error(
-                                "unexpected verus result report".to_string(),
-                                Some(msg),
+                            self.send_notification::<lsp_types::notification::ShowMessage>(
+                                lsp_types::ShowMessageParams { typ: lsp_types::MessageType::WARNING, message: msg},
                             );
+                            // self.show_and_log_error(
+                            //     "unexpected verus result report".to_string(),
+                            //     Some(msg),
+                            // );
                             return;
                         }
                     }

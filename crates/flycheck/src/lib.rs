@@ -184,7 +184,7 @@ impl FlycheckActor {
     }
     fn run(mut self, inbox: Receiver<Restart>) {
         while let Some(event) = self.next_event(&inbox) {
-            dbg!("flychecker run:");
+            // dbg!("flychecker run:");
             match event {
                 Event::Restart(Restart::No) => {
                     self.cancel_check_process();
@@ -203,12 +203,12 @@ impl FlycheckActor {
                                 command = ?self.check_command(None),
                                 "did  restart flycheck"
                             );
-                            dbg!("cargo handle spawn success");
+                            // dbg!("cargo handle spawn success");
                             self.cargo_handle = Some(cargo_handle);
                             self.progress(Progress::DidStart);
                         }
                         Err(error) => {
-                            dbg!("cargo handle spwan failed");
+                            // dbg!("cargo handle spwan failed");
                             self.progress(Progress::DidFailToRestart(format!(
                                 "Failed to run the following command: {:?} error={}",
                                 self.check_command(None),
@@ -235,12 +235,12 @@ impl FlycheckActor {
                                 command = ?self.check_command(Some(path.clone())),
                                 "did  restart flycheck"
                             );
-                            dbg!("cargo handle spawn success");
+                            // dbg!("cargo handle spawn success");
                             self.cargo_handle = Some(cargo_handle);
                             self.progress(Progress::DidStart);
                         }
                         Err(error) => {
-                            dbg!("cargo handle spwan failed");
+                            // dbg!("cargo handle spwan failed");
                             self.progress(Progress::DidFailToRestart(format!(
                                 "Failed to run the following command: {:?} error={}",
                                 self.check_command(Some(path.clone())),
@@ -251,7 +251,7 @@ impl FlycheckActor {
                 }
                 
                 Event::CheckEvent(None) => {
-                    dbg!("FlycheckActor fun checkevent");
+                    // dbg!("FlycheckActor fun checkevent");
                     tracing::debug!(flycheck_id = self.id, "flycheck finished");
 
                     // Watcher finished
@@ -267,12 +267,12 @@ impl FlycheckActor {
                 }
                 Event::CheckEvent(Some(message)) => match message {
                     CargoMessage::CompilerArtifact(msg) => {
-                        dbg!("FlycheckActor fun checkevent compilerartifact");
+                        // dbg!("FlycheckActor fun checkevent compilerartifact");
                         self.progress(Progress::DidCheckCrate(msg.target.name));
                     }
 
                     CargoMessage::Diagnostic(msg) => {
-                        dbg!("FlycheckActor fun checkevent diagnostic");
+                        // dbg!("FlycheckActor fun checkevent diagnostic");
                         self.send(Message::AddDiagnostic {
                             id: self.id,
                             workspace_root: self.workspace_root.clone(),
@@ -311,7 +311,7 @@ impl FlycheckActor {
                 extra_args,
                 features,
             } => {
-                dbg!("normal command");
+                // dbg!("normal command");
                 
                 let mut cmd = Command::new(toolchain::cargo());
                 cmd.arg(command);
@@ -405,19 +405,14 @@ impl CargoHandle {
     }
 
     fn join(mut self) -> io::Result<()> {
-        dbg!("cargohandle join0");
         let _ = self.child.kill();
-        dbg!("cargohandle join1");
         let exit_status = self.child.wait()?;
-        dbg!("cargohandle join2");
         let (read_at_least_one_message, error) = self.thread.join()?;
-        dbg!("cargohandle join3");
  
         // when Verus verification fails, it terminates with compiler error
         if read_at_least_one_message {//|| exit_status.success() 
             Ok(())
         } else {
-            dbg!("cargohandle join4");
             Err(io::Error::new(io::ErrorKind::Other, format!(
                 "Cargo watcher failed, the command produced no valid metadata (exit code: {:?}):\n{}",
                 exit_status, error
@@ -447,18 +442,19 @@ impl CargoActor {
         // simply skip a line if it doesn't parse, which just ignores any
         // erroneous output.
 
-        dbg!("cargo actor run");
         let error = String::new(); //FIXME proper error 
         // let mut error = String::new();
         let mut read_at_least_one_stdout = false;
         let mut read_at_least_one_stderr = false;
+        let mut reported_verus_result_stdout = false;
+        let mut reported_verus_result_stderr = false;
         let output = streaming_output(
             self.stdout,
             self.stderr,
             &mut |line| {
                 read_at_least_one_stdout = true;
-                dbg!("stdout line");
-                dbg!(&line);
+                // dbg!("stdout line");
+                // dbg!(&line);
 
                 // Try to deserialize a message from Cargo or Rustc.
                 let mut deserializer = serde_json::Deserializer::from_str(line);
@@ -470,34 +466,35 @@ impl CargoActor {
                             cargo_metadata::Message::CompilerArtifact(artifact)
                                 if !artifact.fresh =>
                             {
-                                dbg!(&artifact);
+                                // dbg!(&artifact);
                                 self.sender.send(CargoMessage::CompilerArtifact(artifact)).unwrap();
                             }
                             cargo_metadata::Message::CompilerMessage(msg) => {
-                                dbg!(&msg);
+                                // dbg!(&msg);
                                 self.sender.send(CargoMessage::Diagnostic(msg.message)).unwrap();
                             }
                             _ => (),
                         },
                         JsonMessage::Rustc(message) => {
-                            dbg!(&message);
+                            // dbg!(&message);
                             self.sender.send(CargoMessage::Diagnostic(message)).unwrap();
                         }
                     }
                 } else {
-                    dbg!("json deserialize error");
+                    // dbg!("json deserialize error");
                     // report verification result
                     if line.starts_with("verification results::") {
-                        dbg!("generating verus result");
+                        dbg!("generating verus result stdout", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
+                        reported_verus_result_stdout = true;
                     }
                 }
             },
             // FIXME: below should be removed given that  original r-a properly gets complier error from stdout
             &mut |line| {
                 read_at_least_one_stderr = true;
-                dbg!("stderr line");
-                dbg!(&line);
+                // dbg!("stderr line");
+                // dbg!(&line);
 
                 // Try to deserialize a message from Cargo or Rustc.
                 let mut deserializer = serde_json::Deserializer::from_str(line);
@@ -509,28 +506,28 @@ impl CargoActor {
                             cargo_metadata::Message::CompilerArtifact(artifact)
                                 if !artifact.fresh =>
                             {
-                                dbg!(&artifact);
+                                // dbg!(&artifact);
                                 self.sender.send(CargoMessage::CompilerArtifact(artifact)).unwrap();
                             }
                             cargo_metadata::Message::CompilerMessage(msg) => {
-                                dbg!(&msg);
+                                // dbg!(&msg);
                                 self.sender.send(CargoMessage::Diagnostic(msg.message)).unwrap();
                             }
                             _ => (),
                         },
                         JsonMessage::Rustc(message) => {
-                            dbg!(&message);
+                            // dbg!(&message);
                             self.sender.send(CargoMessage::Diagnostic(message)).unwrap();
                         }
                     }
                 } else {
-                    dbg!("json deserialize error");
+                    // dbg!("json deserialize error");
                     // report verification result
                     if line.starts_with("verification results::") {
-                        dbg!("generating verus result");
+                        dbg!("generating verus result stderr", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
+                        reported_verus_result_stderr = true;
                     }
-                    
                 }
             },
             // &mut |line| {
@@ -540,9 +537,15 @@ impl CargoActor {
             //     error.push('\n');
             // },
         );
-    
+        let reported_verus_result = reported_verus_result_stdout || reported_verus_result_stderr;
         let read_at_least_one_message = read_at_least_one_stdout || read_at_least_one_stderr;
-        dbg!(&read_at_least_one_message);
+        dbg!(&reported_verus_result ,&read_at_least_one_message);
+
+        if !reported_verus_result{
+            dbg!("generating missing verus result");
+            self.sender.send(CargoMessage::VerusResult("Verus Failed Before Producing Verification Result".to_string())).unwrap();
+        }
+            
         match output {
             Ok(_) => {dbg!("cargo actor output OK"); Ok((read_at_least_one_message, error))},
             Err(e) =>{dbg!("cargo actor output Err"); Err(io::Error::new(e.kind(), format!("{:?}: {}", e, error)))},
