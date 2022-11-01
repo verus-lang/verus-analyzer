@@ -94,7 +94,7 @@ impl<'t> Parser<'t> {
             
             T![&&&] => self.at_composite3(n, T![&], T![&], T![&]),
             T![|||] => self.at_composite3(n, T![|], T![|], T![|]),
-            // T![<==>] => self.at_composite4(n, T![<], T![=], T![=], T![>]),   // TODO: at_composite4
+            T![<==>] => self.at_composite4(n, T![<], T![=], T![=], T![>]),   // TODO: at_composite4
             T![==>] => self.at_composite3(n, T![=], T![=], T![>]),
             T![<==] => self.at_composite3(n, T![<], T![=], T![=]),
             T![===] => self.at_composite3(n, T![=], T![=], T![=]),
@@ -133,6 +133,7 @@ impl<'t> Parser<'t> {
             | T![||] => 2,
 
             T![...] | T![..=] | T![<<=] | T![>>=] | T![==>] | T![<==] | T![===] | T![&&&] | T![|||] | T![!==] => 3,
+            T![<==>] => 4,
             _ => 1,
         };
         self.do_bump(kind, n_raw_tokens);
@@ -151,6 +152,16 @@ impl<'t> Parser<'t> {
             && self.inp.kind(self.pos + n + 2) == k3
             && self.inp.is_joint(self.pos + n)
             && self.inp.is_joint(self.pos + n + 1)
+    }
+
+    fn at_composite4(&self, n: usize, k1: SyntaxKind, k2: SyntaxKind, k3: SyntaxKind, k4: SyntaxKind) -> bool {
+        self.inp.kind(self.pos + n) == k1
+            && self.inp.kind(self.pos + n + 1) == k2
+            && self.inp.kind(self.pos + n + 2) == k3
+            && self.inp.kind(self.pos + n + 3) == k4
+            && self.inp.is_joint(self.pos + n)
+            && self.inp.is_joint(self.pos + n + 1)
+            && self.inp.is_joint(self.pos + n + 2)
     }
     
 

@@ -153,6 +153,7 @@ impl ast::BinExpr {
                 T![<==] => BinaryOp::LogicOp(LogicOp::Exply),
                 T![==>] => BinaryOp::LogicOp(LogicOp::Imply),
                 T![===] => BinaryOp::LogicOp(LogicOp::EqEqEq),
+                T![<==>] => BinaryOp::LogicOp(LogicOp::Equiv),
 
                 T![||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&] => BinaryOp::LogicOp(LogicOp::And),

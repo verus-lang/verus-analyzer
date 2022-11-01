@@ -44,6 +44,7 @@ pub enum LogicOp {
     BigOr,  // |||  Verus
     NeEq,   // !==  Verus
     EqEqEq, // ===  Verus
+    Equiv,  // <==> Verus
     
 }
 
@@ -84,6 +85,7 @@ impl fmt::Display for LogicOp {
             LogicOp::BigOr => "|||",
             LogicOp::NeEq => "!==",
             LogicOp::EqEqEq => "===",
+            LogicOp::Equiv => "<==>",
         };
         f.write_str(res)
     }
