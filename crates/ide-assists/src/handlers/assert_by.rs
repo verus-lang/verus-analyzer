@@ -21,7 +21,7 @@ pub(crate) fn assert_by(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()
     }
 
     let assert_by = code_transformer_assert_to_assert_by(expr.clone())?;
-    acc.add(AssistId("assert_by", AssistKind::RefactorRewrite), "Assert by", assert_range, |edit| {
+    acc.add(AssistId("assert_by", AssistKind::RefactorRewrite), "Add proof block for this assert", assert_range, |edit| {
         edit.replace_ast(syntax::ast::Expr::AssertExpr(expr), syntax::ast::Expr::AssertExpr(assert_by));
     })
 }

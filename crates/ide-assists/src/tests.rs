@@ -29,6 +29,7 @@ pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
         group: true,
         skip_glob_imports: true,
     },
+    verus_path: String::new(),
 };
 
 pub(crate) fn with_single_file(text: &str) -> (RootDatabase, FileId) {

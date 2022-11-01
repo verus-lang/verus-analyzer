@@ -20,9 +20,12 @@ use crate::{
 };
 
 use hir::db::DefDatabase;
-use ide_db::base_db::SourceDatabaseExt;
+// use ide_db::base_db::SourceDatabaseExt;
 use ide_db::SnippetCap;
 use crate::AssistConfig;
+
+
+// copied lots of code from inline_call.rs
 
 pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
     snippet_cap: SnippetCap::new(true),
@@ -37,10 +40,10 @@ pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
     verus_path: String::new(),
 };
 
-
 pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
     let name_ref: ast::NameRef = ctx.find_node_at_offset()?;
     let call_info = CallInfo::from_name_ref(name_ref.clone())?;
+    let syntax = call_info.node.syntax().clone();
     let (function, _label) = match &call_info.node {
         ast::CallableExpr::Call(call) => {
             let path = match call.expr()? {
@@ -62,10 +65,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 
     let fn_source = ctx.sema.source(function)?;
     let param_list = fn_source.value.param_list()?;
-
-
     let params = get_fn_params(ctx.sema.db, function, &param_list)?;
-
     if call_info.arguments.len() != params.len() {
         // Can't inline the function because they've passed the wrong number of
         // arguments to this function
@@ -73,70 +73,36 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
         return None;
     }
 
-    let syntax = call_info.node.syntax().clone();
-
-
-
+    // construct a function, which are just a bunch of assertions
     let requires = fn_source.value.requires_clause()?;
     let first_req = requires.expr()?;
-    // dbg!(&first_req);
     let mut req_vec = vec![first_req.clone()];
-
-
     let mut requires_clauses = requires.comma_and_conds();
     while let Some(req) = requires_clauses.next() {
         let req_without_comma = req.condition()?;
         // dbg!(&req_without_comma);
         req_vec.push(req_without_comma.clone());
     }
-
     let req_as_body = block_expr_from_predicates(&req_vec);
-
-
-    // clone
-    // clone_subtree
-    // clone_for_update
-    // let mut temp_fn = fn_source.value.clone_subtree(); // is this deep copy????
     let temp_fn = fn_source.value.clone_for_update();
     ted::replace(temp_fn.body()?.syntax(), req_as_body.syntax().clone_for_update());
 
-    dbg!(&temp_fn);
-    // if self.body().is_none() {
-    //     let body = make::ext::empty_block_expr().clone_for_update();
-    //     match self.semicolon_token() {
-    //         Some(semi) => {
-    //             ted::replace(semi, body.syntax());
-    //             ted::insert(Position::before(body.syntax), make::tokens::single_space());
-    //         }
-    //         None => ted::append_child(self.syntax(), body.syntax()),
-    //     }
-    // }
-
+    // for the above function, construct a temporaty semantic database
     let mut temp_fn_str = temp_fn.to_string();
     temp_fn_str.insert_str(0,"$0");
     let (mut db, file_with_caret_id, range_or_offset) = RootDatabase::with_range_or_offset(&temp_fn_str);
     db.set_enable_proc_attr_macros(true);
-    // let text_without_caret = db.file_text(file_with_caret_id).to_string();
     let frange = FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
     let sema = Semantics::new(&db);
     let config = TEST_CONFIG;
     let tmp_ctx = AssistContext::new(sema, &config, frange);
     let tmp_foo = tmp_ctx.find_node_at_offset::<ast::Fn>()?;
-    // dbg!(&tmp_foo);
-
-
-    let tmp_body = tmp_foo.body()?;
-
-    
+    let tmp_body = tmp_foo.body()?;    
     let tmp_param_list = tmp_foo.param_list()?;
-    
     let tmp_function = tmp_ctx.sema.to_def(&tmp_foo)?;
-    // dbg!(&tmp_function);
     let tmp_params = get_fn_params(tmp_ctx.db(), tmp_function , &tmp_param_list)?;
 
-    // let params = get_fn_params(ctx.sema.db, function, &param_list)?;
-
-
+    // calculate the location to insert
     let mut where_to_insert = call_info.node.syntax().text_range().start();
     for ancestor in  call_info.node.syntax().ancestors() {
         match ancestor.kind() {
@@ -149,31 +115,19 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
         dbg!(ancestor.kind());
     }
 
-
-
+    // register 
     acc.add(
         AssistId("intro_requires", AssistKind::RefactorInline),
-        "Intro Requires",
+        "Insert requires of this function call",
         syntax.text_range(),
         |builder| {
-            dbg!(&req_as_body);
-            // let replacement = inline(&ctx.sema, file_id, function, &req_as_body, &params, &call_info);
             let replacement = inline(&tmp_ctx.sema, file_with_caret_id, tmp_function, &tmp_body, &tmp_params, &call_info);
-
-            // builder.replace_ast(
-            //     match call_info.node {
-            //         ast::CallableExpr::Call(it) => ast::Expr::CallExpr(it),
-            //         ast::CallableExpr::MethodCall(it) => ast::Expr::MethodCallExpr(it),
-            //     },
-            //     replacement,
-            // );
-            builder.insert(
-                where_to_insert,
-                replacement.to_string(),
-            );
+                 builder.insert(
+                    where_to_insert,
+                    replacement,
+                );
         },
     )
-    
 }
 
 
@@ -243,11 +197,11 @@ fn get_fn_params(
 fn inline(
     sema: &Semantics<'_, RootDatabase>,
     function_def_file_id: FileId,
-    function: hir::Function,
+    _function: hir::Function,
     fn_body: &ast::BlockExpr,
     params: &[(ast::Pat, Option<ast::Type>, hir::Param)],
-    CallInfo { node, arguments, generic_arg_list }: &CallInfo,
-) -> ast::Expr {
+    CallInfo { node, arguments, generic_arg_list: _ }: &CallInfo,
+) -> String {
     let body = fn_body.clone_for_update();
     dbg!("inline 1");
     let usages_for_locals = |local| {
@@ -287,9 +241,9 @@ fn inline(
         })
         .collect();
 
-    dbg!("inline 3");
+    // let mut introduced_let_binding = false;
     // Inline parameter expressions or generate `let` statements depending on whether inlining works or not.
-    for ((pat, param_ty, _), usages, expr) in izip!(params, param_use_nodes, arguments).rev() {
+    for ((pat, _param_ty, _), usages, expr) in izip!(params, param_use_nodes, arguments).rev() {
         let inline_direct = |usage, replacement: &ast::Expr| {
             if let Some(field) = path_expr_as_record_field(usage) {
                 cov_mark::hit!(inline_call_inline_direct_field);
@@ -325,6 +279,7 @@ fn inline(
             // can't inline, emit a let statement
             _ => {
                 dbg!("inline 3-2");
+                // introduced_let_binding = true;
                 // let ty =
                 //     sema.type_of_expr(expr).filter(TypeInfo::has_adjustment).and(param_ty.clone());
                 if let Some(stmt_list) = body.stmt_list() {
@@ -343,20 +298,18 @@ fn inline(
         ast::CallableExpr::MethodCall(it) => it.indent_level(),
     };
     body.reindent_to(original_indentation);
-    match body.tail_expr() {
-        Some(expr) if body.statements().next().is_none() => expr,
-        _ => match node
-            .syntax()
-            .parent()
-            .and_then(ast::BinExpr::cast)
-            .and_then(|bin_expr| bin_expr.lhs())
-        {
-            Some(lhs) if lhs.syntax() == node.syntax() => {
-                make::expr_paren(ast::Expr::BlockExpr(body)).clone_for_update()
-            }
-            _ => ast::Expr::BlockExpr(body),
-        },
-    }
+    body.to_string()
+
+    // if introduced_let_binding {    
+    //     body.to_string()
+    // } else {
+    //     for stmt in body.stmt_list().unwrap().clone_for_update().statements() {
+    //         stmt.dedent(syntax::ast::edit::IndentLevel(2));
+    //     }
+    //     ted::remove(body.stmt_list().unwrap().l_curly_token().unwrap());
+    //     ted::remove(body.stmt_list().unwrap().r_curly_token().unwrap());
+    //     body.to_string()
+    // }
 }
 
 fn path_expr_as_record_field(usage: &PathExpr) -> Option<ast::RecordExprField> {

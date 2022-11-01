@@ -165,6 +165,8 @@ pub(super) fn atom_expr(
         T![for] if la == T![<] => closure_expr(p),
         T![for] => for_expr(p, None),
 
+        // TODO: put assert parsing here?
+
         _ => {
             // dbg!("hey atom_expr");
             // dbg!(p.current());

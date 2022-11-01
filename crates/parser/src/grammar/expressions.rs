@@ -235,7 +235,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![*]                  => (11, T![*]),
         T![.] if p.at(T![..=]) => (2,  T![..=]),
         T![.] if p.at(T![..])  => (2,  T![..]),
-        T![!] if p.at(T![!==])  => (2,  T![!==]),       // verus
+        T![!] if p.at(T![!==])  => (5,  T![!==]),       // verus
         T![!] if p.at(T![!=])  => (5,  T![!=]),
         T![-] if p.at(T![-=])  => (1,  T![-=]),
         T![-]                  => (10, T![-]),
@@ -279,7 +279,9 @@ fn expr_bp(
     loop {
         let is_range = p.at(T![..]) || p.at(T![..=]);
         let (op_bp, op) = current_op(p);
+        dbg!(&op_bp, &op, &bp);
         if op_bp < bp {
+            dbg!("break");
             break;
         }
         // test as_precedence
@@ -352,6 +354,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     --1;
         // }
         T![*] | T![!] | T![-] => {
+            dbg!("prefix");
             m = p.start();
             p.bump_any();
             PREFIX_EXPR

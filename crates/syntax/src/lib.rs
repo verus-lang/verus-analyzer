@@ -734,6 +734,31 @@ fn verus_walkthrough9() {
     }
 }
 
+
+ 
+#[test]
+fn verus_walkthrough10_0() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+    pub(crate) proof fn binary_ops<A>(a: A, x: int) {
+        assert(2 + 2 !== 3);
+        assert(a === a);
+    
+        assert(false <==> true && false);
+    }
+    
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+ 
  
 #[test]
 fn verus_walkthrough10() {
@@ -749,7 +774,7 @@ fn verus_walkthrough10() {
             assert(s[0] == 10);
             assert(s[1] == 20);
         }
-    }
+    }    
     }";
     let parse = SourceFile::parse(source_code);
     dbg!(&parse.errors);
