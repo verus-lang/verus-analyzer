@@ -353,7 +353,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     !!true;
         //     --1;
         // }
-        T![*] | T![!] | T![-] => {
+        T![*] | T![!] | T![-]  => {  // | T![|||] | T![&&&]
             dbg!("prefix");
             m = p.start();
             p.bump_any();

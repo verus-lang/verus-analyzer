@@ -759,7 +759,35 @@ fn verus_walkthrough10_0() {
     }
 }
  
- 
+#[test]
+fn verus_walkthrough10_1() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+    spec fn complex_conjuncts(x: int, y: int) -> bool {
+        let b = x < y;
+        &&& b
+        &&& if false {
+                &&& b ==> b
+                &&& !b ==> !b
+            } else {
+                ||| b ==> b
+                ||| !b
+            }
+        &&& false ==> true
+    }
+    
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
 #[test]
 fn verus_walkthrough10() {
     use ast::{HasModuleItem, HasName};
