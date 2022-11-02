@@ -45,13 +45,25 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
 ]);
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
-    // if p.at(T![verus]) {
-    //     let m = p.start();
-    //     p.expect(T![verus]);
-    //     p.expect(T![!]);
-    //     p.expect(T!['{']);
-    //     m.abandon(p);
-    // }
+    if p.at(IDENT) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+        // TODO: check if ident is verus
+        let m = p.start();
+        p.bump(IDENT);
+        p.bump(T![!]);
+        p.bump(T!['{']);
+        m.abandon(p);
+        while !p.at(EOF)  &&  !p.at(T!['}']) {
+            if p.at(T!['}']) {
+                break;
+            }
+            item_or_macro(p, true);
+        }
+        let m = p.start();
+        p.bump(T!['}']);
+        m.abandon(p);
+        return;
+    }
+
     
     let m = p.start();
     attributes::outer_attrs(p);
