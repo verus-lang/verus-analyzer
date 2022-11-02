@@ -32,7 +32,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
         // TODO: comment out using // rather than /* */
         acc.add(
             AssistId("assert_comment", AssistKind::RefactorRewrite),
-            "Confirm if this assertion is essential",
+            "Check if this assertion is essential",
             assert_range,
             |builder| {
                 builder.insert(assert_stmt.syntax().text_range().start(), &format!("/* "));
@@ -43,7 +43,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
         dbg!("verification failed without this asseriton");
         acc.add(
             AssistId("assert_comment", AssistKind::RefactorRewrite),
-            "Confirm if this assertion is essential",
+            "Check if this assertion is essential",
             assert_range,
             |builder| {
                 builder.insert(assert_stmt.syntax().text_range().end(), &format!(" // OBSERVE"));

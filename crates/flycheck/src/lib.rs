@@ -482,6 +482,7 @@ impl CargoActor {
                     }
                 } else {
                     // dbg!("json deserialize error");
+                    dbg!(&line);
                     // report verification result
                     if line.starts_with("verification results::") {
                         dbg!("generating verus result stdout", &line);
@@ -523,6 +524,7 @@ impl CargoActor {
                 } else {
                     // dbg!("json deserialize error");
                     // report verification result
+                    dbg!(&line);
                     if line.starts_with("verification results::") {
                         dbg!("generating verus result stderr", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
