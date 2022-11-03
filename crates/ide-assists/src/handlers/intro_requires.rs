@@ -112,7 +112,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
             }
             _ => (),
         }
-        dbg!(ancestor.kind());
+        // dbg!(ancestor.kind());
     }
 
     // register 
@@ -203,7 +203,7 @@ fn inline(
     CallInfo { node, arguments, generic_arg_list: _ }: &CallInfo,
 ) -> String {
     let body = fn_body.clone_for_update();
-    dbg!("inline 1");
+    // dbg!("inline 1");
     let usages_for_locals = |local| {
         Definition::Local(local)
             .usages(sema)
@@ -214,7 +214,7 @@ fn inline(
             .into_iter()
     };
 
-    dbg!("inline2");
+    // dbg!("inline2");
     let param_use_nodes: Vec<Vec<_>> = params
         .iter()
         .map(|(pat, _, param)| {
@@ -272,13 +272,13 @@ fn inline(
             }
             // inline direct local arguments
             [_, ..] if expr_as_name_ref(expr).is_some() => {
-                dbg!("inline 3-1");
+                // dbg!("inline 3-1");
                 cov_mark::hit!(inline_call_inline_locals);
                 usages.iter().for_each(|usage| inline_direct(usage, expr));
             }
             // can't inline, emit a let statement
             _ => {
-                dbg!("inline 3-2");
+                // dbg!("inline 3-2");
                 // introduced_let_binding = true;
                 // let ty =
                 //     sema.type_of_expr(expr).filter(TypeInfo::has_adjustment).and(param_ty.clone());

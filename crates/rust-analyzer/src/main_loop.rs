@@ -796,8 +796,8 @@ impl GlobalState {
                 if let Ok(vfs_path) = from_proto::vfs_path(&params.text_document.uri) {
                     let (vfs, _) = &*this.vfs.read();
 
-                    dbg!("make cargo check here1");
-                    dbg!(&params.text_document.uri);
+                    // dbg!("make cargo check here1");
+                    // dbg!(&params.text_document.uri);
                     // Trigger flychecks for all workspaces that depend on the saved file
                     if let Some(file_id) = vfs.file_id(&vfs_path) {
                         let analysis = this.analysis_host.analysis();
@@ -845,14 +845,14 @@ impl GlobalState {
                                 project_model::ProjectWorkspace::DetachedFiles { .. } => false,
                             });
 
-                        dbg!("make cargo check here2");    
+                        // dbg!("make cargo check here2");    
                         // Find and trigger corresponding flychecks
                         for flycheck in &this.flycheck {
                             for (id, _) in workspace_ids.clone() {
                                 if id == flycheck.id() {
                                     updated = true;
                                     // this is what triggers cargo check
-                                    dbg!(params.text_document.uri.clone().to_string());
+                                    // dbg!(params.text_document.uri.clone().to_string());
                                     flycheck.restart(Some(params.text_document.uri.clone().path().to_string()));
                                     continue;
                                 }

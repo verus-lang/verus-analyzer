@@ -104,7 +104,7 @@ pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
         // dbg!("getting ;, but ignoring");
         // p.bump(T![;]);
     } else {
-        dbg!("proof block");
+        // dbg!("proof block");
         // parse optional 'proof block'
         expressions::block_expr(p);
     }
@@ -113,7 +113,7 @@ pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
 }
 
 pub(crate)  fn requires(p: &mut Parser<'_>) -> CompletedMarker {
-    dbg!("requires");
+    // dbg!("requires");
     let m = p.start();
     p.expect(T![requires]);
     expressions::expr_no_struct(p);
@@ -142,7 +142,7 @@ pub(crate)  fn requires(p: &mut Parser<'_>) -> CompletedMarker {
 
 
 pub(crate)  fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
-    dbg!("recommends");
+    // dbg!("recommends");
     let m = p.start();
     p.expect(T![recommends]);
     expressions::expr_no_struct(p);
@@ -170,7 +170,7 @@ pub(crate)  fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
 
 
 pub(crate)  fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
-    dbg!("ensures");
+    // dbg!("ensures");
     let m = p.start();
     p.expect(T![ensures]);
     expressions::expr_no_struct(p);
@@ -198,7 +198,7 @@ pub(crate)  fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 pub(crate)  fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
-    dbg!("invariants");
+    // dbg!("invariants");
     let m = p.start();
     p.expect(T![invariant]);
     expressions::expr_no_struct(p);
@@ -227,20 +227,16 @@ pub(crate)  fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
 
 
 pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
-    dbg!("decreases");
+    // dbg!("decreases");
     let m = p.start();
     p.expect(T![decreases]);
     expressions::expr_no_struct(p);
-    dbg!(p.current());
-    dbg!(p.nth(1));
     while !p.at(EOF) && !p.at(T!['{'])  && !p.at(T![;]) {
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
-            dbg!("break at");
             break;
         }
         if p.at(T![,]) {
             if p.nth_at(1, T![recommends]) || p.nth_at(1,T![ensures]) || p.nth_at(1,T![decreases]) || p.nth_at(1,T!['{']) {
-                dbg!("break at2");
                 break;
             } else {
                 comma_cond(p);

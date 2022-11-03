@@ -19,17 +19,12 @@ fn body_hir(db: &RootDatabase, position: FilePosition) -> Option<String> {
     let sema = Semantics::new(db);
     let source_file = sema.parse(position.file_id);
 
-    dbg!("body_hir hey1");
-
-
     let item = find_node_at_offset::<ast::Item>(source_file.syntax(), position.offset)?;
-
-    dbg!("body_hir hey2");
 
     // for item in source_file.items(){
     //     dbg!(&item);
     // }
-    dbg!(&item);
+    // dbg!(&item);
 
 
     let def: DefWithBody = match item {
@@ -38,6 +33,5 @@ fn body_hir(db: &RootDatabase, position: FilePosition) -> Option<String> {
         ast::Item::Static(it) => sema.to_def(&it)?.into(),
         _ => return None,
     };
-    dbg!("body_hir hey3");
     Some(def.debug_hir(db))
 }

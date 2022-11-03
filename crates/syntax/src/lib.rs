@@ -358,6 +358,10 @@ fn api_walkthrough() {
 }
 
 
+
+
+// Do "cargo test --package syntax --lib -- tests"
+
 #[test]
 fn verus_walkthrough1() {
     use ast::{HasModuleItem, HasName};
@@ -520,6 +524,7 @@ fn verus_walkthrough3() {
 
 
 #[test]
+#[ignore = "not yet implemented"] // TODO: assume attributes
 fn verus_walkthrough4() {
     use ast::{HasModuleItem, HasName};
     let source_code = 
@@ -621,9 +626,8 @@ fn verus_walkthrough6() {
     }
 }
 
-// TODO
-// maybe I will get back to "full" parsing of Verus syntax
 #[test]
+#[ignore = "not yet implemented"] // TODO: assume attributes
 fn verus_walkthrough7() {
     use ast::{HasModuleItem, HasName};
     let source_code = 
@@ -764,6 +768,31 @@ fn verus_walkthrough10_1() {
     use ast::{HasModuleItem, HasName};
     let source_code = 
     "verus!{
+    spec fn ccc(x: int, y: int) -> bool {
+        &&& if false {
+                true
+            } else {
+                &&& b ==> b
+                &&& !b
+            }
+        &&& true
+    }
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
+
+#[test]
+fn verus_walkthrough10_2() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
     spec fn complex_conjuncts(x: int, y: int) -> bool {
         let b = x < y;
         &&& b
@@ -787,6 +816,7 @@ fn verus_walkthrough10_1() {
         dbg!(&item);
     }
 }
+
 
 #[test]
 fn verus_walkthrough10() {

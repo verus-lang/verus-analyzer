@@ -538,8 +538,6 @@ pub(crate) fn block_expr(p: &mut Parser<'_>) {
     // panic!();
     if !p.at(T!['{']) {
         // panic!();
-        dbg!(p.current());
-        dbg!(p.nth(1));
         p.error("expected a block");
         return;
     }

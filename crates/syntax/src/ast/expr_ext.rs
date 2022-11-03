@@ -130,8 +130,8 @@ impl ast::PrefixExpr {
             T![*] => UnaryOp::Deref,
             T![!] => UnaryOp::Not,
             T![-] => UnaryOp::Neg,
-            T![&&&] => UnaryOp::BigAnd,
-            T![|||] => UnaryOp::BigOr,
+            // T![&&&] => UnaryOp::BigAnd,
+            // T![|||] => UnaryOp::BigOr,
             _ => return None,
         };
         Some(res)
@@ -333,7 +333,7 @@ impl ast::Literal {
         match token.kind() {
             T![true] => LiteralKind::Bool(true),
             T![false] => LiteralKind::Bool(false),
-            _ => unreachable!(),
+            _ => {dbg!(token.kind()); unreachable!()},
         }
     }
 }

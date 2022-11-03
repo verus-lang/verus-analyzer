@@ -78,7 +78,7 @@ impl FlycheckHandle {
 
     /// Schedule a re-start of the cargo check worker.
     pub fn restart(&self, filepath: Option<String>) {
-        dbg!("restart for", &self.id);
+        // dbg!("restart for", &self.id);
         match filepath {
             Some(path) => {dbg!("verus"); self.sender.send(Restart::Verus(path)).unwrap()},
             None => {dbg!("not verus"); self.sender.send(Restart::Yes).unwrap();}, // normal cargo check
@@ -219,7 +219,7 @@ impl FlycheckActor {
                 }
                 Event::Restart(Restart::Verus(path)) => {
                     // Cancel the previously spawned process
-                    dbg!("restart verus");
+                    // dbg!("restart verus");
                     self.cancel_check_process();
                     while let Ok(_) = inbox.recv_timeout(Duration::from_millis(50)) {}
 
@@ -340,8 +340,8 @@ impl FlycheckActor {
                 cmd
             }
             FlycheckConfig::CustomCommand { command, args } => {
-                dbg!(&command);
-                dbg!(&args);
+                // dbg!(&command);
+                // dbg!(&args);
                 match filepath.as_ref() {
                     Some(path) => {
                         //  insert current-saved filename here
@@ -364,7 +364,7 @@ impl FlycheckActor {
             }
         };
         cmd.current_dir(&self.workspace_root);
-        dbg!(&cmd);
+        // dbg!(&cmd);
         cmd
     }
 
@@ -541,7 +541,7 @@ impl CargoActor {
         );
         let reported_verus_result = reported_verus_result_stdout || reported_verus_result_stderr;
         let read_at_least_one_message = read_at_least_one_stdout || read_at_least_one_stderr;
-        dbg!(&reported_verus_result ,&read_at_least_one_message);
+        // dbg!(&reported_verus_result ,&read_at_least_one_message);
 
         if !reported_verus_result{
             dbg!("generating missing verus result");

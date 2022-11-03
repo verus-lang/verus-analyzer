@@ -70,6 +70,8 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
         return;
     }
 
+    // TODO: remove this special-casing
+    // see verus_walkthrough3 testcase
     if p.at(T![assert]) {
         let m1 = p.start();
         verus::assert(p, m1);
@@ -162,6 +164,19 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 }
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
+    if p.at(T![&&&]) || p.at(T![|||]) {
+        // dbg!("abandon prefix bigand bigor op");
+        let mm = p.start();
+        if p.at(T![&&&]) {
+            p.expect(T![&&&]);
+        }
+        if p.at(T![|||]) {
+            p.expect(T![|||]);
+        }
+        mm.abandon(p);
+    }
+
+    
     attributes::inner_attrs(p);
 
     while !p.at(EOF) && !p.at(T!['}']) {
@@ -196,7 +211,7 @@ struct Restrictions {
 fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
     const NOT_AN_OP: (u8, SyntaxKind) = (0, T![@]);
     match p.current() {
-        T![|] if p.at(T![|||])  => (2,  T![|||]),           // verus
+        T![|] if p.at(T![|||])  => (3,  T![|||]),           // verus
         T![|] if p.at(T![||])  => (3,  T![||]),
         T![|] if p.at(T![|=])  => (1,  T![|=]),
         T![|]                  => (6,  T![|]),
@@ -227,7 +242,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
 
         T![&] if p.at(T![&=])  => (1,  T![&=]),
         // If you update this, remember to update `expr_let()` too.
-        T![&] if p.at(T![&&&])  => (2,  T![&&&]),           // verus
+        T![&] if p.at(T![&&&])  => (4,  T![&&&]),           // verus
         T![&] if p.at(T![&&])  => (4,  T![&&]),
         T![&]                  => (8,  T![&]),
         T![/] if p.at(T![/=])  => (1,  T![/=]),
@@ -338,6 +353,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     let _ = &raw const foo;
         // }
         T![&] => {
+            // dbg!("ref expr");
             m = p.start();
             p.bump(T![&]);
             if p.at_contextual_kw(T![raw]) && (p.nth_at(1, T![mut]) || p.nth_at(1, T![const])) {
@@ -354,8 +370,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     !!true;
         //     --1;
         // }
-        T![*] | T![!] | T![-]  => {  // | T![|||] | T![&&&]
-            dbg!("prefix");
+        T![*] | T![!] | T![-] => {  //
             m = p.start();
             p.bump_any();
             PREFIX_EXPR

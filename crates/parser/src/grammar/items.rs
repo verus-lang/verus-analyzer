@@ -333,11 +333,11 @@ fn extern_crate(p: &mut Parser<'_>, m: Marker) {
 // test mod_item
 // mod a;
 pub(crate) fn mod_item(p: &mut Parser<'_>, m: Marker) {
-    dbg!(p.current());
+    // dbg!(p.current());
     if p.at(T![mod]) {
         p.bump(T![mod]);
     }
-    dbg!(p.current());
+    // dbg!(p.current());
     
     // if p.at(T![verus]) {
     //     p.expect(T![verus]);

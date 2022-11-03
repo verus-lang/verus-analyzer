@@ -422,7 +422,7 @@ impl<'a> Ctx<'a> {
 
     fn lower_module(&mut self, module: &ast::Module) -> Option<FileItemTreeId<Mod>> {
         let name = module.name()?.as_name();
-        dbg!(&name);
+        // dbg!(&name);
         let visibility = self.lower_visibility(module);
         let kind = if module.semicolon_token().is_some() {
             ModKind::Outline
