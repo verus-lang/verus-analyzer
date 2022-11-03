@@ -104,6 +104,7 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
     let now = Instant::now();
     now.hash(&mut hasher);
 
+    // TODO: tmp file path for users
     let tmp_name = format!("/Users/chanhee/Works/rust-analyzer/tmp/testing_verus_action_{:?}_.rs", hasher.finish());
     let path = Path::new(&tmp_name);
     let display = path.display();
