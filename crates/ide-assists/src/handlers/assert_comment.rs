@@ -82,12 +82,14 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
     let mut func_name = String::new();
 
     // get the text of the most grand parent
+    // while doing so, find the surrounding function of this token. (to run "--verify-function")
     for ancestor in token.parent_ancestors() {
         temp_text_string = String::from(ancestor.text());
         match ancestor.kind() {
             SyntaxKind::FN => {
-                if func_name.len() > 0 {
-                    panic!(); // func inside func?
+                if func_name.len() > 0 { // if already found a function as a parent
+                    dbg!("Not supported: when invoking verus, found func inside func. ");
+                    return None;
                 }
                 let func = ast::Fn::cast(ancestor)?;
                 func_name = func.name()?.to_string();
@@ -105,6 +107,7 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
     now.hash(&mut hasher);
 
     // TODO: tmp file path for users
+    // TODO: add "rlimit 2" 
     let tmp_name = format!("/Users/chanhee/Works/rust-analyzer/tmp/testing_verus_action_{:?}_.rs", hasher.finish());
     let path = Path::new(&tmp_name);
     let display = path.display();
