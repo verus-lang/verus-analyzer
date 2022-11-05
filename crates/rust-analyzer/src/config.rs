@@ -1165,7 +1165,7 @@ impl Config {
             snippet_cap: SnippetCap::new(self.experimental("snippetTextEdit")),
             allowed: None,
             insert_use: self.insert_use_config(),
-            verus_path,
+            verus_path: verus_path.clone(),
         }
     }
 

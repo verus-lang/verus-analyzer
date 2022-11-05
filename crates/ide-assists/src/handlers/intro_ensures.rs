@@ -15,7 +15,7 @@ pub(crate) fn intro_ensures(acc: &mut Assists, ctx: &AssistContext<'_>) -> Optio
     }
     dbg!("calculating code diff for intro_ensures");
     let new_func = code_transformer_intro_ensures(func.clone())?;
-    acc.add(AssistId("intro_ensures", AssistKind::RefactorRewrite), "Copy ensures to the end", ensures_range, |edit| {
+    acc.add(AssistId("intro_ensures", AssistKind::RefactorRewrite), "Copy ensures clauses to the end", ensures_range, |edit| {
         edit.replace_ast(func , new_func );
     })
 }

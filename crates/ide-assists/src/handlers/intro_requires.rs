@@ -118,7 +118,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     // register 
     acc.add(
         AssistId("intro_requires", AssistKind::RefactorInline),
-        "Insert requires of this function call",
+        "Insert requires clauses of this function call",
         syntax.text_range(),
         |builder| {
             let replacement = inline(&tmp_ctx.sema, file_with_caret_id, tmp_function, &tmp_body, &tmp_params, &call_info);

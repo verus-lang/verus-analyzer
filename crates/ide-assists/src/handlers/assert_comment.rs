@@ -13,6 +13,7 @@ use crate::{
     AssistId, AssistKind,
 };
 use std::collections::hash_map::DefaultHasher;
+use std::env;
 
 
 pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
@@ -28,7 +29,7 @@ pub(crate) fn assert_comment(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
     let assert_removed_fn = code_transformer_remove_expr_stmt(func, assert_stmt.clone())?;
 
     if run_verus_for(ctx.config.verus_path.clone(), assert_removed_fn.fn_token()?)? {
-        dbg!("still success");
+        dbg!("still success without this assertion");
         // TODO: comment out using // rather than /* */
         acc.add(
             AssistId("assert_comment", AssistKind::RefactorRewrite),
@@ -73,12 +74,13 @@ pub(crate) fn code_transformer_remove_expr_stmt(func:ast::Fn, assert_stmt: ast::
 }
 
 
-// TODO: change output type ---- could give Verus error code
-// TODO: get function name, and include "--verify-function" flag
+// TODO: change output type ---- when failure, give Verus error code for further use-cases
 pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool> {
     let mut temp_text_string = String::new();
     let verify_func_flag = "--verify-function";
-    let verify_root_flag = "--verify-root"; // TODO TODO
+    let verify_root_flag = "--verify-root"; // TODO TODO TODO
+    let rlimit_flag = "--rlimit";
+    let rlimit_number = "3";
     let mut func_name = String::new();
 
     // get the text of the most grand parent
@@ -99,16 +101,14 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
     }
 
     // TODO: instead of writing to a file, consider
-    // 1) dev/shm 
-    // OR
-    // 2) man memfd_create
+    // `dev/shm` OR `man memfd_create`
     let mut hasher = DefaultHasher::new();
     let now = Instant::now();
     now.hash(&mut hasher);
 
-    // TODO: tmp file path for users
-    // TODO: add "rlimit 2" 
-    let tmp_name = format!("/Users/chanhee/Works/rust-analyzer/tmp/testing_verus_action_{:?}_.rs", hasher.finish());
+    let tmp_dir = env::temp_dir();
+    let tmp_name = format!("{}_{:?}_.rs", tmp_dir.display(), hasher.finish());
+    dbg!(&tmp_name);
     let path = Path::new(&tmp_name);
     let display = path.display();
 
@@ -124,14 +124,22 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
         Ok(_) => dbg!("successfully wrote to {}", display),
     };
 
+    dbg!(&verus_exec_path, &path, &verify_root_flag, &verify_func_flag, &func_name, &rlimit_flag, &rlimit_number);
+
     let output = Command::new(verus_exec_path)
     .arg(path)
     .arg(verify_root_flag)
     .arg(verify_func_flag)
     .arg(func_name)
+    .arg(rlimit_flag)
+    .arg(rlimit_number)
     .output().ok()?;
-    // TODO: remove this temporary file!
+
     dbg!(&output);
+    match std::fs::remove_file(path) {
+        Err(why) => {dbg!("couldn't remove file {}: {}", path.display(), why);},
+        Ok(_) => {dbg!("successfully removed {}", path.display());},
+    };
 
     if output.status.success() {
         return Some(true);

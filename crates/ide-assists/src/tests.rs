@@ -29,7 +29,7 @@ pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
         group: true,
         skip_glob_imports: true,
     },
-    verus_path: String::new(),
+    verus_path: String::new(),  // TODO
 };
 
 pub(crate) fn with_single_file(text: &str) -> (RootDatabase, FileId) {
@@ -123,7 +123,25 @@ fn check(handler: Handler, before: &str, expected: ExpectedResult<'_>, assist_la
     let frange = FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
 
     let sema = Semantics::new(&db);
-    let config = TEST_CONFIG;
+
+    // let config = TEST_CONFIG;
+    // to provide verus path for testing
+    let verus_path :String = "/Users/chanhee/Works/secure-foundations/verus/source/tools/rust-verify.sh".to_string();
+    let config = AssistConfig {
+        snippet_cap: SnippetCap::new(true),
+        allowed: None,
+        insert_use: InsertUseConfig {
+            granularity: ImportGranularity::Crate,
+            prefix_kind: hir::PrefixKind::Plain,
+            enforce_granularity: true,
+            group: true,
+            skip_glob_imports: true,
+        },
+        verus_path
+    };
+
+
+
     let ctx = AssistContext::new(sema, &config, frange);
     let resolve = match expected {
         ExpectedResult::Unresolved => AssistResolveStrategy::None,
