@@ -89,6 +89,8 @@ pub struct CargoConfig {
     /// when debugging isolated issues.
     pub no_sysroot: bool,
 
+    // TODO(verus): import verus pervasive from "config"
+
     /// rustc private crate source
     pub rustc_source: Option<RustcSource>,
 
