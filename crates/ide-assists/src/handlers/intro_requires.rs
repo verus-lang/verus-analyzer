@@ -135,6 +135,7 @@ pub(crate) fn intro_requires(acc: &mut Assists, ctx: &AssistContext<'_>) -> Opti
 struct CallInfo {
     node: ast::CallableExpr,
     arguments: Vec<ast::Expr>,
+    #[allow(dead_code)]
     generic_arg_list: Option<ast::GenericArgList>, // TODO: inline requires with generic arg
 }
 

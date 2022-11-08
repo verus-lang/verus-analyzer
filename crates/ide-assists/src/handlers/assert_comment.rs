@@ -107,7 +107,7 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
     now.hash(&mut hasher);
 
     let tmp_dir = env::temp_dir();
-    let tmp_name = format!("{}_{:?}_.rs", tmp_dir.display(), hasher.finish());
+    let tmp_name = format!("{}_verus_assert_comment_{:?}_.rs", tmp_dir.display(), hasher.finish());
     dbg!(&tmp_name);
     let path = Path::new(&tmp_name);
     let display = path.display();
@@ -133,14 +133,15 @@ pub fn run_verus_for(verus_exec_path: String, token: SyntaxToken) -> Option<bool
     .arg(func_name)
     .arg(rlimit_flag)
     .arg(rlimit_number)
-    .output().ok()?;
+    .output();
 
-    dbg!(&output);
     match std::fs::remove_file(path) {
         Err(why) => {dbg!("couldn't remove file {}: {}", path.display(), why);},
         Ok(_) => {dbg!("successfully removed {}", path.display());},
     };
 
+    let output = output.ok()?;
+    dbg!(&output);
     if output.status.success() {
         return Some(true);
     } else {

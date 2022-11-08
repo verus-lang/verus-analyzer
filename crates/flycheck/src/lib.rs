@@ -192,30 +192,30 @@ impl FlycheckActor {
                 Event::Restart(Restart::Yes) => {
                     // Cancel the previously spawned process
                     self.cancel_check_process();
-                    while let Ok(_) = inbox.recv_timeout(Duration::from_millis(50)) {}
+                    // while let Ok(_) = inbox.recv_timeout(Duration::from_millis(50)) {}
 
-                    let command = self.check_command(None);
-                    // insert file name here
-                    tracing::debug!(?command, "will restart flycheck");
-                    match CargoHandle::spawn(command) {
-                        Ok(cargo_handle) => {
-                            tracing::debug!(
-                                command = ?self.check_command(None),
-                                "did  restart flycheck"
-                            );
-                            // dbg!("cargo handle spawn success");
-                            self.cargo_handle = Some(cargo_handle);
-                            self.progress(Progress::DidStart);
-                        }
-                        Err(error) => {
-                            // dbg!("cargo handle spwan failed");
-                            self.progress(Progress::DidFailToRestart(format!(
-                                "Failed to run the following command: {:?} error={}",
-                                self.check_command(None),
-                                error
-                            )));
-                        }
-                    }
+                    // let command = self.check_command(None);
+                    // // insert file name here
+                    // tracing::debug!(?command, "will restart flycheck");
+                    // match CargoHandle::spawn(command) {
+                    //     Ok(cargo_handle) => {
+                    //         tracing::debug!(
+                    //             command = ?self.check_command(None),
+                    //             "did  restart flycheck"
+                    //         );
+                    //         // dbg!("cargo handle spawn success");
+                    //         self.cargo_handle = Some(cargo_handle);
+                    //         self.progress(Progress::DidStart);
+                    //     }
+                    //     Err(error) => {
+                    //         // dbg!("cargo handle spwan failed");
+                    //         self.progress(Progress::DidFailToRestart(format!(
+                    //             "Failed to run the following command: {:?} error={}",
+                    //             self.check_command(None),
+                    //             error
+                    //         )));
+                    //     }
+                    // }
                 }
                 Event::Restart(Restart::Verus(path)) => {
                     // Cancel the previously spawned process
@@ -448,6 +448,8 @@ impl CargoActor {
         let mut read_at_least_one_stderr = false;
         let mut reported_verus_result_stdout = false;
         let mut reported_verus_result_stderr = false;
+        let mut record_stdout: Vec<String> = vec![];
+        let mut record_stderr: Vec<String> = vec![];
         let output = streaming_output(
             self.stdout,
             self.stderr,
@@ -483,8 +485,9 @@ impl CargoActor {
                 } else {
                     // dbg!("json deserialize error");
                     dbg!(&line);
+                    record_stdout.push(line.to_string());
                     // report verification result
-                    if line.starts_with("verification results::") {
+                    if line.starts_with("verification results::") && !line.contains("verified: 0 errors: 0")  {
                         dbg!("generating verus result stdout", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
                         reported_verus_result_stdout = true;
@@ -525,7 +528,8 @@ impl CargoActor {
                     // dbg!("json deserialize error");
                     // report verification result
                     dbg!(&line);
-                    if line.starts_with("verification results::") {
+                    record_stderr.push(line.to_string());
+                    if line.starts_with("verification results::") && !line.contains("verified: 0 errors: 0") {
                         dbg!("generating verus result stderr", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
                         reported_verus_result_stderr = true;
@@ -542,12 +546,14 @@ impl CargoActor {
         let reported_verus_result = reported_verus_result_stdout || reported_verus_result_stderr;
         let read_at_least_one_message = read_at_least_one_stdout || read_at_least_one_stderr;
         // dbg!(&reported_verus_result ,&read_at_least_one_message);
-
+        dbg!(&record_stdout);
+        dbg!(&record_stderr);
         if !reported_verus_result{
             dbg!("generating missing verus result");
-            self.sender.send(CargoMessage::VerusResult("Verus Failed Before Producing Verification Result".to_string())).unwrap();
+            let missing_result = "Verus Failed. Diagnostic errors can be found at View>Problems on VS Code. Non-diagnostic messages are the following (if there's any).\n".to_string();
+            let report_string = format!("{}\n{}\n{}\n", missing_result, record_stdout.join("\n"), record_stderr.join("\n"));
+            self.sender.send(CargoMessage::VerusResult(report_string)).unwrap();
         }
-            
         match output {
             Ok(_) => {dbg!("cargo actor output OK"); Ok((read_at_least_one_message, error))},
             Err(e) =>{dbg!("cargo actor output Err"); Err(io::Error::new(e.kind(), format!("{:?}: {}", e, error)))},
