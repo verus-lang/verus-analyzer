@@ -20,6 +20,10 @@ pub enum UnaryOp {
     Not,
     /// `-`
     Neg,
+    /// &&& verus
+    BigAnd,
+    /// ||| Verus
+    BigOr,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -34,6 +38,14 @@ pub enum BinaryOp {
 pub enum LogicOp {
     And,
     Or,
+    Imply,  // ==>  Verus
+    Exply,  // <==  Verus
+    BigAnd, // &&&  Verus
+    BigOr,  // |||  Verus
+    NeEq,   // !==  Verus
+    EqEqEq, // ===  Verus
+    Equiv,  // <==> Verus
+    
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -67,6 +79,13 @@ impl fmt::Display for LogicOp {
         let res = match self {
             LogicOp::And => "&&",
             LogicOp::Or => "||",
+            LogicOp::Imply => "==>",
+            LogicOp::Exply => "<==",
+            LogicOp::BigAnd => "&&&",
+            LogicOp::BigOr => "|||",
+            LogicOp::NeEq => "!==",
+            LogicOp::EqEqEq => "===",
+            LogicOp::Equiv => "<==>",
         };
         f.write_str(res)
     }

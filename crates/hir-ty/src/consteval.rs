@@ -210,6 +210,9 @@ pub fn eval_const(
                         None,
                     )))
                 }
+                // verus-hir
+                hir_def::expr::UnaryOp::BigAnd => {return Err(ConstEvalError::NotSupported("bigand"))},
+                hir_def::expr::UnaryOp::BigOr =>{return Err(ConstEvalError::NotSupported("bigor"))},
             }
         }
         &Expr::BinaryOp { lhs, rhs, op } => {

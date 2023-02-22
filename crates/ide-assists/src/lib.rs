@@ -159,6 +159,10 @@ mod handlers {
     mod inline_type_alias;
     mod introduce_named_lifetime;
     mod invert_if;
+    mod assert_by;
+    mod assert_comment;
+    mod intro_ensures;
+    mod intro_requires;
     mod merge_imports;
     mod merge_match_arms;
     mod move_bounds;
@@ -251,6 +255,10 @@ mod handlers {
             introduce_named_generic::introduce_named_generic,
             introduce_named_lifetime::introduce_named_lifetime,
             invert_if::invert_if,
+            assert_by::assert_by,
+            assert_comment::assert_comment,
+            intro_ensures::intro_ensures,
+            intro_requires::intro_requires,
             merge_imports::merge_imports,
             merge_match_arms::merge_match_arms,
             move_bounds::move_bounds_to_where_clause,

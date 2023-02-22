@@ -94,7 +94,12 @@ pub struct RetType {
 }
 impl RetType {
     pub fn thin_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![->]) }
+    pub fn tracked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tracked]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -295,14 +300,18 @@ impl ast::HasVisibility for Fn {}
 impl ast::HasGenericParams for Fn {}
 impl ast::HasDocComments for Fn {}
 impl Fn {
+    pub fn publish(&self) -> Option<Publish> { support::child(&self.syntax) }
     pub fn default_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![default]) }
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn unsafe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![unsafe]) }
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
+    pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
+    pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
 }
@@ -365,6 +374,7 @@ impl ast::HasVisibility for Module {}
 impl ast::HasDocComments for Module {}
 impl Module {
     pub fn mod_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![mod]) }
+    pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
     pub fn item_list(&self) -> Option<ItemList> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
 }
@@ -520,11 +530,31 @@ impl UseTreeList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Publish {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Publish {
+    pub fn closed_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![closed]) }
+    pub fn open_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![open]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Abi {
     pub(crate) syntax: SyntaxNode,
 }
 impl Abi {
     pub fn extern_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![extern]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FnMode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FnMode {
+    pub fn spec_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![spec]) }
+    pub fn proof_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![proof]) }
+    pub fn exec_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![exec]) }
+    pub fn mode_spec_checked(&self) -> Option<ModeSpecChecked> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -534,6 +564,30 @@ pub struct WhereClause {
 impl WhereClause {
     pub fn where_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![where]) }
     pub fn predicates(&self) -> AstChildren<WherePred> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RequiresClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RequiresClause {
+    pub fn requires_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![requires])
+    }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EnsuresClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EnsuresClause {
+    pub fn ensures_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ensures]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -548,6 +602,17 @@ impl BlockExpr {
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
     pub fn stmt_list(&self) -> Option<StmtList> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ModeSpecChecked {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ModeSpecChecked {
+    pub fn spec_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![spec]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn checked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![checked]) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -570,6 +635,7 @@ pub struct Param {
 }
 impl ast::HasAttrs for Param {}
 impl Param {
+    pub fn tracked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tracked]) }
     pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
     pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
@@ -715,6 +781,88 @@ impl WherePred {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for CommaAndName {}
+impl CommaAndName {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndPat {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndPat {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndCond {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndCond {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CommaAndExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CommaAndExpr {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CondAndComma {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CondAndComma {
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InvariantClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl InvariantClause {
+    pub fn invariant_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![invariant])
+    }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RecommendsClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RecommendsClause {
+    pub fn recommends_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![recommends])
+    }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DecreasesClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DecreasesClause {
+    pub fn decreases_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![decreases])
+    }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Meta {
     pub(crate) syntax: SyntaxNode,
 }
@@ -843,6 +991,8 @@ impl ClosureExpr {
     pub fn static_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![static]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn move_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![move]) }
+    pub fn forall_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![forall]) }
+    pub fn exists_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![exists]) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<Expr> { support::child(&self.syntax) }
@@ -1049,6 +1199,8 @@ pub struct WhileExpr {
 impl ast::HasAttrs for WhileExpr {}
 impl WhileExpr {
     pub fn while_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![while]) }
+    pub fn invariant_clause(&self) -> Option<InvariantClause> { support::child(&self.syntax) }
+    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1080,6 +1232,44 @@ pub struct UnderscoreExpr {
 impl ast::HasAttrs for UnderscoreExpr {}
 impl UnderscoreExpr {
     pub fn underscore_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![_]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ViewExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for ViewExpr {}
+impl ViewExpr {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn at_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![@]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssertExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for AssertExpr {}
+impl ast::HasName for AssertExpr {}
+impl AssertExpr {
+    pub fn assert_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assert]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
+    pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
+    pub fn block_expr(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssumeExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for AssumeExpr {}
+impl AssumeExpr {
+    pub fn assume_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assume]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1541,6 +1731,9 @@ pub enum Expr {
     YieldExpr(YieldExpr),
     LetExpr(LetExpr),
     UnderscoreExpr(UnderscoreExpr),
+    ViewExpr(ViewExpr),
+    AssertExpr(AssertExpr),
+    AssumeExpr(AssumeExpr),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2142,8 +2335,30 @@ impl AstNode for UseTreeList {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Publish {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PUBLISH }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for Abi {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ABI }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for FnMode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == FN_MODE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2164,8 +2379,41 @@ impl AstNode for WhereClause {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for RequiresClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == REQUIRES_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for EnsuresClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ENSURES_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for BlockExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == BLOCK_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ModeSpecChecked {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == MODE_SPEC_CHECKED }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2320,6 +2568,94 @@ impl AstNode for TypeParam {
 }
 impl AstNode for WherePred {
     fn can_cast(kind: SyntaxKind) -> bool { kind == WHERE_PRED }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndName {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_NAME }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndPat {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_PAT }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndCond {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_COND }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CommaAndExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for CondAndComma {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == COND_AND_COMMA }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for InvariantClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for RecommendsClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == RECOMMENDS_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for DecreasesClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -2705,6 +3041,39 @@ impl AstNode for LetExpr {
 }
 impl AstNode for UnderscoreExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == UNDERSCORE_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ViewExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == VIEW_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for AssertExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ASSERT_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for AssumeExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ASSUME_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3386,6 +3755,15 @@ impl From<LetExpr> for Expr {
 impl From<UnderscoreExpr> for Expr {
     fn from(node: UnderscoreExpr) -> Expr { Expr::UnderscoreExpr(node) }
 }
+impl From<ViewExpr> for Expr {
+    fn from(node: ViewExpr) -> Expr { Expr::ViewExpr(node) }
+}
+impl From<AssertExpr> for Expr {
+    fn from(node: AssertExpr) -> Expr { Expr::AssertExpr(node) }
+}
+impl From<AssumeExpr> for Expr {
+    fn from(node: AssumeExpr) -> Expr { Expr::AssumeExpr(node) }
+}
 impl AstNode for Expr {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
@@ -3422,6 +3800,9 @@ impl AstNode for Expr {
                 | YIELD_EXPR
                 | LET_EXPR
                 | UNDERSCORE_EXPR
+                | VIEW_EXPR
+                | ASSERT_EXPR
+                | ASSUME_EXPR
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3458,6 +3839,9 @@ impl AstNode for Expr {
             YIELD_EXPR => Expr::YieldExpr(YieldExpr { syntax }),
             LET_EXPR => Expr::LetExpr(LetExpr { syntax }),
             UNDERSCORE_EXPR => Expr::UnderscoreExpr(UnderscoreExpr { syntax }),
+            VIEW_EXPR => Expr::ViewExpr(ViewExpr { syntax }),
+            ASSERT_EXPR => Expr::AssertExpr(AssertExpr { syntax }),
+            ASSUME_EXPR => Expr::AssumeExpr(AssumeExpr { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3496,6 +3880,9 @@ impl AstNode for Expr {
             Expr::YieldExpr(it) => &it.syntax,
             Expr::LetExpr(it) => &it.syntax,
             Expr::UnderscoreExpr(it) => &it.syntax,
+            Expr::ViewExpr(it) => &it.syntax,
+            Expr::AssertExpr(it) => &it.syntax,
+            Expr::AssumeExpr(it) => &it.syntax,
         }
     }
 }
@@ -3963,6 +4350,9 @@ impl AstNode for AnyHasAttrs {
                 | YIELD_EXPR
                 | LET_EXPR
                 | UNDERSCORE_EXPR
+                | VIEW_EXPR
+                | ASSERT_EXPR
+                | ASSUME_EXPR
                 | STMT_LIST
                 | RECORD_EXPR_FIELD_LIST
                 | RECORD_EXPR_FIELD
@@ -4083,6 +4473,8 @@ impl AstNode for AnyHasName {
                 | VARIANT
                 | CONST_PARAM
                 | TYPE_PARAM
+                | COMMA_AND_NAME
+                | ASSERT_EXPR
                 | IDENT_PAT
         )
     }
@@ -4403,7 +4795,17 @@ impl std::fmt::Display for UseTreeList {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Publish {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for Abi {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for FnMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -4413,7 +4815,22 @@ impl std::fmt::Display for WhereClause {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for RequiresClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for EnsuresClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for BlockExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ModeSpecChecked {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -4484,6 +4901,46 @@ impl std::fmt::Display for TypeParam {
     }
 }
 impl std::fmt::Display for WherePred {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndPat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndCond {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CommaAndExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for CondAndComma {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for InvariantClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for RecommendsClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for DecreasesClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -4659,6 +5116,21 @@ impl std::fmt::Display for LetExpr {
     }
 }
 impl std::fmt::Display for UnderscoreExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ViewExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AssertExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AssumeExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

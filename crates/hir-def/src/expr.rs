@@ -78,6 +78,14 @@ pub enum Literal {
 pub enum Expr {
     /// This is produced if the syntax tree does not have a required expression piece.
     Missing,
+    // verus
+    // verus-hir for exprs
+    Assert{
+        condition: ExprId,
+    },
+    Assume{
+        condition: ExprId,
+    },
     Path(Path),
     If {
         condition: ExprId,
@@ -351,6 +359,8 @@ impl Expr {
             },
             Expr::Literal(_) => {}
             Expr::Underscore => {}
+            Expr::Assert { condition } => f(*condition),
+            Expr::Assume { condition } => f(*condition),
         }
     }
 }

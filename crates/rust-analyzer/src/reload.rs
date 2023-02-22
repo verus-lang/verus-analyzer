@@ -148,6 +148,7 @@ impl GlobalState {
                     })
                     .collect::<Vec<_>>();
 
+                // let detached_files: Vec<AbsPathBuf>  = vec![AbsPathBuf::try_from("/Users/chanhee/Works/secure-foundations/verus/source/pervasive/seq.rs").unwrap()];
                 if !detached_files.is_empty() {
                     workspaces
                         .push(project_model::ProjectWorkspace::load_detached_files(detached_files));

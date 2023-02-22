@@ -63,12 +63,28 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         (">>", "SHR"),
         ("<<=", "SHLEQ"),
         (">>=", "SHREQ"),
+        //verus
+        ("&&&"  , "BIGAND"),
+        ("|||"  , "BIGOR"),
+        ("<==>" , "EQUIV"),
+        ("==>"  , "IMPLY"),
+        ("<=="  , "EXPLY"),
+        ("==="  , "EQEQEQ"),
+        ("!=="  , "NEEQ"),
     ],
     keywords: &[
         "as", "async", "await", "box", "break", "const", "continue", "crate", "dyn", "else",
         "enum", "extern", "false", "fn", "for", "if", "impl", "in", "let", "loop", "macro",
         "match", "mod", "move", "mut", "pub", "ref", "return", "self", "Self", "static", "struct",
         "super", "trait", "true", "try", "type", "unsafe", "use", "where", "while", "yield",
+        //verus
+        // "verus", 
+        "spec", "proof","requires", "ensures",  "checked",
+        "recommends", "decreases",
+         "exec", "open", "closed", "tracked", 
+        "invariant", "assert" , "assume"  , "implies" , "by"  ,"forall" , "exists"  , "choose",
+        // "ghost", 
+        // "bit_vector", "nonlinear_arith",
     ],
     contextual_keywords: &["auto", "default", "existential", "union", "raw", "macro_rules"],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING"],
@@ -82,6 +98,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "RET_TYPE",
         "EXTERN_CRATE",
         "MODULE",
+        "VERUS",
         "USE",
         "STATIC",
         "CONST",
@@ -161,6 +178,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "AWAIT_EXPR",
         "TRY_EXPR",
         "CAST_EXPR",
+        "VIEW_EXPR",
         // unary
         "REF_EXPR",
         "PREFIX_EXPR",
@@ -213,6 +231,28 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         // macro related
         "MACRO_ITEMS",
         "MACRO_STMTS",
+        // verus,
+        "REQUIRES_CLAUSE",
+        "ENSURES_CLAUSE",
+        "DECREASES_CLAUSE",
+        "RECOMMENDS_CLAUSE",
+        "INVARIANT_CLAUSE",
+
+        "ASSERT_EXPR",
+        "ASSUME_EXPR",
+
+        "ASSERT_BLOCK",     // what is this?
+        "ASSUME_BLOCK",     // what is this?
+
+        "COND_AND_COMMA",       // change this to 'specification'
+        "COMMA_AND_COND",       // change this to 'specification'
+        "PAT_AND_COMMA",
+        "COMMA_AND_EXPR",
+        "COMMA_AND_PAT",
+        "COMMA_AND_NAME",
+        "PUBLISH",
+        "FN_MODE",
+        "MODE_SPEC_CHECKED"
     ],
 };
 

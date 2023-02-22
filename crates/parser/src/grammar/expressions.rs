@@ -23,11 +23,20 @@ pub(super) fn expr_stmt(
     p: &mut Parser<'_>,
     m: Option<Marker>,
 ) -> Option<(CompletedMarker, BlockLike)> {
+    if p.at(T![assert]) {
+        let m = m.unwrap_or_else(|| {
+            let m = p.start();
+            attributes::outer_attrs(p);
+            m
+        });
+        let assert_expr = verus::assert(p, m);
+        return Some((assert_expr,  BlockLike::NotBlock));
+    }
     let r = Restrictions { forbid_structs: false, prefer_stmt: true };
     expr_bp(p, m, r, 1)
 }
 
-fn expr_no_struct(p: &mut Parser<'_>) {
+pub(crate) fn expr_no_struct(p: &mut Parser<'_>) {
     let r = Restrictions { forbid_structs: true, prefer_stmt: false };
     expr_bp(p, None, r, 1);
 }
@@ -58,6 +67,18 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 
     if p.at(T![let]) {
         let_stmt(p, m, semicolon);
+        return;
+    }
+
+    // TODO: remove this special-casing
+    // see verus_walkthrough3 testcase
+    if p.at(T![assert]) {
+        let m1 = p.start();
+        verus::assert(p, m1);
+        if p.at(T![;]){
+            p.expect(T![;]);
+        }
+        m.complete(p, EXPR_STMT);
         return;
     }
 
@@ -98,6 +119,7 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
                 }
                 Semicolon::Forbidden => (),
             }
+            // dbg!("expr_stmt!");
             m.complete(p, EXPR_STMT);
         }
     }
@@ -142,6 +164,19 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 }
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
+    if p.at(T![&&&]) || p.at(T![|||]) {
+        // dbg!("abandon prefix bigand bigor op");
+        let mm = p.start();
+        if p.at(T![&&&]) {
+            p.expect(T![&&&]);
+        }
+        if p.at(T![|||]) {
+            p.expect(T![|||]);
+        }
+        mm.abandon(p);
+    }
+
+    
     attributes::inner_attrs(p);
 
     while !p.at(EOF) && !p.at(T!['}']) {
@@ -176,6 +211,7 @@ struct Restrictions {
 fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
     const NOT_AN_OP: (u8, SyntaxKind) = (0, T![@]);
     match p.current() {
+        T![|] if p.at(T![|||])  => (1,  T![|||]),           // verus
         T![|] if p.at(T![||])  => (3,  T![||]),
         T![|] if p.at(T![|=])  => (1,  T![|=]),
         T![|]                  => (6,  T![|]),
@@ -183,9 +219,16 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![>] if p.at(T![>>])  => (9,  T![>>]),
         T![>] if p.at(T![>=])  => (5,  T![>=]),
         T![>]                  => (5,  T![>]),
+
         T![=] if p.at(T![=>])  => NOT_AN_OP,
+        T![=] if p.at(T![==>]) => (2, T![==>]),       //verus
+        T![=] if p.at(T![===]) => (2, T![===]),       //verus
+
         T![=] if p.at(T![==])  => (5,  T![==]),
+
         T![=]                  => (1,  T![=]),
+        T![<] if p.at(T![<==>])  => (2,  T![<==>]),             // verus
+        T![<] if p.at(T![<==])  => (2,  T![<==]),             // verus
         T![<] if p.at(T![<=])  => (5,  T![<=]),
         T![<] if p.at(T![<<=]) => (1,  T![<<=]),
         T![<] if p.at(T![<<])  => (9,  T![<<]),
@@ -196,8 +239,10 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![^]                  => (7,  T![^]),
         T![%] if p.at(T![%=])  => (1,  T![%=]),
         T![%]                  => (11, T![%]),
+
         T![&] if p.at(T![&=])  => (1,  T![&=]),
         // If you update this, remember to update `expr_let()` too.
+        T![&] if p.at(T![&&&])  => (1,  T![&&&]),           // verus
         T![&] if p.at(T![&&])  => (4,  T![&&]),
         T![&]                  => (8,  T![&]),
         T![/] if p.at(T![/=])  => (1,  T![/=]),
@@ -206,6 +251,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![*]                  => (11, T![*]),
         T![.] if p.at(T![..=]) => (2,  T![..=]),
         T![.] if p.at(T![..])  => (2,  T![..]),
+        T![!] if p.at(T![!==])  => (5,  T![!==]),       // verus
         T![!] if p.at(T![!=])  => (5,  T![!=]),
         T![-] if p.at(T![-=])  => (1,  T![-=]),
         T![-]                  => (10, T![-]),
@@ -249,7 +295,9 @@ fn expr_bp(
     loop {
         let is_range = p.at(T![..]) || p.at(T![..=]);
         let (op_bp, op) = current_op(p);
+        // dbg!(&op_bp, &op, &bp);
         if op_bp < bp {
+            // dbg!("break");
             break;
         }
         // test as_precedence
@@ -305,6 +353,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     let _ = &raw const foo;
         // }
         T![&] => {
+            // dbg!("ref expr");
             m = p.start();
             p.bump(T![&]);
             if p.at_contextual_kw(T![raw]) && (p.nth_at(1, T![mut]) || p.nth_at(1, T![const])) {
@@ -321,7 +370,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     !!true;
         //     --1;
         // }
-        T![*] | T![!] | T![-] => {
+        T![*] | T![!] | T![-] => {  //
             m = p.start();
             p.bump_any();
             PREFIX_EXPR
@@ -387,6 +436,7 @@ fn postfix_expr(
                 }
             },
             T![?] => try_expr(p, lhs),
+            T![@] => view_expr(p, lhs),
             _ => break,
         };
         allow_calls = true;
@@ -498,6 +548,13 @@ fn try_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     let m = lhs.precede(p);
     p.bump(T![?]);
     m.complete(p, TRY_EXPR)
+}
+
+fn view_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+    assert!(p.at(T![@]));
+    let m = lhs.precede(p);
+    p.bump(T![@]);
+    m.complete(p, VIEW_EXPR)
 }
 
 // test cast_expr

@@ -113,7 +113,7 @@ MacroDef =
 
 Module =
   Attr* Visibility?
-  'mod' Name
+  'mod'? Name '!'?
   (ItemList | ';')
 
 ItemList =
@@ -137,14 +137,24 @@ UseTree =
 UseTreeList =
   '{' (UseTree (',' UseTree)* ','?)? '}'
 
+// see verus/dependencies/syn/src/items.rs, impl parse for Signature
 Fn =
- Attr* Visibility?
- 'default'? 'const'? 'async'? 'unsafe'? Abi?
- 'fn' Name GenericParamList? ParamList RetType? WhereClause?
+ Attr* Visibility? Publish?
+ 'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+ 'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
  (body:BlockExpr | ';')
 
 Abi =
   'extern' 'string'?
+
+Publish = 
+  ('closed' | 'open' )
+
+FnMode = 
+  ('spec' | 'proof' | 'exec' | ModeSpecChecked )  
+
+ModeSpecChecked =
+ 'spec' '(' 'checked' ')'
 
 ParamList =
   '('(
@@ -161,13 +171,13 @@ SelfParam =
 
 Param =
   Attr* (
-    Pat (':' Type)?
+    'tracked'? Pat (':' Type)?
   | Type
   | '...'
   )
 
 RetType =
-  '->' Type
+  '->' 'tracked'? ( ('(' Pat ':' Type ')') | Type)
 
 TypeAlias =
   Attr* Visibility?
@@ -294,6 +304,37 @@ WhereClause =
 WherePred =
   ('for' GenericParamList)?  (Lifetime | Type) ':' TypeBoundList?
 
+CommaAndName = 
+  ',' Name 
+
+CommaAndPat = 
+  ',' Pat
+
+CommaAndCond = 
+  ',' condition:Expr
+
+CommaAndExpr = 
+  ',' Expr
+
+
+CondAndComma =
+  condition:Expr ','?
+
+RequiresClause =
+  'requires' Expr CommaAndCond* ','?
+
+EnsuresClause =
+  'ensures' Expr CommaAndCond* ','?
+
+InvariantClause =
+  'invariant' Expr CommaAndCond* ','?
+
+RecommendsClause =
+  'recommends' Expr CommaAndCond* ','?
+
+DecreasesClause = 
+  'decreases' Expr CommaAndCond* ','?
+
 Visibility =
   'pub' ('(' 'in'? Path ')')?
 
@@ -358,6 +399,10 @@ Expr =
 | YieldExpr
 | LetExpr
 | UnderscoreExpr
+| ViewExpr
+| AssertExpr
+| AssumeExpr
+//| AssertForallExpr
 
 MacroExpr =
   MacroCall
@@ -387,11 +432,14 @@ RefExpr =
 TryExpr =
   Attr* Expr '?'
 
+ViewExpr =
+  Attr* Expr '@'
+
 BlockExpr =
   Attr* Label? ('try' | 'unsafe' | 'async' | 'const') StmtList
 
 PrefixExpr =
-  Attr* op:('-' | '!' | '*') Expr
+  Attr* op:('-' | '!' | '*' | '&&&' | '|||' ) Expr
 
 BinExpr =
   Attr*
@@ -401,6 +449,7 @@ BinExpr =
   | '==' | '!=' | '<=' | '>=' | '<' | '>'
   | '+' | '*' | '-' | '/' | '%' | '<<' | '>>' | '^' | '|' | '&'
   | '=' | '+=' | '/=' | '*=' | '%=' | '>>=' | '<<=' | '-=' | '|=' | '&=' | '^='
+  | '==>'
   )
   rhs:Expr
 
@@ -448,7 +497,7 @@ FieldExpr =
   Attr* Expr '.' NameRef
 
 ClosureExpr =
-  Attr* ('for' GenericParamList)? 'static'? 'async'? 'move'?  ParamList RetType?
+  Attr* ('for' GenericParamList)? 'static'? 'async'? 'move'? 'forall'? 'exists'? ParamList RetType? Attr*
   body:Expr
 
 IfExpr =
@@ -464,7 +513,7 @@ ForExpr =
   loop_body:BlockExpr
 
 WhileExpr =
-  Attr* Label? 'while' condition:Expr
+  Attr* Label? 'while' condition:Expr InvariantClause? DecreasesClause?
   loop_body:BlockExpr
 
 Label =
@@ -511,6 +560,16 @@ AwaitExpr =
 
 BoxExpr =
   Attr* 'box' Expr
+
+AssertExpr =
+  Attr* 'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
+
+AssumeExpr = 
+  Attr* 'assume' '(' Expr ')' 
+
+//AssertForallExpr =
+//  Attr* 'assert' 'forall' '|' Param (',' Param)* '|' Expr ('implies' Expr)? 'by' BlockExpr?
+
 
 //*************************//
 //          Types          //

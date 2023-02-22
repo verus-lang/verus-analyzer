@@ -1,3 +1,7 @@
+use verus::decreases;
+
+use crate::grammar::verus::invariants;
+
 use super::*;
 
 // test expr_literals
@@ -70,6 +74,12 @@ pub(super) fn atom_expr(
     if paths::is_path_start(p) {
         return Some(path_expr(p, r));
     }
+
+    //verus #![triggers]
+    //verus #[triggers]
+    // attributes::inner_attrs(p);
+    // attributes::outer_attrs(p);
+ 
     let la = p.nth(1);
     let done = match p.current() {
         T!['('] => tuple_expr(p),
@@ -95,6 +105,7 @@ pub(super) fn atom_expr(
         T![yield] => yield_expr(p),
         T![continue] => continue_expr(p),
         T![break] => break_expr(p, r),
+        // T![requires] => requires(p),
 
         LIFETIME_IDENT if la == T![:] => {
             let m = p.start();
@@ -150,11 +161,18 @@ pub(super) fn atom_expr(
             m.complete(p, BLOCK_EXPR)
         }
 
-        T![static] | T![async] | T![move] | T![|] => closure_expr(p),
+        T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] | T![choose] => closure_expr(p),
         T![for] if la == T![<] => closure_expr(p),
         T![for] => for_expr(p, None),
 
+        // TODO: put assert parsing here?
+
         _ => {
+            // dbg!("hey atom_expr");
+            // dbg!(p.current());
+            // dbg!(p.nth(1));
+            // dbg!(p.nth(2));
+            // dbg!(p.nth(3));
             p.err_recover("expected expression", EXPR_RECOVERY_SET);
             return None;
         }
@@ -253,10 +271,15 @@ fn array_expr(p: &mut Parser<'_>) -> CompletedMarker {
 // }
 fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(match p.current() {
-        T![static] | T![async] | T![move] | T![|] => true,
+        T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] | T![choose] => true,
         T![for] => p.nth(1) == T![<],
         _ => false,
     });
+
+    let is_quant = match p.current() {
+        T![forall] | T![exists] | T![choose] => true,
+        _ => false,
+    };
 
     let m = p.start();
 
@@ -267,6 +290,9 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(T![static]);
     p.eat(T![async]);
     p.eat(T![move]);
+    p.eat(T![forall]);
+    p.eat(T![exists]);
+    p.eat(T![choose]);
 
     if !p.at(T![|]) {
         p.error("expected `|`");
@@ -278,6 +304,9 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
         // fn main() { || -> i32 { 92 }(); }
         block_expr(p);
     } else if p.at_ts(EXPR_FIRST) {
+        expr(p);
+    } else if is_quant {
+        attributes::inner_attrs(p);
         expr(p);
     } else {
         p.error("expected expression");
@@ -347,6 +376,12 @@ fn while_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(T![while]);
     expr_no_struct(p);
+    if p.at(T![invariant]) {
+        invariants(p);
+    }
+    if p.at(T![decreases]) {
+        decreases(p);
+    }
     block_expr(p);
     m.complete(p, WHILE_EXPR)
 }
@@ -499,7 +534,10 @@ fn match_guard(p: &mut Parser<'_>) -> CompletedMarker {
 // fn c() { 1; 2; }
 // fn d() { 1; 2 }
 pub(crate) fn block_expr(p: &mut Parser<'_>) {
+    // dbg!("block_expr");
+    // panic!();
     if !p.at(T!['{']) {
+        // panic!();
         p.error("expected a block");
         return;
     }

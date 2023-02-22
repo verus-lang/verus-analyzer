@@ -42,6 +42,7 @@ pub(super) fn meta(p: &mut Parser<'_>) {
         T![=] => {
             p.bump(T![=]);
             if !expressions::expr(p) {
+                // dbg!("hey meta");
                 p.error("expected expression");
             }
         }

@@ -600,9 +600,46 @@ fn get_or_insert_comma_after(syntax: &SyntaxNode) -> SyntaxToken {
     comma
 }
 
+//verus
+impl ast::AssertExpr {
+    pub fn make_by_keyword(&self) {
+        let by = ast::make::token(T![by]);
+        ted::insert(Position::after(self.r_paren_token().unwrap()), &by);
+    }
+    pub fn register_proof_block(&self, block: ast::BlockExpr) {
+        ted::insert(Position::last_child_of(self.syntax()), block.syntax());
+    }
+}
+
 impl ast::StmtList {
     pub fn push_front(&self, statement: ast::Stmt) {
         ted::insert(Position::after(self.l_curly_token().unwrap()), statement.syntax());
+    }
+    //verus
+    pub fn push_back(&self, statement: ast::Stmt) {
+        match self.tail_expr() {
+            Some(e) => {
+                ted::insert(Position::before(e.syntax()), statement.syntax());
+            },
+            None => ted::insert(Position::before(self.r_curly_token().unwrap()), statement.syntax()),
+        };
+    }
+    //verus
+    pub fn set_tail_expr(&self, expr: ast::Expr) {
+        match self.tail_expr() {
+            Some(e) => {
+                ted::replace(e.syntax(), expr.syntax());
+            },
+            None => ted::insert(Position::before(self.r_curly_token().unwrap()), expr.syntax()),
+        };
+        
+    }
+}
+
+impl ast::Stmt {
+    //verus
+    pub fn remove(&self) {
+        ted::remove(self.syntax());
     }
 }
 

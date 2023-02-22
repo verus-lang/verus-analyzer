@@ -20,7 +20,7 @@ use crate::{
     visibility::RawVisibility,
     AssocItemId, AstIdWithPath, ConstId, ConstLoc, FunctionId, FunctionLoc, HasModule, ImplId,
     Intern, ItemContainerId, ItemLoc, Lookup, Macro2Id, MacroRulesId, ModuleId, ProcMacroId,
-    StaticId, TraitId, TypeAliasId, TypeAliasLoc,
+    StaticId, TraitId, TypeAliasId, TypeAliasLoc, 
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,6 +34,12 @@ pub struct FunctionData {
     pub abi: Option<Interned<str>>,
     pub legacy_const_generics_indices: Box<[u32]>,
     flags: FnFlags,
+    // verus
+    // pub requires: Vec<ExprId>,
+    // this seems like place to add 
+    // pub requires
+    // pub ensures
+    // ...more
 }
 
 impl FunctionData {
@@ -137,6 +143,10 @@ impl FunctionData {
 
     pub fn is_varargs(&self) -> bool {
         self.flags.contains(FnFlags::IS_VARARGS)
+    }
+    
+    pub fn has_requires(&self) -> bool {
+        self.flags.contains(FnFlags::HAS_REQUIRES)
     }
 }
 

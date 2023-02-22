@@ -130,6 +130,8 @@ impl ast::PrefixExpr {
             T![*] => UnaryOp::Deref,
             T![!] => UnaryOp::Not,
             T![-] => UnaryOp::Neg,
+            // T![&&&] => UnaryOp::BigAnd,
+            // T![|||] => UnaryOp::BigOr,
             _ => return None,
         };
         Some(res)
@@ -145,8 +147,17 @@ impl ast::BinExpr {
         self.syntax().children_with_tokens().filter_map(|it| it.into_token()).find_map(|c| {
             #[rustfmt::skip]
             let bin_op = match c.kind() {
+                T![|||] => BinaryOp::LogicOp(LogicOp::BigOr),
+                T![&&&] => BinaryOp::LogicOp(LogicOp::BigAnd),
+                T![!==] => BinaryOp::LogicOp(LogicOp::NeEq),
+                T![<==] => BinaryOp::LogicOp(LogicOp::Exply),
+                T![==>] => BinaryOp::LogicOp(LogicOp::Imply),
+                T![===] => BinaryOp::LogicOp(LogicOp::EqEqEq),
+                T![<==>] => BinaryOp::LogicOp(LogicOp::Equiv),
+
                 T![||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&] => BinaryOp::LogicOp(LogicOp::And),
+                
 
                 T![==] => BinaryOp::CmpOp(CmpOp::Eq { negated: false }),
                 T![!=] => BinaryOp::CmpOp(CmpOp::Eq { negated: true }),
@@ -322,7 +333,7 @@ impl ast::Literal {
         match token.kind() {
             T![true] => LiteralKind::Bool(true),
             T![false] => LiteralKind::Bool(false),
-            _ => unreachable!(),
+            _ => {dbg!(token.kind()); unreachable!()},
         }
     }
 }

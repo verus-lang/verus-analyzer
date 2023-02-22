@@ -251,6 +251,10 @@ impl<'a> Ctx<'a> {
         Some(res)
     }
 
+    // verus
+    // this is the way
+    // CST -> ra-HIR 
+    // add requires/ensures
     fn lower_function(&mut self, func: &ast::Fn) -> Option<FileItemTreeId<Function>> {
         let visibility = self.lower_visibility(func);
         let name = func.name()?.as_name();
@@ -351,6 +355,12 @@ impl<'a> Ctx<'a> {
         if func.unsafe_token().is_some() {
             flags |= FnFlags::HAS_UNSAFE_KW;
         }
+        // verus
+        // let requires:Vec<ExprId> = vec![];
+        if func.requires_clause().is_some() {
+            flags |= FnFlags::HAS_REQUIRES;
+        }
+        // end verus
 
         let mut res = Function {
             name,
@@ -362,6 +372,7 @@ impl<'a> Ctx<'a> {
             async_ret_type: async_ret_type.map(Interned::new),
             ast_id,
             flags,
+            // requires,
         };
         res.explicit_generic_params =
             self.lower_generic_params(GenericsOwner::Function(&res), func);
@@ -411,6 +422,7 @@ impl<'a> Ctx<'a> {
 
     fn lower_module(&mut self, module: &ast::Module) -> Option<FileItemTreeId<Mod>> {
         let name = module.name()?.as_name();
+        // dbg!(&name);
         let visibility = self.lower_visibility(module);
         let kind = if module.semicolon_token().is_some() {
             ModKind::Outline
@@ -511,6 +523,7 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_macro_call(&mut self, m: &ast::MacroCall) -> Option<FileItemTreeId<MacroCall>> {
+        // verus?
         let path = Interned::new(ModPath::from_src(self.db.upcast(), m.path()?, self.hygiene())?);
         let ast_id = self.source_ast_id_map.ast_id(m);
         let expand_to = hir_expand::ExpandTo::from_call_site(m);

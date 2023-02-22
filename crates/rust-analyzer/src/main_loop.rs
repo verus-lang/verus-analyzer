@@ -187,6 +187,8 @@ impl GlobalState {
     }
 
     fn handle_event(&mut self, event: Event) -> Result<()> {
+        // dbg!("main loop: handle_event");
+        // dbg!(&event);
         let loop_start = Instant::now();
         // NOTE: don't count blocking select! call as a loop-turn time
         let _p = profile::span("GlobalState::handle_event");
@@ -288,7 +290,7 @@ impl GlobalState {
 
             if became_quiescent {
                 // Project has loaded properly, kick off initial flycheck
-                self.flycheck.iter().for_each(FlycheckHandle::restart);
+                self.flycheck.iter().for_each(|x| FlycheckHandle::restart(x,None));
                 if self.config.prefill_caches() {
                     self.prime_caches_queue.request_op("became quiescent".to_string());
                 }
@@ -412,7 +414,10 @@ impl GlobalState {
         }
 
         let loop_duration = loop_start.elapsed();
-        if loop_duration > Duration::from_millis(100) && was_quiescent {
+        // verus
+        // ./verus file --verify-function foo
+        // this is expected to take more than 100 millis.
+        if loop_duration > Duration::from_millis(1000) && was_quiescent {
             tracing::warn!("overly long loop turn: {:?}", loop_duration);
             self.poke_rust_analyzer_developer(format!(
                 "overly long loop turn: {:?}",
@@ -524,6 +529,7 @@ impl GlobalState {
     fn handle_flycheck_msg(&mut self, message: flycheck::Message) {
         match message {
             flycheck::Message::AddDiagnostic { id, workspace_root, diagnostic } => {
+                // dbg!(&diagnostic);
                 let snap = self.snapshot();
                 let diagnostics = crate::diagnostics::to_proto::map_rust_diagnostic_to_lsp(
                     &self.config.diagnostics_map(),
@@ -569,6 +575,36 @@ impl GlobalState {
                             );
                         }
                         (Progress::End, None)
+                    }
+                    flycheck::Progress::VerusResult(msg) => {
+                        // this is hacky
+                        // dbg!("reporting verus result");
+                        if msg.starts_with("verification results::") {
+                            if msg.contains("verified: 0 errors: 0") {
+                                self.send_notification::<lsp_types::notification::ShowMessage>(
+                                    lsp_types::ShowMessageParams { typ: lsp_types::MessageType::WARNING, message: msg},
+                                );
+                            } else 
+                            if msg.contains("errors: 0") {
+                                self.send_notification::<lsp_types::notification::ShowMessage>(
+                                    lsp_types::ShowMessageParams { typ: lsp_types::MessageType::INFO, message: msg},
+                                );
+                            } else {
+                                self.send_notification::<lsp_types::notification::ShowMessage>(
+                                    lsp_types::ShowMessageParams { typ: lsp_types::MessageType::ERROR, message: msg},
+                                );
+                            }
+                            return;
+                        } else {
+                            self.send_notification::<lsp_types::notification::ShowMessage>(
+                                lsp_types::ShowMessageParams { typ: lsp_types::MessageType::WARNING, message: msg},
+                            );
+                            // self.show_and_log_error(
+                            //     "unexpected verus result report".to_string(),
+                            //     Some(msg),
+                            // );
+                            return;
+                        }
                     }
                 };
 
@@ -760,6 +796,8 @@ impl GlobalState {
                 if let Ok(vfs_path) = from_proto::vfs_path(&params.text_document.uri) {
                     let (vfs, _) = &*this.vfs.read();
 
+                    // dbg!("make cargo check here1");
+                    // dbg!(&params.text_document.uri);
                     // Trigger flychecks for all workspaces that depend on the saved file
                     if let Some(file_id) = vfs.file_id(&vfs_path) {
                         let analysis = this.analysis_host.analysis();
@@ -807,12 +845,15 @@ impl GlobalState {
                                 project_model::ProjectWorkspace::DetachedFiles { .. } => false,
                             });
 
+                        // dbg!("make cargo check here2");    
                         // Find and trigger corresponding flychecks
                         for flycheck in &this.flycheck {
                             for (id, _) in workspace_ids.clone() {
                                 if id == flycheck.id() {
                                     updated = true;
-                                    flycheck.restart();
+                                    // this is what triggers cargo check
+                                    // dbg!(params.text_document.uri.clone().to_string());
+                                    flycheck.restart(Some(params.text_document.uri.clone().path().to_string()));
                                     continue;
                                 }
                             }
@@ -831,7 +872,8 @@ impl GlobalState {
                 // No specific flycheck was triggered, so let's trigger all of them.
                 if !updated {
                     for flycheck in &this.flycheck {
-                        flycheck.restart();
+                        // flycheck.restart(None);
+                        flycheck.restart(Some(params.text_document.uri.clone().path().to_string())); //FIXME
                     }
                 }
                 Ok(())

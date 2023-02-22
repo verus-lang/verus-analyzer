@@ -240,6 +240,8 @@ pub struct Body {
     /// Block expressions in this body that may contain inner items.
     block_scopes: Vec<BlockId>,
     _c: Count<Self>,
+    //verus
+    // pub requires: Vec<ExprId>,
 }
 
 pub type ExprPtr = AstPtr<ast::Expr>;
@@ -367,13 +369,14 @@ impl Body {
     }
 
     fn shrink_to_fit(&mut self) {
-        let Self { _c: _, body_expr: _, block_scopes, or_pats, exprs, labels, params, pats } = self;
+        let Self { _c: _, body_expr: _, block_scopes, or_pats, exprs, labels, params, pats} = self;
         block_scopes.shrink_to_fit();
         or_pats.shrink_to_fit();
         exprs.shrink_to_fit();
         labels.shrink_to_fit();
         params.shrink_to_fit();
         pats.shrink_to_fit();
+        // requires.shrink_to_fit();
     }
 }
 
@@ -388,6 +391,7 @@ impl Default for Body {
             params: Default::default(),
             block_scopes: Default::default(),
             _c: Default::default(),
+            // requires: Default::default(),
         }
     }
 }

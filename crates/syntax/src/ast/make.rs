@@ -318,7 +318,7 @@ pub fn record_field(
     ast_from_text(&format!("struct S {{ {visibility}{name}: {ty}, }}"))
 }
 
-// TODO
+
 pub fn block_expr(
     stmts: impl IntoIterator<Item = ast::Stmt>,
     tail_expr: Option<ast::Expr>,
@@ -333,6 +333,19 @@ pub fn block_expr(
     buf += "}";
     ast_from_text(&format!("fn f() {buf}"))
 }
+
+// verus
+pub fn block_expr_from_predicates(
+    exp_vec: &Vec<ast::Expr>,
+) -> ast::BlockExpr {
+    let mut buf = "{\n".to_string();
+    for e in exp_vec {
+        format_to!(buf, "    assert({e});\n");
+    }
+    buf += "}";
+    ast_from_text(&format!("fn f() {buf}"))
+}
+
 
 /// Ideally this function wouldn't exist since it involves manual indenting.
 /// It differs from `make::block_expr` by also supporting comments.
@@ -423,6 +436,15 @@ pub fn expr_if(
     };
     expr_from_text(&format!("if {condition} {then_branch} {else_branch}"))
 }
+
+pub fn expr_assert_by(
+    condition: ast::Expr,
+) -> ast::Expr {
+    // dbg!(&format!("assert({condition}) by {{\n assert({condition}); \n}}"));
+    ast_from_text(&format!("assert({condition}) by {{ assert({condition}); }}"))
+}
+
+
 pub fn expr_for_loop(pat: ast::Pat, expr: ast::Expr, block: ast::BlockExpr) -> ast::Expr {
     expr_from_text(&format!("for {pat} in {expr} {block}"))
 }
@@ -661,6 +683,11 @@ pub fn expr_stmt(expr: ast::Expr) -> ast::ExprStmt {
     ast_from_text(&format!("fn f() {{ {expr}{semi} (); }}"))
 }
 
+// verus
+pub fn assert_stmt_from_predicate(expr: ast::Expr) -> ast::ExprStmt {
+    ast_from_text(&format!("fn f() {{ assert({expr});(); }}"))
+}
+
 pub fn item_const(
     visibility: Option<ast::Visibility>,
     name: ast::Name,
@@ -835,7 +862,7 @@ pub mod tokens {
 
     pub(super) static SOURCE_FILE: Lazy<Parse<SourceFile>> = Lazy::new(|| {
         SourceFile::parse(
-            "const C: <()>::Item = (1 != 1, 2 == 2, 3 < 3, 4 <= 4, 5 > 5, 6 >= 6, !true, *p)\n;\n\n",
+            "by const C: <()>::Item = (1 != 1, 2 == 2, 3 < 3, 4 <= 4, 5 > 5, 6 >= 6, !true, *p)\n;\n\n",
         )
     });
 

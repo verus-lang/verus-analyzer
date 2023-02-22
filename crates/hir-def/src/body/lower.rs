@@ -92,6 +92,7 @@ pub(super) fn lower(
             block_scopes: Vec::new(),
             _c: Count::new(),
             or_pats: Default::default(),
+            // requires: Vec::new(),
         },
         expander,
         name_to_pat_grouping: Default::default(),
@@ -551,6 +552,16 @@ impl ExprCollector<'_> {
                 }
             }
             ast::Expr::UnderscoreExpr(_) => self.alloc_expr(Expr::Underscore, syntax_ptr),
+            // Verus-hir
+            // Verus-TODO
+            ast::Expr::AssertExpr(e) => {
+                let condition = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::Assert { condition }, syntax_ptr)},
+            ast::Expr::AssumeExpr(e) => {
+                let condition = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::Assume { condition }, syntax_ptr)},
+            ast::Expr::ViewExpr(_) => self.alloc_expr(Expr::Missing, syntax_ptr),
+            
         })
     }
 

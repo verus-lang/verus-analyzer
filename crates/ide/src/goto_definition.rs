@@ -182,6 +182,90 @@ mod tests {
     }
 
     #[test]
+    fn goto_def_verus_easy() {
+        check(
+            r#"
+verus! {
+    fn main() {}
+    
+    spec fn add1_int(i: int) -> int {
+          //^^^^^^^^
+        i + 1
+    }
+    
+    proof fn test1(i: int, n: nat, u: u8) {
+        assert(add1_int$0(u as int) == u as int + 1);          
+    }
+} // verus!
+}"#,
+        );
+    }
+
+
+    #[test]
+    fn goto_def_verus() {
+        check(
+            r#"
+            use builtin_macros::*;
+            use builtin::*;
+            mod pervasive;
+            use pervasive::*;
+            
+            verus! {
+            
+            fn main() {}
+            
+            spec fn add1_int(i: int) -> int {
+                  //^^^^^^^^
+
+                i + 1
+            }
+            
+            spec fn add1_nat(i: nat) -> nat {
+                i + 1
+            }
+            
+            #[verifier(opaque)]
+            spec fn add1_nat_opaque(i: nat) -> nat {
+                i + 1
+            }
+            
+            proof fn test0() -> (n:nat)
+                ensures true
+            {
+                100
+            }
+            
+            proof fn test1(i: int, n: nat, u: u8) {
+                assert(n >= 0);
+                assert(u >= 0);
+                assert(n + n >= 0);
+                assert((add(u, u) as int) < 256);
+                assert(u < 100 ==> (add(u, u) as int) < 250);
+                assert(add1_int$0(u as int) == u as int + 1);
+                // assert(add1_int(u) == (u + 1) as int); // FAILS
+                assert(add1_nat(u as nat) == u as nat + 1);
+                // assert((u as int) < 256 ==> u < 256); // FAILS, because 256 is a u8 in u < 256
+                let n0 = test0();
+                assert(n0 >= 0);
+                assert(add1_nat_opaque(5) >= 0);
+                // assert(i / 2 <= n); // FAILS
+                assert(n / 2 <= n);
+                assert(u / 2 <= u);
+                assert(u % 10 < 10);
+            }
+            
+            } // verus!
+"#,
+        );
+    }
+
+
+
+
+
+
+    #[test]
     fn goto_def_if_items_same_name() {
         check(
             r#"

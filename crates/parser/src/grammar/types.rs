@@ -15,6 +15,7 @@ pub(super) const TYPE_FIRST: TokenSet = paths::PATH_FIRST.union(TokenSet::new(&[
     T![impl],
     T![dyn],
     T![Self],
+    T![tracked],
 ]));
 
 const TYPE_RECOVERY_SET: TokenSet = TokenSet::new(&[

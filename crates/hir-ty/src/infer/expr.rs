@@ -81,6 +81,16 @@ impl<'a> InferenceContext<'a> {
 
         let ty = match &self.body[tgt_expr] {
             Expr::Missing => self.err_ty(),
+            Expr::Assert { condition } => {
+                let bool_ty = self.result.standard_types.bool_.clone();
+                self.infer_expr_coerce(*condition, &Expectation::HasType(bool_ty.clone()));
+                bool_ty
+            },
+            Expr::Assume { condition } => {
+                let bool_ty = self.result.standard_types.bool_.clone();
+                self.infer_expr_coerce(*condition, &Expectation::HasType(bool_ty.clone()));
+                bool_ty
+            },
             &Expr::If { condition, then_branch, else_branch } => {
                 self.infer_expr(
                     condition,
@@ -598,6 +608,9 @@ impl<'a> InferenceContext<'a> {
                                 .resolve_associated_type(inner_ty, self.resolve_ops_not_output()),
                         }
                     }
+                    // verus-hir
+                    UnaryOp::BigAnd => inner_ty,
+                    UnaryOp::BigOr => inner_ty,
                 }
             }
             Expr::BinaryOp { lhs, rhs, op } => match op {

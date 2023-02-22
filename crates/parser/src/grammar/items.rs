@@ -8,8 +8,9 @@ pub(crate) use self::{
     expressions::{match_arm_list, record_expr_field_list},
     traits::assoc_item_list,
     use_item::use_tree_list,
+    verus::{assume, requires, recommends, ensures, decreases,},
 };
-use super::*;
+use super::{*, verus::{fn_mode, publish}};
 
 // test mod_contents
 // fn foo() {}
@@ -39,9 +40,31 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![use],
     T![macro],
     T![;],
+    //verus
+    // T![proof],
 ]);
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+    if p.at(IDENT) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+        // TODO: check if ident is verus
+        let m = p.start();
+        p.bump(IDENT);
+        p.bump(T![!]);
+        p.bump(T!['{']);
+        m.abandon(p);
+        while !p.at(EOF)  &&  !p.at(T!['}']) {
+            if p.at(T!['}']) {
+                break;
+            }
+            item_or_macro(p, true);
+        }
+        let m = p.start();
+        p.bump(T!['}']);
+        m.abandon(p);
+        return;
+    }
+
+    
     let m = p.start();
     attributes::outer_attrs(p);
 
@@ -87,6 +110,8 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
 pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // test_err pub_expr
     // fn foo() { pub 92; }
+
+    // dbg!("opt-item");
     let has_visibility = opt_visibility(p, false);
 
     let m = match opt_item_without_modifiers(p, m) {
@@ -96,6 +121,43 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
     let mut has_mods = false;
     let mut has_extern = false;
+
+    if p.at(IDENT) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+        // check if ident is verus
+        mod_item(p, m);
+        return Ok(());
+        // dbg!("hi Verus"); 
+        // p.bump(T![verus]);
+        // p.bump(T![!]);
+        // p.expect(T!['{']);
+        // m.abandon(p);
+        // while !p.at(EOF) && !(p.at(T!['}'])) {
+        //     item_or_macro(p, true);
+        // }
+        // let m = p.start();
+        // p.expect(T!['}']);
+        // m.abandon(p);
+        // return Ok(());
+    }
+    
+    // if p.at(T![assert]) {
+    //     assert(p,m);
+    //     return Ok(());
+    // }
+    if p.at(T![assume]) {
+        assume(p, m);
+        return Ok(());
+    }
+
+    // Fn =
+    // Attr* Visibility? Publish?
+    // 'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+    // 'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
+    // (body:BlockExpr | ';')
+
+    if p.at(T![open]) || p.at(T![closed]) {
+        publish(p);
+    }
 
     // modifiers
     if p.at(T![const]) && p.nth(1) != T!['{'] {
@@ -122,11 +184,18 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         has_mods = true;
         abi(p);
     }
+
+    if p.at(T![spec]) || p.at(T![proof]) || p.at(T![exec]) {
+        fn_mode(p);
+    }
+
     if p.at_contextual_kw(T![auto]) && p.nth(1) == T![trait] {
         p.bump_remap(T![auto]);
         has_mods = true;
     }
 
+
+   
     // test default_item
     // default impl T for Foo {}
     if p.at_contextual_kw(T![default]) {
@@ -226,12 +295,13 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         T![enum] => adt::enum_(p, m),
         IDENT if p.at_contextual_kw(T![union]) && p.nth(1) == IDENT => adt::union(p, m),
 
-        T![macro] => macro_def(p, m),
+        T![macro] => {macro_def(p, m)},
         IDENT if p.at_contextual_kw(T![macro_rules]) && p.nth(1) == BANG => macro_rules(p, m),
 
         T![const] if (la == IDENT || la == T![_] || la == T![mut]) => consts::konst(p, m),
         T![static] if (la == IDENT || la == T![_] || la == T![mut]) => consts::static_(p, m),
 
+        // T![proof] => {dbg!("hey"); panic!();}
         _ => return Err(m),
     };
     Ok(())
@@ -263,8 +333,23 @@ fn extern_crate(p: &mut Parser<'_>, m: Marker) {
 // test mod_item
 // mod a;
 pub(crate) fn mod_item(p: &mut Parser<'_>, m: Marker) {
-    p.bump(T![mod]);
+    // dbg!(p.current());
+    if p.at(T![mod]) {
+        p.bump(T![mod]);
+    }
+    // dbg!(p.current());
+    
+    // if p.at(T![verus]) {
+    //     p.expect(T![verus]);
+    //     p.expect(T![!]);
+    // } else {
+    //     name(p);
+    // }
     name(p);
+    if p.at(T![!]) {
+        p.expect(T![!]);
+    }
+
     if p.at(T!['{']) {
         // test mod_item_curly
         // mod b { }
@@ -274,6 +359,31 @@ pub(crate) fn mod_item(p: &mut Parser<'_>, m: Marker) {
     }
     m.complete(p, MODULE);
 }
+
+// pub(crate) fn verus_item(p: &mut Parser<'_>, m: Marker) {
+//     p.bump(T![mod]);
+//     name(p);
+//     if p.at(T!['{']) {
+//         // test mod_item_curly
+//         // mod b { }
+//         item_list(p);
+//     } else if !p.eat(T![;]) {
+//         p.error("expected `;` or `{`");
+//     }
+//     m.complete(p, MODULE);
+
+
+//     if p.at(T![verus]) {
+//         dbg!("hi Verus"); 
+//         p.bump(T![verus]);
+//         p.bump(T![!]);
+//         p.bump(T!['{']);
+//         // token_tree(p);
+//         m.complete(p, VERUS_KW);
+//         return Ok(());
+//     }
+// }
+
 
 // test type_alias
 // type Foo = Bar;
@@ -356,6 +466,8 @@ fn macro_rules(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_RULES);
 }
 
+
+
 // test macro_def
 // macro m($i:ident) {}
 fn macro_def(p: &mut Parser<'_>, m: Marker) {
@@ -380,6 +492,18 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_DEF);
 }
 
+
+
+// see verus/dependencies/syn/src/items.rs, impl parse for Signature
+// Fn =
+//  Attr* Visibility? Publish?
+//  'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+//  'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
+//  (body:BlockExpr | ';')
+//
+// TODO: parse properly 'publish', 'fnmode'
+// Note: requires -> recommends -> ensures -> decreases 
+// 
 // test fn
 // fn foo() {}
 fn fn_(p: &mut Parser<'_>, m: Marker) {
@@ -398,21 +522,95 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // test function_ret_type
     // fn foo() {}
     // fn bar() -> () {}
-    opt_ret_type(p);
+    
+    // opt_ret_type(p);
+    // verus specific return naming
+    if p.at(T![->]) {
+        let m = p.start();
+        p.bump(T![->]);
+        if p.at(T![tracked]) {
+            p.expect(T![tracked]);
+        }
+        if p.at(T!['(']) {
+            // verus named param    
+            p.expect(T!['(']);
+            patterns::pattern(p); 
+            p.expect(T![:]);   
+            types::type_no_bounds(p);
+            p.expect(T![')']);
+        } else {
+            types::type_no_bounds(p);
+        }
+        m.complete(p, RET_TYPE);
+    } 
+
 
     // test function_where_clause
     // fn foo<T>() where T: Copy {}
     generic_params::opt_where_clause(p);
+
+
+    // Note: requires -> recommends -> ensures -> decreases 
+    // optional parsing of `requires` and `ensures`
+    if p.at(T![requires]) {
+        requires(p);
+    }
+    if p.at(T![recommends]) {
+        recommends(p);
+    }
+    if p.at(T![ensures]) {
+        ensures(p);
+    }
+    if p.at(T![decreases]) {
+        decreases(p);
+    }
+
+
 
     if p.at(T![;]) {
         // test fn_decl
         // trait T { fn foo(); }
         p.bump(T![;]);
     } else {
+        // dbg!("parse fn body");
         expressions::block_expr(p);
     }
     m.complete(p, FN);
 }
+
+
+// fn req_clause(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     while !p.at(EOF) && !p.at(T![,]) {
+//         p.bump_any();
+//         expr_no_struct(p);
+//         // if p.at(T![,]) {
+
+//         //     break;
+//         // }
+//     }
+//     p.expect(T![,]);
+//     p.eat(T![,]);
+//     m.complete(p, REQUIRES_CLAUSE);
+// }
+
+// fn ens_clause(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     while !p.at(EOF) && !p.at(T![,]) {
+//         p.bump_any();
+//         // if p.at(T![,]) {
+
+//         //     break;
+//         // }
+//     }
+//     p.expect(T![,]);
+//     p.eat(T![,]);
+//     m.complete(p, ENSURES_CLAUSE);
+// }
+
+
+
+
 
 fn macro_call(p: &mut Parser<'_>) -> BlockLike {
     assert!(paths::is_use_path_start(p));
@@ -463,3 +661,12 @@ pub(crate) fn token_tree(p: &mut Parser<'_>) {
     p.expect(closing_paren_kind);
     m.complete(p, TOKEN_TREE);
 }
+
+
+
+
+
+
+
+
+

@@ -307,6 +307,8 @@ impl<'a> Printer<'a> {
                     ast::UnaryOp::Deref => "*",
                     ast::UnaryOp::Not => "!",
                     ast::UnaryOp::Neg => "-",
+                    ast::UnaryOp::BigAnd => "&&&",
+                    ast::UnaryOp::BigOr => "|||",
                 };
                 w!(self, "{}", op);
                 self.print_expr(*expr);
@@ -421,7 +423,19 @@ impl<'a> Printer<'a> {
                     });
                 }
                 w!(self, "}}");
+            },
+            // verus --- add "assert"
+            Expr::Assert { condition } => {
+                w!(self, "assert(");
+                self.print_expr(*condition);
+                w!(self, ")");
+            },
+            Expr::Assume { condition } => {
+                w!(self, "assume(");
+                self.print_expr(*condition);
+                w!(self, ")");                
             }
+            // TODO: assume, viewexpr
         }
     }
 

@@ -873,3 +873,15 @@ impl ast::MatchGuard {
         support::child(&self.syntax)
     }
 }
+
+impl ast::CondAndComma {
+    pub fn condition(&self) -> Option<ast::Expr> {
+        support::child(&self.syntax)
+    }
+}
+
+impl ast::CommaAndCond {
+    pub fn condition(&self) -> Option<ast::Expr> {
+        support::child(&self.syntax)
+    }
+}
