@@ -845,15 +845,19 @@ impl GlobalState {
                                 project_model::ProjectWorkspace::DetachedFiles { .. } => false,
                             });
 
-                        // dbg!("make cargo check here2");    
                         // Find and trigger corresponding flychecks
                         for flycheck in &this.flycheck {
                             for (id, _) in workspace_ids.clone() {
                                 if id == flycheck.id() {
                                     updated = true;
                                     // this is what triggers cargo check
-                                    // dbg!(params.text_document.uri.clone().to_string());
-                                    flycheck.restart(Some(params.text_document.uri.clone().path().to_string()));
+                                    // we intercept this and instead runs Verus
+                                    // However, when user hits save button on a pervasive file, 
+                                    // the user just wants to save, not "run Verus"
+                                    let filename = params.text_document.uri.clone().path().to_string();
+                                    if !filename.contains("pervasive"){
+                                        flycheck.restart(Some(filename));
+                                    }
                                     continue;
                                 }
                             }
@@ -870,11 +874,13 @@ impl GlobalState {
                 }
 
                 // No specific flycheck was triggered, so let's trigger all of them.
+                // Verus: we don't necessarily want to trigger Verus to all of them
                 if !updated {
-                    for flycheck in &this.flycheck {
-                        // flycheck.restart(None);
-                        flycheck.restart(Some(params.text_document.uri.clone().path().to_string())); //FIXME
-                    }
+                    dbg!("no specific flycheck was triggered");
+                //     for flycheck in &this.flycheck {
+                //         // flycheck.restart(None);
+                //         flycheck.restart(Some(params.text_document.uri.clone().path().to_string())); //FIXME
+                //     }
                 }
                 Ok(())
             })?
