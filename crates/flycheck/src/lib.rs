@@ -5,7 +5,7 @@
 #![warn(rust_2018_idioms, unused_lifetimes, semicolon_in_expressions_from_macros)]
 
 use std::{
-    fmt, io,
+    fmt, io, fs, path::Path,
     process::{ChildStderr, ChildStdout, Command, Stdio},
     time::Duration,
 };
@@ -340,15 +340,61 @@ impl FlycheckActor {
                 cmd
             }
             FlycheckConfig::CustomCommand { command, args } => {
-                // dbg!(&command);
-                // dbg!(&args);
                 match filepath.as_ref() {
-                    Some(path) => {
-                        //  insert current-saved filename here
+                    Some(path_str) => {
+                        // it the file is 1)main.rs or 2)lib.rs or 3)floting file without project root, replace current-saved filename with "${file}" 
+                        // also, insert  `--verify-root` to prevent verifying whole project
+                        // Otherwise, replace "${file}" with main.rs or lib.rs, and use `--verify-module`.
+                        // e.g. path_to/rust-verify.sh ironsht/src/main_t.rs --verify-module environment_t when `src/environment_t.rs` is saved.
+                        // TODO: handle multiple modules in a file (currently it is assumed to have only a single module per file)
+                        let path = Path::new(path_str);
+                        let parent = path.parent().unwrap();
+
+                        let entries = fs::read_dir(parent).unwrap();
+                        let is_main = path_str.ends_with("main.rs");
+                        let is_lib = path_str.ends_with("lib.rs");
+                        let mut main_found = false;
+                        let mut lib_found = false;
+                        let mut current_module_name = String::from("");
+
+                        // iterate current directory to check if lib or main exists
+                        for entry in entries {
+                            let entry_path =entry.unwrap().file_name();
+                            let entry_str = entry_path.to_str().unwrap();
+                            if entry_str == "main.rs" {
+                                main_found = true;
+                            } else if entry_str == "lib.rs" {
+                                lib_found = true;
+                            }
+                            if path_str.ends_with(entry_str) {
+                                current_module_name = entry_str.replace(".rs", "");
+                                dbg!(&current_module_name);
+                            }
+                        }
+                        
+                        if main_found && lib_found {
+                            dbg!("Warning: found both main and lib, for now, select main"); // REVIEW: is this desirable?
+                        }
+
+                        // adjust arguments, and put appropriate flags
+                        let verify_root = is_main || is_lib || (!main_found && !lib_found);
                         let mut args = args.to_vec();
-                        args = args.iter().map(|x| {if x == "${file}"  {path.clone()} else {x.clone()} }).collect();
+
+                        if verify_root {
+                            args = args.iter().map(|x| {if x == "${file}"  {path_str.clone()} else {x.clone()} }).collect();
+                            // insert right after target file name
+                            args.insert(1, "--verify-root".to_string()); // to avoid verifying all modules 
+                        } else {
+                            let root_path = if main_found {parent.join(Path::new("main.rs"))} else {parent.join(Path::new("lib.rs"))};
+                            let root_str = root_path.as_os_str().to_str().unwrap();
+                            args = args.iter().map(|x| {if x == "${file}"  {root_str.to_string()} else {x.clone()} }).collect();
+                            // insert right after target file name
+                            args.insert(1, "--verify-module".to_string());
+                            args.insert(2, current_module_name);
+                        }
                         let mut cmd = Command::new(command);
                         cmd.args(args);
+                        dbg!(&cmd);
                         cmd
                     },
                     None => {
@@ -448,6 +494,8 @@ impl CargoActor {
         let mut read_at_least_one_stderr = false;
         let mut reported_verus_result_stdout = false;
         let mut reported_verus_result_stderr = false;
+        let mut reported_verified_zero_error_zero_stdout = false;
+        let mut reported_verified_zero_error_zero_stderr = false;
         let mut record_stdout: Vec<String> = vec![];
         let mut record_stderr: Vec<String> = vec![];
         let output = streaming_output(
@@ -488,10 +536,14 @@ impl CargoActor {
                     record_stdout.push(line.to_string());
                     // report verification result
                     if line.starts_with("verification results::") && !line.contains("verified: 0 errors: 0")  {
-                        dbg!("generating verus result stdout", &line);
+                        dbg!("generating verus result warning", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
                         reported_verus_result_stdout = true;
                     }
+                    if line.starts_with("verification results:: verified: 0 errors: 0"){
+                        reported_verified_zero_error_zero_stdout = true;
+                    }
+
                 }
             },
             // FIXME: below should be removed given that  original r-a properly gets complier error from stdout
@@ -530,9 +582,12 @@ impl CargoActor {
                     dbg!(&line);
                     record_stderr.push(line.to_string());
                     if line.starts_with("verification results::") && !line.contains("verified: 0 errors: 0") {
-                        dbg!("generating verus result stderr", &line);
+                        dbg!("generating verus result warning", &line);
                         self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
                         reported_verus_result_stderr = true;
+                    }
+                    if line.starts_with("verification results:: verified: 0 errors: 0"){
+                        reported_verified_zero_error_zero_stderr = true;
                     }
                 }
             },
@@ -550,7 +605,11 @@ impl CargoActor {
         dbg!(&record_stderr);
         if !reported_verus_result{
             dbg!("generating missing verus result");
-            let missing_result = "Verus Failed. Diagnostic errors can be found at View>Problems on VS Code. Non-diagnostic messages are the following (if there's any).\n".to_string();
+            let missing_result = if reported_verified_zero_error_zero_stdout || reported_verified_zero_error_zero_stderr {
+                "verification results:: verified: 0 errors: 0. Diagnostic errors can be found at View>Problems on VS Code. Non-diagnostic messages are the following (if there's any).\n".to_string()
+            } else {
+                "Verus Failed. Diagnostic errors can be found at View>Problems on VS Code. Non-diagnostic messages are the following (if there's any).\n".to_string()
+            };
             let report_string = format!("{}\n{}\n{}\n", missing_result, record_stdout.join("\n"), record_stderr.join("\n"));
             self.sender.send(CargoMessage::VerusResult(report_string)).unwrap();
         }
