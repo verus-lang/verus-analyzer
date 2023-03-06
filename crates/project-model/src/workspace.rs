@@ -639,6 +639,7 @@ fn cargo_to_crate_graph(
         }
 
         // Set deps to the core, std and to the lib target of the current package
+        // Verus(add vstd?)
         for (from, kind) in pkg_crates.get(&pkg).into_iter().flatten() {
             // Add sysroot deps first so that a lib target named `core` etc. can overwrite them.
             public_deps.add(*from, &mut crate_graph);
@@ -816,6 +817,7 @@ fn handle_rustc_crates(
                     );
                     pkg_to_lib_crate.insert(pkg, crate_id);
                     // Add dependencies on core / std / alloc for this crate
+                    // Verus(add vstd(pervasive)?)
                     public_deps.add(crate_id, crate_graph);
                     rustc_pkg_crates.entry(pkg).or_insert_with(Vec::new).push(crate_id);
                 }

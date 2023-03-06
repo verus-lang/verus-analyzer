@@ -25,6 +25,11 @@ impl FamousDefs<'_, '_> {
     pub fn std(&self) -> Option<Crate> {
         self.find_lang_crate(LangCrateOrigin::Std)
     }
+    
+    // Verus 
+    pub fn vstd(&self) -> Option<Crate> {
+        self.find_lang_crate(LangCrateOrigin::Vstd)
+    }
 
     pub fn core(&self) -> Option<Crate> {
         self.find_lang_crate(LangCrateOrigin::Core)
@@ -109,6 +114,7 @@ impl FamousDefs<'_, '_> {
     pub fn builtin_crates(&self) -> impl Iterator<Item = Crate> {
         IntoIterator::into_iter([
             self.std(),
+            self.vstd(),// Verus 
             self.core(),
             self.alloc(),
             self.test(),

@@ -409,6 +409,9 @@ fn parse_crate(crate_str: String) -> (String, CrateOrigin, Option<String>) {
         let crate_origin = match &*crate_str {
             "std" => CrateOrigin::Lang(LangCrateOrigin::Std),
             "core" => CrateOrigin::Lang(LangCrateOrigin::Core),
+            "vstd" => CrateOrigin::Lang(LangCrateOrigin::Vstd),             // Verus 
+            "builtin" => CrateOrigin::Lang(LangCrateOrigin::Builtin),       // Verus 
+            // "builtin_macros" => CrateOrigin::Lang(LangCrateOrigin::BuiltinMacros),  // Verus 
             _ => CrateOrigin::CratesIo { repo: None },
         };
         (crate_str, crate_origin, None)

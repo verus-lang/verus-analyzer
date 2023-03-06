@@ -4,7 +4,7 @@
 //! but we can't process `.rlib` and need source code instead. The source code
 //! is typically installed with `rustup component add rust-src` command.
 
-use std::{env, fs, iter, ops, path::PathBuf, process::Command};
+use std::{env, fs, iter, ops, path::PathBuf, process::Command, str::FromStr};
 
 use anyhow::{format_err, Result};
 use la_arena::{Arena, Idx};
@@ -49,10 +49,11 @@ impl Sysroot {
         &self.src_root
     }
 
+    // Verus(add vstd here?)
     pub fn public_deps(&self) -> impl Iterator<Item = (&'static str, SysrootCrate, bool)> + '_ {
         // core is added as a dependency before std in order to
         // mimic rustcs dependency order
-        ["core", "alloc", "std"]
+        ["core", "alloc", "std", "vstd", "builtin", "builtin_macros"]   // Verus 
             .into_iter()
             .zip(iter::repeat(true))
             .chain(iter::once(("test", false)))
@@ -100,7 +101,28 @@ impl Sysroot {
                     deps: Vec::new(),
                 });
             }
+
+            // Verus 
+            if name == "vstd" || name == "builtin" { //|| name == "builtin_macros"
+                dbg!(name);
+                let mut vstd_path = format!("/Users/chanhee/Works/secure-foundations/verus/source/{}/src/lib.rs", name);
+                if name == "vstd" {
+                    // tmp
+                    vstd_path = "/Users/chanhee/Works/secure-foundations/verus/source/pervasive/vstd.rs".to_string();
+                }
+                dbg!(&vstd_path);
+                let pathb = PathBuf::from_str(vstd_path.as_str()).unwrap();
+                let abspath:AbsPathBuf = AbsPathBuf::assert(pathb);
+                let root = ManifestPath::try_from(abspath).unwrap();
+                sysroot.crates.alloc(SysrootCrateData {
+                    name: name.into(),
+                    root,
+                    deps: Vec::new(),
+                });
+            }
+
         }
+
 
         if let Some(std) = sysroot.by_name("std") {
             for dep in STD_DEPS.trim().lines() {
@@ -109,6 +131,7 @@ impl Sysroot {
                 }
             }
         }
+
 
         if let Some(alloc) = sysroot.by_name("alloc") {
             if let Some(core) = sysroot.by_name("core") {
@@ -207,6 +230,7 @@ fn get_rust_src(sysroot_path: &AbsPath) -> Option<AbsPathBuf> {
     }
 }
 
+// Verus changes made vstd, builtin,   (Removed) -> builtin_macros
 const SYSROOT_CRATES: &str = "
 alloc
 core
@@ -215,6 +239,8 @@ panic_unwind
 proc_macro
 profiler_builtins
 std
+vstd
+builtin
 stdarch/crates/std_detect
 term
 test
