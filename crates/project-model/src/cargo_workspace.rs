@@ -90,6 +90,7 @@ pub struct CargoConfig {
     pub no_sysroot: bool,
 
     // TODO(verus): import verus pervasive from "config"
+    pub verus_root: Option<String>,
 
     /// rustc private crate source
     pub rustc_source: Option<RustcSource>,

@@ -148,6 +148,7 @@ impl ProjectWorkspace {
     ) -> Result<ProjectWorkspace> {
         let res = match manifest {
             ProjectManifest::ProjectJson(project_json) => {
+                dbg!("project manifest");
                 let file = fs::read_to_string(&project_json).with_context(|| {
                     format!("Failed to read json file {}", project_json.display())
                 })?;
@@ -159,6 +160,7 @@ impl ProjectWorkspace {
                 ProjectWorkspace::load_inline(project_json, config.target.as_deref())?
             }
             ProjectManifest::CargoToml(cargo_toml) => {
+                dbg!("cargo manifest");
                 let cargo_version = utf8_stdout({
                     let mut cmd = Command::new(toolchain::cargo());
                     cmd.arg("--version");
@@ -182,11 +184,13 @@ impl ProjectWorkspace {
                     )
                 })?;
                 let cargo = CargoWorkspace::new(meta);
+                let verus_path = config.verus_root.as_ref();
+                dbg!(&verus_path);
 
                 let sysroot = if config.no_sysroot {
                     None
                 } else {
-                    Some(Sysroot::discover(cargo_toml.parent()).with_context(|| {
+                    Some(Sysroot::discover(cargo_toml.parent(), verus_path.map_or(None, |v| Some(v.clone()))).with_context(|| {
                         format!(
                             "Failed to find sysroot for Cargo.toml file {}. Is rust-src installed?",
                             cargo_toml.display()
@@ -239,13 +243,13 @@ impl ProjectWorkspace {
         target: Option<&str>,
     ) -> Result<ProjectWorkspace> {
         let sysroot = match (project_json.sysroot.clone(), project_json.sysroot_src.clone()) {
-            (Some(sysroot), Some(sysroot_src)) => Some(Sysroot::load(sysroot, sysroot_src)?),
+            (Some(sysroot), Some(sysroot_src)) => Some(Sysroot::load(sysroot, sysroot_src, None)?),
             (Some(sysroot), None) => {
                 // assume sysroot is structured like rustup's and guess `sysroot_src`
                 let sysroot_src =
                     sysroot.join("lib").join("rustlib").join("src").join("rust").join("library");
 
-                Some(Sysroot::load(sysroot, sysroot_src)?)
+                Some(Sysroot::load(sysroot, sysroot_src, None)?)
             }
             (None, Some(sysroot_src)) => {
                 // assume sysroot is structured like rustup's and guess `sysroot`
@@ -253,7 +257,7 @@ impl ProjectWorkspace {
                 for _ in 0..5 {
                     sysroot.pop();
                 }
-                Some(Sysroot::load(sysroot, sysroot_src)?)
+                Some(Sysroot::load(sysroot, sysroot_src, None)?)
             }
             (None, None) => None,
         };
@@ -263,11 +267,13 @@ impl ProjectWorkspace {
     }
 
     pub fn load_detached_files(detached_files: Vec<AbsPathBuf>) -> Result<ProjectWorkspace> {
+        dbg!("load detached files");
         let sysroot = Sysroot::discover(
             detached_files
                 .first()
                 .and_then(|it| it.parent())
                 .ok_or_else(|| format_err!("No detached files to load"))?,
+            None,
         )?;
         let rustc_cfg = rustc_cfg::get(None, None);
         Ok(ProjectWorkspace::DetachedFiles { files: detached_files, sysroot, rustc_cfg })

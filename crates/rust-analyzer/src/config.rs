@@ -985,6 +985,8 @@ impl Config {
             }
         });
 
+        //  grap Verus root path from checkonsave
+
         CargoConfig {
             no_default_features: self.data.cargo_noDefaultFeatures,
             all_features: matches!(self.data.cargo_features, CargoFeatures::All),
@@ -998,6 +1000,7 @@ impl Config {
             unset_test_crates: UnsetTestCrates::Only(self.data.cargo_unsetTest.clone()),
             wrap_rustc_in_build_scripts: self.data.cargo_buildScripts_useRustcWrapper,
             run_build_script_command: self.data.cargo_buildScripts_overrideCommand.clone(),
+            verus_root: self.get_verus_root_path(),
         }
     }
 
@@ -1151,16 +1154,37 @@ impl Config {
         self.experimental("snippetTextEdit")
     }
 
-    pub fn assist(&self) -> AssistConfig {
-        let verus_path = match &self.data.checkOnSave_overrideCommand {
+    // from checkOnSave_overrideCommand, grap tools/rust_verify.sh path for proof action usage
+    fn get_verus_path(&self) -> Option<String> {
+        match &self.data.checkOnSave_overrideCommand {
             Some(args) if !args.is_empty() => {
                 let mut args = args.clone();
                 let command = args.remove(0);
-                command
+                if command.contains("verus") {
+                    Some(command)
+                } else {
+                    None
+                }
             }
-            _ => {String::new()}
-        };
+            _ => {None}
+        }
+    }
 
+    // from checkOnSave_overrideCommand, grap Verus root path, which is verus/source
+    // "/Users/chanhee/Works/secure-foundations/verus/source/tools/rust-verify.sh",
+    fn get_verus_root_path(&self) -> Option<String> {
+        let verus_string = self.get_verus_path()?;
+        dbg!(&verus_string);
+        let verus_path = std::path::Path::new(&verus_string);
+        let verus_root_path = verus_path.parent()?.parent()?;
+        let verus_root_str = verus_root_path.to_str()?;
+        Some(verus_root_str.to_string())
+    }
+
+    pub fn assist(&self) -> AssistConfig {
+        // from checkOnSave_overrideCommand, grap Verus path for proof action usage
+        let verus_path = self.get_verus_path().map_or(String::new(), |v| v);
+    
         AssistConfig {
             snippet_cap: SnippetCap::new(self.experimental("snippetTextEdit")),
             allowed: None,

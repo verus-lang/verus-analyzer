@@ -68,11 +68,12 @@ impl Sysroot {
         self.crates.iter().map(|(id, _data)| id)
     }
 
-    pub fn discover(dir: &AbsPath) -> Result<Sysroot> {
+    pub fn discover(dir: &AbsPath, verus_root_dir: Option<String>) -> Result<Sysroot> {
+        dbg!("discover", &verus_root_dir);
         tracing::debug!("Discovering sysroot for {}", dir.display());
         let sysroot_dir = discover_sysroot_dir(dir)?;
         let sysroot_src_dir = discover_sysroot_src_dir(&sysroot_dir, dir)?;
-        let res = Sysroot::load(sysroot_dir, sysroot_src_dir)?;
+        let res = Sysroot::load(sysroot_dir, sysroot_src_dir, verus_root_dir)?;
         Ok(res)
     }
 
@@ -83,7 +84,7 @@ impl Sysroot {
     }
 
     // add one argument about "verus_root_directory"
-    pub fn load(sysroot_dir: AbsPathBuf, sysroot_src_dir: AbsPathBuf) -> Result<Sysroot> {
+    pub fn load(sysroot_dir: AbsPathBuf, sysroot_src_dir: AbsPathBuf, verus_root_dir: Option<String>) -> Result<Sysroot> {
         let mut sysroot =
             Sysroot { root: sysroot_dir, src_root: sysroot_src_dir, crates: Arena::default() };
 
@@ -106,20 +107,31 @@ impl Sysroot {
             // Verus 
             if name == "vstd" || name == "builtin" { //|| name == "builtin_macros"
                 dbg!(name);
-                let mut vstd_path = format!("/Users/chanhee/Works/secure-foundations/verus/source/{}/src/lib.rs", name);
-                if name == "vstd" {
-                    // tmp
-                    vstd_path = "/Users/chanhee/Works/secure-foundations/verus/source/pervasive/mod.rs".to_string();
+                let verus_root = verus_root_dir.as_ref();
+                match verus_root {
+                    Some(verus_root) => {
+                        let mut vstd_path = format!("{}/{}/src/lib.rs", verus_root, name);
+                        if name == "vstd" {
+                            // TODO test vstd with actually moving the pervasive files
+                            // vstd_path = "/Users/chanhee/Works/secure-foundations/verus/source/pervasive/mod.rs".to_string();
+                        }
+                        dbg!(&vstd_path);
+                        let pathb = PathBuf::from_str(vstd_path.as_str()).unwrap();
+                        let abspath:AbsPathBuf = AbsPathBuf::assert(pathb);
+                        let root = ManifestPath::try_from(abspath).unwrap();
+                        sysroot.crates.alloc(SysrootCrateData {
+                            name: name.into(),
+                            root,
+                            deps: Vec::new(),
+                        });
+
+                    }
+                    None => {
+                        dbg!("unwrap verus root on sysroot load");
+                    }
                 }
-                dbg!(&vstd_path);
-                let pathb = PathBuf::from_str(vstd_path.as_str()).unwrap();
-                let abspath:AbsPathBuf = AbsPathBuf::assert(pathb);
-                let root = ManifestPath::try_from(abspath).unwrap();
-                sysroot.crates.alloc(SysrootCrateData {
-                    name: name.into(),
-                    root,
-                    deps: Vec::new(),
-                });
+                
+
             }
 
         }
