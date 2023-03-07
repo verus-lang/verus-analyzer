@@ -53,7 +53,7 @@ impl Sysroot {
     pub fn public_deps(&self) -> impl Iterator<Item = (&'static str, SysrootCrate, bool)> + '_ {
         // core is added as a dependency before std in order to
         // mimic rustcs dependency order
-        ["core", "alloc", "std", "vstd", "builtin", "builtin_macros"]   // Verus 
+        ["core", "alloc", "std", "vstd", "builtin"]   // Verus 
             .into_iter()
             .zip(iter::repeat(true))
             .chain(iter::once(("test", false)))
@@ -82,6 +82,7 @@ impl Sysroot {
         discover_sysroot_dir(current_dir).ok().and_then(|sysroot_dir| get_rustc_src(&sysroot_dir))
     }
 
+    // add one argument about "verus_root_directory"
     pub fn load(sysroot_dir: AbsPathBuf, sysroot_src_dir: AbsPathBuf) -> Result<Sysroot> {
         let mut sysroot =
             Sysroot { root: sysroot_dir, src_root: sysroot_src_dir, crates: Arena::default() };
@@ -108,7 +109,7 @@ impl Sysroot {
                 let mut vstd_path = format!("/Users/chanhee/Works/secure-foundations/verus/source/{}/src/lib.rs", name);
                 if name == "vstd" {
                     // tmp
-                    vstd_path = "/Users/chanhee/Works/secure-foundations/verus/source/pervasive/vstd.rs".to_string();
+                    vstd_path = "/Users/chanhee/Works/secure-foundations/verus/source/pervasive/mod.rs".to_string();
                 }
                 dbg!(&vstd_path);
                 let pathb = PathBuf::from_str(vstd_path.as_str()).unwrap();
