@@ -60,14 +60,16 @@ pub(crate) fn assume(p: &mut Parser<'_>, m: Marker) {
 // AssertExpr =
 //   'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
 pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    if p.nth_at(1, T![forall]) {
+        return assert_forall(p, m);
+    }
+
     p.expect(T![assert]);    
     if p.at(T!['(']) {
         // parse expression here
         p.expect(T!['(']);
         expressions::expr(p);
         p.expect(T![')']);
-    } else if p.at(T![forall]) {
-        return assert_forall(p, m);
     } else {
         p.error("assert must be followed by left parenthesis or forall");
     }
@@ -102,6 +104,8 @@ pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
 
 
 pub(crate) fn assert_forall(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    p.expect(T![assert]);
+    
     if !p.at(T![forall]) {
         p.error("assert forall must start with forall");
     }
