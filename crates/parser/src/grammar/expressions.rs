@@ -128,6 +128,11 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     // fn f() { let x: i32 = 92; }
     fn let_stmt(p: &mut Parser<'_>, m: Marker, with_semi: Semicolon) {
         p.bump(T![let]);
+
+        // verus
+        p.eat(T![ghost]);
+        p.eat(T![tracked]);
+
         patterns::pattern(p);
         if p.at(T![:]) {
             // test let_stmt_ascription

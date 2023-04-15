@@ -1038,6 +1038,50 @@ proof fn test_even_f()
     }
 }
 
+#[test]
+fn verus_walkthrough17() {
+    use ast::HasModuleItem;
+    //from: https://github.com/verus-lang/verus/wiki/Doc%3A-Deprecated-and-recommended-syntax%2C-and-upcoming-changes
+    let source_code = 
+    "verus!{
+proof fn lemma1(i: int, tracked t: S) {
+}
+
+fn f(i: u32, Ghost(j): Ghost<int>, Tracked(t): Tracked<S>) -> (k: u32)
+    // Note: Ghost(j) unwraps the Ghost<int> value so that j has type int
+    // Note: Tracked(t) unwraps the Tracked<S> value so that t has type S
+    requires
+        i != j,
+        i < 10,
+    ensures
+        k == i + 1,
+{
+    let ghost i_plus_j = i + j;
+    let ghost t_ghost_copy = t;
+    let tracked t_moved = t;
+    proof {
+        lemma1(i as int, t_moved);
+    }
+    assert(t_moved == t_ghost_copy);
+    assert(i_plus_j == i + j);
+    i + 1
+}
+
+fn g(Tracked(t): Tracked<S>) -> u32 {
+    f(5, Ghost(6), Tracked(t))
+}
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
+
 // "verus! {
 
 //     /// functions may be declared exec (default), proof, or spec, which contain
