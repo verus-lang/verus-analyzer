@@ -567,8 +567,8 @@ AssertExpr =
 AssumeExpr = 
   Attr* 'assume' '(' Expr ')' 
 
-//AssertForallExpr =
-//  Attr* 'assert' 'forall' '|' Param (',' Param)* '|' Expr ('implies' Expr)? 'by' BlockExpr?
+AssertForallExpr =
+ Attr* 'assert' 'forall' ClosureExpr ('implies' Expr)? 'by' BlockExpr
 
 
 //*************************//

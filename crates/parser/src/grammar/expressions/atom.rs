@@ -269,7 +269,7 @@ fn array_expr(p: &mut Parser<'_>) -> CompletedMarker {
 //     for<'a> || {};
 //     for<'a> move || {};
 // }
-fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
+pub(crate) fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(match p.current() {
         T![static] | T![async] | T![move] | T![|] | T![forall] | T![exists] | T![choose] => true,
         T![for] => p.nth(1) == T![<],

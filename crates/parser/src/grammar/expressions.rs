@@ -1,4 +1,4 @@
-mod atom;
+pub(crate) mod atom;
 
 use super::*;
 

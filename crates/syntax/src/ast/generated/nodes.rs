@@ -1360,6 +1360,21 @@ impl MatchGuard {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssertForallExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for AssertForallExpr {}
+impl AssertForallExpr {
+    pub fn assert_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assert]) }
+    pub fn forall_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![forall]) }
+    pub fn closure_expr(&self) -> Option<ClosureExpr> { support::child(&self.syntax) }
+    pub fn implies_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![implies]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
+    pub fn block_expr(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3171,6 +3186,17 @@ impl AstNode for MatchGuard {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for AssertForallExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ASSERT_FORALL_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for ArrayType {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ARRAY_TYPE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -4358,6 +4384,7 @@ impl AstNode for AnyHasAttrs {
                 | RECORD_EXPR_FIELD
                 | MATCH_ARM_LIST
                 | MATCH_ARM
+                | ASSERT_FORALL_EXPR
                 | IDENT_PAT
                 | REST_PAT
                 | RECORD_PAT_FIELD
@@ -5171,6 +5198,11 @@ impl std::fmt::Display for MatchArm {
     }
 }
 impl std::fmt::Display for MatchGuard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AssertForallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
