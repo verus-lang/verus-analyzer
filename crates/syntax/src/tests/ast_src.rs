@@ -79,11 +79,10 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "super", "trait", "true", "try", "type", "unsafe", "use", "where", "while", "yield",
         //verus
         // "verus", 
-        "spec", "proof","requires", "ensures",  "checked",
+        "spec", "proof","requires", "ensures", "checked",
         "recommends", "decreases",
-         "exec", "open", "closed", "tracked", 
+        "exec", "open", "closed", "tracked", "ghost",
         "invariant", "assert" , "assume"  , "implies" , "by"  ,"forall" , "exists"  , "choose",
-        // "ghost", 
         // "bit_vector", "nonlinear_arith",
     ],
     contextual_keywords: &["auto", "default", "existential", "union", "raw", "macro_rules"],
