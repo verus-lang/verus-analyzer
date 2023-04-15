@@ -239,6 +239,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "INVARIANT_CLAUSE",
 
         "ASSERT_EXPR",
+        "ASSERT_FORALL_EXPR",
         "ASSUME_EXPR",
 
         "ASSERT_BLOCK",     // what is this?

@@ -1009,6 +1009,35 @@ spec(checked) fn my_spec_fun2(x: int, y: int) -> int
         dbg!(&item);
     }
 }
+
+
+#[test]
+fn verus_walkthrough16() {
+    use ast::{HasModuleItem, HasName};
+    let source_code = 
+    "verus!{
+proof fn test_even_f()
+    ensures
+        forall|i: int| is_even(i) ==> f(i),
+{
+    assert forall|i: int| is_even(i) implies f(i) by {
+        // First, i is in scope here
+        // Second, we assume is_even(i) here
+        lemma_even_f(i);
+        // Finally, we have to prove f(i) here
+    }
+}
+    }";
+    let parse = SourceFile::parse(source_code);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+    }
+}
+
 // "verus! {
 
 //     /// functions may be declared exec (default), proof, or spec, which contain

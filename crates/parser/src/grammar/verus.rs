@@ -60,25 +60,18 @@ pub(crate) fn assume(p: &mut Parser<'_>, m: Marker) {
 // AssertExpr =
 //   'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
 pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
-    p.expect(T![assert]);
-    
+    if p.nth_at(1, T![forall]) {
+        return assert_forall(p, m);
+    }
+
+    p.expect(T![assert]);    
     if p.at(T!['(']) {
         // parse expression here
         p.expect(T!['(']);
         expressions::expr(p);
         p.expect(T![')']);
     } else {
-        // TODO: make this a separate kind AssertForall
-        // assert forall|x: int, y: int| f1(x) + f1(y) == x + y + 2 by {
-        //     reveal(f1);
-        // }
-        p.error("TODO: make this a separate kind AssertForall");
-        expressions::expr(p);
-        if p.at(T![implies]) {
-            p.bump(T![implies]);
-            expressions::expr(p);
-        }
-        // p.error("expected function arguments");
+        p.error("assert must be followed by left parenthesis or forall");
     }
     
     // parse optional `by`
@@ -99,18 +92,35 @@ pub(crate)  fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     }
 
     if p.at(T![;]) || p.at(T![,]) {
-        // test fn_decl
-        // trait T { fn foo(); }
-        // dbg!("getting ;, but ignoring");
-        // p.bump(T![;]);
+        // end of assert_expr
     } else {
-        // dbg!("proof block");
         // parse optional 'proof block'
         expressions::block_expr(p);
     }
 
     m.complete(p, ASSERT_EXPR)
+    
 }
+
+
+pub(crate) fn assert_forall(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    p.expect(T![assert]);
+    
+    if !p.at(T![forall]) {
+        p.error("assert forall must start with forall");
+    }
+    
+    expressions::atom::closure_expr(p);
+    if p.at(T![implies]) {
+        p.bump(T![implies]);
+        expressions::expr(p);
+    }
+
+    p.expect(T![by]);
+    expressions::block_expr(p);
+    m.complete(p, ASSERT_FORALL_EXPR)
+}
+
 
 pub(crate)  fn requires(p: &mut Parser<'_>) -> CompletedMarker {
     // dbg!("requires");
