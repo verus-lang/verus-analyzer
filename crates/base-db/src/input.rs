@@ -137,7 +137,7 @@ impl ops::Deref for CrateName {
 pub enum CrateOrigin {
     /// Crates that are from crates.io official registry,
     CratesIo { repo: Option<String> },
-    /// Crates that are provided by the language, like std, core, proc-macro, ...
+    /// Crates that are provided by the language, like std, core, proc-macro, ...   (Verus: vstd, builtin, builtin_macros)
     Lang(LangCrateOrigin),
 }
 
@@ -147,6 +147,9 @@ pub enum LangCrateOrigin {
     Core,
     ProcMacro,
     Std,
+    Vstd,         // Verus 
+    Builtin,      // Verus 
+    // BuiltinMacros, // Verus
     Test,
     Other,
 }
@@ -158,6 +161,9 @@ impl From<&str> for LangCrateOrigin {
             "core" => LangCrateOrigin::Core,
             "proc-macro" => LangCrateOrigin::ProcMacro,
             "std" => LangCrateOrigin::Std,
+            "vstd" => LangCrateOrigin::Vstd,                        // Verus 
+            "builtin" => LangCrateOrigin::Builtin,                  // Verus 
+            // "builtin_macros" => LangCrateOrigin::BuiltinMacros,     // Verus 
             "test" => LangCrateOrigin::Test,
             _ => LangCrateOrigin::Other,
         }
@@ -171,6 +177,9 @@ impl fmt::Display for LangCrateOrigin {
             LangCrateOrigin::Core => "core",
             LangCrateOrigin::ProcMacro => "proc_macro",
             LangCrateOrigin::Std => "std",
+            LangCrateOrigin::Vstd => "vstd",                        // Verus 
+            LangCrateOrigin::Builtin => "builtin",                  // Verus 
+            // LangCrateOrigin::BuiltinMacros => "builtin_macros",     // Verus 
             LangCrateOrigin::Test => "test",
             LangCrateOrigin::Other => "other",
         };

@@ -4,7 +4,7 @@
 //! but we can't process `.rlib` and need source code instead. The source code
 //! is typically installed with `rustup component add rust-src` command.
 
-use std::{env, fs, iter, ops, path::PathBuf, process::Command};
+use std::{env, fs, iter, ops, path::PathBuf, process::Command, str::FromStr};
 
 use anyhow::{format_err, Result};
 use la_arena::{Arena, Idx};
@@ -49,10 +49,11 @@ impl Sysroot {
         &self.src_root
     }
 
+    // Verus(add vstd here?)
     pub fn public_deps(&self) -> impl Iterator<Item = (&'static str, SysrootCrate, bool)> + '_ {
         // core is added as a dependency before std in order to
         // mimic rustcs dependency order
-        ["core", "alloc", "std"]
+        ["core", "alloc", "std", "vstd", "builtin"]   // Verus 
             .into_iter()
             .zip(iter::repeat(true))
             .chain(iter::once(("test", false)))
@@ -67,11 +68,12 @@ impl Sysroot {
         self.crates.iter().map(|(id, _data)| id)
     }
 
-    pub fn discover(dir: &AbsPath) -> Result<Sysroot> {
+    pub fn discover(dir: &AbsPath, verus_root_dir: Option<String>) -> Result<Sysroot> {
+        dbg!("discover", &verus_root_dir);
         tracing::debug!("Discovering sysroot for {}", dir.display());
         let sysroot_dir = discover_sysroot_dir(dir)?;
         let sysroot_src_dir = discover_sysroot_src_dir(&sysroot_dir, dir)?;
-        let res = Sysroot::load(sysroot_dir, sysroot_src_dir)?;
+        let res = Sysroot::load(sysroot_dir, sysroot_src_dir, verus_root_dir)?;
         Ok(res)
     }
 
@@ -81,7 +83,8 @@ impl Sysroot {
         discover_sysroot_dir(current_dir).ok().and_then(|sysroot_dir| get_rustc_src(&sysroot_dir))
     }
 
-    pub fn load(sysroot_dir: AbsPathBuf, sysroot_src_dir: AbsPathBuf) -> Result<Sysroot> {
+    // add one argument about "verus_root_directory"
+    pub fn load(sysroot_dir: AbsPathBuf, sysroot_src_dir: AbsPathBuf, verus_root_dir: Option<String>) -> Result<Sysroot> {
         let mut sysroot =
             Sysroot { root: sysroot_dir, src_root: sysroot_src_dir, crates: Arena::default() };
 
@@ -100,7 +103,39 @@ impl Sysroot {
                     deps: Vec::new(),
                 });
             }
+
+            // Verus 
+            if name == "vstd" || name == "builtin" { //|| name == "builtin_macros"
+                dbg!(name);
+                let verus_root = verus_root_dir.as_ref();
+                match verus_root {
+                    Some(verus_root) => {
+                        let mut vstd_path = format!("{}/{}/src/lib.rs", verus_root, name);
+                        if name == "vstd" {
+                            // TODO test vstd with actually moving the pervasive files
+                            // vstd_path = "/Users/chanhee/Works/secure-foundations/verus/source/pervasive/mod.rs".to_string();
+                        }
+                        dbg!(&vstd_path);
+                        let pathb = PathBuf::from_str(vstd_path.as_str()).unwrap();
+                        let abspath:AbsPathBuf = AbsPathBuf::assert(pathb);
+                        let root = ManifestPath::try_from(abspath).unwrap();
+                        sysroot.crates.alloc(SysrootCrateData {
+                            name: name.into(),
+                            root,
+                            deps: Vec::new(),
+                        });
+
+                    }
+                    None => {
+                        dbg!("unwrap verus root on sysroot load");
+                    }
+                }
+                
+
+            }
+
         }
+
 
         if let Some(std) = sysroot.by_name("std") {
             for dep in STD_DEPS.trim().lines() {
@@ -109,6 +144,7 @@ impl Sysroot {
                 }
             }
         }
+
 
         if let Some(alloc) = sysroot.by_name("alloc") {
             if let Some(core) = sysroot.by_name("core") {
@@ -207,6 +243,7 @@ fn get_rust_src(sysroot_path: &AbsPath) -> Option<AbsPathBuf> {
     }
 }
 
+// Verus changes made vstd, builtin,   (Removed) -> builtin_macros
 const SYSROOT_CRATES: &str = "
 alloc
 core
@@ -215,6 +252,8 @@ panic_unwind
 proc_macro
 profiler_builtins
 std
+vstd
+builtin
 stdarch/crates/std_detect
 term
 test

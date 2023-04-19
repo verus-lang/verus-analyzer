@@ -21,6 +21,8 @@ pub struct ProjectJson {
     pub(crate) sysroot: Option<AbsPathBuf>,
     /// e.g. `path/to/sysroot/lib/rustlib/src/rust`
     pub(crate) sysroot_src: Option<AbsPathBuf>,
+    // verus root path
+    // pub(crate) verus_root: Option<AbsPathBuf>,
     project_root: AbsPathBuf,
     crates: Vec<Crate>,
 }
@@ -57,6 +59,7 @@ impl ProjectJson {
         ProjectJson {
             sysroot: data.sysroot.map(|it| base.join(it)),
             sysroot_src: data.sysroot_src.map(|it| base.join(it)),
+            // verus_root: data.verus_root.map_or(None, |v| AbsPathBuf::try_from(v).ok()),
             project_root: base.to_path_buf(),
             crates: data
                 .crates
@@ -128,6 +131,7 @@ impl ProjectJson {
 pub struct ProjectJsonData {
     sysroot: Option<PathBuf>,
     sysroot_src: Option<PathBuf>,
+    // verus_root: Option<PathBuf>,
     crates: Vec<CrateData>,
 }
 
