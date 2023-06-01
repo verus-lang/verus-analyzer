@@ -70,6 +70,18 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
         Err(m) => m,
     };
 
+    // verus
+    // entry for every assertion 
+    if p.at(T![assert]) {
+        let m1 = p.start();
+        verus::assert(p, m1);
+        if p.at(T![;]){
+            p.expect(T![;]);
+        }
+        m.complete(p, EXPR_STMT);
+        return;
+    }
+
     if !p.at_ts(EXPR_FIRST) {
         p.err_and_bump("expected expression, item or let statement");
         m.abandon(p);
@@ -114,6 +126,11 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     // fn f() { let x: i32 = 92; }
     fn let_stmt(p: &mut Parser<'_>, m: Marker, with_semi: Semicolon) {
         p.bump(T![let]);
+
+        // verus
+        p.eat(T![ghost]);
+        p.eat(T![tracked]);
+
         patterns::pattern(p);
         if p.at(T![:]) {
             // test let_stmt_ascription
@@ -161,6 +178,19 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 }
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
+    // verus
+    if p.at(T![&&&]) || p.at(T![|||]) {
+        let mm = p.start();
+        if p.at(T![&&&]) {
+            p.expect(T![&&&]);
+        }
+        if p.at(T![|||]) {
+            p.expect(T![|||]);
+        }
+        mm.abandon(p);
+    }
+
+
     attributes::inner_attrs(p);
 
     while !p.at(EOF) && !p.at(T!['}']) {
@@ -195,6 +225,7 @@ struct Restrictions {
 fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
     const NOT_AN_OP: (u8, SyntaxKind) = (0, T![@]);
     match p.current() {
+        T![|] if p.at(T![|||]) => (1, T![|||]), // verus
         T![|] if p.at(T![||])  => (3,  T![||]),
         T![|] if p.at(T![|=])  => (1,  T![|=]),
         T![|]                  => (6,  T![|]),
@@ -203,8 +234,12 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![>] if p.at(T![>=])  => (5,  T![>=]),
         T![>]                  => (5,  T![>]),
         T![=] if p.at(T![=>])  => NOT_AN_OP,
+        T![=] if p.at(T![==>]) => (2, T![==>]), //verus
+        T![=] if p.at(T![===]) => (2, T![===]), //verus
         T![=] if p.at(T![==])  => (5,  T![==]),
         T![=]                  => (1,  T![=]),
+        T![<] if p.at(T![<==>]) => (2, T![<==>]), // verus
+        T![<] if p.at(T![<==]) => (2, T![<==]),   // verus
         T![<] if p.at(T![<=])  => (5,  T![<=]),
         T![<] if p.at(T![<<=]) => (1,  T![<<=]),
         T![<] if p.at(T![<<])  => (9,  T![<<]),
@@ -216,6 +251,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![%] if p.at(T![%=])  => (1,  T![%=]),
         T![%]                  => (11, T![%]),
         T![&] if p.at(T![&=])  => (1,  T![&=]),
+        T![&] if p.at(T![&&&]) => (1, T![&&&]), // verus
         // If you update this, remember to update `expr_let()` too.
         T![&] if p.at(T![&&])  => (4,  T![&&]),
         T![&]                  => (8,  T![&]),
@@ -225,6 +261,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![*]                  => (11, T![*]),
         T![.] if p.at(T![..=]) => (2,  T![..=]),
         T![.] if p.at(T![..])  => (2,  T![..]),
+        T![!] if p.at(T![!==]) => (5, T![!==]), // verus
         T![!] if p.at(T![!=])  => (5,  T![!=]),
         T![-] if p.at(T![-=])  => (1,  T![-=]),
         T![-]                  => (10, T![-]),
@@ -412,6 +449,7 @@ fn postfix_expr(
                 }
             },
             T![?] => try_expr(p, lhs),
+            T![@] => verus::view_expr(p, lhs),
             _ => break,
         };
         allow_calls = true;
