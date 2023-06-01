@@ -303,7 +303,9 @@ impl Fn {
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
+    pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
+    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
 }
@@ -597,11 +599,37 @@ impl RequiresClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RecommendsClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RecommendsClause {
+    pub fn recommends_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![recommends])
+    }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnsuresClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl EnsuresClause {
     pub fn ensures_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ensures]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DecreasesClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DecreasesClause {
+    pub fn decreases_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![decreases])
+    }
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
@@ -1279,19 +1307,6 @@ impl InvariantClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DecreasesClause {
-    pub(crate) syntax: SyntaxNode,
-}
-impl DecreasesClause {
-    pub fn decreases_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![decreases])
-    }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchArmList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1687,19 +1702,6 @@ pub struct CondAndComma {
     pub(crate) syntax: SyntaxNode,
 }
 impl CondAndComma {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RecommendsClause {
-    pub(crate) syntax: SyntaxNode,
-}
-impl RecommendsClause {
-    pub fn recommends_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![recommends])
-    }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
@@ -2435,8 +2437,30 @@ impl AstNode for RequiresClause {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for RecommendsClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == RECOMMENDS_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for EnsuresClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ENSURES_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for DecreasesClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3106,17 +3130,6 @@ impl AstNode for InvariantClause {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for DecreasesClause {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for MatchArmList {
     fn can_cast(kind: SyntaxKind) -> bool { kind == MATCH_ARM_LIST }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3559,17 +3572,6 @@ impl AstNode for CommaAndExpr {
 }
 impl AstNode for CondAndComma {
     fn can_cast(kind: SyntaxKind) -> bool { kind == COND_AND_COMMA }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for RecommendsClause {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == RECOMMENDS_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4898,7 +4900,17 @@ impl std::fmt::Display for RequiresClause {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for RecommendsClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for EnsuresClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for DecreasesClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -5203,11 +5215,6 @@ impl std::fmt::Display for InvariantClause {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for DecreasesClause {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for MatchArmList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -5409,11 +5416,6 @@ impl std::fmt::Display for CommaAndExpr {
     }
 }
 impl std::fmt::Display for CondAndComma {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for RecommendsClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
