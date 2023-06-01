@@ -37,6 +37,7 @@ mod patterns;
 mod generic_args;
 mod generic_params;
 mod types;
+mod verus;
 
 use crate::{
     parser::{CompletedMarker, Marker, Parser},
