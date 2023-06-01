@@ -53,7 +53,7 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
         p.bump(T![!]);
         p.bump(T!['{']);
         m.abandon(p);
-        while !p.at(EOF)  &&  !p.at(T!['}']) {
+        while !p.at(EOF) && !p.at(T!['}']) {
             if p.at(T!['}']) {
                 break;
             }
@@ -65,7 +65,6 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
         return;
     }
     // verus end
-
 
     let m = p.start();
     attributes::outer_attrs(p);
@@ -135,7 +134,6 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     if p.at(T![open]) || p.at(T![closed]) {
         verus::publish(p);
     }
-
 
     // modifiers
     if p.at(T![const]) && p.nth(1) != T!['{'] {
@@ -469,7 +467,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // fn foo<T>() where T: Copy {}
     generic_params::opt_where_clause(p);
 
-    // Note: requires -> recommends -> ensures -> decreases 
+    // Note: requires -> recommends -> ensures -> decreases
     if p.at(T![requires]) {
         verus::requires(p);
     }

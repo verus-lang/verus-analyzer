@@ -4,7 +4,7 @@ use crate::SyntaxKind;
 
 /// A bit-set of `SyntaxKind`s
 #[derive(Clone, Copy)]
-pub(crate) struct TokenSet(u128, u128); 
+pub(crate) struct TokenSet(u128, u128);
 // Verus: when adding Verus tokens, the number of token exceeds 128. therefore, extend the size of TokenSet to 256.
 // (u128, u128) -- (upper, lower)
 
@@ -37,7 +37,7 @@ impl TokenSet {
 const fn mask(kind: SyntaxKind) -> (u128, u128) {
     let k = kind as usize;
     if k >= 128 {
-        (1u128 << (k - 128) ,0u128)
+        (1u128 << (k - 128), 0u128)
     } else {
         (0, 1u128 << k)
     }

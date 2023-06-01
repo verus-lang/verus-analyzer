@@ -71,11 +71,11 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     };
 
     // verus
-    // entry for every assertion 
+    // entry for every assertion
     if p.at(T![assert]) {
         let m1 = p.start();
         verus::assert(p, m1);
-        if p.at(T![;]){
+        if p.at(T![;]) {
             p.expect(T![;]);
         }
         m.complete(p, EXPR_STMT);
@@ -189,7 +189,6 @@ pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
         }
         mm.abandon(p);
     }
-
 
     attributes::inner_attrs(p);
 
