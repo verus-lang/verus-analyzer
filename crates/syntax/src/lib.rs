@@ -711,7 +711,8 @@ fn verus_walkthrough9_0() {
     }
 }
 
-#[test] #[ignore]
+#[test]
+#[ignore]
 fn verus_walkthrough9() {
     use ast::HasModuleItem;
     let source_code = "verus!{
