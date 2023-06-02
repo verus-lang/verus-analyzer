@@ -192,8 +192,9 @@ Struct =
 RecordFieldList =
  '{' fields:(RecordField (',' RecordField)* ','?)? '}'
 
+// verus: DataMode
 RecordField =
-  Attr* Visibility?
+  Attr* Visibility? DataMode?
   Name ':' Type
 
 TupleFieldList =
@@ -337,6 +338,7 @@ LetElse =
 ExprStmt =
   Expr ';'?
 
+// verus: assertexpr, assumeexpr, asserforallexpr
 Expr =
   ArrayExpr
 | AwaitExpr
@@ -374,6 +376,7 @@ Expr =
 | ViewExpr
 | AssertExpr
 | AssumeExpr
+| AssertForallExpr
 
 MacroExpr =
   MacroCall
@@ -700,6 +703,9 @@ Publish =
 FnMode = 
   ('spec' | 'proof' | 'exec' | ModeSpecChecked )  
 
+DataMode =
+  ('ghost' | 'tracked')
+
 ModeSpecChecked =
  'spec' '(' 'checked' ')'
 
@@ -741,3 +747,6 @@ AssertExpr =
 
 AssumeExpr = 
   Attr* 'assume' '(' Expr ')' 
+
+AssertForallExpr =
+  Attr* 'assert' 'forall' ClosureExpr ('implies' Expr)? 'by' BlockExpr
