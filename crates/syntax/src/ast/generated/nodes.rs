@@ -705,8 +705,18 @@ impl ast::HasName for RecordField {}
 impl ast::HasVisibility for RecordField {}
 impl ast::HasDocComments for RecordField {}
 impl RecordField {
+    pub fn data_mode(&self) -> Option<DataMode> { support::child(&self.syntax) }
     pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DataMode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DataMode {
+    pub fn ghost_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ghost]) }
+    pub fn tracked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tracked]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1236,6 +1246,21 @@ impl AssumeExpr {
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssertForallExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for AssertForallExpr {}
+impl AssertForallExpr {
+    pub fn assert_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assert]) }
+    pub fn forall_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![forall]) }
+    pub fn closure_expr(&self) -> Option<ClosureExpr> { support::child(&self.syntax) }
+    pub fn implies_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![implies]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
+    pub fn block_expr(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1769,6 +1794,7 @@ pub enum Expr {
     ViewExpr(ViewExpr),
     AssertExpr(AssertExpr),
     AssumeExpr(AssumeExpr),
+    AssertForallExpr(AssertForallExpr),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2536,6 +2562,17 @@ impl AstNode for RecordField {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for DataMode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DATA_MODE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for TupleField {
     fn can_cast(kind: SyntaxKind) -> bool { kind == TUPLE_FIELD }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3055,6 +3092,17 @@ impl AstNode for AssertExpr {
 }
 impl AstNode for AssumeExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ASSUME_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for AssertForallExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ASSERT_FORALL_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3825,6 +3873,9 @@ impl From<AssertExpr> for Expr {
 impl From<AssumeExpr> for Expr {
     fn from(node: AssumeExpr) -> Expr { Expr::AssumeExpr(node) }
 }
+impl From<AssertForallExpr> for Expr {
+    fn from(node: AssertForallExpr) -> Expr { Expr::AssertForallExpr(node) }
+}
 impl AstNode for Expr {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
@@ -3865,6 +3916,7 @@ impl AstNode for Expr {
                 | VIEW_EXPR
                 | ASSERT_EXPR
                 | ASSUME_EXPR
+                | ASSERT_FORALL_EXPR
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3905,6 +3957,7 @@ impl AstNode for Expr {
             VIEW_EXPR => Expr::ViewExpr(ViewExpr { syntax }),
             ASSERT_EXPR => Expr::AssertExpr(AssertExpr { syntax }),
             ASSUME_EXPR => Expr::AssumeExpr(AssumeExpr { syntax }),
+            ASSERT_FORALL_EXPR => Expr::AssertForallExpr(AssertForallExpr { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3947,6 +4000,7 @@ impl AstNode for Expr {
             Expr::ViewExpr(it) => &it.syntax,
             Expr::AssertExpr(it) => &it.syntax,
             Expr::AssumeExpr(it) => &it.syntax,
+            Expr::AssertForallExpr(it) => &it.syntax,
         }
     }
 }
@@ -4425,6 +4479,7 @@ impl AstNode for AnyHasAttrs {
                 | VIEW_EXPR
                 | ASSERT_EXPR
                 | ASSUME_EXPR
+                | ASSERT_FORALL_EXPR
                 | STMT_LIST
                 | RECORD_EXPR_FIELD_LIST
                 | RECORD_EXPR_FIELD
@@ -4945,6 +5000,11 @@ impl std::fmt::Display for RecordField {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for DataMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for TupleField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -5181,6 +5241,11 @@ impl std::fmt::Display for AssertExpr {
     }
 }
 impl std::fmt::Display for AssumeExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AssertForallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
