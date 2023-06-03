@@ -628,6 +628,23 @@ impl ExprCollector<'_> {
                 }
             }
             ast::Expr::UnderscoreExpr(_) => self.alloc_expr(Expr::Underscore, syntax_ptr),
+            // verus
+            // TODO: assert_forall
+            ast::Expr::ViewExpr(e) => {
+                let condition = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::View { condition }, syntax_ptr)
+            }
+            ast::Expr::AssertExpr(e) => {
+                let body = e.block_expr().map(|e| self.collect_block(e));
+                let condition = self.collect_expr_opt(e.expr());
+
+                self.alloc_expr(Expr::Assert { condition, body }, syntax_ptr)
+            }
+            ast::Expr::AssumeExpr(e) => {
+                let condition = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::Assume { condition }, syntax_ptr)
+            },
+            ast::Expr::AssertForallExpr(_) => self.alloc_expr(Expr::Missing, syntax_ptr),
         })
     }
 

@@ -187,6 +187,8 @@ impl<'a> InferenceContext<'a> {
             | Expr::Path(_)
             | Expr::Continue { .. }
             | Expr::Underscore => (),
+            // verus:TODO
+            Expr::Assert { .. } | Expr::Assume { .. } | Expr::View {.. } => (),
         }
     }
 

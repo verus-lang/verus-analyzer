@@ -316,7 +316,10 @@ impl<'ctx> MirLowerCtx<'ctx> {
         mut current: BasicBlockId,
     ) -> Result<Option<BasicBlockId>> {
         match &self.body.exprs[expr_id] {
-            Expr::Missing => {
+            Expr::Missing
+            // verus
+            | Expr::Assert {..} | Expr::Assume{..} | Expr::View{..}
+             => {
                 if let DefWithBodyId::FunctionId(f) = self.owner {
                     let assoc = self.db.lookup_intern_function(f);
                     if let ItemContainerId::TraitId(t) = assoc.container {
