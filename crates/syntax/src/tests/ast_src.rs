@@ -305,6 +305,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "FN_MODE",
         "DATA_MODE",
         "MODE_SPEC_CHECKED",
+        "PROVER",
     ],
 };
 
