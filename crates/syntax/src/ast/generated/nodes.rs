@@ -1755,6 +1755,19 @@ impl Prover {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TriggerAttribute {
+    pub(crate) syntax: SyntaxNode,
+}
+impl TriggerAttribute {
+    pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
+    pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
+    pub fn trigger_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![trigger]) }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GenericArg {
     TypeArg(TypeArg),
     AssocTypeArg(AssocTypeArg),
@@ -3675,6 +3688,17 @@ impl AstNode for Prover {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for TriggerAttribute {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == TRIGGER_ATTRIBUTE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl From<TypeArg> for GenericArg {
     fn from(node: TypeArg) -> GenericArg { GenericArg::TypeArg(node) }
 }
@@ -5538,6 +5562,11 @@ impl std::fmt::Display for SignatureDecreases {
     }
 }
 impl std::fmt::Display for Prover {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for TriggerAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
