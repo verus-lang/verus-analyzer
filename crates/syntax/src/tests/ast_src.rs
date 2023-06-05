@@ -139,6 +139,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "exists",
         "choose",
         "via",
+        "when",
      ],
     contextual_keywords: &["auto", "default", "existential", "union", "raw", "macro_rules", "yeet"],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING", "C_STRING"],
@@ -307,6 +308,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "DATA_MODE",
         "MODE_SPEC_CHECKED",
         "PROVER",
+        "SIGNATURE_DECREASES",
     ],
 };
 

@@ -739,6 +739,9 @@ RecommendsClause =
 DecreasesClause = 
   'decreases' Expr CommaAndCond* ','?
 
+SignatureDecreases =
+  DecreasesClause ('when' Expr)? ('via' Expr)?
+
 ViewExpr =
   Attr* Expr '@'
 
