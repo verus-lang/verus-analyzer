@@ -483,7 +483,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         verus::ensures(p);
     }
     if p.at(T![decreases]) {
-        verus::decreases(p);
+        verus::signature_decreases(p);
     }
 
     if p.at(T![;]) {
