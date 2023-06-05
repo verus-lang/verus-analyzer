@@ -750,3 +750,6 @@ AssumeExpr =
 
 AssertForallExpr =
   Attr* 'assert' 'forall' ClosureExpr ('implies' Expr)? 'by' BlockExpr
+
+Prover =
+  'by' '(' Name ')'
