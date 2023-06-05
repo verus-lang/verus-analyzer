@@ -610,6 +610,7 @@ impl RecommendsClause {
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn via_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![via]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
