@@ -400,6 +400,7 @@ impl ast::HasVisibility for Struct {}
 impl ast::HasGenericParams for Struct {}
 impl ast::HasDocComments for Struct {}
 impl Struct {
+    pub fn data_mode(&self) -> Option<DataMode> { support::child(&self.syntax) }
     pub fn struct_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![struct]) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     pub fn field_list(&self) -> Option<FieldList> { support::child(&self.syntax) }
@@ -677,6 +678,15 @@ impl Param {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DataMode {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DataMode {
+    pub fn ghost_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ghost]) }
+    pub fn tracked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tracked]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordFieldList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -708,15 +718,6 @@ impl RecordField {
     pub fn data_mode(&self) -> Option<DataMode> { support::child(&self.syntax) }
     pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DataMode {
-    pub(crate) syntax: SyntaxNode,
-}
-impl DataMode {
-    pub fn ghost_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ghost]) }
-    pub fn tracked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tracked]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2529,6 +2530,17 @@ impl AstNode for Param {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for DataMode {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DATA_MODE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for RecordFieldList {
     fn can_cast(kind: SyntaxKind) -> bool { kind == RECORD_FIELD_LIST }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -2553,17 +2565,6 @@ impl AstNode for TupleFieldList {
 }
 impl AstNode for RecordField {
     fn can_cast(kind: SyntaxKind) -> bool { kind == RECORD_FIELD }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for DataMode {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == DATA_MODE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4985,6 +4986,11 @@ impl std::fmt::Display for Param {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for DataMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for RecordFieldList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -4996,11 +5002,6 @@ impl std::fmt::Display for TupleFieldList {
     }
 }
 impl std::fmt::Display for RecordField {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for DataMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
