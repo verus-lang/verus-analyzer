@@ -309,6 +309,7 @@ pub enum SyntaxKind {
     FN_MODE,
     DATA_MODE,
     MODE_SPEC_CHECKED,
+    PROVER,
     #[doc(hidden)]
     __LAST,
 }

@@ -1732,6 +1732,17 @@ impl CondAndComma {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Prover {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for Prover {}
+impl Prover {
+    pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GenericArg {
     TypeArg(TypeArg),
     AssocTypeArg(AssocTypeArg),
@@ -3630,6 +3641,17 @@ impl AstNode for CondAndComma {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Prover {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PROVER }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl From<TypeArg> for GenericArg {
     fn from(node: TypeArg) -> GenericArg { GenericArg::TypeArg(node) }
 }
@@ -4606,6 +4628,7 @@ impl AstNode for AnyHasName {
                 | ASSERT_EXPR
                 | IDENT_PAT
                 | COMMA_AND_NAME
+                | PROVER
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -5482,6 +5505,11 @@ impl std::fmt::Display for CommaAndExpr {
     }
 }
 impl std::fmt::Display for CondAndComma {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Prover {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
