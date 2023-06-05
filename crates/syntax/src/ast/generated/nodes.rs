@@ -1733,6 +1733,17 @@ impl CondAndComma {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SignatureDecreases {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SignatureDecreases {
+    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
+    pub fn when_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![when]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn via_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![via]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Prover {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3642,6 +3653,17 @@ impl AstNode for CondAndComma {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for SignatureDecreases {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SIGNATURE_DECREASES }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for Prover {
     fn can_cast(kind: SyntaxKind) -> bool { kind == PROVER }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -5506,6 +5528,11 @@ impl std::fmt::Display for CommaAndExpr {
     }
 }
 impl std::fmt::Display for CondAndComma {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for SignatureDecreases {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
