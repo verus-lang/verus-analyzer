@@ -1681,14 +1681,6 @@ impl ModeSpecChecked {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommaAndCond {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CommaAndCond {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SignatureDecreases {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3567,17 +3559,6 @@ impl AstNode for ModeSpecChecked {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for CommaAndCond {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_COND }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for SignatureDecreases {
     fn can_cast(kind: SyntaxKind) -> bool { kind == SIGNATURE_DECREASES }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -5438,11 +5419,6 @@ impl std::fmt::Display for RecordPatField {
     }
 }
 impl std::fmt::Display for ModeSpecChecked {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for CommaAndCond {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
