@@ -709,20 +709,8 @@ DataMode =
 ModeSpecChecked =
  'spec' '(' 'checked' ')'
 
-CommaAndName = 
-  ',' Name 
-
-CommaAndPat = 
-  ',' Pat
-
 CommaAndCond = 
   ',' condition:Expr
-
-CommaAndExpr = 
-  ',' Expr
-
-CondAndComma =
-  condition:Expr ','?
 
 RequiresClause =
   'requires' Expr CommaAndCond* ','?
