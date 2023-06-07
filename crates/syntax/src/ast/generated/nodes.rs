@@ -594,9 +594,7 @@ impl RequiresClause {
     pub fn requires_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![requires])
     }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -607,10 +605,9 @@ impl RecommendsClause {
     pub fn recommends_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![recommends])
     }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
     pub fn via_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![via]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -619,9 +616,7 @@ pub struct EnsuresClause {
 }
 impl EnsuresClause {
     pub fn ensures_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ensures]) }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -632,9 +627,7 @@ impl DecreasesClause {
     pub fn decreases_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![decreases])
     }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1328,9 +1321,7 @@ impl InvariantClause {
     pub fn invariant_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![invariant])
     }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn comma_and_conds(&self) -> AstChildren<CommaAndCond> { support::children(&self.syntax) }
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
