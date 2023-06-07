@@ -1690,45 +1690,10 @@ impl ModeSpecChecked {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommaAndName {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for CommaAndName {}
-impl CommaAndName {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommaAndPat {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CommaAndPat {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CommaAndCond {
     pub(crate) syntax: SyntaxNode,
 }
 impl CommaAndCond {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommaAndExpr {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CommaAndExpr {
-    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CondAndComma {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CondAndComma {
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
 }
 
@@ -3611,52 +3576,8 @@ impl AstNode for ModeSpecChecked {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for CommaAndName {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_NAME }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for CommaAndPat {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_PAT }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for CommaAndCond {
     fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_COND }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for CommaAndExpr {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COMMA_AND_EXPR }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for CondAndComma {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == COND_AND_COMMA }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4674,7 +4595,6 @@ impl AstNode for AnyHasName {
                 | TYPE_PARAM
                 | ASSERT_EXPR
                 | IDENT_PAT
-                | COMMA_AND_NAME
                 | PROVER
         )
     }
@@ -5531,27 +5451,7 @@ impl std::fmt::Display for ModeSpecChecked {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for CommaAndName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for CommaAndPat {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for CommaAndCond {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for CommaAndExpr {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for CondAndComma {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
