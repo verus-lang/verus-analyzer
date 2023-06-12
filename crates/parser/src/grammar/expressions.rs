@@ -249,6 +249,8 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![>] if p.at(T![>=])  => (5,  T![>=]),
         T![>]                  => (5,  T![>]),
         T![=] if p.at(T![=>])  => NOT_AN_OP,
+        T![=] if p.at(T![=~~=]) => (1, T![=~~=]), // verus
+        T![=] if p.at(T![=~=]) => (1, T![=~=]), // verus
         T![=] if p.at(T![==>]) => (2, T![==>]), //verus
         T![=] if p.at(T![===]) => (2, T![===]), //verus
         T![=] if p.at(T![==])  => (5,  T![==]),
@@ -277,6 +279,8 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind) {
         T![.] if p.at(T![..=]) => (2,  T![..=]),
         T![.] if p.at(T![..])  => (2,  T![..]),
         T![!] if p.at(T![!==]) => (5, T![!==]), // verus
+        T![!] if p.at(T![!~~=]) => (1, T![!~~=]), // verus
+        T![!] if p.at(T![!~=]) => (1, T![!~=]), // verus
         T![!] if p.at(T![!=])  => (5,  T![!=]),
         T![-] if p.at(T![-=])  => (1,  T![-=]),
         T![-]                  => (10, T![-]),
