@@ -1,4 +1,4 @@
-## Using VS Code for Verus 
+# Using VS Code for Verus 
 
 **WARNING: this is experimental; some features might be broken**
 
@@ -6,9 +6,9 @@ The steps below walk you through compiling a Verus-specific version of rust-anal
 
 
 
-### Quick Start
+## Quick Start
 
-#### 1. Compile custom rust-analyzer
+### 1. Compile custom rust-analyzer
 
 1. Clone the repository: `git clone https://github.com/verus-lang/rust-analyzer.git`  
 2. `cd rust-analyzer`
@@ -18,10 +18,10 @@ The steps below walk you through compiling a Verus-specific version of rust-anal
 
 
 
-#### 2. VS Code
+### 2. VS Code
 Before starting, please install the original rust-analyzer extension in VS Code's extensions tab.
 
-##### 2.1. Adding a separate [VS Code Workspace](https://code.visualstudio.com/docs/editor/workspaces)
+#### 2.1. Adding a separate [VS Code Workspace](https://code.visualstudio.com/docs/editor/workspaces)
 Suppose you have a new project with `cargo new`. After you open this project in VS Code, use `File > Save Workspace As...` to generate `{project_name}.code-workspace` file. The file will look similar to this. 
 
 ```
@@ -36,7 +36,7 @@ Suppose you have a new project with `cargo new`. After you open this project in 
 ```
 
 
-##### 2.2. Adding settings variables
+#### 2.2. Adding settings variables
 We will modify the "settings" section of the `.code-workspace` file. To be specific, we will add two entries in the "settings" section of the file. These are `rust-analyzer.server.path` and `rust-analyzer.check.command`.
 
 - `rust-analyzer.server.path` should be set to the path of the custom rust-analyzer binary produced in step 1 above (e.g., the full path to `./dist/rust-analyzer-x86_64-apple-darwin`)
@@ -55,46 +55,47 @@ When you modify and save this file, VS Code will ask you if you want to reload t
 By opening this workspace, the rust-analyzer plugin will use the custom binary. If you open your project without that workspace setting(e.g. open this project by "open folder"), it will use the original rust-analyzer binary.
 
 
-##### 2.3. [VS Code in Remote Machine](https://code.visualstudio.com/docs/remote/ssh)(Optional)
+#### 2.3. [VS Code in Remote Machine](https://code.visualstudio.com/docs/remote/ssh)(Optional)
 For VS Code in Remote Machine, we need to set up the entire above process in the remote machine. That includes Verus being installed in the same remote machine.
  
 
 
-#### 3.IDE functionalities
-There is a requirement for the IDE functionalities to work. The requirement is that Rust-analyzer expects normal Rust project's layout and the metadata(`cargo.toml`) file.
+### 3. Requirements for IDE functionalities
+There is a requirement for the IDE functionalities to work. The requirement is that Rust-analyzer expects a standard Rust project layout and the metadata(`cargo.toml`) file.
 
-Rust-analyzer scans the project root(`lib.rs` or `main.rs`) and all files that are reachable from the root. If the file you are working on is not reachable from the project root, most of the IDE functionalities like "goto definition" will not work. For example, if you open the `verus` repository and open up one of the examples, these functionalities might not work, as the examples are not reachable from Verus project's root. 
+Rust-analyzer scans the project root(`lib.rs` or `main.rs`) and all files that are reachable from the root. If the file you are working on is not reachable from the project root, most of the IDE functionalities like "goto definition" will not work. For example, when you have a file named `foo.rs` next to `main.rs`, and did not import `foo.rs` in `main.rs`(i.e., did not add `mod foo` on top of `main.rs`), the IDE functionalities will not work for `foo.rs`.
 
-We also need `cargo.toml` files as in many Rust projects. For a small promect, you could start by `cargo new`, and it automatically generated the `cargo.toml` file. For a larger project, you could use [workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to manage multiple crates.
+We also need `cargo.toml` files as in standard Rust projects. For a small promect, you could start by `cargo new`, and it automatically generated the `cargo.toml` file. For a larger project, you could use [workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to manage multiple crates.
 
 ---
-### Functionalities and Details
+## Functionalities and Details
 
-#### 1.Syntax
+### 1.Syntax
 We extended rust-analyzer's grammar for Verus-specific syntax. This custom rust-analyzer highlights reserved Verus keywords (e.g. `spec`, `proof`, `requires`, `ensures`). If a user types `prooof` instead of `proof`, a syntax error will be generated for it. 
 
 
-#### 2.IDE functionalities
+### 2.IDE functionalities
 You can find more documents for IDE functionalities on the following links.
 - [Go to Definition](https://rust-analyzer.github.io/manual.html#go-to-definition)
 - [Go to Type Declaration](https://rust-analyzer.github.io/manual.html#go-to-type-definition)
 - [Find all References](https://rust-analyzer.github.io/manual.html#find-all-references)
 - [Hover](https://rust-analyzer.github.io/manual.html#hover)
 
-
----
-### Limitations 
-- This is currently experimental and subject to change.   
-- It is intended to be used only for Verus code. (For Rust code, you can use the original binary by opening the project without the `.code-workspace` file, which is just using "open folder" in VS Code)
-- Some features of rust-analyzer might be broken or missing.  
-- An issue was reported while compiling this custom rust-analyzer on Apple Silicon Mac. As a temporary measure, running `rustup target add x86_64-apple-darwin` might help bypass the problem.
-
-
-### TODOs
+#### 2.1 TODOs for IDE functionalities
 - requires/ensures/decreaes/invariant/assert-by-block/assert-forall-block are not fully scanned for IDE purposes(e.g. might not be able to "goto definition" of the function used in requires/ensures)
 
 - Although Verus' custom operators are parsed, those are not registered for IDE purposes. For example, type inference around those operators might not work. (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are boolean)
 
 - `builtin` and `pervasive`/`vstd` are not scanned. For example, the builtin types like `int` and `nat` could be shown as `unknown`.
+
+
+---
+### Limitations 
+- This is currently experimental and subject to change.   
+- It is intended to be used only for Verus code. (For Rust code, you can use the original binary by opening the project without the `.code-workspace` file, which is just using "open folder" in VS Code)
+- Multiple features of rust-analyzer might be broken or missing.  
+<!-- - An issue was reported while compiling this custom rust-analyzer on Apple Silicon Mac. As a temporary measure, running `rustup target add x86_64-apple-darwin` might help bypass the problem. -->
+
+
 
  
