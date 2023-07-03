@@ -26,7 +26,7 @@ fn sourcegen_ast() {
 
     let grammar =
         include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/rust.ungram")).parse().unwrap();
-    let ast = lower(&grammar);
+    let ast = lower(&grammar, false);
 
     let ast_tokens = generate_tokens(&ast);
     let ast_tokens_file =
@@ -571,7 +571,7 @@ impl Field {
     }
 }
 
-pub(crate) fn lower(grammar: &Grammar) -> AstSrc {
+pub(crate) fn lower(grammar: &Grammar, is_vst: bool) -> AstSrc {
     let mut res = AstSrc {
         tokens:
             "Whitespace Comment String ByteString CString IntNumber FloatNumber Char Byte Ident"
@@ -601,7 +601,10 @@ pub(crate) fn lower(grammar: &Grammar) -> AstSrc {
 
     deduplicate_fields(&mut res);
     extract_enums(&mut res);
-    extract_struct_traits(&mut res);
+    if !is_vst{
+        // CST omits some fields, but VST should have all the fields
+        extract_struct_traits(&mut res);
+    }
     extract_enum_traits(&mut res);
     res
 }
