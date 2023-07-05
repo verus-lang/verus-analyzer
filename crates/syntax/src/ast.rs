@@ -10,6 +10,7 @@ pub mod edit;
 pub mod edit_in_place;
 pub mod make;
 pub mod prec;
+pub mod vst;
 
 use std::marker::PhantomData;
 
