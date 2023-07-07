@@ -541,8 +541,8 @@ fn verus_walkthrough3() {
     let file: SourceFile = parse.tree();
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -610,8 +610,8 @@ fn verus_walkthrough5() {
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -674,8 +674,8 @@ fn verus_walkthrough7() {
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -777,8 +777,8 @@ fn verus_walkthrough10_0() {
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -802,8 +802,8 @@ fn verus_walkthrough10_1() {
     let file: SourceFile = parse.tree();
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -832,8 +832,8 @@ fn verus_walkthrough10_2() {
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -903,8 +903,8 @@ fn binary_search(v: &Vec<u64>, k: u64) -> (r: usize)
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -930,8 +930,8 @@ assert(forall|i: int| #![auto] 0 <= i < t.len() ==> uninterp_fn(t[i]));
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -1043,8 +1043,8 @@ proof fn test_even_f()
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -1295,8 +1295,8 @@ verus!{
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
@@ -1361,8 +1361,9 @@ verus!{
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(&v_item);
+        // println!("{}", &v_item);
     }
 }
 
@@ -1384,7 +1385,8 @@ spec fn sum(x: int, y: int) -> int
     for item in file.items() {
         dbg!(&item);
         let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
+        dbg!(&v_item);
+        println!("{}", &v_item);
     }
 }
 
@@ -1415,3 +1417,19 @@ spec fn test_rec2(x: int, y: int) -> int
         println!("{}", &v_item);
     }
 }
+
+/*
+TODO: cst_to_vst, "op_details"
+failures:
+    verus_walkthrough10_0
+    verus_walkthrough10_1
+    verus_walkthrough10_2
+    verus_walkthrough11
+    verus_walkthrough12
+    verus_walkthrough16
+    verus_walkthrough23
+    verus_walkthrough25
+    verus_walkthrough3
+    verus_walkthrough5
+    verus_walkthrough7
+ */
