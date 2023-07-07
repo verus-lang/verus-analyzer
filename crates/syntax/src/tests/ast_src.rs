@@ -337,6 +337,7 @@ pub(crate) enum Field {
 pub(crate) enum Cardinality {
     Optional,
     Many,
+    One,
 }
 
 #[derive(Debug)]
