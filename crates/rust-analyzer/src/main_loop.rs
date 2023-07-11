@@ -618,7 +618,6 @@ impl GlobalState {
                         (Progress::End, None)
                     }
                     flycheck::Progress::VerusResult(res) => {
-                        tracing::error!("flycheck {id}: {res}");
                         self.send_notification::<lsp_types::notification::ShowMessage>(
                             lsp_types::ShowMessageParams {
                                 typ: lsp_types::MessageType::INFO,
@@ -754,7 +753,6 @@ impl GlobalState {
     fn on_notification(&mut self, not: Notification) -> Result<()> {
         use crate::handlers::notification as handlers;
         use lsp_types::notification as notifs;
-        tracing::error!("on_notification: {:?}", not);
 
         NotificationDispatcher { not: Some(not), global_state: self }
             .on::<notifs::Cancel>(handlers::handle_cancel)?

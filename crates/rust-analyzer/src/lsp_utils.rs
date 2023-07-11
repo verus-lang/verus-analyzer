@@ -123,7 +123,6 @@ impl GlobalState {
         fraction: Option<f64>,
         cancel_token: Option<String>,
     ) {
-        tracing::debug!("progress {} {:?} {:?} {:?} {:?}", title, state, message, fraction, cancel_token);
         if !self.config.work_done_progress() {
             return;
         }

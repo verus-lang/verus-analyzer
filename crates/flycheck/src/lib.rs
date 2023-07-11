@@ -259,24 +259,20 @@ impl FlycheckActor {
                     }
 
                     let command = self.run_verus(filename.clone());
-                    tracing::error!(?command, "will restart verus");
                     match CargoHandle::spawn(command) {
                         Ok(cargo_handle) => {
                             tracing::error!(
-                                // command = ?self.check_command(),
                                 "did  restart Verus"
                             );
                             
                             self.cargo_handle = Some(cargo_handle);
-                            // self.report_progress(Progress::DidStart);
                             self.report_progress(Progress::VerusResult(format!(
                                 "Started running the following Verus command: {:?}",
                                 self.run_verus(filename),
                             )));
-                            self.report_progress(Progress::DidStart); // this is important -- otherewise, previous diagnostic stays
+                            self.report_progress(Progress::DidStart); // this is important -- otherewise, previous diagnostic does not disappear
                         }
                         Err(error) => {
-                            tracing::error!(?error, "got this running Verus");
                             self.report_progress(Progress::VerusResult(format!(
                                 "Failed to run the following Verus command: {:?} error={}",
                                 self.run_verus(filename),
@@ -322,8 +318,6 @@ impl FlycheckActor {
                         });
                     }
                     CargoMessage::VerusResult(res) => {
-                        // self.send(Message::)
-                        tracing::error!(?res, "verus result");
                         self.report_progress(Progress::VerusResult(res));
                     },
                 },
@@ -428,7 +422,6 @@ impl FlycheckActor {
 
     // copied from above check_command
     fn run_verus(&self, file: String) -> Command {
-        tracing::debug!(flycheck_id = self.id, "run verus");
         let (mut cmd, args) = match &self.config {
             FlycheckConfig::CargoCommand {..} => panic!("verus: please set cargo override command"),
             FlycheckConfig::CustomCommand {
@@ -446,7 +439,6 @@ impl FlycheckActor {
                 let mut root: Option<std::path::PathBuf> = None;
                 let mut extra_args_from_toml = None;
                 for ans in file.ancestors() {
-                    tracing::error!(?ans, "ancestors");
                     if ans.join("Cargo.toml").exists() {
                         let toml = std::fs::read_to_string(ans.join("Cargo.toml")).unwrap();
                         let mut found_verus_settings = false;
