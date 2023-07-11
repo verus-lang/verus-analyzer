@@ -40,15 +40,13 @@ Suppose you have a new project with `cargo new`. After you open this project in 
 We will modify the "settings" section of the `.code-workspace` file. To be specific, we will add two entries in the "settings" section of the file. These are `rust-analyzer.server.path` and `rust-analyzer.check.command`.
 
 - `rust-analyzer.server.path` should be set to the path of the verus-analyzer binary produced in step 1 above (e.g., the full path to `./dist/rust-analyzer-x86_64-apple-darwin`)
-- `rust-analyzer.checkOnSave.overrideCommand` to a list that contains the Verus binary. Please use the absolute path to the Verus binary that is built by `vargo`.
+- `rust-analyzer.checkOnSave` to disable `cargo check`.
 
 For example, the "settings" in the `.code-workspace` file could look the following:
 ```json
 "settings": {
         "rust-analyzer.server.path": "ABSOLUTE-PATH-TO-THE-VERUS-ANALYZER-BINARY",
-        "rust-analyzer.checkOnSave.overrideCommand": [
-            "ABSOLUTE-PATH-TO-VERUS-BINARY", //  e.g., /home/verus-username/verus/source/target-verus/(debug|release)/verus
-        ],
+        "rust-analyzer.checkOnSave": false,
 }
 ```
 
@@ -70,15 +68,25 @@ Rust-analyzer scans the project root(`lib.rs` or `main.rs`) and all files that a
 We also need `Cargo.toml` files as in standard Rust projects. For a small project, you could start with `cargo new`, and it automatically generated the `Cargo.toml` file. For a larger project, you could use [workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to manage multiple crates.
 
 
-### 4. Running Verus in VS Code
+### 4. Running Verus in VS Code (optional)
+
+To run Verus inside VS Code, remove `"rust-analyzer.checkOnSave": false` from the `.code-workspace` file, and add `"rust-analyzer.checkOnSave.overrideCommand"`. The value of `"rust-analyzer.checkOnSave.overrideCommand"` should be a list that contains the Verus binary. Please use the absolute path to the Verus binary that is built by `vargo`.
+
+For example, the "settings" in the `.code-workspace` file could now look the following:
+```json
+"settings": {
+        "rust-analyzer.server.path": "ABSOLUTE-PATH-TO-THE-VERUS-ANALYZER-BINARY",
+        "rust-analyzer.checkOnSave.overrideCommand": [
+            "ABSOLUTE-PATH-TO-VERUS-BINARY", //  e.g., /home/verus-username/verus/source/target-verus/(debug|release)/verus
+        ],
+}
+```
 
 To provide extra arguments, add `extra_args` at `[package.metadata.verus.ide]` inside your `Cargo.toml` file. For example, if you want to run Verus with `--crate-type=dylib --expand-errors`, add the following to your `Cargo.toml` file.
 ```toml
 [package.metadata.verus.ide]
 extra_args = "--crate-type=dylib --expand-errors"
 ```
-
-If you don't want to run Verus inside VS Code, set `"rust-analyzer.checkOnSave": false`, and remove `"rust-analyzer.checkOnSave.overrideCommand"` from the `.code-workspace` file.
 
 Please set only one of `rust-analyzer.checkOnSave.overrideCommand` and `rust-analyzer.checkOnSave` in the `.code-workspace` file, depending as to whether you want to run Verus inside VS Code or not.
 

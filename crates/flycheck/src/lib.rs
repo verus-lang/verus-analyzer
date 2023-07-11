@@ -282,7 +282,7 @@ impl FlycheckActor {
                     }
                 }
                 Event::CheckEvent(None) => {
-                    tracing::error!(flycheck_id = self.id, "flycheck finished");
+                    tracing::debug!(flycheck_id = self.id, "flycheck finished");
 
                     // Watcher finished
                     let cargo_handle = self.cargo_handle.take().unwrap();
@@ -605,8 +605,6 @@ impl CargoActor {
         // simply skip a line if it doesn't parse, which just ignores any
         // erroneous output.
 
-        tracing::debug!("cargo actor run");
-
         let mut stdout_errors = String::new();
         let mut stderr_errors = String::new();
         let mut read_at_least_one_stdout_message = false;
@@ -625,9 +623,6 @@ impl CargoActor {
                         cargo_metadata::Message::CompilerMessage(msg) => {
                             self.sender.send(CargoMessage::Diagnostic(msg.message)).unwrap();
                         }
-                        // cargo_metadata::Message::TextLine(l) => {
-                        //     tracing::error!("cargo text line: {:?}", l);
-                        // }
                         _ => (),
                     },
                     JsonMessage::Rustc(message) => {
@@ -636,6 +631,8 @@ impl CargoActor {
                 }
                 return true;
             } else {
+                // verus
+                // forward verification result
                 tracing::error!("deserialize error: {:?}", line);
                 if line.contains("verification results::") {
                     self.sender.send(CargoMessage::VerusResult(line.to_string())).unwrap();
@@ -664,7 +661,6 @@ impl CargoActor {
         let read_at_least_one_message =
             read_at_least_one_stdout_message || read_at_least_one_stderr_message;
         let mut error: String = stdout_errors;
-        tracing::error!("stderr_errors: {:?}", stderr_errors);
         error.push_str(&stderr_errors);
         match output {
             Ok(_) => Ok((read_at_least_one_message, error)),

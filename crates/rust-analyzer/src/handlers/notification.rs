@@ -121,7 +121,6 @@ pub(crate) fn handle_did_save_text_document(
     state: &mut GlobalState,
     params: DidSaveTextDocumentParams,
 ) -> Result<()> {
-    tracing::error!("handle_did_save_text_document");
     if let Ok(vfs_path) = from_proto::vfs_path(&params.text_document.uri) {
         // Re-fetch workspaces if a workspace related file has changed
         if let Some(abs_path) = vfs_path.as_path() {
