@@ -121,6 +121,7 @@ pub(crate) fn handle_did_save_text_document(
     state: &mut GlobalState,
     params: DidSaveTextDocumentParams,
 ) -> Result<()> {
+    tracing::error!("handle_did_save_text_document");
     if let Ok(vfs_path) = from_proto::vfs_path(&params.text_document.uri) {
         // Re-fetch workspaces if a workspace related file has changed
         if let Some(abs_path) = vfs_path.as_path() {
@@ -138,7 +139,7 @@ pub(crate) fn handle_did_save_text_document(
         // No specific flycheck was triggered, so let's trigger all of them.
         for flycheck in state.flycheck.iter() {
             flycheck.restart();
-        }
+         }
     }
     Ok(())
 }
@@ -224,10 +225,12 @@ pub(crate) fn handle_did_change_watched_files(
 }
 
 fn run_flycheck(state: &mut GlobalState, vfs_path: VfsPath) -> bool {
+    tracing::error!("run_flycheck: {:?}", vfs_path);
     let _p = profile::span("run_flycheck");
 
     let file_id = state.vfs.read().0.file_id(&vfs_path);
     if let Some(file_id) = file_id {
+        tracing::error!("run_flycheck: 1");
         let world = state.snapshot();
         let mut updated = false;
         let task = move || -> std::result::Result<(), ide::Cancelled> {
@@ -273,11 +276,15 @@ fn run_flycheck(state: &mut GlobalState, vfs_path: VfsPath) -> bool {
                 project_model::ProjectWorkspace::DetachedFiles { .. } => false,
             });
 
+            tracing::error!("run_flycheck: 2");
+
             // Find and trigger corresponding flychecks
             for flycheck in world.flycheck.iter() {
                 for (id, _) in workspace_ids.clone() {
                     if id == flycheck.id() {
                         updated = true;
+                        tracing::error!("run_flycheck: 3");
+                        flycheck.restart_verus(vfs_path.to_string());
                         flycheck.restart();
                         continue;
                     }
@@ -286,11 +293,14 @@ fn run_flycheck(state: &mut GlobalState, vfs_path: VfsPath) -> bool {
             // No specific flycheck was triggered, so let's trigger all of them.
             if !updated {
                 for flycheck in world.flycheck.iter() {
+                    tracing::error!("run_flycheck: 4");
+                    flycheck.restart_verus(vfs_path.to_string());
                     flycheck.restart();
                 }
             }
             Ok(())
         };
+        tracing::error!("run_flycheck: 5");
         state.task_pool.handle.spawn_with_sender(move |_| {
             if let Err(e) = std::panic::catch_unwind(task) {
                 tracing::error!("flycheck task panicked: {e:?}")

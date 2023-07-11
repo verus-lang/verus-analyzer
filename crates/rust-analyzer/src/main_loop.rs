@@ -269,6 +269,7 @@ impl GlobalState {
                 }
             }
             Event::Flycheck(message) => {
+                tracing::debug!("flycheck message");
                 let _p = profile::span("GlobalState::handle_event/flycheck");
                 self.handle_flycheck_msg(message);
                 // Coalesce many flycheck updates into a single loop turn
@@ -616,6 +617,16 @@ impl GlobalState {
                             result.err().map(|err| format!("cargo check failed to start: {err}"));
                         (Progress::End, None)
                     }
+                    flycheck::Progress::VerusResult(res) => {
+                        tracing::error!("flycheck {id}: {res}");
+                        self.send_notification::<lsp_types::notification::ShowMessage>(
+                            lsp_types::ShowMessageParams {
+                                typ: lsp_types::MessageType::INFO,
+                                message: res,
+                            },
+                        );
+                        (Progress::End, None)
+                    }
                 };
 
                 // When we're running multiple flychecks, we have to include a disambiguator in
@@ -743,6 +754,7 @@ impl GlobalState {
     fn on_notification(&mut self, not: Notification) -> Result<()> {
         use crate::handlers::notification as handlers;
         use lsp_types::notification as notifs;
+        tracing::error!("on_notification: {:?}", not);
 
         NotificationDispatcher { not: Some(not), global_state: self }
             .on::<notifs::Cancel>(handlers::handle_cancel)?
