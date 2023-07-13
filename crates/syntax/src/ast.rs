@@ -1,6 +1,6 @@
 //! Abstract Syntax Tree, layered on top of untyped `SyntaxNode`s
 
-pub(crate) mod generated; // vst
+pub mod generated; // vst
 mod traits;
 mod token_ext;
 mod node_ext;
