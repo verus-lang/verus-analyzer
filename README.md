@@ -123,7 +123,7 @@ You can find more documents for IDE functionalities on the following links.
 #### Misc
 - `rust-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
 - `Developer: Reload Window` can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
-- Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in the workspace setting can disable the syntax error messages in VS Code
+- Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in the workspace setting can disable the syntax error messages in VS Code. You could also add `unresolved-module` to the above list to disable the error message for unresolved modules.
 
 
  
