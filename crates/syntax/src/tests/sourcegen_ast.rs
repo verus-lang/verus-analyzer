@@ -632,7 +632,15 @@ fn lower_enum(grammar: &Grammar, rule: &Rule) -> Option<Vec<String>> {
     Some(variants)
 }
 
-fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, rule: &Rule, is_vst: bool, inside_opt: bool, inside_alt: bool) {
+fn lower_rule(
+    acc: &mut Vec<Field>,
+    grammar: &Grammar,
+    label: Option<&String>,
+    rule: &Rule,
+    is_vst: bool,
+    inside_opt: bool,
+    inside_alt: bool,
+) {
     if lower_comma_list(acc, grammar, label, rule) {
         return;
     }
@@ -644,11 +652,21 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
             let name = label.cloned().unwrap_or_else(|| to_lower_snake_case(&ty));
             // dbg!("node");
             // dbg!(&name);
-    
-            let cardinality =  if is_vst && !inside_opt && !inside_alt && (ty != "Pat".to_string()) && (ty != "PathType".to_string()) && (ty != "ParamList".to_string() ) {Cardinality::One } else { Cardinality::Optional };
-            
+
+            let cardinality = if is_vst
+                && !inside_opt
+                && !inside_alt
+                && (ty != "Pat".to_string())
+                && (ty != "PathType".to_string())
+                && (ty != "ParamList".to_string())
+            {
+                Cardinality::One
+            } else {
+                Cardinality::Optional
+            };
+
             // let cardinality = Cardinality::Optional;
-            let field = Field::Node { name, ty, cardinality};
+            let field = Field::Node { name, ty, cardinality };
             acc.push(field);
         }
         Rule::Token(token) => {
@@ -751,7 +769,7 @@ fn deduplicate_fields(ast: &mut AstSrc) {
                     continue 'outer;
                 }
                 // verus
-                match (f1,f2) {
+                match (f1, f2) {
                     (Field::Node { name: n1, ty: _, .. }, Field::Node { name: n2, ty: _, .. }) => {
                         if n1 == n2 {
                             node.fields.remove(i);

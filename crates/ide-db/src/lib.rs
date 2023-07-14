@@ -41,7 +41,7 @@ pub mod syntax_helpers {
     // verus
     pub mod vst_ext;
 
-    pub use parser::LexedStr;    
+    pub use parser::LexedStr;
 }
 
 use std::{fmt, mem::ManuallyDrop};
