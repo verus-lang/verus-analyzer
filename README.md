@@ -69,8 +69,7 @@ We also need `Cargo.toml` files as in standard Rust projects. For a small projec
 
 
 ### 4. Running Verus in VS Code (optional)
-
-To run Verus inside VS Code, remove `"rust-analyzer.checkOnSave": false` from the `.code-workspace` file, and add `"rust-analyzer.checkOnSave.overrideCommand"`. The value of `"rust-analyzer.checkOnSave.overrideCommand"` should be a list that contains the Verus binary. Please use the absolute path to the Verus binary that is built by `vargo`.
+This is an experimemntal feature that allows you to run Verus inside VS Code by saving a file.  To run Verus inside VS Code, please remove `"rust-analyzer.checkOnSave": false` from the `.code-workspace` file, and add `"rust-analyzer.checkOnSave.overrideCommand"`.  The value of `"rust-analyzer.checkOnSave.overrideCommand"` should be a list that contains the Verus binary.  Please use the absolute path to the Verus binary that is built by `vargo`.
 
 For example, the "settings" in the `.code-workspace` file could now look the following:
 ```json
@@ -82,7 +81,7 @@ For example, the "settings" in the `.code-workspace` file could now look the fol
 }
 ```
 
-To provide extra arguments, add `extra_args` at `[package.metadata.verus.ide]` inside your `Cargo.toml` file. For example, if you want to run Verus with `--crate-type=dylib --expand-errors`, add the following to your `Cargo.toml` file.
+To provide extra arguments, add `extra_args` at `[package.metadata.verus.ide]` inside your `Cargo.toml` file. For example, if you want to run Verus with `--crate-type=dylib --expand-errors`, you could add the following at the bottom of your `Cargo.toml` file.
 ```toml
 [package.metadata.verus.ide]
 extra_args = "--crate-type=dylib --expand-errors"
@@ -105,16 +104,16 @@ You can find more documents for IDE functionalities on the following links.
 - [Hover](https://rust-analyzer.github.io/manual.html#hover)
 
 #### 2.1 TODOs for IDE functionalities
-- requires/ensures/decreases/invariant/assert-by-block/assert-forall-block are not fully scanned for IDE purposes(e.g. might not be able to "goto definition" of the function used in requires/ensures)
+- Code scanning is incomplete for Verus-specific items. To be specific, requires/ensures/decreases/invariant/assert-by-block/assert-forall-block are not fully scanned for IDE purposes.(e.g., might not be able to "goto definition" of the function used in requires/ensures, "find all references" might omit occurences inside requires/ensures)
 
 - Although Verus' custom operators are parsed, those are not registered for IDE purposes. For example, type inference around those operators might not work. (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are boolean)
 
-- `builtin` and `pervasive`/`vstd` are not scanned. For example, the builtin types like `int` and `nat` could be shown as `unknown`.
+- `builtin` and `vstd` are not scanned. For example, the builtin types like `int` and `nat` could be shown as `unknown`. Auto completion for `vstd` might not work.
 
 
 ---
 ### Limitations 
-- This is currently experimental and subject to change.   
+- This is experimental software and subject to change.   
 - It is intended to be used only for Verus code. (For Rust code, you can use the original binary by opening the project without the `.code-workspace` file, which is just using "open folder" in VS Code)
 - Multiple features of rust-analyzer might be broken or missing.  
 - Syntax might not be updated to the latest version of Verus.
@@ -123,6 +122,7 @@ You can find more documents for IDE functionalities on the following links.
 
 #### Misc
 - `rust-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
+- `Developer: Reload Window` can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
 - Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in the workspace setting can disable the syntax error messages in VS Code
 
 
