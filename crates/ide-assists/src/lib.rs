@@ -70,6 +70,7 @@ mod assist_context;
 #[cfg(test)]
 mod tests;
 pub mod utils;
+pub mod vst_api;
 
 use hir::Semantics;
 use ide_db::{base_db::FileRange, RootDatabase};
@@ -211,6 +212,7 @@ mod handlers {
     // verus
     mod assert_by;
     mod intro_match;
+    mod wp_move_assertion;
 
     pub(crate) fn all() -> &'static [Handler] {
         &[
@@ -349,6 +351,7 @@ mod handlers {
             // Verus
             assert_by::assert_by,
             intro_match::intro_match,
+            wp_move_assertion::wp_move_assertion,
         ]
     }
 }
