@@ -138,7 +138,7 @@ pub(crate) fn handle_did_save_text_document(
         // No specific flycheck was triggered, so let's trigger all of them.
         for flycheck in state.flycheck.iter() {
             flycheck.restart();
-        }
+         }
     }
     Ok(())
 }
@@ -278,6 +278,7 @@ fn run_flycheck(state: &mut GlobalState, vfs_path: VfsPath) -> bool {
                 for (id, _) in workspace_ids.clone() {
                     if id == flycheck.id() {
                         updated = true;
+                        flycheck.restart_verus(vfs_path.to_string());
                         flycheck.restart();
                         continue;
                     }
@@ -286,6 +287,7 @@ fn run_flycheck(state: &mut GlobalState, vfs_path: VfsPath) -> bool {
             // No specific flycheck was triggered, so let's trigger all of them.
             if !updated {
                 for flycheck in world.flycheck.iter() {
+                    flycheck.restart_verus(vfs_path.to_string());
                     flycheck.restart();
                 }
             }
