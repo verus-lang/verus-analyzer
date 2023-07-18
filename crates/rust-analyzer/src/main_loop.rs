@@ -269,6 +269,7 @@ impl GlobalState {
                 }
             }
             Event::Flycheck(message) => {
+                tracing::debug!("flycheck message");
                 let _p = profile::span("GlobalState::handle_event/flycheck");
                 self.handle_flycheck_msg(message);
                 // Coalesce many flycheck updates into a single loop turn
@@ -614,6 +615,15 @@ impl GlobalState {
                     flycheck::Progress::DidFinish(result) => {
                         self.last_flycheck_error =
                             result.err().map(|err| format!("cargo check failed to start: {err}"));
+                        (Progress::End, None)
+                    }
+                    flycheck::Progress::VerusResult(res) => {
+                        self.send_notification::<lsp_types::notification::ShowMessage>(
+                            lsp_types::ShowMessageParams {
+                                typ: lsp_types::MessageType::INFO,
+                                message: res,
+                            },
+                        );
                         (Progress::End, None)
                     }
                 };
