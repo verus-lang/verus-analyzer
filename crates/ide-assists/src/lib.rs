@@ -102,7 +102,7 @@ pub fn assists(
     acc.finish()
 }
 
-mod handlers {
+pub(crate) mod handlers {
     use crate::{AssistContext, Assists};
 
     pub(crate) type Handler = fn(&mut Assists, &AssistContext<'_>) -> Option<()>;
@@ -161,7 +161,7 @@ mod handlers {
     mod generate_setter;
     mod generate_delegate_methods;
     mod add_return_type;
-    mod inline_call;
+    pub(crate) mod inline_call;
     mod inline_local_variable;
     mod inline_macro;
     mod inline_type_alias;
