@@ -213,6 +213,7 @@ mod handlers {
     mod assert_by;
     mod intro_match;
     mod wp_move_assertion;
+    mod apply_induction;
 
     pub(crate) fn all() -> &'static [Handler] {
         &[
@@ -352,6 +353,7 @@ mod handlers {
             assert_by::assert_by,
             intro_match::intro_match,
             wp_move_assertion::wp_move_assertion,
+            apply_induction::apply_induction,
         ]
     }
 }
