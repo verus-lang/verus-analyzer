@@ -65,12 +65,12 @@ macro_rules! eprintln {
     ($($tt:tt)*) => { stdx::eprintln!($($tt)*) };
 }
 
-mod assist_config;
+pub(crate) mod assist_config;
 mod assist_context;
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+pub(crate) mod tests;
 pub mod utils;
-pub mod vst_api;
+pub(crate) mod vst_api;
 
 use hir::Semantics;
 use ide_db::{base_db::FileRange, RootDatabase};
@@ -102,7 +102,7 @@ pub fn assists(
     acc.finish()
 }
 
-mod handlers {
+pub(crate) mod handlers {
     use crate::{AssistContext, Assists};
 
     pub(crate) type Handler = fn(&mut Assists, &AssistContext<'_>) -> Option<()>;
@@ -161,7 +161,7 @@ mod handlers {
     mod generate_setter;
     mod generate_delegate_methods;
     mod add_return_type;
-    mod inline_call;
+    pub(crate) mod inline_call;
     mod inline_local_variable;
     mod inline_macro;
     mod inline_type_alias;
