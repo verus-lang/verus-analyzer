@@ -214,6 +214,7 @@ pub(crate) mod handlers {
     mod intro_match;
     mod wp_move_assertion;
     mod apply_induction;
+    mod localize_error;
 
     pub(crate) fn all() -> &'static [Handler] {
         &[
@@ -354,6 +355,7 @@ pub(crate) mod handlers {
             intro_match::intro_match,
             wp_move_assertion::wp_move_assertion,
             apply_induction::apply_induction,
+            localize_error::localize_error,
         ]
     }
 }
