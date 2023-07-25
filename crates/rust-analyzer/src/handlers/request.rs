@@ -1124,6 +1124,7 @@ pub(crate) fn handle_code_action(
         &snap.config.diagnostics(),
         resolve,
         frange,
+        snap.verus_errors.clone(),
     )?;
     for (index, assist) in assists.into_iter().enumerate() {
         let resolve_data =
@@ -1191,6 +1192,7 @@ pub(crate) fn handle_code_action_resolve(
         &snap.config.diagnostics(),
         AssistResolveStrategy::Single(assist_resolve),
         frange,
+        snap.verus_errors.clone(),
     )?;
 
     let assist = match assists.get(assist_index) {
