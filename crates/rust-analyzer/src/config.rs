@@ -1412,12 +1412,22 @@ impl Config {
     }
 
     pub fn assist(&self) -> AssistConfig {
+        let verus_path = match &self.data.check_overrideCommand {
+            Some(args) if !args.is_empty() => {
+                let mut args = args.clone();
+                let command = args.remove(0);
+                command
+            }
+            _ => String::new(),
+        };
+
         AssistConfig {
             snippet_cap: SnippetCap::new(self.experimental("snippetTextEdit")),
             allowed: None,
             insert_use: self.insert_use_config(),
             prefer_no_std: self.data.imports_prefer_no_std,
             assist_emit_must_use: self.data.assist_emitMustUse,
+            verus_path,
         }
     }
 

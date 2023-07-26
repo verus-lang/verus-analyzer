@@ -31,6 +31,7 @@ pub const TEST_CONFIG: AssistConfig = AssistConfig {
     },
     prefer_no_std: false,
     assist_emit_must_use: false,
+    verus_path: String::new(), //verus
 };
 
 pub(crate) const TEST_CONFIG_NO_SNIPPET_CAP: AssistConfig = AssistConfig {
@@ -45,6 +46,7 @@ pub(crate) const TEST_CONFIG_NO_SNIPPET_CAP: AssistConfig = AssistConfig {
     },
     prefer_no_std: false,
     assist_emit_must_use: false,
+    verus_path: String::new(), //verus
 };
 
 pub(crate) fn with_single_file(text: &str) -> (RootDatabase, FileId) {
