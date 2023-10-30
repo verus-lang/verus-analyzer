@@ -228,8 +228,6 @@ pub(crate) mod handlers {
     mod unqualify_method_call;
     mod wrap_return_type_in_result;
     // verus
-    mod wp_move_assertion;
-    mod apply_induction;
     mod proof_action;
 
     pub(crate) fn all() -> &'static [Handler] {
@@ -371,8 +369,8 @@ pub(crate) mod handlers {
             proof_action::intro_failing_ensures::intro_failing_ensures,
             proof_action::intro_failing_requires::intro_failing_requires,
             proof_action::intro_match::intro_match,
-            wp_move_assertion::wp_move_assertion,
-            apply_induction::apply_induction,
+            proof_action::wp_move_assertion::wp_move_assertion,
+            proof_action::apply_induction::apply_induction,
             proof_action::localize_error::localize_error,
             proof_action::remove_dead_assertion::remove_dead_assertions,
         ]
