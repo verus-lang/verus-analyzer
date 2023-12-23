@@ -1250,7 +1250,6 @@ pub struct AssertForallExpr {
 impl ast::HasAttrs for AssertForallExpr {}
 impl AssertForallExpr {
     pub fn assert_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![assert]) }
-    pub fn forall_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![forall]) }
     pub fn closure_expr(&self) -> Option<ClosureExpr> { support::child(&self.syntax) }
     pub fn implies_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![implies]) }
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
