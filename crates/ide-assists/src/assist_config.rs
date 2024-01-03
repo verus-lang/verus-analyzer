@@ -17,4 +17,5 @@ pub struct AssistConfig {
     pub assist_emit_must_use: bool,
     // verus
     pub verus_path: String,
+    pub fmt_path: String,
 }

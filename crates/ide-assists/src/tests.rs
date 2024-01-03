@@ -21,6 +21,7 @@ use crate::{
 
 
 pub const HARDCODED_VERUS_PATH_FOR_TEST: &str = "/home/chanhee/verus/source/target-verus/debug/verus";
+pub const HARDCODED_VERUS_FMT_PATH_FOR_TEST: &str = "/home/chanhee/verusfmt/target/debug/verusfmt";
 
 pub const TEST_CONFIG: AssistConfig = AssistConfig {
     snippet_cap: SnippetCap::new(true),
@@ -35,6 +36,7 @@ pub const TEST_CONFIG: AssistConfig = AssistConfig {
     prefer_no_std: false,
     assist_emit_must_use: false,
     verus_path: String::new(), //verus
+    fmt_path: String::new(), // verusfmt
 };
 
 pub(crate) const TEST_CONFIG_NO_SNIPPET_CAP: AssistConfig = AssistConfig {
@@ -50,6 +52,7 @@ pub(crate) const TEST_CONFIG_NO_SNIPPET_CAP: AssistConfig = AssistConfig {
     prefer_no_std: false,
     assist_emit_must_use: false,
     verus_path: String::new(), //verus
+    fmt_path: String::new(), // verusfmt
 };
 
 pub(crate) fn with_single_file(text: &str) -> (RootDatabase, FileId) {

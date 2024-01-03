@@ -1428,6 +1428,7 @@ impl Config {
             prefer_no_std: self.data.imports_prefer_no_std,
             assist_emit_must_use: self.data.assist_emitMustUse,
             verus_path,
+            fmt_path: String::from("/home/chanhee/verusfmt/target/debug/verusfmt"),  // TODO: get this from user config file
         }
     }
 
