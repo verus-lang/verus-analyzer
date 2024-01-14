@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 mod generated;
 #[cfg(not(feature = "in-rust-tree"))]
 mod sourcegen;

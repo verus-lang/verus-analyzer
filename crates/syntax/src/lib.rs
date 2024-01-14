@@ -66,7 +66,6 @@ pub use rowan::{
 };
 pub use smol_str::SmolStr;
 
-use ast::generated::vst_nodes;
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of
 /// errors.
