@@ -302,6 +302,7 @@ impl Fn {
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn prover(&self) -> Option<Prover> { support::child(&self.syntax) }
     pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
@@ -584,6 +585,17 @@ pub struct WhereClause {
 impl WhereClause {
     pub fn where_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![where]) }
     pub fn predicates(&self) -> AstChildren<WherePred> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Prover {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for Prover {}
+impl Prover {
+    pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1691,17 +1703,6 @@ impl ModeSpecChecked {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Prover {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for Prover {}
-impl Prover {
-    pub fn by_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![by]) }
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TriggerAttribute {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2427,6 +2428,17 @@ impl AstNode for GenericParamList {
 }
 impl AstNode for WhereClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == WHERE_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Prover {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PROVER }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3569,17 +3581,6 @@ impl AstNode for ModeSpecChecked {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for Prover {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == PROVER }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for TriggerAttribute {
     fn can_cast(kind: SyntaxKind) -> bool { kind == TRIGGER_ATTRIBUTE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -4559,6 +4560,7 @@ impl AstNode for AnyHasName {
                 | TYPE_ALIAS
                 | UNION
                 | RENAME
+                | PROVER
                 | SELF_PARAM
                 | RECORD_FIELD
                 | VARIANT
@@ -4566,7 +4568,6 @@ impl AstNode for AnyHasName {
                 | TYPE_PARAM
                 | ASSERT_EXPR
                 | IDENT_PAT
-                | PROVER
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -4908,6 +4909,11 @@ impl std::fmt::Display for GenericParamList {
     }
 }
 impl std::fmt::Display for WhereClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Prover {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -5423,11 +5429,6 @@ impl std::fmt::Display for RecordPatField {
     }
 }
 impl std::fmt::Display for ModeSpecChecked {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Prover {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
