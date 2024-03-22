@@ -305,7 +305,7 @@ impl Fn {
     pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
-    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
+    pub fn signature_decreases(&self) -> Option<SignatureDecreases> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
 }
@@ -620,14 +620,14 @@ impl EnsuresClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DecreasesClause {
+pub struct SignatureDecreases {
     pub(crate) syntax: SyntaxNode,
 }
-impl DecreasesClause {
-    pub fn decreases_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![decreases])
-    }
-    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+impl SignatureDecreases {
+    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
+    pub fn when_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![when]) }
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn via_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![via]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1324,6 +1324,17 @@ impl InvariantClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DecreasesClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DecreasesClause {
+    pub fn decreases_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![decreases])
+    }
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchArmList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1677,17 +1688,6 @@ impl ModeSpecChecked {
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     pub fn checked_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![checked]) }
     pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SignatureDecreases {
-    pub(crate) syntax: SyntaxNode,
-}
-impl SignatureDecreases {
-    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
-    pub fn when_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![when]) }
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    pub fn via_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![via]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2469,8 +2469,8 @@ impl AstNode for EnsuresClause {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for DecreasesClause {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
+impl AstNode for SignatureDecreases {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SIGNATURE_DECREASES }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3162,6 +3162,17 @@ impl AstNode for InvariantClause {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for DecreasesClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for MatchArmList {
     fn can_cast(kind: SyntaxKind) -> bool { kind == MATCH_ARM_LIST }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3549,17 +3560,6 @@ impl AstNode for RecordPatField {
 }
 impl AstNode for ModeSpecChecked {
     fn can_cast(kind: SyntaxKind) -> bool { kind == MODE_SPEC_CHECKED }
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for SignatureDecreases {
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SIGNATURE_DECREASES }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4927,7 +4927,7 @@ impl std::fmt::Display for EnsuresClause {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for DecreasesClause {
+impl std::fmt::Display for SignatureDecreases {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -5242,6 +5242,11 @@ impl std::fmt::Display for InvariantClause {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for DecreasesClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for MatchArmList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -5418,11 +5423,6 @@ impl std::fmt::Display for RecordPatField {
     }
 }
 impl std::fmt::Display for ModeSpecChecked {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for SignatureDecreases {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
