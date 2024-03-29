@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![allow(unused)]
 mod generated;
 #[cfg(not(feature = "in-rust-tree"))]
 mod sourcegen;
@@ -16,12 +17,10 @@ use syntax::TextRange;
 use test_utils::{assert_eq_text, extract_offset};
 
 use crate::{
-    assists, handlers::Handler, verus_error::VerusError, Assist, AssistConfig, AssistContext, AssistKind, AssistResolveStrategy, Assists, SingleResolve
+    assists, handlers::Handler, vst_api::verus_error::VerusError, Assist, AssistConfig, AssistContext, AssistKind, AssistResolveStrategy, Assists, SingleResolve
 };
 
 
-pub const HARDCODED_VERUS_PATH_FOR_TEST: &str = "/home/chanhee/verus/source/target-verus/debug/verus";
-pub const HARDCODED_VERUS_FMT_PATH_FOR_TEST: &str = "/home/chanhee/verusfmt/target/debug/verusfmt";
 
 pub const TEST_CONFIG: AssistConfig = AssistConfig {
     snippet_cap: SnippetCap::new(true),
