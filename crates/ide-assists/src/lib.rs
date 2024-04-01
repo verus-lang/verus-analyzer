@@ -66,7 +66,7 @@ macro_rules! eprintln {
 }
 
 pub(crate) mod assist_config;
-mod assist_context;
+pub mod assist_context;
 // #[cfg(test)]
 pub(crate) mod tests;
 pub mod utils;
