@@ -254,7 +254,7 @@ impl FixtureWithProjectMeta {
 }
 
 impl MiniCore {
-    const RAW_SOURCE: &str = include_str!("./minicore.rs");
+    const RAW_SOURCE: &'static str = include_str!("./minicore.rs");
 
     fn has_flag(&self, flag: &str) -> bool {
         self.activated_flags.iter().any(|it| it == flag)
