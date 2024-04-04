@@ -35,3 +35,4 @@ sourcegen.workspace = true
 
 [features]
 in-rust-tree = []
+proof-action = []

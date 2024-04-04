@@ -98,3 +98,4 @@ mbe.workspace = true
 jemalloc = ["jemallocator", "profile/jemalloc"]
 force-always-assert = ["always-assert/force"]
 in-rust-tree = ["ide/in-rust-tree", "syntax/in-rust-tree"]
+proof-action = ["ide-assists/proof-action"]
