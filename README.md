@@ -17,7 +17,6 @@ The steps below walk you through compiling a Verus-specific version of rust-anal
 5. Make it executable (e.g., `chmod +x ./dist/verus-analyzer-x86_64-apple-darwin`)
 
 
-
 ### 2. VS Code
 Before starting, please install the original rust-analyzer extension in VS Code's extensions tab.
 
@@ -134,34 +133,35 @@ vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are at
 
 ---
 
-## Proof Action (Optional)
+## Proof Actions (Optional)
 
-Proof action is an **experimental** feature to assist developers debug proof failures.  
+Proof actions are an **experimental** feature to assist developers when debugging proof failures.  
 
 ### Compilation
+Compile Verus analyzer.  These steps are similar to the basic version with the exception 
+of the extra flag used in step 3.
 
-During [1. Compile binary](#1-compile-binary), include the `--proof-action` flag.
-Compile the rust-analyzer binary with `--proof-action` flag 
-```
-cargo xtask dist --proof-action
-```
+1. Clone the repository: `git clone https://github.com/verus-lang/verus-analyzer.git`  
+2. `cd verus-analyzer`
+3. Compile the rust-analyzer binary: `cargo xtask dist --proof-action`
+4. Unzip the generated file (e.g., `gunzip ./dist/verus-analyzer-x86_64-apple-darwin.gz`)
+5. Make it executable (e.g., `chmod +x ./dist/verus-analyzer-x86_64-apple-darwin`)
 
 
-### Prerequisite
-* [4. Running Verus in VS Code (optional)](#4-running-verus-in-vs-code-optional)
+### Prerequisites
+* Follow the directions for [4. Running Verus in VS Code (optional)](#4-running-verus-in-vs-code-optional)
 * [verusfmt](https://github.com/verus-lang/verusfmt)   
-You can install `verusfmt` using the following
+You can install `verusfmt` using:
 ```
 cargo install verusfmt --locked
 ```
-You can also use `which verusfmt` to get the absolute path to it.
+You can then use `which verusfmt` to get the absolute path to it.
 
 
 
 ### Configuration
 
-The "settings" in the `.code-workspace` file need additional configuration to give environment variable for verus-analyzer binary.
-"VERUS_BINARY_PATH", "TMPDIR", and "VERUS_FMT_BINARY_PATH" are needed.
+The "settings" entry in the `.code-workspace` file needs some additional configuration to provide environment variables for the verus-analyzer binary.  In particular, we need to define: "VERUS_BINARY_PATH", "TMPDIR", and "VERUS_FMT_BINARY_PATH".
 
 ```json
 "rust-analyzer.server.extraEnv": {
@@ -171,7 +171,7 @@ The "settings" in the `.code-workspace` file need additional configuration to gi
 }
 ```
 
-The final configuration for `settings` might look like the following.
+Hence, the final configuration for `settings` might look like the following.
 
 ```json
 "settings": {
