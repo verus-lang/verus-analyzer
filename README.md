@@ -138,7 +138,7 @@ vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are at
 Proof actions are an **experimental** feature to assist developers when debugging proof failures.  
 
 ### Compilation
-Compile Verus analyzer.  These steps are similar to the basic version with the exception 
+Compile Verus analyzer by following the steps below.  These steps are similar to the basic version with the exception 
 of the extra flag used in step 3.
 
 1. Clone the repository: `git clone https://github.com/verus-lang/verus-analyzer.git`  
