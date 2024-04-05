@@ -118,6 +118,9 @@ pub(crate) struct GlobalState {
         OpQueue<(), (Arc<Vec<ProjectWorkspace>>, Vec<anyhow::Result<WorkspaceBuildScripts>>)>,
     pub(crate) fetch_proc_macros_queue: OpQueue<Vec<ProcMacroPaths>, bool>,
     pub(crate) prime_caches_queue: OpQueue,
+
+    // verus
+    pub(crate) verus_errors: Vec<ide_assists::proof_plumber_api::verus_error::VerusError>,
 }
 
 /// An immutable snapshot of the world's state at a point in time.
@@ -132,6 +135,8 @@ pub(crate) struct GlobalStateSnapshot {
     // used to signal semantic highlighting to fall back to syntax based highlighting until proc-macros have been loaded
     pub(crate) proc_macros_loaded: bool,
     pub(crate) flycheck: Arc<[FlycheckHandle]>,
+    // verus
+    pub(crate) verus_errors: Vec<ide_assists::proof_plumber_api::verus_error::VerusError>,
 }
 
 impl std::panic::UnwindSafe for GlobalStateSnapshot {}
@@ -194,6 +199,7 @@ impl GlobalState {
             fetch_proc_macros_queue: OpQueue::default(),
 
             prime_caches_queue: OpQueue::default(),
+            verus_errors: Vec::new(),
         };
         // Apply any required database inputs from the config.
         this.update_configuration(config);
@@ -332,6 +338,7 @@ impl GlobalState {
             proc_macros_loaded: !self.config.expand_proc_macros()
                 || *self.fetch_proc_macros_queue.last_op_result(),
             flycheck: self.flycheck.clone(),
+            verus_errors: self.verus_errors.clone(),
         }
     }
 

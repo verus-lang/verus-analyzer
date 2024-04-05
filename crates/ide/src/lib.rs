@@ -65,6 +65,7 @@ use std::ffi::OsStr;
 
 use cfg::CfgOptions;
 use fetch_crates::CrateInfo;
+use ide_assists::proof_plumber_api::verus_error::VerusError;
 use ide_db::{
     base_db::{
         salsa::{self, ParallelDatabase},
@@ -627,6 +628,7 @@ impl Analysis {
         diagnostics_config: &DiagnosticsConfig,
         resolve: AssistResolveStrategy,
         frange: FileRange,
+        verus_errors: Vec<VerusError>,
     ) -> Cancellable<Vec<Assist>> {
         let include_fixes = match &assist_config.allowed {
             Some(it) => it.iter().any(|&it| it == AssistKind::None || it == AssistKind::QuickFix),
@@ -644,7 +646,14 @@ impl Analysis {
                 Vec::new()
             };
             let ssr_assists = ssr::ssr_assists(db, &resolve, frange);
-            let assists = ide_assists::assists(db, assist_config, resolve, frange);
+            dbg!("assist_with_fixes");
+            dbg!(&verus_errors);
+            let assists = 
+                if verus_errors.len() > 0 {
+                    ide_assists::assists_with_verus_error(db, assist_config, resolve, frange, verus_errors)
+                } else {
+                    ide_assists::assists(db, assist_config, resolve, frange)
+                };
 
             let mut res = diagnostic_assists;
             res.extend(ssr_assists.into_iter());

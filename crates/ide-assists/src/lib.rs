@@ -36,7 +36,7 @@
 //!   selection. Example: `sort_items` sorts items alphabetically. Naively, it
 //!   should be available more or less everywhere, which isn't useful. So
 //!   instead we only show it if the user *selects* the items they want to sort.
-//! * Consider grouping related assists together (see [`Assists::add_group`]).
+//! * Consider grouping related assists together (see Assists::add_group).
 //! * Make assists robust. If the assist depends on results of type-inference too
 //!   much, it might only fire in fully-correct code. This makes assist less
 //!   useful and (worse) less predictable. The user should have a clear
@@ -60,20 +60,24 @@
 
 #![warn(rust_2018_idioms, unused_lifetimes, semicolon_in_expressions_from_macros)]
 
+#![cfg_attr(not(feature = "proof-action"), allow(unused))]
+
 #[allow(unused)]
 macro_rules! eprintln {
     ($($tt:tt)*) => { stdx::eprintln!($($tt)*) };
 }
 
-mod assist_config;
-mod assist_context;
-#[cfg(test)]
-mod tests;
+pub(crate) mod assist_config;
+pub mod assist_context;
+// #[cfg(test)]
+pub(crate) mod tests;
 pub mod utils;
+pub mod proof_plumber_api;
 
 use hir::Semantics;
 use ide_db::{base_db::FileRange, RootDatabase};
 use syntax::TextRange;
+use proof_plumber_api::verus_error::VerusError;
 
 pub(crate) use crate::assist_context::{AssistContext, Assists};
 
@@ -93,7 +97,7 @@ pub fn assists(
     range: FileRange,
 ) -> Vec<Assist> {
     let sema = Semantics::new(db);
-    let ctx = AssistContext::new(sema, config, range);
+    let ctx = AssistContext::new(sema, config, range, vec![]); // verus: return no verus error here
     let mut acc = Assists::new(&ctx, resolve);
     handlers::all().iter().for_each(|handler| {
         handler(&mut acc, &ctx);
@@ -101,7 +105,23 @@ pub fn assists(
     acc.finish()
 }
 
-mod handlers {
+pub fn assists_with_verus_error(
+    db: &RootDatabase,
+    config: &AssistConfig,
+    resolve: AssistResolveStrategy,
+    range: FileRange,
+    verus_error: Vec<VerusError>,
+) -> Vec<Assist> {
+    let sema = Semantics::new(db);
+    let ctx = AssistContext::new(sema, config, range, verus_error); 
+    let mut acc = Assists::new(&ctx, resolve);
+    handlers::all().iter().for_each(|handler| {
+        handler(&mut acc, &ctx);
+    });
+    acc.finish()
+}
+
+pub(crate) mod handlers {
     use crate::{AssistContext, Assists};
 
     pub(crate) type Handler = fn(&mut Assists, &AssistContext<'_>) -> Option<()>;
@@ -160,7 +180,7 @@ mod handlers {
     mod generate_setter;
     mod generate_delegate_methods;
     mod add_return_type;
-    mod inline_call;
+    pub(crate) mod inline_call;
     mod inline_local_variable;
     mod inline_macro;
     mod inline_type_alias;
@@ -208,6 +228,8 @@ mod handlers {
     mod unwrap_result_return_type;
     mod unqualify_method_call;
     mod wrap_return_type_in_result;
+    // verus
+    mod proof_action;
 
     pub(crate) fn all() -> &'static [Handler] {
         &[
@@ -342,6 +364,42 @@ mod handlers {
             inline_macro::inline_macro,
             // Are you sure you want to add new assist here, and not to the
             // sorted list above?
+            //
+            // Verus
+            #[cfg(feature="proof-action")] 
+            proof_action::insert_assert_by_block::assert_by,
+            #[cfg(feature="proof-action")] 
+            proof_action::insert_failing_postcondition::intro_failing_ensures,
+            #[cfg(feature="proof-action")] 
+            proof_action::insert_failing_precondition::intro_failing_requires,
+            #[cfg(feature="proof-action")] 
+            proof_action::intro_matching_assertions::intro_match,
+            #[cfg(feature="proof-action")] 
+            proof_action::weakest_pre_step::wp_move_assertion,
+            #[cfg(feature="proof-action")] 
+            proof_action::apply_induction::apply_induction,
+            #[cfg(feature="proof-action")] 
+            proof_action::decompose_failing_assert::localize_error,
+            #[cfg(feature="proof-action")] 
+            proof_action::remove_redundant_assertion::remove_dead_assertions,
+            #[cfg(feature="proof-action")] 
+            proof_action::reveal_opaque_in_by_block::assert_by_reveal,
+            #[cfg(feature="proof-action")] 
+            proof_action::reveal_opaque_above::insert_reveal,
+            #[cfg(feature="proof-action")] 
+            proof_action::convert_imply_to_if::imply_to_if,
+            #[cfg(feature="proof-action")] 
+            proof_action::split_imply_ensures::split_imply_ensures,
+            #[cfg(feature="proof-action")] 
+            proof_action::intro_forall::intro_forall,   
+            #[cfg(feature="proof-action")] 
+            proof_action::intro_forall_implies::intro_forall_implies,
+            #[cfg(feature="proof-action")] 
+            proof_action::intro_assume_false::by_assume_false,
+            #[cfg(feature="proof-action")] 
+            proof_action::split_smaller_or_equal_to::split_smaller_or_equal_to,
+            #[cfg(feature="proof-action")] 
+            proof_action::seq_index_inbound::seq_index_inbound,
         ]
     }
 }

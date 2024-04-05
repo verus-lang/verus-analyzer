@@ -22,7 +22,7 @@ use crate::{
     lsp_ext,
     lsp_utils::{notification_is, Progress},
     reload::{BuildDataProgress, ProcMacroProgress, ProjectWorkspaceProgress},
-    Result,
+    Result, verus_interaction,
 };
 
 pub fn main_loop(config: Config, connection: Connection) -> Result<()> {
@@ -571,6 +571,12 @@ impl GlobalState {
     fn handle_flycheck_msg(&mut self, message: flycheck::Message) {
         match message {
             flycheck::Message::AddDiagnostic { id, workspace_root, diagnostic } => {
+                // register verus errors
+                // should flush out errors on save
+                if let Some(verr) = verus_interaction::diagnostic_to_verus_err(&diagnostic) {
+                    self.verus_errors.push(verr)
+                };
+
                 let snap = self.snapshot();
                 let diagnostics = crate::diagnostics::to_proto::map_rust_diagnostic_to_lsp(
                     &self.config.diagnostics_map(),
@@ -600,6 +606,7 @@ impl GlobalState {
                 let (state, message) = match progress {
                     flycheck::Progress::DidStart => {
                         self.diagnostics.clear_check(id);
+                        self.verus_errors = vec![]; // verus: clear out errors
                         (Progress::Begin, None)
                     }
                     flycheck::Progress::DidCheckCrate(target) => (Progress::Report, Some(target)),

@@ -23,9 +23,17 @@ jobs:
 
       - name: test syntax
         run: cargo test --package syntax --lib
+      
+      # TODO: test all proof action
+      # TODO: env variable for verus_fmt, verus
+      # - name: test proof action
+        # run: cargo test --package ide-assists --lib -- handlers::proof_action::wp_move_assertion::tests::wp_lemma_call --exact --nocapture
 
-      - name: build
-        run: cargo build
+      - name: build default
+        run: cargo xtask dist
+
+      - name: build proof action version
+        run: cargo xtask dist --proof-action
 
 # TODO: more test
 # TODO: auto-merge upstream

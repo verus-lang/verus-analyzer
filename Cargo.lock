@@ -1481,6 +1481,7 @@ version = "0.0.0"
 dependencies = [
  "always-assert",
  "anyhow",
+ "cargo_metadata",
  "cfg",
  "crossbeam-channel",
  "dissimilar",
@@ -1491,6 +1492,7 @@ dependencies = [
  "hir-def",
  "hir-ty",
  "ide",
+ "ide-assists",
  "ide-db",
  "ide-ssr",
  "itertools",

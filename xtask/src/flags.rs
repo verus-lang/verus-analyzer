@@ -33,6 +33,7 @@ xflags::xflags! {
         }
         cmd dist {
             optional --client-patch-version version: String
+            optional --proof-action
         }
         /// Read a changelog AsciiDoc file and update the GitHub Releases entry in Markdown.
         cmd publish-release-notes {
@@ -96,6 +97,7 @@ pub struct Promote {
 #[derive(Debug)]
 pub struct Dist {
     pub client_patch_version: Option<String>,
+    pub proof_action: bool,
 }
 
 #[derive(Debug)]

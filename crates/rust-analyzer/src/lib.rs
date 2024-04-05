@@ -12,6 +12,7 @@
 #![warn(rust_2018_idioms, unused_lifetimes, semicolon_in_expressions_from_macros)]
 
 pub mod cli;
+mod verus_interaction;
 
 #[allow(unused)]
 macro_rules! eprintln {

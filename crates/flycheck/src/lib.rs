@@ -5,9 +5,7 @@
 #![warn(rust_2018_idioms, unused_lifetimes, semicolon_in_expressions_from_macros)]
 
 use std::{
-    fmt, io,
-    process::{ChildStderr, ChildStdout, Command, Stdio},
-    time::Duration, path::Path,
+    fmt, io, path::Path, process::{ChildStderr, ChildStdout, Command, Stdio}, time::Duration
 };
 
 use command_group::{CommandGroup, GroupChild};
@@ -262,7 +260,7 @@ impl FlycheckActor {
                     match CargoHandle::spawn(command) {
                         Ok(cargo_handle) => {
                             tracing::error!(
-                                "did  restart Verus"
+                                "did restart Verus"
                             );
                             
                             self.cargo_handle = Some(cargo_handle);
@@ -550,8 +548,10 @@ struct CargoHandle {
 
 impl CargoHandle {
     fn spawn(mut command: Command) -> std::io::Result<CargoHandle> {
+        dbg!("spawn from CargoHandle");
         command.stdout(Stdio::piped()).stderr(Stdio::piped()).stdin(Stdio::null());
         let mut child = command.group_spawn().map(JodGroupChild)?;
+        dbg!("finished executing command");
 
         let stdout = child.0.inner().stdout.take().unwrap();
         let stderr = child.0.inner().stderr.take().unwrap();

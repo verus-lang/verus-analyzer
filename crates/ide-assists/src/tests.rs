@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused)]
+#![allow(unused_imports)]
 mod generated;
 #[cfg(not(feature = "in-rust-tree"))]
 mod sourcegen;
@@ -15,11 +18,12 @@ use syntax::TextRange;
 use test_utils::{assert_eq_text, extract_offset};
 
 use crate::{
-    assists, handlers::Handler, Assist, AssistConfig, AssistContext, AssistKind,
-    AssistResolveStrategy, Assists, SingleResolve,
+    assists, handlers::Handler, proof_plumber_api::verus_error::VerusError, Assist, AssistConfig, AssistContext, AssistKind, AssistResolveStrategy, Assists, SingleResolve
 };
 
-pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
+
+
+pub const TEST_CONFIG: AssistConfig = AssistConfig {
     snippet_cap: SnippetCap::new(true),
     allowed: None,
     insert_use: InsertUseConfig {
@@ -31,6 +35,8 @@ pub(crate) const TEST_CONFIG: AssistConfig = AssistConfig {
     },
     prefer_no_std: false,
     assist_emit_must_use: false,
+    verus_path: String::new(), //verus
+    fmt_path: String::new(), // verusfmt
 };
 
 pub(crate) const TEST_CONFIG_NO_SNIPPET_CAP: AssistConfig = AssistConfig {
@@ -45,6 +51,8 @@ pub(crate) const TEST_CONFIG_NO_SNIPPET_CAP: AssistConfig = AssistConfig {
     },
     prefer_no_std: false,
     assist_emit_must_use: false,
+    verus_path: String::new(), //verus
+    fmt_path: String::new(), // verusfmt
 };
 
 pub(crate) fn with_single_file(text: &str) -> (RootDatabase, FileId) {
@@ -55,6 +63,12 @@ pub(crate) fn with_single_file(text: &str) -> (RootDatabase, FileId) {
 pub(crate) fn check_assist(assist: Handler, ra_fixture_before: &str, ra_fixture_after: &str) {
     let ra_fixture_after = trim_indent(ra_fixture_after);
     check(assist, ra_fixture_before, ExpectedResult::After(&ra_fixture_after), None);
+}
+
+#[track_caller]
+pub(crate) fn check_assist_with_verus_error(assist: Handler, verus_errors: Vec<VerusError>, ra_fixture_before: &str, ra_fixture_after: &str) {
+    let ra_fixture_after = trim_indent(ra_fixture_after);
+    check_with_verus_error(assist, ra_fixture_before, ExpectedResult::After(&ra_fixture_after), None, verus_errors);
 }
 
 #[track_caller]
@@ -70,6 +84,7 @@ pub(crate) fn check_assist_no_snippet_cap(
         ra_fixture_before,
         ExpectedResult::After(&ra_fixture_after),
         None,
+        vec![],
     );
 }
 
@@ -149,7 +164,12 @@ enum ExpectedResult<'a> {
 
 #[track_caller]
 fn check(handler: Handler, before: &str, expected: ExpectedResult<'_>, assist_label: Option<&str>) {
-    check_with_config(TEST_CONFIG, handler, before, expected, assist_label);
+    check_with_config(TEST_CONFIG, handler, before, expected, assist_label, vec![]);
+}
+
+#[track_caller]
+fn check_with_verus_error(handler: Handler, before: &str, expected: ExpectedResult<'_>, assist_label: Option<&str>, verus_errors: Vec<VerusError>) {
+    check_with_config(TEST_CONFIG, handler, before, expected, assist_label, verus_errors);
 }
 
 #[track_caller]
@@ -159,6 +179,7 @@ fn check_with_config(
     before: &str,
     expected: ExpectedResult<'_>,
     assist_label: Option<&str>,
+    verus_errors: Vec<VerusError>,
 ) {
     let (mut db, file_with_caret_id, range_or_offset) = RootDatabase::with_range_or_offset(before);
     db.enable_proc_attr_macros();
@@ -167,7 +188,7 @@ fn check_with_config(
     let frange = FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
 
     let sema = Semantics::new(&db);
-    let ctx = AssistContext::new(sema, &config, frange);
+    let ctx = AssistContext::new(sema, &config, frange, verus_errors); 
     let resolve = match expected {
         ExpectedResult::Unresolved => AssistResolveStrategy::None,
         _ => AssistResolveStrategy::All,

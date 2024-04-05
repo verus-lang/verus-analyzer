@@ -1,10 +1,11 @@
 //! Defines [`SyntaxKind`] -- a fieldless enum of all possible syntactic
 //! constructs of the Rust language.
 
+#[allow(unused_imports)]
 mod generated;
 
 #[allow(unreachable_pub)]
-pub use self::generated::{SyntaxKind, T};
+pub use self::generated::SyntaxKind;
 
 impl From<u16> for SyntaxKind {
     #[inline]
