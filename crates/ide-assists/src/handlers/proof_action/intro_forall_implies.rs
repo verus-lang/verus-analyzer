@@ -1,4 +1,3 @@
-// use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use crate::{
     assist_context::{AssistContext, Assists},
     // utils::invert_boolean_expression,

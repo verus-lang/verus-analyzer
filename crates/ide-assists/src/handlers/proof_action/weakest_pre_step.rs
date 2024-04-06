@@ -151,7 +151,7 @@ pub(crate) fn vst_rewriter_wp_move_assertion(
                     // when `prev` is let-binding, do subsitution (replace `pat` with `init`)
                     let new_assert = vst_map_expr_visitor(assertion.clone(), &mut |e| {
                         // TODO: do proper usage check in semantic level instead of string match             
-                        // TODO: careful with variable name shadowing
+                        // TODO: variable name shadowing
                         if e.to_string().trim() == pat.to_string().trim() {
                             Ok(init_expr.clone())
                         } else {
@@ -641,14 +641,3 @@ proof fn lemma_fibo_is_monotonic(i: nat, j: nat)
 //     }
 }
 
-// let stmt
-// match e {
-// Expr::PathExpr(p) => {
-//     if p.to_string() == pat.to_string() {
-//         Ok(init_expr.clone())
-//     } else {
-//         Ok(e.clone())
-//     }
-// }
-// _ => Ok(e.clone()),
-// }
