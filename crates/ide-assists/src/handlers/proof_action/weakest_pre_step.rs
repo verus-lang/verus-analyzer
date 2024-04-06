@@ -291,7 +291,53 @@ fn foo()
         );
     }
 
+    // TEST: let-binding2
+        #[test]
+        fn wp_let_bind2() {
+            check_assist(
+                wp_move_assertion,
+                r#"
+fn foo(b: u32)
+{
+    let a: u32 = b;
+    ass$0ert(a > 10 && a < 100);
+}
+"#,
+            r#"
+fn foo(b: u32)
+{
+    assert(b > 10 && b < 100);
+    let a: u32 = b;
+    assert(a > 10 && a < 100);
+}
 
+"#,
+            );
+        }
+    
+    // TEST: let-binding3
+    #[test]
+    fn wp_let_bind3() {
+        check_assist(
+            wp_move_assertion,
+            r#"
+fn foo(b: u32, c: u32)
+{
+    let a: u32 = b + c;
+    ass$0ert(a > 10 && a < 100);
+}
+"#,
+        r#"
+fn foo(b: u32, c: u32)
+{
+    assert(b + c > 10 && b + c < 100);
+    let a: u32 = b + c;
+    assert(a > 10 && a < 100);
+}
+
+"#,
+        );
+    }
     // TEST: assert
     #[test]
     fn wp_assertion_step() {
@@ -592,52 +638,5 @@ proof fn lemma_fibo_is_monotonic(i: nat, j: nat)
         );
     }
 
-//     #[test] // not yet implemented
-//     fn wp_assign_easy() {
-//         check_assist(
-//             wp_move_assertion,
-//             r#"
-// fn foo()
-// {
-//     let mut a:u32 = 1;
-//     a = 8;
-//     ass$0ert(a > 10 && a < 100);
-// }
-// "#,
-//             r#"
-// fn foo()
-// {
-//     let mut a:u32 = 1;
-//     assert(8 > 10 && 8 < 100);
-//     a = 8;
-//     assert(a > 10 && a < 100);
-// }
-// "#,
-//         );
-//     }
-
-//     #[test] // not yet implemented
-//     fn wp_assign_expr() {
-//         check_assist(
-//             wp_move_assertion,
-//             r#"
-// fn foo()
-// {
-//     let mut a:u32 = 1;
-//     a = 8 + 9;
-//     ass$0ert(a > 10 && a < 100);
-// }
-// "#,
-//             r#"
-// fn foo()
-// {
-//     let mut a:u32 = 1;
-//     assert(8 + 9 > 10 && 8 + 9 < 100);
-//     a = 8 + 9;
-//     assert(a > 10 && a < 100);
-// }
-// "#,
-//         );
-//     }
 }
 
