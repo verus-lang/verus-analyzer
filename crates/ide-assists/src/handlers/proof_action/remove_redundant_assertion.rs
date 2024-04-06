@@ -117,7 +117,7 @@ mod tests {
     use crate::tests::check_assist;
 
     #[test]
-    fn comment_one() {
+    fn remove_one() {
         check_assist(
             remove_dead_assertions,
             "
@@ -137,6 +137,37 @@ proof fn foo(x: nat)
     ensures
         x >= 0,
 {
+}
+
+
+fn main() {}
+",
+        )
+    }
+
+
+    #[test]
+    fn preserve_necessary() {
+        check_assist(
+            remove_dead_assertions,
+            "
+use vstd::prelude::*;
+proo$0f fn foo(x: u32, y: u32)
+    ensures
+        x & y == y & x,
+{
+    assert(x & y == y & x) by (bit_vector);
+}
+
+fn main() {}
+",
+            "
+use vstd::prelude::*;
+proof fn foo(x: u32, y: u32)
+    ensures
+        x & y == y & x,
+{
+    assert(x & y == y & x) by (bit_vector);
 }
 
 
