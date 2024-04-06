@@ -180,7 +180,7 @@ pub(crate) fn vst_rewriter_wp_move_assertion(
                 // prev is if-else. For each branch, insert assertion
                 // recursively insert for nested if-else
                 Expr::IfExpr(_if_expr) => {
-                    let cb = |exp: &mut Expr| {
+                    let mut cb = |exp: &mut Expr| {
                         match exp {
                             Expr::BlockExpr(bb) => {
                                 bb.stmt_list.statements.push(Stmt::from(assertion.clone()));
@@ -189,7 +189,7 @@ pub(crate) fn vst_rewriter_wp_move_assertion(
                         };
                         return Ok::<Expr, String>(exp.clone());
                     };
-                    let new_if_expr = vst_map_expr_visitor(exp.clone(), &cb).ok()?;
+                    let new_if_expr = vst_map_expr_visitor(exp.clone(), &mut cb).ok()?;
                     (new_if_expr.into(), false)
                 }
                 Expr::MatchExpr(match_expr) => {

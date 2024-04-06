@@ -15,10 +15,10 @@ pub fn vst_walk_expr(expr: &vst::Expr, cb: &mut dyn FnMut(vst::Expr)) {
 }
 
 /// Map a VST Node recursively
-pub fn vst_map_expr_visitor<EE, FF>(exp: EE, cb: &FF) -> Result<vst::Expr, String>
+pub fn vst_map_expr_visitor<EE, FF>(exp: EE, cb: &mut FF) -> Result<vst::Expr, String>
 where
     EE: Into<vst::Expr>,
-    FF: Fn(&mut vst::Expr) -> Result<vst::Expr, String>,
+    FF: FnMut(&mut vst::Expr) -> Result<vst::Expr, String>,
 {
     let exp: vst::Expr = exp.into();
     let res = match exp {
@@ -68,10 +68,16 @@ where
             }
             vst::Expr::IfExpr(e)
         }
-        vst::Expr::AssertExpr(mut e) => {
-            let new_exp = vst_map_expr_visitor(*e.expr.clone(), cb)?;
-            e.expr = Box::new(new_exp);
-            vst::Expr::AssertExpr(e)
+        vst::Expr::AssertExpr(_) => {
+            let assert_exp = cb(&mut exp.clone())?;
+            match assert_exp {
+                vst::Expr::AssertExpr(mut e) => {
+                    let new_exp = vst_map_expr_visitor(*e.expr.clone(), cb)?;
+                    e.expr = Box::new(new_exp);
+                    vst::Expr::AssertExpr(e)
+                }
+                _ => panic!(),
+            }
         }
         vst::Expr::BlockExpr(_) => {
             let newbe = cb(&mut exp.clone())?;
