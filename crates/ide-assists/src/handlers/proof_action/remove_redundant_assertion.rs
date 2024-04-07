@@ -147,6 +147,38 @@ fn main() {}
 
 
     #[test]
+    fn remove_multiple() {
+        check_assist(
+            remove_dead_assertions,
+            "
+use vstd::prelude::*;
+pr$0oof fn foo(x: nat) 
+    ensures 
+        x >= 0,
+{ 
+    assert(x >= 0);
+    assert(x + x >= 0);
+    assert(x * x >= 0) by (nonlinear_arith);
+    assert(x + 3 >= 3);
+}
+
+fn main() {}
+",
+            "
+use vstd::prelude::*;
+proof fn foo(x: nat)
+    ensures
+        x >= 0,
+{
+}
+
+
+fn main() {}
+",
+        )
+    }
+
+    #[test]
     fn preserve_necessary() {
         check_assist(
             remove_dead_assertions,
