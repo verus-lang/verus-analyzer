@@ -73,7 +73,12 @@ fn dist_client(
     Ok(())
 }
 
-fn dist_server(sh: &Shell, release: &str, target: &Target, proof_action: bool) -> anyhow::Result<()> {
+fn dist_server(
+    sh: &Shell,
+    release: &str,
+    target: &Target,
+    proof_action: bool,
+) -> anyhow::Result<()> {
     let _e = sh.push_env("CFG_RELEASE", release);
     let _e = sh.push_env("CARGO_PROFILE_RELEASE_LTO", "thin");
 
@@ -92,7 +97,6 @@ fn dist_server(sh: &Shell, release: &str, target: &Target, proof_action: bool) -
     } else {
         cmd!(sh, "cargo build --manifest-path ./crates/rust-analyzer/Cargo.toml --bin rust-analyzer --target {target_name} --release").run()?;
     }
-    
 
     let dst = Path::new("dist").join(&target.artifact_name);
     gzip(&target.server_path, &dst.with_extension("gz"))?;
@@ -164,7 +168,13 @@ impl Target {
                 } else if cfg!(target_os = "windows") {
                     "x86_64-pc-windows-msvc".to_string()
                 } else if cfg!(target_os = "macos") {
-                    "x86_64-apple-darwin".to_string()
+                    if cfg!(target_arch = "x86_64") {
+                        "x86_64-apple-darwin".to_string()
+                    } else if cfg!(target_arch = "aarch64") {
+                        "aarch64-apple-darwin".to_string()
+                    } else {
+                        panic!("Unsupported architecture, maybe try setting RA_TARGET")
+                    }
                 } else {
                     panic!("Unsupported OS, maybe try setting RA_TARGET")
                 }
