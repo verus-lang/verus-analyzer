@@ -743,6 +743,7 @@ pub struct LoopExpr {
 impl ast::HasAttrs for LoopExpr {}
 impl ast::HasLoopBody for LoopExpr {}
 impl LoopExpr {
+    pub fn loop_clauses(&self) -> AstChildren<LoopClause> { support::children(&self.syntax) }
     pub fn loop_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![loop]) }
 }
 

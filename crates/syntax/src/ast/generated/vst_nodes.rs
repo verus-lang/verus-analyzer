@@ -517,6 +517,7 @@ pub struct LoopExpr {
     pub attrs: Vec<Attr>,
     pub label: Option<Box<Label>>,
     pub loop_body: Box<BlockExpr>,
+    pub loop_clauses: Vec<LoopClause>,
     pub loop_token: bool,
     pub cst: Option<super::nodes::LoopExpr>,
 }
@@ -2696,6 +2697,11 @@ impl TryFrom<super::nodes::LoopExpr> for LoopExpr {
                     .ok_or(format!("{}", stringify!(loop_body)))
                     .map(|it| BlockExpr::try_from(it))??,
             ),
+            loop_clauses: item
+                .loop_clauses()
+                .into_iter()
+                .map(LoopClause::try_from)
+                .collect::<Result<Vec<LoopClause>, String>>()?,
             loop_token: item.loop_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -6294,6 +6300,9 @@ impl std::fmt::Display for LoopExpr {
         }
         s.push_str(&self.loop_body.to_string());
         s.push_str(" ");
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.loop_token {
             let mut tmp = stringify!(loop_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -9873,6 +9882,7 @@ impl LoopExpr {
             attrs: vec![],
             label: None,
             loop_body: Box::new(loop_body),
+            loop_clauses: vec![],
             loop_token: true,
             cst: None,
         }

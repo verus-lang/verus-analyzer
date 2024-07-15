@@ -1553,6 +1553,43 @@ pub fn clone_vec_u8() {
 }
 
 
+#[test]
+fn verus_loops() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn test() {
+    loop
+        invariant
+            x > 0,
+    {
+        x += 1;
+    }
+}
+
+fn test() {
+    loop
+        invariant
+            false,
+        ensures
+            next_idx + count <= 512,
+    {
+        x
+    }
+}
+    }";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+
 
 // TODO: Restore once we have while loops in a better state
 #[ignore]

@@ -506,7 +506,7 @@ IfExpr =
   ('else' else_branch:(IfExpr | BlockExpr))?
 
 LoopExpr =
-  Attr* Label? 'loop'
+  Attr* Label? 'loop' LoopClause*
   loop_body:BlockExpr
 
 ForExpr =
