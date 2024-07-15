@@ -510,7 +510,7 @@ LoopExpr =
   loop_body:BlockExpr
 
 ForExpr =
-  Attr* Label? 'for' Pat 'in' iterable:Expr
+  Attr* Label? 'for' Pat 'in' (iter_name:Name ':')? iterable:Expr LoopClause*
   loop_body:BlockExpr
 
 // verus: invariantclause, decreasesclause

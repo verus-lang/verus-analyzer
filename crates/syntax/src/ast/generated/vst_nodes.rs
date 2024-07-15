@@ -347,9 +347,12 @@ pub struct FnPtrType {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForExpr {
     pub attrs: Vec<Attr>,
+    pub iter_name: Option<Box<Name>>,
     pub label: Option<Box<Label>>,
     pub loop_body: Box<BlockExpr>,
+    pub loop_clauses: Vec<LoopClause>,
     pub pat: Option<Box<Pat>>,
+    pub colon_token: bool,
     pub for_token: bool,
     pub in_token: bool,
     pub cst: Option<super::nodes::ForExpr>,
@@ -2288,6 +2291,10 @@ impl TryFrom<super::nodes::ForExpr> for ForExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            iter_name: match item.iter_name() {
+                Some(it) => Some(Box::new(Name::try_from(it)?)),
+                None => None,
+            },
             label: match item.label() {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
                 None => None,
@@ -2297,10 +2304,16 @@ impl TryFrom<super::nodes::ForExpr> for ForExpr {
                     .ok_or(format!("{}", stringify!(loop_body)))
                     .map(|it| BlockExpr::try_from(it))??,
             ),
+            loop_clauses: item
+                .loop_clauses()
+                .into_iter()
+                .map(LoopClause::try_from)
+                .collect::<Result<Vec<LoopClause>, String>>()?,
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
+            colon_token: item.colon_token().is_some(),
             for_token: item.for_token().is_some(),
             in_token: item.in_token().is_some(),
             cst: Some(item.clone()),
@@ -5814,14 +5827,27 @@ impl std::fmt::Display for ForExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if let Some(it) = &self.iter_name {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.label {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
         s.push_str(&self.loop_body.to_string());
         s.push_str(" ");
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if let Some(it) = &self.pat {
             s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.for_token {
@@ -9696,9 +9722,12 @@ impl ForExpr {
     pub fn new(loop_body: BlockExpr) -> Self {
         Self {
             attrs: vec![],
+            iter_name: None,
             label: None,
             loop_body: Box::new(loop_body),
+            loop_clauses: vec![],
             pat: None,
+            colon_token: false,
             for_token: true,
             in_token: true,
             cst: None,

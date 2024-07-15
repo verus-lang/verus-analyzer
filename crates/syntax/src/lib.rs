@@ -1592,7 +1592,6 @@ fn test() {
 
 
 // TODO: Restore once we have while loops in a better state
-#[ignore]
 #[test]
 fn verus_for_loops() {
     use ast::HasModuleItem;
