@@ -743,10 +743,13 @@ EnsuresClause =
   'ensures' (Expr (',' Expr)* ','?)
 
 LoopClause =
-  InvariantClause | EnsuresClause | DecreasesClause
+  InvariantExceptBreakClause | InvariantClause | EnsuresClause | DecreasesClause
 
 InvariantClause =
   'invariant' (Expr (',' Expr)* ','?)
+
+InvariantExceptBreakClause =
+  'invariant_except_break' (Expr (',' Expr)* ','?)
 
 RecommendsClause =
   'recommends' (Expr (',' Expr)* ','?) ('via' Expr)?

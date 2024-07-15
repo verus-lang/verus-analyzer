@@ -439,6 +439,12 @@ pub struct InvariantClause {
     pub cst: Option<super::nodes::InvariantClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InvariantExceptBreakClause {
+    pub exprs: Vec<Expr>,
+    pub invariant_except_break_token: bool,
+    pub cst: Option<super::nodes::InvariantExceptBreakClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemList {
     pub attrs: Vec<Attr>,
     pub items: Vec<Item>,
@@ -1394,6 +1400,7 @@ pub enum LoopClause {
     DecreasesClause(Box<DecreasesClause>),
     EnsuresClause(Box<EnsuresClause>),
     InvariantClause(Box<InvariantClause>),
+    InvariantExceptBreakClause(Box<InvariantExceptBreakClause>),
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pat {
@@ -2486,6 +2493,20 @@ impl TryFrom<super::nodes::InvariantClause> for InvariantClause {
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
             invariant_token: item.invariant_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::InvariantExceptBreakClause> for InvariantExceptBreakClause {
+    type Error = String;
+    fn try_from(item: super::nodes::InvariantExceptBreakClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            exprs: item
+                .exprs()
+                .into_iter()
+                .map(Expr::try_from)
+                .collect::<Result<Vec<Expr>, String>>()?,
+            invariant_except_break_token: item.invariant_except_break_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4747,6 +4768,9 @@ impl TryFrom<super::nodes::LoopClause> for LoopClause {
             super::nodes::LoopClause::InvariantClause(it) => {
                 Ok(Self::InvariantClause(Box::new(it.try_into()?)))
             }
+            super::nodes::LoopClause::InvariantExceptBreakClause(it) => {
+                Ok(Self::InvariantExceptBreakClause(Box::new(it.try_into()?)))
+            }
         }
     }
 }
@@ -6059,6 +6083,19 @@ impl std::fmt::Display for InvariantClause {
         s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.invariant_token {
             let mut tmp = stringify!(invariant_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for InvariantExceptBreakClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.invariant_except_break_token {
+            let mut tmp = stringify!(invariant_except_break_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8590,6 +8627,7 @@ impl std::fmt::Display for LoopClause {
             LoopClause::DecreasesClause(it) => write!(f, "{}", it.to_string()),
             LoopClause::EnsuresClause(it) => write!(f, "{}", it.to_string()),
             LoopClause::InvariantClause(it) => write!(f, "{}", it.to_string()),
+            LoopClause::InvariantExceptBreakClause(it) => write!(f, "{}", it.to_string()),
         }
     }
 }
@@ -8829,6 +8867,9 @@ impl LoopClause {
             }
             LoopClause::InvariantClause(it) => {
                 Some(super::nodes::LoopClause::InvariantClause(it.cst.as_ref()?.clone()))
+            }
+            LoopClause::InvariantExceptBreakClause(it) => {
+                Some(super::nodes::LoopClause::InvariantExceptBreakClause(it.cst.as_ref()?.clone()))
             }
         }
     }
@@ -9134,6 +9175,11 @@ impl From<EnsuresClause> for LoopClause {
 }
 impl From<InvariantClause> for LoopClause {
     fn from(item: InvariantClause) -> Self { LoopClause::InvariantClause(Box::new(item)) }
+}
+impl From<InvariantExceptBreakClause> for LoopClause {
+    fn from(item: InvariantExceptBreakClause) -> Self {
+        LoopClause::InvariantExceptBreakClause(Box::new(item))
+    }
 }
 impl From<BoxPat> for Pat {
     fn from(item: BoxPat) -> Self { Pat::BoxPat(Box::new(item)) }
@@ -9744,6 +9790,9 @@ impl InferType {
 }
 impl InvariantClause {
     pub fn new() -> Self { Self { exprs: vec![], invariant_token: true, cst: None } }
+}
+impl InvariantExceptBreakClause {
+    pub fn new() -> Self { Self { exprs: vec![], invariant_except_break_token: true, cst: None } }
 }
 impl ItemList {
     pub fn new() -> Self {

@@ -282,6 +282,38 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ENSURES_CLAUSE)
 }
 
+pub(crate) fn invariants_except_break(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![invariant_except_break]);
+    expressions::expr_no_struct(p);
+
+    while !p.at(EOF) && !p.at(T![decreases]) && !p.at(T!['{']) && !p.at(T![;]) {
+        if p.at(T![invariant]) || p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
+            break;
+        }
+        if p.at(T![,]) {
+            if p.nth_at(1, T![recommends])
+                || p.nth_at(1, T![invariant])
+                || p.nth_at(1, T![ensures])
+                || p.nth_at(1, T![decreases])
+                || p.nth_at(1, T!['{'])
+            {
+                break;
+            } else {
+                comma_cond(p);
+            }
+        } else {
+            dbg!("invariant_except_breakss parse error");
+            p.error("TODO: please add COMMA after each invariant_except_break clause.");
+            return m.complete(p, ERROR);
+        }
+    }
+    if p.at(T![,]) {
+        p.expect(T![,]);
+    }
+    m.complete(p, INVARIANT_EXCEPT_BREAK_CLAUSE)
+}
+
 pub(crate) fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(T![invariant]);

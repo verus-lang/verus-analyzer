@@ -25,6 +25,7 @@ For example, inside `verus/dependencies/syn/src/items.rs`, refer to `impl parse 
 Inside the `crates` directory, we need to modify several crates, but most changes will be made on the `parser` and `syntax` crates.
 
 1. Update `syntax/rust.ungram` with the new syntax. Also, update `xtask/src/codegen/grammar/ast_src.rs` for newly introduced tokens if there are any. 
+  - In particular, you will need to update the `keywords` list for new keywords to be available
 
 2. Run `cargo xtask codegen grammar` to  auto-generate `crates/syntax/ast/generated/*` and `crates/parser/src/syntax_kind/generated.rs` files.
   - This relies on these files `xtask/src/codegen/grammar/{ast_src.rs,sourcegen_vst.rs}` 

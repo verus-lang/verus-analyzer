@@ -1525,6 +1525,8 @@ fn verus_while_loops() {
 pub fn clone_vec_u8() {
     let i = 0;
     while i < v.len()
+        invariant_except_break
+            i <= v.len(),
         invariant
             i <= v.len(),
             i == out.len(),

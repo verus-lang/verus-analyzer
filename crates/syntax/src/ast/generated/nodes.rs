@@ -623,6 +623,17 @@ impl InvariantClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InvariantExceptBreakClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl InvariantExceptBreakClause {
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+    pub fn invariant_except_break_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![invariant_except_break])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1932,6 +1943,7 @@ pub enum LoopClause {
     DecreasesClause(DecreasesClause),
     EnsuresClause(EnsuresClause),
     InvariantClause(InvariantClause),
+    InvariantExceptBreakClause(InvariantExceptBreakClause),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2584,6 +2596,17 @@ impl AstNode for InferType {
 }
 impl AstNode for InvariantClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for InvariantExceptBreakClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_EXCEPT_BREAK_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4332,15 +4355,26 @@ impl From<EnsuresClause> for LoopClause {
 impl From<InvariantClause> for LoopClause {
     fn from(node: InvariantClause) -> LoopClause { LoopClause::InvariantClause(node) }
 }
+impl From<InvariantExceptBreakClause> for LoopClause {
+    fn from(node: InvariantExceptBreakClause) -> LoopClause {
+        LoopClause::InvariantExceptBreakClause(node)
+    }
+}
 impl AstNode for LoopClause {
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, DECREASES_CLAUSE | ENSURES_CLAUSE | INVARIANT_CLAUSE)
+        matches!(
+            kind,
+            DECREASES_CLAUSE | ENSURES_CLAUSE | INVARIANT_CLAUSE | INVARIANT_EXCEPT_BREAK_CLAUSE
+        )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             DECREASES_CLAUSE => LoopClause::DecreasesClause(DecreasesClause { syntax }),
             ENSURES_CLAUSE => LoopClause::EnsuresClause(EnsuresClause { syntax }),
             INVARIANT_CLAUSE => LoopClause::InvariantClause(InvariantClause { syntax }),
+            INVARIANT_EXCEPT_BREAK_CLAUSE => {
+                LoopClause::InvariantExceptBreakClause(InvariantExceptBreakClause { syntax })
+            }
             _ => return None,
         };
         Some(res)
@@ -4350,6 +4384,7 @@ impl AstNode for LoopClause {
             LoopClause::DecreasesClause(it) => &it.syntax,
             LoopClause::EnsuresClause(it) => &it.syntax,
             LoopClause::InvariantClause(it) => &it.syntax,
+            LoopClause::InvariantExceptBreakClause(it) => &it.syntax,
         }
     }
 }
@@ -5166,6 +5201,11 @@ impl std::fmt::Display for InferType {
     }
 }
 impl std::fmt::Display for InvariantClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for InvariantExceptBreakClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

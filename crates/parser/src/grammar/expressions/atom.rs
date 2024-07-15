@@ -444,6 +444,9 @@ fn while_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     expr_no_struct(p);
 
     // verus
+    if p.at(T![invariant_except_break]) {
+        verus::invariants_except_break(p);
+    }
     if p.at(T![invariant]) {
         verus::invariants(p);
     }
