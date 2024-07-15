@@ -119,7 +119,7 @@ Please set only one of `rust-analyzer.checkOnSave.overrideCommand` and `rust-ana
 ## Functionalities and Details
 
 ### 1.Syntax
-We extended rust-analyzer's grammar for Verus-specific syntax. This custom rust-analyzer highlights reserved Verus keywords (e.g., `spec`, `proof`, `requires`, `ensures`). If a user types `proof` instead of `proof`, a syntax error will be generated for it.
+We extended rust-analyzer's grammar for Verus-specific syntax. This custom rust-analyzer highlights reserved Verus keywords (e.g., `spec`, `proof`, `requires`, `ensures`). If a user types `prof` instead of `proof`, a syntax error will be generated.
 
 
 ### 2.IDE functionalities
@@ -130,9 +130,9 @@ You can find more documents for IDE functionalities on the following links.
 - [Hover](https://rust-analyzer.github.io/manual.html#hover)
 
 #### 2.1 TODOs for IDE functionalities
-- Code scanning is incomplete for Verus-specific items. To be specific, requires/ensures/decreases/invariant/assert-by-block/assert-forall-block are not fully scanned for IDE purposes.(e.g., might not be able to "goto definition" of the function used in requires/ensures, "find all references" might omit occurrences inside requires/ensures)
+- Code scanning is incomplete for Verus-specific items. To be specific, requires/ensures/decreases/invariant/assert-by-block/assert-forall-block are not fully scanned for IDE purposes (e.g., might not be able to "goto definition" of the function used in requires/ensures, "find all references" might omit occurrences inside requires/ensures).
 
-- Although Verus' custom operators are parsed, those are not registered for IDE purposes. For example, type inference around those operators might not work. (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are boolean)
+- Although Verus' custom operators are parsed, thye are not registered for IDE purposes. For example, type inference around such operators might not work. (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are Boolean).
 
 - `builtin` and `vstd` are not scanned. For example, the builtin types like `int` and `nat` could be shown as `unknown`. Auto completion for `vstd` might not work.
 
@@ -150,10 +150,10 @@ You can find more documents for IDE functionalities on the following links.
 - `rust-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
 - `Developer: Reload Window` can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
 - Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in the workspace setting can disable the syntax error messages in VS Code. You could also add `unresolved-module` to the above list to disable the error message for unresolved modules.
-- There is no proper support for `buildin`/`vstd`. However, at `Cargo.toml` in your project, adding `vstd` in `dependencices` or `dev-dependencies` might make verus-analyzer scan `vstd` and `builtin`. For example,
+- There is no proper support for `buildin`/`vstd`. However, in your project's `Cargo.toml` file, you can add `vstd` in `dependencices` or `dev-dependencies`, which might make verus-analyzer scan `vstd` and `builtin`. For example,
 ```
 [dependencies]
-vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are at the same directory
+vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in the same directory
 ```
 
 
