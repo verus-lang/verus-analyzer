@@ -1261,10 +1261,9 @@ pub struct WherePred {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WhileExpr {
     pub attrs: Vec<Attr>,
-    pub decreases_clause: Option<Box<DecreasesClause>>,
-    pub invariant_clause: Option<Box<InvariantClause>>,
     pub label: Option<Box<Label>>,
     pub loop_body: Box<BlockExpr>,
+    pub loop_clauses: Vec<LoopClause>,
     pub while_token: bool,
     pub cst: Option<super::nodes::WhileExpr>,
 }
@@ -1389,6 +1388,12 @@ pub enum Item {
     Union(Box<Union>),
     Use(Box<Use>),
     VerusGlobal(Box<VerusGlobal>),
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LoopClause {
+    DecreasesClause(Box<DecreasesClause>),
+    EnsuresClause(Box<EnsuresClause>),
+    InvariantClause(Box<InvariantClause>),
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pat {
@@ -4503,14 +4508,6 @@ impl TryFrom<super::nodes::WhileExpr> for WhileExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            decreases_clause: match item.decreases_clause() {
-                Some(it) => Some(Box::new(DecreasesClause::try_from(it)?)),
-                None => None,
-            },
-            invariant_clause: match item.invariant_clause() {
-                Some(it) => Some(Box::new(InvariantClause::try_from(it)?)),
-                None => None,
-            },
             label: match item.label() {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
                 None => None,
@@ -4520,6 +4517,11 @@ impl TryFrom<super::nodes::WhileExpr> for WhileExpr {
                     .ok_or(format!("{}", stringify!(loop_body)))
                     .map(|it| BlockExpr::try_from(it))??,
             ),
+            loop_clauses: item
+                .loop_clauses()
+                .into_iter()
+                .map(LoopClause::try_from)
+                .collect::<Result<Vec<LoopClause>, String>>()?,
             while_token: item.while_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4729,6 +4731,22 @@ impl TryFrom<super::nodes::Item> for Item {
             super::nodes::Item::Union(it) => Ok(Self::Union(Box::new(it.try_into()?))),
             super::nodes::Item::Use(it) => Ok(Self::Use(Box::new(it.try_into()?))),
             super::nodes::Item::VerusGlobal(it) => Ok(Self::VerusGlobal(Box::new(it.try_into()?))),
+        }
+    }
+}
+impl TryFrom<super::nodes::LoopClause> for LoopClause {
+    type Error = String;
+    fn try_from(item: super::nodes::LoopClause) -> Result<Self, Self::Error> {
+        match item {
+            super::nodes::LoopClause::DecreasesClause(it) => {
+                Ok(Self::DecreasesClause(Box::new(it.try_into()?)))
+            }
+            super::nodes::LoopClause::EnsuresClause(it) => {
+                Ok(Self::EnsuresClause(Box::new(it.try_into()?)))
+            }
+            super::nodes::LoopClause::InvariantClause(it) => {
+                Ok(Self::InvariantClause(Box::new(it.try_into()?)))
+            }
         }
     }
 }
@@ -8370,20 +8388,15 @@ impl std::fmt::Display for WhileExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.decreases_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.invariant_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.label {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
         s.push_str(&self.loop_body.to_string());
         s.push_str(" ");
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.while_token {
             let mut tmp = stringify!(while_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8568,6 +8581,15 @@ impl std::fmt::Display for Item {
             Item::Union(it) => write!(f, "{}", it.to_string()),
             Item::Use(it) => write!(f, "{}", it.to_string()),
             Item::VerusGlobal(it) => write!(f, "{}", it.to_string()),
+        }
+    }
+}
+impl std::fmt::Display for LoopClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LoopClause::DecreasesClause(it) => write!(f, "{}", it.to_string()),
+            LoopClause::EnsuresClause(it) => write!(f, "{}", it.to_string()),
+            LoopClause::InvariantClause(it) => write!(f, "{}", it.to_string()),
         }
     }
 }
@@ -8792,6 +8814,21 @@ impl Item {
             Item::Use(it) => Some(super::nodes::Item::Use(it.cst.as_ref()?.clone())),
             Item::VerusGlobal(it) => {
                 Some(super::nodes::Item::VerusGlobal(it.cst.as_ref()?.clone()))
+            }
+        }
+    }
+}
+impl LoopClause {
+    pub fn cst(&self) -> Option<super::nodes::LoopClause> {
+        match self {
+            LoopClause::DecreasesClause(it) => {
+                Some(super::nodes::LoopClause::DecreasesClause(it.cst.as_ref()?.clone()))
+            }
+            LoopClause::EnsuresClause(it) => {
+                Some(super::nodes::LoopClause::EnsuresClause(it.cst.as_ref()?.clone()))
+            }
+            LoopClause::InvariantClause(it) => {
+                Some(super::nodes::LoopClause::InvariantClause(it.cst.as_ref()?.clone()))
             }
         }
     }
@@ -9088,6 +9125,15 @@ impl From<Use> for Item {
 }
 impl From<VerusGlobal> for Item {
     fn from(item: VerusGlobal) -> Self { Item::VerusGlobal(Box::new(item)) }
+}
+impl From<DecreasesClause> for LoopClause {
+    fn from(item: DecreasesClause) -> Self { LoopClause::DecreasesClause(Box::new(item)) }
+}
+impl From<EnsuresClause> for LoopClause {
+    fn from(item: EnsuresClause) -> Self { LoopClause::EnsuresClause(Box::new(item)) }
+}
+impl From<InvariantClause> for LoopClause {
+    fn from(item: InvariantClause) -> Self { LoopClause::InvariantClause(Box::new(item)) }
 }
 impl From<BoxPat> for Pat {
     fn from(item: BoxPat) -> Self { Pat::BoxPat(Box::new(item)) }
@@ -10557,10 +10603,9 @@ impl WhileExpr {
     pub fn new(loop_body: BlockExpr) -> Self {
         Self {
             attrs: vec![],
-            decreases_clause: None,
-            invariant_clause: None,
             label: None,
             loop_body: Box::new(loop_body),
+            loop_clauses: vec![],
             while_token: true,
             cst: None,
         }

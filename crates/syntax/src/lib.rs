@@ -1519,6 +1519,109 @@ verus!{
 }
 
 #[test]
+fn verus_while_loops() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub fn clone_vec_u8() {
+    let i = 0;
+    while i < v.len()
+        invariant
+            i <= v.len(),
+            i == out.len(),
+            forall |j| #![auto] 0 <= j < i  ==> out@[j] == v@[j],
+        ensures
+            i > 0,
+        decreases
+            72,
+    {
+        i = i + 1;
+    }
+}
+    }";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+
+
+// TODO: Restore once we have while loops in a better state
+#[ignore]
+#[test]
+fn verus_for_loops() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn reverse(v: &mut Vec<u64>)
+    ensures
+        v.len() == old(v).len(),
+        forall|i: int| 0 <= i < old(v).len() ==> v[i] == old(v)[old(v).len() - i - 1],
+{
+    let length = v.len();
+    let ghost v1 = v@;
+    for n in 0..(length / 2)
+        invariant
+            length == v.len(),
+            forall|i: int| 0 <= i < n ==> v[i] == v1[length - i - 1],
+            forall|i: int| 0 <= i < n ==> v1[i] == v[length - i - 1],
+            forall|i: int| n <= i && i + n < length ==> #[trigger] v[i] == v1[i],
+    {
+        let x = v[n];
+        let y = v[length - 1 - n];
+        v.set(n, y);
+        v.set(length - 1 - n, x);
+    }
+}
+
+fn test() {
+    for x in iter: 0..end
+        invariant
+            end == 10,
+    {
+        n += 3;
+    }
+    let x = 2;
+    for x in iter: vec_iter_copy(v)
+        invariant
+            b <==> (forall|i: int| 0 <= i < iter.cur ==> v[i] > 0),
+    {
+        b = b && x > 0;
+    }
+    let y = 3;
+    for x in iter: 0..({
+        let z = end;
+        non_spec();
+        z
+    })
+        invariant
+            n == iter.cur * 3,
+            end == 10,
+    {
+        n += 3;
+        end = end + 0;  // causes end to be non-constant
+    }
+}
+    }";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+
+#[test]
 fn cst_to_vst1() {
     use ast::HasModuleItem;
     let source_code = "

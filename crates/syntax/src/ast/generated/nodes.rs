@@ -1773,8 +1773,7 @@ pub struct WhileExpr {
 }
 impl ast::HasAttrs for WhileExpr {}
 impl WhileExpr {
-    pub fn decreases_clause(&self) -> Option<DecreasesClause> { support::child(&self.syntax) }
-    pub fn invariant_clause(&self) -> Option<InvariantClause> { support::child(&self.syntax) }
+    pub fn loop_clauses(&self) -> AstChildren<LoopClause> { support::children(&self.syntax) }
     pub fn while_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![while]) }
 }
 
@@ -1927,6 +1926,13 @@ pub enum Item {
     VerusGlobal(VerusGlobal),
 }
 impl ast::HasAttrs for Item {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LoopClause {
+    DecreasesClause(DecreasesClause),
+    EnsuresClause(EnsuresClause),
+    InvariantClause(InvariantClause),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pat {
@@ -4317,6 +4323,36 @@ impl AstNode for Item {
         }
     }
 }
+impl From<DecreasesClause> for LoopClause {
+    fn from(node: DecreasesClause) -> LoopClause { LoopClause::DecreasesClause(node) }
+}
+impl From<EnsuresClause> for LoopClause {
+    fn from(node: EnsuresClause) -> LoopClause { LoopClause::EnsuresClause(node) }
+}
+impl From<InvariantClause> for LoopClause {
+    fn from(node: InvariantClause) -> LoopClause { LoopClause::InvariantClause(node) }
+}
+impl AstNode for LoopClause {
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, DECREASES_CLAUSE | ENSURES_CLAUSE | INVARIANT_CLAUSE)
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            DECREASES_CLAUSE => LoopClause::DecreasesClause(DecreasesClause { syntax }),
+            ENSURES_CLAUSE => LoopClause::EnsuresClause(EnsuresClause { syntax }),
+            INVARIANT_CLAUSE => LoopClause::InvariantClause(InvariantClause { syntax }),
+            _ => return None,
+        };
+        Some(res)
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            LoopClause::DecreasesClause(it) => &it.syntax,
+            LoopClause::EnsuresClause(it) => &it.syntax,
+            LoopClause::InvariantClause(it) => &it.syntax,
+        }
+    }
+}
 impl From<BoxPat> for Pat {
     fn from(node: BoxPat) -> Pat { Pat::BoxPat(node) }
 }
@@ -4855,6 +4891,11 @@ impl std::fmt::Display for GenericParam {
     }
 }
 impl std::fmt::Display for Item {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for LoopClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

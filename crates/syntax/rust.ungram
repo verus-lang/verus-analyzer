@@ -515,7 +515,7 @@ ForExpr =
 
 // verus: invariantclause, decreasesclause
 WhileExpr =
-  Attr* Label? 'while' condition:Expr InvariantClause? DecreasesClause?
+  Attr* Label? 'while' condition:Expr LoopClause*
   loop_body:BlockExpr
 
 Label =
@@ -741,6 +741,9 @@ RequiresClause =
 
 EnsuresClause =
   'ensures' (Expr (',' Expr)* ','?)
+
+LoopClause =
+  InvariantClause | EnsuresClause | DecreasesClause
 
 InvariantClause =
   'invariant' (Expr (',' Expr)* ','?)

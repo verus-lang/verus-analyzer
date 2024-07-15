@@ -447,6 +447,9 @@ fn while_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     if p.at(T![invariant]) {
         verus::invariants(p);
     }
+    if p.at(T![ensures]) {
+        verus::ensures(p);
+    }
     if p.at(T![decreases]) {
         verus::decreases(p);
     }

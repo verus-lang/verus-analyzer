@@ -277,6 +277,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "ENSURES_CLAUSE",
         "DECREASES_CLAUSE",
         "RECOMMENDS_CLAUSE",
+        "LOOP_CLAUSE",
         "INVARIANT_CLAUSE",
         "ASSERT_EXPR",
         "ASSERT_FORALL_EXPR",
