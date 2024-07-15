@@ -30,8 +30,8 @@ This step is dependent on your operating system.
 
 #### MacOS:
 ```bash
-$ gunzip ./dist/verus-analyzer-x86_64-apple-darwin.gz
-$ chmod +x ./dist/verus-analyzer-x86_64-apple-darwin
+$ gunzip ./dist/verus-analyzer-aarch64-apple-darwin.gz
+$ chmod +x ./dist/verus-analyzer-aarch64-apple-darwin
 ```
 
 #### Linux:
@@ -171,8 +171,8 @@ of the extra flag used in step 3.
 1. Clone the repository: `git clone https://github.com/verus-lang/verus-analyzer.git`
 2. `cd verus-analyzer`
 3. Compile the rust-analyzer binary: `cargo xtask dist --proof-action`
-4. Unzip the generated file (e.g., `gunzip ./dist/verus-analyzer-x86_64-apple-darwin.gz`)
-5. Make it executable (e.g., `chmod +x ./dist/verus-analyzer-x86_64-apple-darwin`)
+4. Unzip the generated file (e.g., `gunzip ./dist/verus-analyzer-aarch64-apple-darwin.gz`)
+5. Make it executable (e.g., `chmod +x ./dist/verus-analyzer-aarch64-apple-darwin`)
 
 
 ### Prerequisites
