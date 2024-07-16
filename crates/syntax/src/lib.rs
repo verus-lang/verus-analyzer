@@ -1658,6 +1658,26 @@ fn test() {
     }
 }
 
+#[test]
+fn verus_broadcast() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+    broadcast proof fn property() { }
+    pub broadcast proof fn property() { }
+
+}
+    }";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
 
 #[test]
 fn cst_to_vst1() {

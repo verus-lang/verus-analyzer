@@ -109,6 +109,8 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "when",
         "trigger",
         "global",
+        "broadcast",
+        "group",
     ],
     contextual_keywords: &[
         "auto",
@@ -293,6 +295,12 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "SIGNATURE_DECREASES",
         "TRIGGER_ATTRIBUTE",
         "VERUS_GLOBAL",
+        "BROADCAST_USE_LIST",
+        "BROADCAST_USE",
+        "BROADCAST_GROUP_IDENTIFIER",
+        "BROADCAST_GROUP_MEMBER",
+        "BROADCAST_GROUP_LIST",
+        "BROADCAST_GROUP",
     ],
 };
 

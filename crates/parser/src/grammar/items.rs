@@ -450,7 +450,7 @@ Keep the parsing order consistent with the ungrammar file
 this `fn_` function parses from the `fn` keyword
 Fn =
     Attr* Visibility? Publish?
-    'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+    'default'? 'const'? 'async'? 'unsafe'? Abi? 'broadcast'? FnMode?
     'fn' Name GenericParamList? ParamList RetType? WhereClause? RequiresClause? EnsuresClause?
     (body:BlockExpr | ';')
 */
