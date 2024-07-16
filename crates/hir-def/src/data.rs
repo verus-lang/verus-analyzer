@@ -763,6 +763,12 @@ impl<'a> AssocItemCollector<'a> {
             AssocItem::VerusGlobal(_id) => {
                 todo!()
             }
+            AssocItem::BroadcastGroup(_id) => {
+                todo!()
+            }
+            AssocItem::BroadcastUse(_id) => {
+                todo!()
+            }
         }
     }
 
