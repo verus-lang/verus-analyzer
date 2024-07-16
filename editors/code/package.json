@@ -1,7 +1,7 @@
 {
     "name": "verus-analyzer",
     "displayName": "verus-analyzer",
-    "description": "Rust language support for Visual Studio Code",
+    "description": "Verus language support for Visual Studio Code",
     "private": true,
     "icon": "icon.png",
     "version": "0.5.0-dev",
@@ -3150,8 +3150,8 @@
         "views": {
             "explorer": [
                 {
-                    "id": "rustDependencies",
-                    "name": "Rust Dependencies",
+                    "id": "verusDependencies",
+                    "name": "Verus Dependencies",
                     "when": "inRustProject && config.verus-analyzer.showDependenciesExplorer"
                 }
             ]

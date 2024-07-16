@@ -123,7 +123,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
         if (this.config.testExplorer) {
             this.testController = vscode.tests.createTestController(
                 "rustAnalyzerTestController",
-                "Rust Analyzer test controller",
+                "Verus Analyzer test controller",
             );
         }
         this.workspace = workspace;
@@ -178,11 +178,11 @@ export class Ctx implements RustAnalyzerExtensionApi {
         }
 
         if (!this.traceOutputChannel) {
-            this.traceOutputChannel = new LazyOutputChannel("Rust Analyzer Language Server Trace");
+            this.traceOutputChannel = new LazyOutputChannel("Verus Analyzer Language Server Trace");
             this.pushExtCleanup(this.traceOutputChannel);
         }
         if (!this.outputChannel) {
-            this.outputChannel = vscode.window.createOutputChannel("Rust Analyzer Language Server");
+            this.outputChannel = vscode.window.createOutputChannel("Verus Analyzer Language Server");
             this.pushExtCleanup(this.outputChannel);
         }
 
@@ -192,7 +192,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     let message = "bootstrap error. ";
 
                     message +=
-                        'See the logs in "OUTPUT > Rust Analyzer Client" (should open automatically). ';
+                        'See the logs in "OUTPUT > Verus Analyzer Client" (should open automatically). ';
                     message +=
                         'To enable verbose logs use { "verus-analyzer.trace.extension": true }';
 

@@ -44,3 +44,9 @@ npx vsce package -o ../../dist/verus-analyzer-aarch64-apple-darwin.vsix --target
 ```
 (updating `aarch64-apple-darwin` as appropriate).
 
+You can install the resulting `.vsix` file from the commandline via:
+```
+code --install-extension /path/to/rust-analyzer.vsix
+```
+Or in VS Code, you can open the Extensions panel, click the '...' button in the upper-right
+portion of the panel, and select "Install from VSIX..."
