@@ -162,7 +162,7 @@ async function getDebugConfiguration(
     }
 
     if (debugConfig.name === "run binary") {
-        // The LSP side: crates\rust-analyzer\src\main_loop\handlers.rs,
+        // The LSP side: crates\verus-analyzer\src\main_loop\handlers.rs,
         // fn to_lsp_runnable(...) with RunnableKind::Bin
         debugConfig.name = `run ${path.basename(executable)}`;
     }

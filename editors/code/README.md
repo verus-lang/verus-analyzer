@@ -1,7 +1,7 @@
-# rust-analyzer
+# verus-analyzer
 
-This extension provides support for the [Rust programming language](https://www.rust-lang.org/).
-It is recommended over and replaces `rust-lang.rust`.
+This extension provides support for the [Verus programming language](https://github.com/verus-lang/verus).
+It is derived from [rust-analyzer](https://rust-analyzer.github.io/)
 
 ## Features
 
@@ -32,21 +32,21 @@ It is recommended over and replaces `rust-lang.rust`.
 ## Quick start
 
 1. Install [rustup].
-2. Install the [rust-analyzer extension].
+2. Install the [verus-analyzer extension].
 
 [rustup]: https://rustup.rs
-[rust-analyzer extension]: https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer
+[verus-analyzer extension]: https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer
 
 ## Configuration
 
-This extension provides configurations through VSCode's configuration settings. All configurations are under `rust-analyzer.*`.
+This extension provides configurations through VSCode's configuration settings. All configurations are under `verus-analyzer.*`.
 
-See [the manual](https://rust-analyzer.github.io/manual.html#vs-code-2) for more information on VSCode specific configurations.
+See [the Rust analyzer manual](https://rust-analyzer.github.io/manual.html#vs-code-2) for more information on VSCode specific configurations.
 
 ## Communication
 
-For usage and troubleshooting requests, please use the ["IDEs and Editors" category of the Rust forum](https://users.rust-lang.org/c/ide/14).
+For usage and troubleshooting requests, please use the [Verus Zulip](https://verus-lang.zulipchat.com/).
 
 ## Documentation
 
-See [rust-analyzer.github.io](https://rust-analyzer.github.io/) for more information.
+See [rust-analyzer.github.io](https://rust-analyzer.github.io/) for more information about the original Rust analyzer.

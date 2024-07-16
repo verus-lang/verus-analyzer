@@ -32,7 +32,7 @@ export async function activate(
     // so we do it ourselves.
     const api = await activateServer(ctx).catch((err) => {
         void vscode.window.showErrorMessage(
-            `Cannot activate rust-analyzer extension: ${err.message}`,
+            `Cannot activate verus-analyzer extension: ${err.message}`,
         );
         throw err;
     });
@@ -197,7 +197,7 @@ function checkConflictingExtensions() {
     if (vscode.extensions.getExtension("rust-lang.rust")) {
         vscode.window
             .showWarningMessage(
-                `You have both the rust-analyzer (rust-lang.rust-analyzer) and Rust (rust-lang.rust) ` +
+                `You have both the verus-analyzer (rust-lang.verus-analyzer) and Rust (rust-lang.rust) ` +
                     "plugins enabled. These are known to conflict and cause various functions of " +
                     "both plugins to not work correctly. You should disable one of them.",
                 "Got it",

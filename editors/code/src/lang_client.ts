@@ -10,7 +10,7 @@ export class RaLanguageClient extends lc.LanguageClient {
         showNotification?: boolean | undefined,
     ): T {
         const showError = vscode.workspace
-            .getConfiguration("rust-analyzer")
+            .getConfiguration("verus-analyzer")
             .get("showRequestFailedErrorNotification");
         if (
             !showError &&

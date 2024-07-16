@@ -26,7 +26,7 @@ export interface JsonProject {
     ///
     /// https://github.com/rust-lang/rust/tree/master/library.
     ///
-    /// If provided, rust-analyzer automatically adds
+    /// If provided, verus-analyzer automatically adds
     /// dependencies on sysroot crates. Conversely,
     /// if you omit this path, you can specify sysroot
     /// dependencies yourself and, for example, have
@@ -60,13 +60,13 @@ export interface Crate {
     ///
     /// Set this to `false` for things like standard
     /// library and 3rd party crates to enable
-    /// performance optimizations (rust-analyzer
+    /// performance optimizations (verus-analyzer
     /// assumes that non-member crates don't change).
     is_workspace_member?: boolean;
     /// Optionally specify the (super)set of `.rs`
     /// files comprising this crate.
     ///
-    /// By default, rust-analyzer assumes that only
+    /// By default, verus-analyzer assumes that only
     /// files under `root_module.parent` can belong
     /// to a crate. `include_dirs` are included
     /// recursively, unless a subdirectory is in
@@ -76,7 +76,7 @@ export interface Crate {
     ///
     /// If two crates share an `.rs` file in common,
     /// they *must* have the same `source`.
-    /// rust-analyzer assumes that files from one
+    /// verus-analyzer assumes that files from one
     /// source can't refer to files in another source.
     source?: {
         include_dirs: string[];

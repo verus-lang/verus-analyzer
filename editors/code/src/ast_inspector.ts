@@ -36,7 +36,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
 
     constructor(ctx: Ctx) {
         ctx.pushExtCleanup(
-            vscode.languages.registerHoverProvider({ scheme: "rust-analyzer" }, this),
+            vscode.languages.registerHoverProvider({ scheme: "verus-analyzer" }, this),
         );
         ctx.pushExtCleanup(vscode.languages.registerDefinitionProvider({ language: "rust" }, this));
         vscode.workspace.onDidCloseTextDocument(
@@ -84,7 +84,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
 
     private findAstTextEditor(): undefined | vscode.TextEditor {
         return vscode.window.visibleTextEditors.find(
-            (it) => it.document.uri.scheme === "rust-analyzer",
+            (it) => it.document.uri.scheme === "verus-analyzer",
         );
     }
 

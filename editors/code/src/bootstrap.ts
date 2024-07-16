@@ -13,8 +13,8 @@ export async function bootstrap(
     const path = await getServer(context, config, state);
     if (!path) {
         throw new Error(
-            "rust-analyzer Language Server is not available. " +
-                "Please, ensure its [proper installation](https://rust-analyzer.github.io/manual.html#installation).",
+            "verus-analyzer Language Server is not available. " +
+                "Please, ensure its [proper installation](https://github.com/verus-lang/verus-analyzer/).",
         );
     }
 
@@ -43,10 +43,10 @@ async function getServer(
         }
         return explicitPath;
     }
-    if (config.package.releaseTag === null) return "rust-analyzer";
+    if (config.package.releaseTag === null) return "verus-analyzer";
 
     const ext = process.platform === "win32" ? ".exe" : "";
-    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `rust-analyzer${ext}`);
+    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `verus-analyzer${ext}`);
     const bundledExists = await vscode.workspace.fs.stat(bundled).then(
         () => true,
         () => false,
@@ -62,10 +62,10 @@ async function getServer(
 
     await vscode.window.showErrorMessage(
         "Unfortunately we don't ship binaries for your platform yet. " +
-            "You need to manually clone the rust-analyzer repository and " +
+            "You need to manually clone the verus-analyzer repository and " +
             "run `cargo xtask install --server` to build the language server from sources. " +
             "If you feel that your platform should be supported, please create an issue " +
-            "about that [here](https://github.com/rust-lang/rust-analyzer/issues) and we " +
+            "about that [here]() and we " +
             "will consider it.",
     );
     return undefined;
@@ -93,7 +93,7 @@ async function getNixOsServer(
     server: vscode.Uri,
 ) {
     await vscode.workspace.fs.createDirectory(config.globalStorageUri).then();
-    const dest = vscode.Uri.joinPath(config.globalStorageUri, `rust-analyzer${ext}`);
+    const dest = vscode.Uri.joinPath(config.globalStorageUri, `verus-analyzer${ext}`);
     let exists = await vscode.workspace.fs.stat(dest).then(
         () => true,
         () => false,
@@ -126,13 +126,13 @@ async function patchelf(dest: vscode.Uri): Promise<void> {
     await vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
-            title: "Patching rust-analyzer for NixOS",
+            title: "Patching verus-analyzer for NixOS",
         },
         async (progress, _) => {
             const expression = `
             {srcStr, pkgs ? import <nixpkgs> {}}:
                 pkgs.stdenv.mkDerivation {
-                    name = "rust-analyzer";
+                    name = "verus-analyzer";
                     src = /. + srcStr;
                     phases = [ "installPhase" "fixupPhase" ];
                     installPhase = "cp $src $out";

@@ -194,7 +194,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     message +=
                         'See the logs in "OUTPUT > Rust Analyzer Client" (should open automatically). ';
                     message +=
-                        'To enable verbose logs use { "rust-analyzer.trace.extension": true }';
+                        'To enable verbose logs use { "verus-analyzer.trace.extension": true }';
 
                     log.error("Bootstrap error", err);
                     throw new Error(message);
@@ -202,7 +202,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             );
             text(spawn(this._serverPath, ["--version"]).stdout.setEncoding("utf-8")).then(
                 (data) => {
-                    const prefix = `rust-analyzer `;
+                    const prefix = `verus-analyzer `;
                     this._serverVersion = data
                         .slice(data.startsWith(prefix) ? prefix.length : 0)
                         .trim();
@@ -223,7 +223,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 debug: run,
             };
 
-            let rawInitializationOptions = vscode.workspace.getConfiguration("rust-analyzer");
+            let rawInitializationOptions = vscode.workspace.getConfiguration("verus-analyzer");
             if (this.config.discoverProjectRunner) {
                 const command = `${this.config.discoverProjectRunner}.discoverWorkspaceCommand`;
                 log.info(`running command: ${command}`);
@@ -422,7 +422,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
         };
 
         for (const [name, factory] of Object.entries(this.commandFactories)) {
-            const fullName = `rust-analyzer.${name}`;
+            const fullName = `verus-analyzer.${name}`;
             let callback;
             if (isClientRunning(this)) {
                 // we asserted that `client` is defined
@@ -432,7 +432,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             } else {
                 callback = () =>
                     vscode.window.showErrorMessage(
-                        `command ${fullName} failed: rust-analyzer server is not running`,
+                        `command ${fullName} failed: verus-analyzer server is not running`,
                     );
             }
 
@@ -459,9 +459,9 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 statusBar.color = undefined;
                 statusBar.backgroundColor = undefined;
                 if (this.config.statusBarClickAction === "stopServer") {
-                    statusBar.command = "rust-analyzer.stopServer";
+                    statusBar.command = "verus-analyzer.stopServer";
                 } else {
-                    statusBar.command = "rust-analyzer.openLogs";
+                    statusBar.command = "verus-analyzer.openLogs";
                 }
                 this.dependencies?.refresh();
                 break;
@@ -470,26 +470,26 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 statusBar.backgroundColor = new vscode.ThemeColor(
                     "statusBarItem.warningBackground",
                 );
-                statusBar.command = "rust-analyzer.openLogs";
+                statusBar.command = "verus-analyzer.openLogs";
                 icon = "$(warning) ";
                 break;
             case "error":
                 statusBar.color = new vscode.ThemeColor("statusBarItem.errorForeground");
                 statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-                statusBar.command = "rust-analyzer.openLogs";
+                statusBar.command = "verus-analyzer.openLogs";
                 icon = "$(error) ";
                 break;
             case "stopped":
                 statusBar.tooltip.appendText("Server is stopped");
                 statusBar.tooltip.appendMarkdown(
-                    "\n\n[Start server](command:rust-analyzer.startServer)",
+                    "\n\n[Start server](command:verus-analyzer.startServer)",
                 );
                 statusBar.color = new vscode.ThemeColor("statusBarItem.warningForeground");
                 statusBar.backgroundColor = new vscode.ThemeColor(
                     "statusBarItem.warningBackground",
                 );
-                statusBar.command = "rust-analyzer.startServer";
-                statusBar.text = "$(stop-circle) rust-analyzer";
+                statusBar.command = "verus-analyzer.startServer";
+                statusBar.text = "$(stop-circle) verus-analyzer";
                 return;
         }
         if (status.message) {
@@ -503,20 +503,20 @@ export class Ctx implements RustAnalyzerExtensionApi {
         statusBar.tooltip.appendMarkdown(
             `[Extension Info](command:analyzer.serverVersion "Show version and server binary info"): Version ${this.version}, Server Version ${this._serverVersion}` +
                 "\n\n---\n\n" +
-                '[$(terminal) Open Logs](command:rust-analyzer.openLogs "Open the server logs")' +
+                '[$(terminal) Open Logs](command:verus-analyzer.openLogs "Open the server logs")' +
                 "\n\n" +
-                `[$(settings) ${toggleCheckOnSave} Check on Save](command:rust-analyzer.toggleCheckOnSave "Temporarily ${toggleCheckOnSave.toLowerCase()} check on save functionality")` +
+                `[$(settings) ${toggleCheckOnSave} Check on Save](command:verus-analyzer.toggleCheckOnSave "Temporarily ${toggleCheckOnSave.toLowerCase()} check on save functionality")` +
                 "\n\n" +
-                '[$(refresh) Reload Workspace](command:rust-analyzer.reloadWorkspace "Reload and rediscover workspaces")' +
+                '[$(refresh) Reload Workspace](command:verus-analyzer.reloadWorkspace "Reload and rediscover workspaces")' +
                 "\n\n" +
-                '[$(symbol-property) Rebuild Build Dependencies](command:rust-analyzer.rebuildProcMacros "Rebuild build scripts and proc-macros")' +
+                '[$(symbol-property) Rebuild Build Dependencies](command:verus-analyzer.rebuildProcMacros "Rebuild build scripts and proc-macros")' +
                 "\n\n" +
-                '[$(stop-circle) Stop server](command:rust-analyzer.stopServer "Stop the server")' +
+                '[$(stop-circle) Stop server](command:verus-analyzer.stopServer "Stop the server")' +
                 "\n\n" +
-                '[$(debug-restart) Restart server](command:rust-analyzer.restartServer "Restart the server")',
+                '[$(debug-restart) Restart server](command:verus-analyzer.restartServer "Restart the server")',
         );
         if (!status.quiescent) icon = "$(loading~spin) ";
-        statusBar.text = `${icon}rust-analyzer`;
+        statusBar.text = `${icon}verus-analyzer`;
     }
 
     pushExtCleanup(d: Disposable) {
