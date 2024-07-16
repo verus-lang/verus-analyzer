@@ -109,7 +109,10 @@ Item =
 | TypeAlias
 | Union
 | Use
-| VerusGlobal // Verus
+// Verus Items
+| VerusGlobal
+| BroadcastGroup
+| BroadcastUse
 
 MacroRules =
   Attr* Visibility?
@@ -151,7 +154,7 @@ UseTreeList =
 // Keep consistent with `verus/dependencies/syn/src/items.rs`, `impl parse for Signature`
 Fn =
  Attr* Visibility? Publish?
- 'default'? 'const'? 'async'? 'unsafe'? Abi? FnMode?
+ 'default'? 'const'? 'async'? 'unsafe'? Abi? 'broadcast'? FnMode?
  'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? SignatureDecreases?
  (body:BlockExpr | ';')
 
@@ -269,6 +272,7 @@ AssocItem =
 | Fn
 | MacroCall
 | TypeAlias
+| BroadcastGroup // Verus
 
 Impl =
   Attr* Visibility?
@@ -323,6 +327,24 @@ Meta =
   'unsafe' '(' Path ('=' Expr | TokenTree)? ')'
 | Path ('=' Expr | TokenTree)?
 
+// Verus broadcasts
+BroadcastUseList =
+  Path (',' Path)* ','?
+  
+BroadcastUse =
+  Attr* 'broadcast' 'use' BroadcastUseList ';'
+
+BroadcastGroupIdentifier =
+  'ident'
+
+BroadcastGroupMember = 
+  Attr* Path
+
+BroadcastGroupList =
+  '{' (BroadcastGroupMember (',' BroadcastGroupMember)* ','?)? '}'
+
+BroadcastGroup = 
+  Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
 
 //****************************//
 // Statements and Expressions //

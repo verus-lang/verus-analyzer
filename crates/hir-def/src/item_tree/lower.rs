@@ -7,7 +7,7 @@ use la_arena::Arena;
 use rustc_hash::FxHashMap;
 use span::{AstIdMap, SyntaxContextId};
 use syntax::{
-    ast::{self, HasModuleItem, HasName, HasTypeBounds, IsString},
+    ast::{self, BroadcastGroup, BroadcastUse, HasModuleItem, HasName, HasTypeBounds, IsString},
     AstNode,
 };
 use triomphe::Arc;
@@ -151,6 +151,8 @@ impl<'a> Ctx<'a> {
             ast::Item::MacroDef(ast) => self.lower_macro_def(ast)?.into(),
             ast::Item::ExternBlock(ast) => self.lower_extern_block(ast).into(),
             ast::Item::VerusGlobal(ast) => self.lower_verus_global(ast).into(),
+            ast::Item::BroadcastGroup(ast) => self.lower_broadcast_group(ast).into(),
+            ast::Item::BroadcastUse(ast) => self.lower_broadcast_use(ast).into(),        
         };
         let attrs = RawAttrs::new(self.db.upcast(), item, self.span_map());
         self.add_attrs(mod_item.into(), attrs);
@@ -175,6 +177,7 @@ impl<'a> Ctx<'a> {
             ast::AssocItem::TypeAlias(ast) => self.lower_type_alias(ast).map(Into::into),
             ast::AssocItem::Const(ast) => Some(self.lower_const(ast).into()),
             ast::AssocItem::MacroCall(ast) => self.lower_macro_call(ast).map(Into::into),
+            ast::AssocItem::BroadcastGroup(ast) => self.lower_broadcast_group(ast).map(Into::into),
         }?;
         let attrs = RawAttrs::new(self.db.upcast(), item_node, self.span_map());
         self.add_attrs(
@@ -473,6 +476,20 @@ impl<'a> Ctx<'a> {
         let ast_id = self.source_ast_id_map.ast_id(global);
         let res = VerusGlobal { ast_id };
         id(self.data().verus_globals.alloc(res))
+    }
+
+    fn lower_broadcast_group(&mut self, _bg: &ast::BroadcastGroup) -> FileItemTreeId<BroadcastGroup> {
+        panic!("'broadcast group' not implemented yet");
+        // let ast_id = self.source_ast_id_map.ast_id(global);
+        // let res = VerusGlobal { ast_id };
+        // id(self.data().verus_globals.alloc(res))
+    }
+
+    fn lower_broadcast_use(&mut self, _broadcast: &ast::BroadcastUse) -> FileItemTreeId<BroadcastUse> {
+        panic!("'broadcast use' not implemented yet");
+        // let ast_id = self.source_ast_id_map.ast_id(broadcast);
+        // let res = VerusGlobal { ast_id };
+        // id(self.data(). .verus_globals.alloc(res))
     }
 
     fn lower_module(&mut self, module: &ast::Module) -> Option<FileItemTreeId<Mod>> {
