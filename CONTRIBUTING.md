@@ -1,4 +1,4 @@
-# Contributing to rust-analyzer
+# Contributing to verus-analyzer
 
 Thank you for your interest in contributing to rust-analyzer! There are many ways to contribute
 and we appreciate all of them.
@@ -28,3 +28,19 @@ possibility of someone putting a lot of work into a feature that is then going t
 it out of scope (be it due to generally not fitting in with rust-analyzer, or just not having the
 maintenance capacity). If there already is a feature issue open but it is not clear whether it is
 considered accepted feel free to just drop a comment and ask!
+
+## Building a VSIX file
+
+This requires the `esbuild` tool to be installed.  On Mac OS, run `brew install esbuild`.
+
+You also need to install the `vscode-languageclient` package via:
+```
+npm install vscode-languageclient
+```
+
+Now, in `verus-analyzer/editors/code`, run:
+```
+npx vsce package -o ../../dist/verus-analyzer-aarch64-apple-darwin.vsix --target darwin-arm64
+```
+(updating `aarch64-apple-darwin` as appropriate).
+
