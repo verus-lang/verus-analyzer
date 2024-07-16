@@ -492,8 +492,6 @@ fn for_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         p.bump(IDENT);
         m.complete(p, NAME);
         p.expect(T![:]);
-        // Consume the colon separating the iteraor name from the iterator expression
-        p.bump(T![:]);
     }
     // end verus
 
