@@ -766,9 +766,6 @@ impl<'a> AssocItemCollector<'a> {
             AssocItem::BroadcastGroup(_id) => {
                 todo!()
             }
-            AssocItem::BroadcastUse(_id) => {
-                todo!()
-            }
         }
     }
 
