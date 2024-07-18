@@ -207,6 +207,76 @@ impl BreakExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroup {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for BroadcastGroup {}
+impl ast::HasVisibility for BroadcastGroup {}
+impl BroadcastGroup {
+    pub fn broadcast_group_identifier(&self) -> Option<BroadcastGroupIdentifier> {
+        support::child(&self.syntax)
+    }
+    pub fn broadcast_group_list(&self) -> Option<BroadcastGroupList> {
+        support::child(&self.syntax)
+    }
+    pub fn broadcast_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![broadcast])
+    }
+    pub fn group_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![group]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroupIdentifier {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BroadcastGroupIdentifier {
+    pub fn ident_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ident]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroupList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BroadcastGroupList {
+    pub fn broadcast_group_members(&self) -> AstChildren<BroadcastGroupMember> {
+        support::children(&self.syntax)
+    }
+    pub fn l_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['{']) }
+    pub fn r_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['}']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroupMember {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for BroadcastGroupMember {}
+impl BroadcastGroupMember {
+    pub fn path(&self) -> Option<Path> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastUse {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for BroadcastUse {}
+impl BroadcastUse {
+    pub fn broadcast_use_list(&self) -> Option<BroadcastUseList> { support::child(&self.syntax) }
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    pub fn broadcast_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![broadcast])
+    }
+    pub fn use_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![use]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastUseList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl BroadcastUseList {
+    pub fn paths(&self) -> AstChildren<Path> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CallExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -442,6 +512,9 @@ impl Fn {
     pub fn signature_decreases(&self) -> Option<SignatureDecreases> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
+    pub fn broadcast_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![broadcast])
+    }
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
     pub fn default_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![default]) }
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
@@ -1835,13 +1908,13 @@ impl ast::HasVisibility for Adt {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AssocItem {
+    BroadcastGroup(BroadcastGroup),
     Const(Const),
     Fn(Fn),
     MacroCall(MacroCall),
     TypeAlias(TypeAlias),
 }
 impl ast::HasAttrs for AssocItem {}
-impl ast::HasDocComments for AssocItem {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Expr {
@@ -1921,6 +1994,8 @@ impl ast::HasAttrs for GenericParam {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item {
+    BroadcastGroup(BroadcastGroup),
+    BroadcastUse(BroadcastUse),
     Const(Const),
     Enum(Enum),
     ExternBlock(ExternBlock),
@@ -2226,6 +2301,72 @@ impl AstNode for BoxPat {
 }
 impl AstNode for BreakExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == BREAK_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for BroadcastGroup {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == BROADCAST_GROUP }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for BroadcastGroupIdentifier {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == BROADCAST_GROUP_IDENTIFIER }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for BroadcastGroupList {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == BROADCAST_GROUP_LIST }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for BroadcastGroupMember {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == BROADCAST_GROUP_MEMBER }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for BroadcastUse {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == BROADCAST_USE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for BroadcastUseList {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == BROADCAST_USE_LIST }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3814,6 +3955,9 @@ impl AstNode for Adt {
         }
     }
 }
+impl From<BroadcastGroup> for AssocItem {
+    fn from(node: BroadcastGroup) -> AssocItem { AssocItem::BroadcastGroup(node) }
+}
 impl From<Const> for AssocItem {
     fn from(node: Const) -> AssocItem { AssocItem::Const(node) }
 }
@@ -3827,9 +3971,12 @@ impl From<TypeAlias> for AssocItem {
     fn from(node: TypeAlias) -> AssocItem { AssocItem::TypeAlias(node) }
 }
 impl AstNode for AssocItem {
-    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, CONST | FN | MACRO_CALL | TYPE_ALIAS) }
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, BROADCAST_GROUP | CONST | FN | MACRO_CALL | TYPE_ALIAS)
+    }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
+            BROADCAST_GROUP => AssocItem::BroadcastGroup(BroadcastGroup { syntax }),
             CONST => AssocItem::Const(Const { syntax }),
             FN => AssocItem::Fn(Fn { syntax }),
             MACRO_CALL => AssocItem::MacroCall(MacroCall { syntax }),
@@ -3840,6 +3987,7 @@ impl AstNode for AssocItem {
     }
     fn syntax(&self) -> &SyntaxNode {
         match self {
+            AssocItem::BroadcastGroup(it) => &it.syntax,
             AssocItem::Const(it) => &it.syntax,
             AssocItem::Fn(it) => &it.syntax,
             AssocItem::MacroCall(it) => &it.syntax,
@@ -4225,6 +4373,12 @@ impl AstNode for GenericParam {
         }
     }
 }
+impl From<BroadcastGroup> for Item {
+    fn from(node: BroadcastGroup) -> Item { Item::BroadcastGroup(node) }
+}
+impl From<BroadcastUse> for Item {
+    fn from(node: BroadcastUse) -> Item { Item::BroadcastUse(node) }
+}
 impl From<Const> for Item {
     fn from(node: Const) -> Item { Item::Const(node) }
 }
@@ -4283,7 +4437,9 @@ impl AstNode for Item {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            CONST
+            BROADCAST_GROUP
+                | BROADCAST_USE
+                | CONST
                 | ENUM
                 | EXTERN_BLOCK
                 | EXTERN_CRATE
@@ -4305,6 +4461,8 @@ impl AstNode for Item {
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
+            BROADCAST_GROUP => Item::BroadcastGroup(BroadcastGroup { syntax }),
+            BROADCAST_USE => Item::BroadcastUse(BroadcastUse { syntax }),
             CONST => Item::Const(Const { syntax }),
             ENUM => Item::Enum(Enum { syntax }),
             EXTERN_BLOCK => Item::ExternBlock(ExternBlock { syntax }),
@@ -4329,6 +4487,8 @@ impl AstNode for Item {
     }
     fn syntax(&self) -> &SyntaxNode {
         match self {
+            Item::BroadcastGroup(it) => &it.syntax,
+            Item::BroadcastUse(it) => &it.syntax,
             Item::Const(it) => &it.syntax,
             Item::Enum(it) => &it.syntax,
             Item::ExternBlock(it) => &it.syntax,
@@ -4649,6 +4809,9 @@ impl AstNode for AnyHasAttrs {
                 | BIN_EXPR
                 | BLOCK_EXPR
                 | BREAK_EXPR
+                | BROADCAST_GROUP
+                | BROADCAST_GROUP_MEMBER
+                | BROADCAST_USE
                 | CALL_EXPR
                 | CAST_EXPR
                 | CLOSURE_EXPR
@@ -4869,7 +5032,8 @@ impl AstNode for AnyHasVisibility {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            CONST
+            BROADCAST_GROUP
+                | CONST
                 | ENUM
                 | EXTERN_CRATE
                 | FN
@@ -5035,6 +5199,36 @@ impl std::fmt::Display for BoxPat {
     }
 }
 impl std::fmt::Display for BreakExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for BroadcastGroup {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for BroadcastGroupIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for BroadcastGroupList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for BroadcastGroupMember {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for BroadcastUse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for BroadcastUseList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

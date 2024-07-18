@@ -148,6 +148,48 @@ pub struct BreakExpr {
     pub cst: Option<super::nodes::BreakExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroup {
+    pub attrs: Vec<Attr>,
+    pub broadcast_group_identifier: Box<BroadcastGroupIdentifier>,
+    pub broadcast_group_list: Box<BroadcastGroupList>,
+    pub visibility: Option<Box<Visibility>>,
+    pub broadcast_token: bool,
+    pub group_token: bool,
+    pub cst: Option<super::nodes::BroadcastGroup>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroupIdentifier {
+    pub ident_token: Option<String>,
+    pub cst: Option<super::nodes::BroadcastGroupIdentifier>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroupList {
+    pub broadcast_group_members: Vec<BroadcastGroupMember>,
+    pub l_curly_token: bool,
+    pub r_curly_token: bool,
+    pub cst: Option<super::nodes::BroadcastGroupList>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastGroupMember {
+    pub attrs: Vec<Attr>,
+    pub path: Box<Path>,
+    pub cst: Option<super::nodes::BroadcastGroupMember>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastUse {
+    pub attrs: Vec<Attr>,
+    pub broadcast_use_list: Box<BroadcastUseList>,
+    pub semicolon_token: bool,
+    pub broadcast_token: bool,
+    pub use_token: bool,
+    pub cst: Option<super::nodes::BroadcastUse>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BroadcastUseList {
+    pub paths: Vec<Path>,
+    pub cst: Option<super::nodes::BroadcastUseList>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CallExpr {
     pub arg_list: Box<ArgList>,
     pub attrs: Vec<Attr>,
@@ -319,6 +361,7 @@ pub struct Fn {
     pub where_clause: Option<Box<WhereClause>>,
     pub semicolon_token: bool,
     pub async_token: bool,
+    pub broadcast_token: bool,
     pub const_token: bool,
     pub default_token: bool,
     pub fn_token: bool,
@@ -1305,6 +1348,7 @@ pub enum Adt {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AssocItem {
+    BroadcastGroup(Box<BroadcastGroup>),
     Const(Box<Const>),
     Fn(Box<Fn>),
     MacroCall(Box<MacroCall>),
@@ -1380,6 +1424,8 @@ pub enum GenericParam {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item {
+    BroadcastGroup(Box<BroadcastGroup>),
+    BroadcastUse(Box<BroadcastUse>),
     Const(Box<Const>),
     Enum(Box<Enum>),
     ExternBlock(Box<ExternBlock>),
@@ -1766,6 +1812,111 @@ impl TryFrom<super::nodes::BreakExpr> for BreakExpr {
                 None => None,
             },
             break_token: item.break_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::BroadcastGroup> for BroadcastGroup {
+    type Error = String;
+    fn try_from(item: super::nodes::BroadcastGroup) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            broadcast_group_identifier: Box::new(
+                item.broadcast_group_identifier()
+                    .ok_or(format!("{}", stringify!(broadcast_group_identifier)))
+                    .map(|it| BroadcastGroupIdentifier::try_from(it))??,
+            ),
+            broadcast_group_list: Box::new(
+                item.broadcast_group_list()
+                    .ok_or(format!("{}", stringify!(broadcast_group_list)))
+                    .map(|it| BroadcastGroupList::try_from(it))??,
+            ),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            broadcast_token: item.broadcast_token().is_some(),
+            group_token: item.group_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::BroadcastGroupIdentifier> for BroadcastGroupIdentifier {
+    type Error = String;
+    fn try_from(item: super::nodes::BroadcastGroupIdentifier) -> Result<Self, Self::Error> {
+        Ok(Self {
+            ident_token: item.ident_token().map(|it| it.text().to_string()),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::BroadcastGroupList> for BroadcastGroupList {
+    type Error = String;
+    fn try_from(item: super::nodes::BroadcastGroupList) -> Result<Self, Self::Error> {
+        Ok(Self {
+            broadcast_group_members: item
+                .broadcast_group_members()
+                .into_iter()
+                .map(BroadcastGroupMember::try_from)
+                .collect::<Result<Vec<BroadcastGroupMember>, String>>()?,
+            l_curly_token: item.l_curly_token().is_some(),
+            r_curly_token: item.r_curly_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::BroadcastGroupMember> for BroadcastGroupMember {
+    type Error = String;
+    fn try_from(item: super::nodes::BroadcastGroupMember) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            path: Box::new(
+                item.path()
+                    .ok_or(format!("{}", stringify!(path)))
+                    .map(|it| Path::try_from(it))??,
+            ),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::BroadcastUse> for BroadcastUse {
+    type Error = String;
+    fn try_from(item: super::nodes::BroadcastUse) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            broadcast_use_list: Box::new(
+                item.broadcast_use_list()
+                    .ok_or(format!("{}", stringify!(broadcast_use_list)))
+                    .map(|it| BroadcastUseList::try_from(it))??,
+            ),
+            semicolon_token: item.semicolon_token().is_some(),
+            broadcast_token: item.broadcast_token().is_some(),
+            use_token: item.use_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::BroadcastUseList> for BroadcastUseList {
+    type Error = String;
+    fn try_from(item: super::nodes::BroadcastUseList) -> Result<Self, Self::Error> {
+        Ok(Self {
+            paths: item
+                .paths()
+                .into_iter()
+                .map(Path::try_from)
+                .collect::<Result<Vec<Path>, String>>()?,
             cst: Some(item.clone()),
         })
     }
@@ -2235,6 +2386,7 @@ impl TryFrom<super::nodes::Fn> for Fn {
             },
             semicolon_token: item.semicolon_token().is_some(),
             async_token: item.async_token().is_some(),
+            broadcast_token: item.broadcast_token().is_some(),
             const_token: item.const_token().is_some(),
             default_token: item.default_token().is_some(),
             fn_token: item.fn_token().is_some(),
@@ -4624,6 +4776,9 @@ impl TryFrom<super::nodes::AssocItem> for AssocItem {
     type Error = String;
     fn try_from(item: super::nodes::AssocItem) -> Result<Self, Self::Error> {
         match item {
+            super::nodes::AssocItem::BroadcastGroup(it) => {
+                Ok(Self::BroadcastGroup(Box::new(it.try_into()?)))
+            }
             super::nodes::AssocItem::Const(it) => Ok(Self::Const(Box::new(it.try_into()?))),
             super::nodes::AssocItem::Fn(it) => Ok(Self::Fn(Box::new(it.try_into()?))),
             super::nodes::AssocItem::MacroCall(it) => Ok(Self::MacroCall(Box::new(it.try_into()?))),
@@ -4753,6 +4908,12 @@ impl TryFrom<super::nodes::Item> for Item {
     type Error = String;
     fn try_from(item: super::nodes::Item) -> Result<Self, Self::Error> {
         match item {
+            super::nodes::Item::BroadcastGroup(it) => {
+                Ok(Self::BroadcastGroup(Box::new(it.try_into()?)))
+            }
+            super::nodes::Item::BroadcastUse(it) => {
+                Ok(Self::BroadcastUse(Box::new(it.try_into()?)))
+            }
             super::nodes::Item::Const(it) => Ok(Self::Const(Box::new(it.try_into()?))),
             super::nodes::Item::Enum(it) => Ok(Self::Enum(Box::new(it.try_into()?))),
             super::nodes::Item::ExternBlock(it) => Ok(Self::ExternBlock(Box::new(it.try_into()?))),
@@ -5227,6 +5388,112 @@ impl std::fmt::Display for BreakExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for BroadcastGroup {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.broadcast_group_identifier.to_string());
+        s.push_str(" ");
+        s.push_str(&self.broadcast_group_list.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.visibility {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.broadcast_token {
+            let mut tmp = stringify!(broadcast_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.group_token {
+            let mut tmp = stringify!(group_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for BroadcastGroupIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if let Some(it) = &self.ident_token {
+            s.push_str(&it);
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for BroadcastGroupList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(
+            &self
+                .broadcast_group_members
+                .iter()
+                .map(|it| it.to_string())
+                .collect::<Vec<String>>()
+                .join(" "),
+        );
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.r_curly_token {
+            let mut tmp = stringify!(r_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for BroadcastGroupMember {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.path.to_string());
+        s.push_str(" ");
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for BroadcastUse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.broadcast_use_list.to_string());
+        s.push_str(" ");
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.broadcast_token {
+            let mut tmp = stringify!(broadcast_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.use_token {
+            let mut tmp = stringify!(use_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for BroadcastUseList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.paths.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
@@ -5722,6 +5989,12 @@ impl std::fmt::Display for Fn {
         }
         if self.async_token {
             let mut tmp = stringify!(async_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.broadcast_token {
+            let mut tmp = stringify!(broadcast_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8542,6 +8815,7 @@ impl std::fmt::Display for Adt {
 impl std::fmt::Display for AssocItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            AssocItem::BroadcastGroup(it) => write!(f, "{}", it.to_string()),
             AssocItem::Const(it) => write!(f, "{}", it.to_string()),
             AssocItem::Fn(it) => write!(f, "{}", it.to_string()),
             AssocItem::MacroCall(it) => write!(f, "{}", it.to_string()),
@@ -8635,6 +8909,8 @@ impl std::fmt::Display for GenericParam {
 impl std::fmt::Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Item::BroadcastGroup(it) => write!(f, "{}", it.to_string()),
+            Item::BroadcastUse(it) => write!(f, "{}", it.to_string()),
             Item::Const(it) => write!(f, "{}", it.to_string()),
             Item::Enum(it) => write!(f, "{}", it.to_string()),
             Item::ExternBlock(it) => write!(f, "{}", it.to_string()),
@@ -8729,6 +9005,9 @@ impl Adt {
 impl AssocItem {
     pub fn cst(&self) -> Option<super::nodes::AssocItem> {
         match self {
+            AssocItem::BroadcastGroup(it) => {
+                Some(super::nodes::AssocItem::BroadcastGroup(it.cst.as_ref()?.clone()))
+            }
             AssocItem::Const(it) => Some(super::nodes::AssocItem::Const(it.cst.as_ref()?.clone())),
             AssocItem::Fn(it) => Some(super::nodes::AssocItem::Fn(it.cst.as_ref()?.clone())),
             AssocItem::MacroCall(it) => {
@@ -8864,6 +9143,12 @@ impl GenericParam {
 impl Item {
     pub fn cst(&self) -> Option<super::nodes::Item> {
         match self {
+            Item::BroadcastGroup(it) => {
+                Some(super::nodes::Item::BroadcastGroup(it.cst.as_ref()?.clone()))
+            }
+            Item::BroadcastUse(it) => {
+                Some(super::nodes::Item::BroadcastUse(it.cst.as_ref()?.clone()))
+            }
             Item::Const(it) => Some(super::nodes::Item::Const(it.cst.as_ref()?.clone())),
             Item::Enum(it) => Some(super::nodes::Item::Enum(it.cst.as_ref()?.clone())),
             Item::ExternBlock(it) => {
@@ -8976,6 +9261,9 @@ impl From<Struct> for Adt {
 }
 impl From<Union> for Adt {
     fn from(item: Union) -> Self { Adt::Union(Box::new(item)) }
+}
+impl From<BroadcastGroup> for AssocItem {
+    fn from(item: BroadcastGroup) -> Self { AssocItem::BroadcastGroup(Box::new(item)) }
 }
 impl From<Const> for AssocItem {
     fn from(item: Const) -> Self { AssocItem::Const(Box::new(item)) }
@@ -9147,6 +9435,12 @@ impl From<LifetimeParam> for GenericParam {
 }
 impl From<TypeParam> for GenericParam {
     fn from(item: TypeParam) -> Self { GenericParam::TypeParam(Box::new(item)) }
+}
+impl From<BroadcastGroup> for Item {
+    fn from(item: BroadcastGroup) -> Self { Item::BroadcastGroup(Box::new(item)) }
+}
+impl From<BroadcastUse> for Item {
+    fn from(item: BroadcastUse) -> Self { Item::BroadcastUse(Box::new(item)) }
 }
 impl From<Const> for Item {
     fn from(item: Const) -> Self { Item::Const(Box::new(item)) }
@@ -9499,6 +9793,53 @@ impl BreakExpr {
         Self { attrs: vec![], expr: None, lifetime: None, break_token: true, cst: None }
     }
 }
+impl BroadcastGroup {
+    pub fn new(
+        broadcast_group_identifier: BroadcastGroupIdentifier,
+        broadcast_group_list: BroadcastGroupList,
+    ) -> Self {
+        Self {
+            attrs: vec![],
+            broadcast_group_identifier: Box::new(broadcast_group_identifier),
+            broadcast_group_list: Box::new(broadcast_group_list),
+            visibility: None,
+            broadcast_token: true,
+            group_token: true,
+            cst: None,
+        }
+    }
+}
+impl BroadcastGroupIdentifier {
+    pub fn new() -> Self { Self { ident_token: None, cst: None } }
+}
+impl BroadcastGroupList {
+    pub fn new() -> Self {
+        Self {
+            broadcast_group_members: vec![],
+            l_curly_token: true,
+            r_curly_token: true,
+            cst: None,
+        }
+    }
+}
+impl BroadcastGroupMember {
+    pub fn new(path: Path) -> Self { Self { attrs: vec![], path: Box::new(path), cst: None } }
+}
+impl BroadcastUse {
+    pub fn new(broadcast_use_list: BroadcastUseList) -> Self {
+        Self {
+            attrs: vec![],
+            broadcast_use_list: Box::new(broadcast_use_list),
+            semicolon_token: true,
+            broadcast_token: true,
+            use_token: true,
+            cst: None,
+        }
+    }
+}
+impl BroadcastUseList {
+    pub fn new() -> Self { Self { paths: vec![], cst: None } }
+}
 impl CallExpr {
     pub fn new<ET0>(arg_list: ArgList, expr: ET0) -> Self
     where
@@ -9685,6 +10026,7 @@ impl Fn {
             where_clause: None,
             semicolon_token: false,
             async_token: false,
+            broadcast_token: false,
             const_token: false,
             default_token: false,
             fn_token: true,
