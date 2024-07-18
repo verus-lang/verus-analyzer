@@ -288,7 +288,12 @@ pub(crate) fn invariants_except_break(p: &mut Parser<'_>) -> CompletedMarker {
     expressions::expr_no_struct(p);
 
     while !p.at(EOF) && !p.at(T![decreases]) && !p.at(T!['{']) && !p.at(T![;]) {
-        if p.at(T![invariant]) || p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
+        if p.at(T![invariant])
+            || p.at(T![recommends])
+            || p.at(T![ensures])
+            || p.at(T![decreases])
+            || p.at(T!['{'])
+        {
             break;
         }
         if p.at(T![,]) {
