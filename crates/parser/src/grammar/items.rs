@@ -255,7 +255,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         }
 
         T![use] => {
-            use_item::use_(p, m);
+            verus::broadcast_use_list(p, m);
         }
 
         // test extern_block
