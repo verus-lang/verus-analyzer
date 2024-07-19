@@ -101,6 +101,24 @@ pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker 
     m.complete(p, BROADCAST_GROUP)
 }
 
+pub(crate) fn broadcast_use_list(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    p.bump(T![use]);
+    while !p.at(EOF) && !p.at(T![;]) {
+        paths::use_path(p);
+
+        if p.at(T![;]) {
+            break;
+        }
+        if p.at(T![,]) {
+            p.bump(T![,]);
+        } else {
+            dbg!("broadcast_use_list at: {:?}", p.current());
+        }
+    }
+    p.expect(T![;]); 
+    m.complete(p, BROADCAST_USE_LIST)
+}
+
 pub(crate) fn data_mode(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     if p.at(T![ghost]) {
