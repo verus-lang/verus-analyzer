@@ -80,15 +80,7 @@ pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
     }
 }
 
-pub(crate) fn broadcast_group_member(p: &mut Parser<'_>) -> CompletedMarker {
-    let m = p.start();
-    attributes::inner_attrs(p);
-    paths::use_path(p);
-    m.complete(p, BROADCAST_GROUP_MEMBER)
-}
-
 pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
-//    p.bump(T![broadcast]);
     p.bump(T![group]);
     p.bump(IDENT);  // group name
     p.expect(T!['{']); 

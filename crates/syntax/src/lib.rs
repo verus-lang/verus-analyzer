@@ -1552,7 +1552,6 @@ pub fn clone_vec_u8() {
     }
 }
 
-
 #[test]
 fn verus_loops() {
     use ast::HasModuleItem;
@@ -1588,8 +1587,6 @@ fn test() {
         // dbg!(v_item);
     }
 }
-
-
 
 // TODO: Restore once we have while loops in a better state
 #[test]
@@ -1662,11 +1659,11 @@ fn test() {
 fn verus_broadcast() {
     use ast::HasModuleItem;
     let source_code = "verus!{
-    broadcast proof fn property() { }
-    pub broadcast proof fn property() { }
+    fn t2(p: Ring) {
+        broadcast use Ring::properties;
+    }
+}";
 
-}
-    }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
     assert!(parse.errors().is_empty());

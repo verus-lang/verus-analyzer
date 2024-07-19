@@ -254,6 +254,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
             verus::broadcast_group(p, m);
         }
 
+        T![use] => {
+            use_item::use_(p, m);
+        }
+
         // test extern_block
         // unsafe extern "C" {}
         // extern {}
