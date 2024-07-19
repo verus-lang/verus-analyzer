@@ -327,25 +327,6 @@ Meta =
   'unsafe' '(' Path ('=' Expr | TokenTree)? ')'
 | Path ('=' Expr | TokenTree)?
 
-// Verus broadcasts
-BroadcastUseList =
-  Path (',' Path)* ','?
-  
-BroadcastUse =
-  Attr* 'broadcast' 'use' BroadcastUseList ';'
-
-BroadcastGroupIdentifier =
-  'ident'
-
-BroadcastGroupMember = 
-  Attr* Path
-
-BroadcastGroupList =
-  '{' (BroadcastGroupMember (',' BroadcastGroupMember)* ','?)? '}'
-
-BroadcastGroup = 
-  Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
-
 //****************************//
 // Statements and Expressions //
 //****************************//
@@ -803,3 +784,22 @@ TriggerAttribute =
 VerusGlobal =
   Attr*
   'global' Name Type op:('==') value:('int_number') ';'
+
+BroadcastUseList =
+  Path (',' Path)* ','?
+  
+BroadcastUse =
+  Attr* 'broadcast' 'use' BroadcastUseList ';'
+
+BroadcastGroupIdentifier =
+  'ident'
+
+BroadcastGroupMember = 
+  Attr* Path
+
+BroadcastGroupList =
+  '{' (BroadcastGroupMember (',' BroadcastGroupMember)* ','?)? '}'
+
+BroadcastGroup = 
+  Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
+
