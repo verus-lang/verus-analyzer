@@ -111,7 +111,7 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
         }
         EOF | T!['}'] => p.error("expected an item"),
         T![let] => error_let_stmt(p, "expected an item"),
-        _ => p.err_and_bump("expected an item"),
+        _ => { dbg!("item_or_macro"); p.err_and_bump("expected an item") },
     }
 }
 
@@ -160,6 +160,11 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // fn foo(){} unsafe { } fn bar(){}
     if p.at(T![unsafe]) && p.nth(1) != T!['{'] {
         p.eat(T![unsafe]);
+        has_mods = true;
+    }
+
+    if p.at(T![broadcast]) {
+        p.bump(T![broadcast]);
         has_mods = true;
     }
 
@@ -245,6 +250,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
         T![type] => type_alias(p, m),
 
+        T![group] => {
+            verus::broadcast_group(p, m);
+        }
+
         // test extern_block
         // unsafe extern "C" {}
         // extern {}
@@ -257,6 +266,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
             if has_mods {
                 p.error("expected existential, fn, trait or impl");
             } else {
+                dbg!("opt_item");
                 p.error("expected an item");
             }
             m.complete(p, ERROR);
