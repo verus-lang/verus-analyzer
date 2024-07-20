@@ -314,7 +314,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             client: client,
         };
         this._dependencies = new RustDependenciesProvider(ctxInit);
-        this._treeView = vscode.window.createTreeView("rustDependencies", {
+        this._treeView = vscode.window.createTreeView("verusDependencies", {
             treeDataProvider: this._dependencies,
             showCollapseAll: true,
         });
