@@ -698,10 +698,12 @@ impl ParseFromLine for CargoCheckMessage {
             };
         } else {
             // verus
-            // forward verification result
-            tracing::error!("deserialize error: {:?}", line);
+            // forward verification result if present
+            // TODO: We should ask Verus for json output and then parse it properly here
             if line.contains("verification results::") {
                 Some(CargoCheckMessage::VerusResult(line.to_string()));
+            } else {
+                tracing::error!("deserialize error: {:?}", line);
             }
         }
 
