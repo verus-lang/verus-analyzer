@@ -24,14 +24,17 @@ pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> () {
         if p.at(T![tracked]) {
             p.expect(T![tracked]);
         }
-        if p.at(T!['(']) {
+        if p.at(T!['(']) && p.nth_at(1, IDENT) && p.nth_at(2, T![:]) {
+            dbg!("Verus named param");
             // verus named param
-            p.expect(T!['(']);
-            patterns::pattern(p);
-            p.expect(T![:]);
+            p.bump(T!['(']);
+            //patterns::pattern(p);
+            p.bump(IDENT);
+            p.bump(T![:]);
             types::type_no_bounds(p);
             p.expect(T![')']);
         } else {
+            dbg!("Failed to find Verus named param");
             types::type_no_bounds(p);
         }
         m.complete(p, RET_TYPE);
