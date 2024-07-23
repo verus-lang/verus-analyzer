@@ -51,6 +51,17 @@ impl ArrayType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ArrowExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for ArrowExpr {}
+impl ArrowExpr {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    pub fn thin_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![->]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AsmExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -713,7 +724,9 @@ impl InvariantExceptBreakClause {
 pub struct IsExpr {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasAttrs for IsExpr {}
 impl IsExpr {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
     pub fn is_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![is]) }
 }
@@ -1928,6 +1941,7 @@ impl ast::HasAttrs for AssocItem {}
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Expr {
     ArrayExpr(ArrayExpr),
+    ArrowExpr(ArrowExpr),
     AsmExpr(AsmExpr),
     AssertExpr(AssertExpr),
     AssertForallExpr(AssertForallExpr),
@@ -1946,6 +1960,7 @@ pub enum Expr {
     FormatArgsExpr(FormatArgsExpr),
     IfExpr(IfExpr),
     IndexExpr(IndexExpr),
+    IsExpr(IsExpr),
     LetExpr(LetExpr),
     Literal(Literal),
     LoopExpr(LoopExpr),
@@ -2167,6 +2182,17 @@ impl AstNode for ArrayExpr {
 }
 impl AstNode for ArrayType {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ARRAY_TYPE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ArrowExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ARROW_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4018,6 +4044,9 @@ impl AstNode for AssocItem {
 impl From<ArrayExpr> for Expr {
     fn from(node: ArrayExpr) -> Expr { Expr::ArrayExpr(node) }
 }
+impl From<ArrowExpr> for Expr {
+    fn from(node: ArrowExpr) -> Expr { Expr::ArrowExpr(node) }
+}
 impl From<AsmExpr> for Expr {
     fn from(node: AsmExpr) -> Expr { Expr::AsmExpr(node) }
 }
@@ -4071,6 +4100,9 @@ impl From<IfExpr> for Expr {
 }
 impl From<IndexExpr> for Expr {
     fn from(node: IndexExpr) -> Expr { Expr::IndexExpr(node) }
+}
+impl From<IsExpr> for Expr {
+    fn from(node: IsExpr) -> Expr { Expr::IsExpr(node) }
 }
 impl From<LetExpr> for Expr {
     fn from(node: LetExpr) -> Expr { Expr::LetExpr(node) }
@@ -4140,6 +4172,7 @@ impl AstNode for Expr {
         matches!(
             kind,
             ARRAY_EXPR
+                | ARROW_EXPR
                 | ASM_EXPR
                 | ASSERT_EXPR
                 | ASSERT_FORALL_EXPR
@@ -4158,6 +4191,7 @@ impl AstNode for Expr {
                 | FORMAT_ARGS_EXPR
                 | IF_EXPR
                 | INDEX_EXPR
+                | IS_EXPR
                 | LET_EXPR
                 | LITERAL
                 | LOOP_EXPR
@@ -4184,6 +4218,7 @@ impl AstNode for Expr {
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             ARRAY_EXPR => Expr::ArrayExpr(ArrayExpr { syntax }),
+            ARROW_EXPR => Expr::ArrowExpr(ArrowExpr { syntax }),
             ASM_EXPR => Expr::AsmExpr(AsmExpr { syntax }),
             ASSERT_EXPR => Expr::AssertExpr(AssertExpr { syntax }),
             ASSERT_FORALL_EXPR => Expr::AssertForallExpr(AssertForallExpr { syntax }),
@@ -4202,6 +4237,7 @@ impl AstNode for Expr {
             FORMAT_ARGS_EXPR => Expr::FormatArgsExpr(FormatArgsExpr { syntax }),
             IF_EXPR => Expr::IfExpr(IfExpr { syntax }),
             INDEX_EXPR => Expr::IndexExpr(IndexExpr { syntax }),
+            IS_EXPR => Expr::IsExpr(IsExpr { syntax }),
             LET_EXPR => Expr::LetExpr(LetExpr { syntax }),
             LITERAL => Expr::Literal(Literal { syntax }),
             LOOP_EXPR => Expr::LoopExpr(LoopExpr { syntax }),
@@ -4230,6 +4266,7 @@ impl AstNode for Expr {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             Expr::ArrayExpr(it) => &it.syntax,
+            Expr::ArrowExpr(it) => &it.syntax,
             Expr::AsmExpr(it) => &it.syntax,
             Expr::AssertExpr(it) => &it.syntax,
             Expr::AssertForallExpr(it) => &it.syntax,
@@ -4248,6 +4285,7 @@ impl AstNode for Expr {
             Expr::FormatArgsExpr(it) => &it.syntax,
             Expr::IfExpr(it) => &it.syntax,
             Expr::IndexExpr(it) => &it.syntax,
+            Expr::IsExpr(it) => &it.syntax,
             Expr::LetExpr(it) => &it.syntax,
             Expr::Literal(it) => &it.syntax,
             Expr::LoopExpr(it) => &it.syntax,
@@ -4819,6 +4857,7 @@ impl AstNode for AnyHasAttrs {
         matches!(
             kind,
             ARRAY_EXPR
+                | ARROW_EXPR
                 | ASM_EXPR
                 | ASSERT_EXPR
                 | ASSERT_FORALL_EXPR
@@ -4850,6 +4889,7 @@ impl AstNode for AnyHasAttrs {
                 | IF_EXPR
                 | IMPL
                 | INDEX_EXPR
+                | IS_EXPR
                 | ITEM_LIST
                 | LET_EXPR
                 | LET_STMT
@@ -5154,6 +5194,11 @@ impl std::fmt::Display for ArrayExpr {
     }
 }
 impl std::fmt::Display for ArrayType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ArrowExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
