@@ -803,3 +803,5 @@ BroadcastGroupList =
 BroadcastGroup = 
   Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
 
+IsExpr = 
+  'is' Type
