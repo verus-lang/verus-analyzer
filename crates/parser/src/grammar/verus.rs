@@ -55,6 +55,21 @@ pub(crate) fn is_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMark
     m.complete(p, IS_EXPR)
 }
 
+pub(crate) fn arrow_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+    assert!(p.at(T![->]));
+    let m = lhs.precede(p);
+    p.bump(T![->]);
+    dbg!(p.current());
+    if p.at(IDENT) {
+        p.bump(IDENT);
+    } else if p.at(NAME_REF) {
+        p.bump(NAME_REF);
+    } else {
+        p.expect(INT_NUMBER);
+    }
+    m.complete(p, ARROW_EXPR)
+}
+
 pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     if p.at(T![open]) {

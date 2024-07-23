@@ -173,6 +173,14 @@ pub enum Expr {
     View {
         condition: ExprId,
     },
+    IsExpr {
+        expr: ExprId,
+        type_ref: Interned<TypeRef>,
+    },
+    ArrowExpr {
+        expr: ExprId,
+        name: Name,
+    },
 
     Path(Path),
     If {
@@ -489,6 +497,12 @@ impl Expr {
             }
             Expr::View { condition } => {
                 f(*condition);
+            }
+            Expr::IsExpr { expr, .. } => {
+                f(*expr);
+            }
+            Expr::ArrowExpr { expr, .. } => {
+                f(*expr);
             }
         }
     }

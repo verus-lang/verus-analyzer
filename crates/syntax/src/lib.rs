@@ -1543,10 +1543,21 @@ fn foo() -> (u32, u32)
 fn verus_struct_syntax() {
     use ast::HasModuleItem;
     let source_code = "verus!{
-proof fn sufficiently_creamy(bev: Beverage) -> bool
-    requires bev is Coffee
+proof fn sufficiently_creamy() -> bool
+    requires 
+        bev is Coffee,
 {
-   true
+   bev->creamers
+}
+
+spec fn is_insect(l: Life) -> bool {
+    l is Arthropod && l->Arthropod_legs == 6
+}
+
+spec fn rect_height(s: Shape) -> int
+    recommends s is Rect
+{
+    s->1
 }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
