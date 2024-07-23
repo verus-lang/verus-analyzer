@@ -710,6 +710,15 @@ impl InvariantExceptBreakClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsExpr {
+    pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+    pub fn is_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![is]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2752,6 +2761,17 @@ impl AstNode for InvariantClause {
 }
 impl AstNode for InvariantExceptBreakClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_EXCEPT_BREAK_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for IsExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == IS_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -5404,6 +5424,11 @@ impl std::fmt::Display for InvariantClause {
     }
 }
 impl std::fmt::Display for InvariantExceptBreakClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for IsExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
