@@ -345,6 +345,7 @@ pub enum SyntaxKind {
     BROADCAST_GROUP_LIST,
     BROADCAST_GROUP,
     IS_EXPR,
+    ARROW_EXPR,
     #[doc(hidden)]
     __LAST,
 }

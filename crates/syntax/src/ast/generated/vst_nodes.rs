@@ -34,6 +34,14 @@ pub struct ArrayType {
     pub cst: Option<super::nodes::ArrayType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ArrowExpr {
+    pub attrs: Vec<Attr>,
+    pub expr: Box<Expr>,
+    pub name_ref: Option<Box<NameRef>>,
+    pub thin_arrow_token: bool,
+    pub cst: Option<super::nodes::ArrowExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AsmExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
@@ -492,6 +500,8 @@ pub struct InvariantExceptBreakClause {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsExpr {
+    pub attrs: Vec<Attr>,
+    pub expr: Box<Expr>,
     pub ty: Option<Box<Type>>,
     pub is_token: bool,
     pub cst: Option<super::nodes::IsExpr>,
@@ -1363,6 +1373,7 @@ pub enum AssocItem {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Expr {
     ArrayExpr(Box<ArrayExpr>),
+    ArrowExpr(Box<ArrowExpr>),
     AsmExpr(Box<AsmExpr>),
     AssertExpr(Box<AssertExpr>),
     AssertForallExpr(Box<AssertForallExpr>),
@@ -1381,6 +1392,7 @@ pub enum Expr {
     FormatArgsExpr(Box<FormatArgsExpr>),
     IfExpr(Box<IfExpr>),
     IndexExpr(Box<IndexExpr>),
+    IsExpr(Box<IsExpr>),
     LetExpr(Box<LetExpr>),
     Literal(Box<Literal>),
     LoopExpr(Box<LoopExpr>),
@@ -1563,6 +1575,29 @@ impl TryFrom<super::nodes::ArrayType> for ArrayType {
             l_brack_token: item.l_brack_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
             semicolon_token: item.semicolon_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::ArrowExpr> for ArrowExpr {
+    type Error = String;
+    fn try_from(item: super::nodes::ArrowExpr) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
+            name_ref: match item.name_ref() {
+                Some(it) => Some(Box::new(NameRef::try_from(it)?)),
+                None => None,
+            },
+            thin_arrow_token: item.thin_arrow_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2687,6 +2722,16 @@ impl TryFrom<super::nodes::IsExpr> for IsExpr {
     type Error = String;
     fn try_from(item: super::nodes::IsExpr) -> Result<Self, Self::Error> {
         Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
@@ -4810,6 +4855,7 @@ impl TryFrom<super::nodes::Expr> for Expr {
     fn try_from(item: super::nodes::Expr) -> Result<Self, Self::Error> {
         match item {
             super::nodes::Expr::ArrayExpr(it) => Ok(Self::ArrayExpr(Box::new(it.try_into()?))),
+            super::nodes::Expr::ArrowExpr(it) => Ok(Self::ArrowExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::AsmExpr(it) => Ok(Self::AsmExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::AssertExpr(it) => Ok(Self::AssertExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::AssertForallExpr(it) => {
@@ -4834,6 +4880,7 @@ impl TryFrom<super::nodes::Expr> for Expr {
             }
             super::nodes::Expr::IfExpr(it) => Ok(Self::IfExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::IndexExpr(it) => Ok(Self::IndexExpr(Box::new(it.try_into()?))),
+            super::nodes::Expr::IsExpr(it) => Ok(Self::IsExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::LetExpr(it) => Ok(Self::LetExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::Literal(it) => Ok(Self::Literal(Box::new(it.try_into()?))),
             super::nodes::Expr::LoopExpr(it) => Ok(Self::LoopExpr(Box::new(it.try_into()?))),
@@ -5098,6 +5145,25 @@ impl std::fmt::Display for ArrayType {
         }
         if self.semicolon_token {
             let mut tmp = stringify!(semicolon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ArrowExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.name_ref {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.thin_arrow_token {
+            let mut tmp = stringify!(thin_arrow_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6430,6 +6496,9 @@ impl std::fmt::Display for InvariantExceptBreakClause {
 impl std::fmt::Display for IsExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         if let Some(it) = &self.ty {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -8862,6 +8931,7 @@ impl std::fmt::Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Expr::ArrayExpr(it) => write!(f, "{}", it.to_string()),
+            Expr::ArrowExpr(it) => write!(f, "{}", it.to_string()),
             Expr::AsmExpr(it) => write!(f, "{}", it.to_string()),
             Expr::AssertExpr(it) => write!(f, "{}", it.to_string()),
             Expr::AssertForallExpr(it) => write!(f, "{}", it.to_string()),
@@ -8880,6 +8950,7 @@ impl std::fmt::Display for Expr {
             Expr::FormatArgsExpr(it) => write!(f, "{}", it.to_string()),
             Expr::IfExpr(it) => write!(f, "{}", it.to_string()),
             Expr::IndexExpr(it) => write!(f, "{}", it.to_string()),
+            Expr::IsExpr(it) => write!(f, "{}", it.to_string()),
             Expr::LetExpr(it) => write!(f, "{}", it.to_string()),
             Expr::Literal(it) => write!(f, "{}", it.to_string()),
             Expr::LoopExpr(it) => write!(f, "{}", it.to_string()),
@@ -9058,6 +9129,7 @@ impl Expr {
     pub fn cst(&self) -> Option<super::nodes::Expr> {
         match self {
             Expr::ArrayExpr(it) => Some(super::nodes::Expr::ArrayExpr(it.cst.as_ref()?.clone())),
+            Expr::ArrowExpr(it) => Some(super::nodes::Expr::ArrowExpr(it.cst.as_ref()?.clone())),
             Expr::AsmExpr(it) => Some(super::nodes::Expr::AsmExpr(it.cst.as_ref()?.clone())),
             Expr::AssertExpr(it) => Some(super::nodes::Expr::AssertExpr(it.cst.as_ref()?.clone())),
             Expr::AssertForallExpr(it) => {
@@ -9084,6 +9156,7 @@ impl Expr {
             }
             Expr::IfExpr(it) => Some(super::nodes::Expr::IfExpr(it.cst.as_ref()?.clone())),
             Expr::IndexExpr(it) => Some(super::nodes::Expr::IndexExpr(it.cst.as_ref()?.clone())),
+            Expr::IsExpr(it) => Some(super::nodes::Expr::IsExpr(it.cst.as_ref()?.clone())),
             Expr::LetExpr(it) => Some(super::nodes::Expr::LetExpr(it.cst.as_ref()?.clone())),
             Expr::Literal(it) => Some(super::nodes::Expr::Literal(it.cst.as_ref()?.clone())),
             Expr::LoopExpr(it) => Some(super::nodes::Expr::LoopExpr(it.cst.as_ref()?.clone())),
@@ -9315,6 +9388,9 @@ impl From<TypeAlias> for AssocItem {
 impl From<ArrayExpr> for Expr {
     fn from(item: ArrayExpr) -> Self { Expr::ArrayExpr(Box::new(item)) }
 }
+impl From<ArrowExpr> for Expr {
+    fn from(item: ArrowExpr) -> Self { Expr::ArrowExpr(Box::new(item)) }
+}
 impl From<AsmExpr> for Expr {
     fn from(item: AsmExpr) -> Self { Expr::AsmExpr(Box::new(item)) }
 }
@@ -9368,6 +9444,9 @@ impl From<IfExpr> for Expr {
 }
 impl From<IndexExpr> for Expr {
     fn from(item: IndexExpr) -> Self { Expr::IndexExpr(Box::new(item)) }
+}
+impl From<IsExpr> for Expr {
+    fn from(item: IsExpr) -> Self { Expr::IsExpr(Box::new(item)) }
 }
 impl From<LetExpr> for Expr {
     fn from(item: LetExpr) -> Self { Expr::LetExpr(Box::new(item)) }
@@ -9676,6 +9755,20 @@ impl ArrayType {
             l_brack_token: true,
             r_brack_token: true,
             semicolon_token: true,
+            cst: None,
+        }
+    }
+}
+impl ArrowExpr {
+    pub fn new<ET0>(expr: ET0) -> Self
+    where
+        ET0: Into<Expr>,
+    {
+        Self {
+            attrs: vec![],
+            expr: Box::new(expr.into()),
+            name_ref: None,
+            thin_arrow_token: true,
             cst: None,
         }
     }
@@ -10210,7 +10303,12 @@ impl InvariantExceptBreakClause {
     pub fn new() -> Self { Self { exprs: vec![], invariant_except_break_token: true, cst: None } }
 }
 impl IsExpr {
-    pub fn new() -> Self { Self { ty: None, is_token: true, cst: None } }
+    pub fn new<ET0>(expr: ET0) -> Self
+    where
+        ET0: Into<Expr>,
+    {
+        Self { attrs: vec![], expr: Box::new(expr.into()), ty: None, is_token: true, cst: None }
+    }
 }
 impl ItemList {
     pub fn new() -> Self {
@@ -11093,6 +11191,9 @@ impl YieldExpr {
 impl From<ArrayExpr> for Stmt {
     fn from(item: ArrayExpr) -> Self { Stmt::from(Expr::from(item)) }
 }
+impl From<ArrowExpr> for Stmt {
+    fn from(item: ArrowExpr) -> Self { Stmt::from(Expr::from(item)) }
+}
 impl From<AsmExpr> for Stmt {
     fn from(item: AsmExpr) -> Self { Stmt::from(Expr::from(item)) }
 }
@@ -11146,6 +11247,9 @@ impl From<IfExpr> for Stmt {
 }
 impl From<IndexExpr> for Stmt {
     fn from(item: IndexExpr) -> Self { Stmt::from(Expr::from(item)) }
+}
+impl From<IsExpr> for Stmt {
+    fn from(item: IsExpr) -> Self { Stmt::from(Expr::from(item)) }
 }
 impl From<LetExpr> for Stmt {
     fn from(item: LetExpr) -> Self { Stmt::from(Expr::from(item)) }
