@@ -491,6 +491,12 @@ pub struct InvariantExceptBreakClause {
     pub cst: Option<super::nodes::InvariantExceptBreakClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsExpr {
+    pub ty: Option<Box<Type>>,
+    pub is_token: bool,
+    pub cst: Option<super::nodes::IsExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemList {
     pub attrs: Vec<Attr>,
     pub items: Vec<Item>,
@@ -2673,6 +2679,19 @@ impl TryFrom<super::nodes::InvariantExceptBreakClause> for InvariantExceptBreakC
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
             invariant_except_break_token: item.invariant_except_break_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::IsExpr> for IsExpr {
+    type Error = String;
+    fn try_from(item: super::nodes::IsExpr) -> Result<Self, Self::Error> {
+        Ok(Self {
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            is_token: item.is_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -6401,6 +6420,22 @@ impl std::fmt::Display for InvariantExceptBreakClause {
         s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.invariant_except_break_token {
             let mut tmp = stringify!(invariant_except_break_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for IsExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.is_token {
+            let mut tmp = stringify!(is_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -10173,6 +10208,9 @@ impl InvariantClause {
 }
 impl InvariantExceptBreakClause {
     pub fn new() -> Self { Self { exprs: vec![], invariant_except_break_token: true, cst: None } }
+}
+impl IsExpr {
+    pub fn new() -> Self { Self { ty: None, is_token: true, cst: None } }
 }
 impl ItemList {
     pub fn new() -> Self {
