@@ -349,6 +349,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "BROADCAST_GROUP_LIST",
         "BROADCAST_GROUP",
         "IS_EXPR",
+        "ARROW_EXPR",
     ],
 };
 

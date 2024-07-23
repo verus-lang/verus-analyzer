@@ -392,6 +392,8 @@ Expr =
 | AssertExpr
 | AssumeExpr
 | AssertForallExpr
+| IsExpr
+| ArrowExpr
 
 OffsetOfExpr =
   Attr* 'builtin' '#' 'offset_of' '(' Type ',' fields:(NameRef ('.' NameRef)* ) ')'
@@ -804,4 +806,7 @@ BroadcastGroup =
   Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
 
 IsExpr = 
-  'is' Type
+  Attr* Expr 'is' Type
+
+ArrowExpr =
+  Attr* Expr '->' (NameRef | value:('int_number'))

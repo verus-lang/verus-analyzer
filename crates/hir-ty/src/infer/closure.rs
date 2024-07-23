@@ -715,6 +715,12 @@ impl InferenceContext<'_> {
             Expr::View { condition } => {
                 self.consume_expr(*condition);
             }
+            Expr::IsExpr { expr, .. } => {
+                self.consume_expr(*expr);
+            }
+            Expr::ArrowExpr { expr, .. } => {
+                self.consume_expr(*expr);
+            }
         }
     }
 

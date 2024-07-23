@@ -489,6 +489,14 @@ fn postfix_expr(
             T![?] => try_expr(p, lhs),
             T![@] => verus::view_expr(p, lhs),
             T![is] => verus::is_expr(p, lhs),
+            T![->] => { dbg!("Found '->'"); verus::arrow_expr(p, lhs)},
+            T![-] => {
+                if p.nth_at(1, T![>]) { 
+                    dbg!("Found '->' in a hacky way"); verus::arrow_expr(p, lhs)
+                } else {
+                    break
+                }
+            },
             _ => break,
         };
         allow_calls = true;
