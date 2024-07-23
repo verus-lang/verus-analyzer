@@ -1519,6 +1519,27 @@ verus!{
 }
 
 #[test]
+fn verus_anonymous_return_types() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn foo() -> (u32, u32)
+{
+    (1, 2)
+}
+    }";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
 fn verus_while_loops() {
     use ast::HasModuleItem;
     let source_code = "verus!{
