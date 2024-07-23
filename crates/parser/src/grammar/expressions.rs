@@ -488,6 +488,7 @@ fn postfix_expr(
             },
             T![?] => try_expr(p, lhs),
             T![@] => verus::view_expr(p, lhs),
+            T![is] => verus::is_expr(p, lhs),
             _ => break,
         };
         allow_calls = true;

@@ -34,17 +34,25 @@ pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> () {
             types::type_no_bounds(p);
             p.expect(T![')']);
         } else {
-            dbg!("Failed to find Verus named param");
             types::type_no_bounds(p);
         }
         m.complete(p, RET_TYPE);
     }
 }
+
 pub(crate) fn view_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(T![@]));
     let m = lhs.precede(p);
     p.bump(T![@]);
     m.complete(p, VIEW_EXPR)
+}
+
+pub(crate) fn is_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+    assert!(p.at(T![is]));
+    let m = lhs.precede(p);
+    p.bump(T![is]);
+    types::type_no_bounds(p);
+    m.complete(p, IS_EXPR)
 }
 
 pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
