@@ -681,6 +681,14 @@ pub struct MatchGuard {
     pub cst: Option<super::nodes::MatchGuard>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MatchesExpr {
+    pub attrs: Vec<Attr>,
+    pub expr: Box<Expr>,
+    pub pat: Option<Box<Pat>>,
+    pub matches_token: bool,
+    pub cst: Option<super::nodes::MatchesExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Meta {
     pub expr: Option<Box<Expr>>,
     pub path: Box<Path>,
@@ -1398,6 +1406,7 @@ pub enum Expr {
     LoopExpr(Box<LoopExpr>),
     MacroExpr(Box<MacroExpr>),
     MatchExpr(Box<MatchExpr>),
+    MatchesExpr(Box<MatchesExpr>),
     MethodCallExpr(Box<MethodCallExpr>),
     OffsetOfExpr(Box<OffsetOfExpr>),
     ParenExpr(Box<ParenExpr>),
@@ -3188,6 +3197,29 @@ impl TryFrom<super::nodes::MatchGuard> for MatchGuard {
         Ok(Self { if_token: item.if_token().is_some(), cst: Some(item.clone()) })
     }
 }
+impl TryFrom<super::nodes::MatchesExpr> for MatchesExpr {
+    type Error = String;
+    fn try_from(item: super::nodes::MatchesExpr) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
+            pat: match item.pat() {
+                Some(it) => Some(Box::new(Pat::try_from(it)?)),
+                None => None,
+            },
+            matches_token: item.matches_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
 impl TryFrom<super::nodes::Meta> for Meta {
     type Error = String;
     fn try_from(item: super::nodes::Meta) -> Result<Self, Self::Error> {
@@ -4886,6 +4918,7 @@ impl TryFrom<super::nodes::Expr> for Expr {
             super::nodes::Expr::LoopExpr(it) => Ok(Self::LoopExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::MacroExpr(it) => Ok(Self::MacroExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::MatchExpr(it) => Ok(Self::MatchExpr(Box::new(it.try_into()?))),
+            super::nodes::Expr::MatchesExpr(it) => Ok(Self::MatchesExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::MethodCallExpr(it) => {
                 Ok(Self::MethodCallExpr(Box::new(it.try_into()?)))
             }
@@ -6955,6 +6988,25 @@ impl std::fmt::Display for MatchGuard {
         write!(f, "{s}")
     }
 }
+impl std::fmt::Display for MatchesExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.matches_token {
+            let mut tmp = stringify!(matches_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
 impl std::fmt::Display for Meta {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
@@ -8956,6 +9008,7 @@ impl std::fmt::Display for Expr {
             Expr::LoopExpr(it) => write!(f, "{}", it.to_string()),
             Expr::MacroExpr(it) => write!(f, "{}", it.to_string()),
             Expr::MatchExpr(it) => write!(f, "{}", it.to_string()),
+            Expr::MatchesExpr(it) => write!(f, "{}", it.to_string()),
             Expr::MethodCallExpr(it) => write!(f, "{}", it.to_string()),
             Expr::OffsetOfExpr(it) => write!(f, "{}", it.to_string()),
             Expr::ParenExpr(it) => write!(f, "{}", it.to_string()),
@@ -9162,6 +9215,9 @@ impl Expr {
             Expr::LoopExpr(it) => Some(super::nodes::Expr::LoopExpr(it.cst.as_ref()?.clone())),
             Expr::MacroExpr(it) => Some(super::nodes::Expr::MacroExpr(it.cst.as_ref()?.clone())),
             Expr::MatchExpr(it) => Some(super::nodes::Expr::MatchExpr(it.cst.as_ref()?.clone())),
+            Expr::MatchesExpr(it) => {
+                Some(super::nodes::Expr::MatchesExpr(it.cst.as_ref()?.clone()))
+            }
             Expr::MethodCallExpr(it) => {
                 Some(super::nodes::Expr::MethodCallExpr(it.cst.as_ref()?.clone()))
             }
@@ -9462,6 +9518,9 @@ impl From<MacroExpr> for Expr {
 }
 impl From<MatchExpr> for Expr {
     fn from(item: MatchExpr) -> Self { Expr::MatchExpr(Box::new(item)) }
+}
+impl From<MatchesExpr> for Expr {
+    fn from(item: MatchesExpr) -> Self { Expr::MatchesExpr(Box::new(item)) }
 }
 impl From<MethodCallExpr> for Expr {
     fn from(item: MethodCallExpr) -> Self { Expr::MethodCallExpr(Box::new(item)) }
@@ -10490,6 +10549,20 @@ impl MatchExpr {
 impl MatchGuard {
     pub fn new() -> Self { Self { if_token: true, cst: None } }
 }
+impl MatchesExpr {
+    pub fn new<ET0>(expr: ET0) -> Self
+    where
+        ET0: Into<Expr>,
+    {
+        Self {
+            attrs: vec![],
+            expr: Box::new(expr.into()),
+            pat: None,
+            matches_token: true,
+            cst: None,
+        }
+    }
+}
 impl Meta {
     pub fn new(path: Path) -> Self {
         Self {
@@ -11265,6 +11338,9 @@ impl From<MacroExpr> for Stmt {
 }
 impl From<MatchExpr> for Stmt {
     fn from(item: MatchExpr) -> Self { Stmt::from(Expr::from(item)) }
+}
+impl From<MatchesExpr> for Stmt {
+    fn from(item: MatchesExpr) -> Self { Stmt::from(Expr::from(item)) }
 }
 impl From<MethodCallExpr> for Stmt {
     fn from(item: MethodCallExpr) -> Self { Stmt::from(Expr::from(item)) }
