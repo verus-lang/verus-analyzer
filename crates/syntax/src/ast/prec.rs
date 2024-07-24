@@ -351,7 +351,8 @@ impl Expr {
 
             //verus
             // ViewExpr(@) is similar to TryExpr(?)
-            ViewExpr(_) | IsExpr(_) | ArrowExpr(_) | MatchesExpr(_) | AssertExpr(_) | AssumeExpr(_) | AssertForallExpr(_) => false,
+            ViewExpr(_) | IsExpr(_) | ArrowExpr(_) | MatchesExpr(_) | AssertExpr(_)
+            | AssumeExpr(_) | AssertForallExpr(_) => false,
         }
     }
 }
