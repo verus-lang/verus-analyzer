@@ -1228,6 +1228,20 @@ impl<'ctx> MirLowerCtx<'ctx> {
                 );
                 Ok(Some(current))
             }
+            Expr::MatchesExpr { expr, pat: _ } => {
+                let Some((it, current)) = self.lower_expr_to_some_operand(*expr, current)? else {
+                    return Ok(None);
+                };
+                let source_ty = self.infer[*expr].clone();
+                let target_ty = self.infer[expr_id].clone();
+                self.push_assignment(
+                    current,
+                    place,
+                    Rvalue::Cast(cast_kind(&source_ty, &target_ty)?, it, target_ty),
+                    expr_id.into(),
+                );
+                Ok(Some(current))
+            }
             Expr::Array(l) => match l {
                 Array::ElementList { elements, .. } => {
                     let elem_ty = match &self.expr_ty_without_adjust(expr_id).kind(Interner) {

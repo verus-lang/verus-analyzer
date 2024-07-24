@@ -937,6 +937,11 @@ impl InferenceContext<'_> {
                 self.write_expr_ty(tgt_expr, ty.clone());
                 ty
             }
+            Expr::MatchesExpr { expr, pat } => {
+                let input_ty = self.infer_expr(*expr, &Expectation::none());
+                self.infer_top_pat(*pat, &input_ty);
+                self.result.standard_types.bool_.clone()
+            }
             Expr::Assume { condition } => {
                 let bool_ty = self.result.standard_types.bool_.clone();
                 self.infer_expr_coerce(*condition, &Expectation::HasType(bool_ty.clone()));

@@ -394,6 +394,7 @@ Expr =
 | AssertForallExpr
 | IsExpr
 | ArrowExpr
+| MatchesExpr
 
 OffsetOfExpr =
   Attr* 'builtin' '#' 'offset_of' '(' Type ',' fields:(NameRef ('.' NameRef)* ) ')'
@@ -810,3 +811,6 @@ IsExpr =
 
 ArrowExpr =
   Attr* Expr '->' (NameRef | value:('int_number'))
+
+MatchesExpr =
+  Attr* Expr 'matches' Pat 

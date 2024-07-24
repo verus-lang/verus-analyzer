@@ -721,6 +721,9 @@ impl InferenceContext<'_> {
             Expr::ArrowExpr { expr, .. } => {
                 self.consume_expr(*expr);
             }
+            Expr::MatchesExpr { expr, .. } => {
+                self.consume_expr(*expr);
+            }
         }
     }
 

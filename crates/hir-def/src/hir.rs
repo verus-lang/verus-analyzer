@@ -181,6 +181,10 @@ pub enum Expr {
         expr: ExprId,
         name: Name,
     },
+    MatchesExpr {
+        expr: ExprId,
+        pat: PatId,
+    },
 
     Path(Path),
     If {
@@ -502,6 +506,9 @@ impl Expr {
                 f(*expr);
             }
             Expr::ArrowExpr { expr, .. } => {
+                f(*expr);
+            }
+            Expr::MatchesExpr { expr, .. } => {
                 f(*expr);
             }
         }

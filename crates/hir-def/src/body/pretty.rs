@@ -504,6 +504,11 @@ impl Printer<'_> {
                 w!(self, "->");
                 w!(self, "{}", name.display(self.db.upcast()));
             }
+            Expr::MatchesExpr { expr, pat } => {
+                self.print_expr(*expr);
+                w!(self, " matches ");
+                self.print_pat(*pat);
+            }
         }
     }
 
