@@ -986,6 +986,17 @@ impl MatchGuard {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MatchesExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for MatchesExpr {}
+impl MatchesExpr {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    pub fn matches_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![matches]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Meta {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1966,6 +1977,7 @@ pub enum Expr {
     LoopExpr(LoopExpr),
     MacroExpr(MacroExpr),
     MatchExpr(MatchExpr),
+    MatchesExpr(MatchesExpr),
     MethodCallExpr(MethodCallExpr),
     OffsetOfExpr(OffsetOfExpr),
     ParenExpr(ParenExpr),
@@ -3071,6 +3083,17 @@ impl AstNode for MatchGuard {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for MatchesExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == MATCHES_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for Meta {
     fn can_cast(kind: SyntaxKind) -> bool { kind == META }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -4119,6 +4142,9 @@ impl From<MacroExpr> for Expr {
 impl From<MatchExpr> for Expr {
     fn from(node: MatchExpr) -> Expr { Expr::MatchExpr(node) }
 }
+impl From<MatchesExpr> for Expr {
+    fn from(node: MatchesExpr) -> Expr { Expr::MatchesExpr(node) }
+}
 impl From<MethodCallExpr> for Expr {
     fn from(node: MethodCallExpr) -> Expr { Expr::MethodCallExpr(node) }
 }
@@ -4197,6 +4223,7 @@ impl AstNode for Expr {
                 | LOOP_EXPR
                 | MACRO_EXPR
                 | MATCH_EXPR
+                | MATCHES_EXPR
                 | METHOD_CALL_EXPR
                 | OFFSET_OF_EXPR
                 | PAREN_EXPR
@@ -4243,6 +4270,7 @@ impl AstNode for Expr {
             LOOP_EXPR => Expr::LoopExpr(LoopExpr { syntax }),
             MACRO_EXPR => Expr::MacroExpr(MacroExpr { syntax }),
             MATCH_EXPR => Expr::MatchExpr(MatchExpr { syntax }),
+            MATCHES_EXPR => Expr::MatchesExpr(MatchesExpr { syntax }),
             METHOD_CALL_EXPR => Expr::MethodCallExpr(MethodCallExpr { syntax }),
             OFFSET_OF_EXPR => Expr::OffsetOfExpr(OffsetOfExpr { syntax }),
             PAREN_EXPR => Expr::ParenExpr(ParenExpr { syntax }),
@@ -4291,6 +4319,7 @@ impl AstNode for Expr {
             Expr::LoopExpr(it) => &it.syntax,
             Expr::MacroExpr(it) => &it.syntax,
             Expr::MatchExpr(it) => &it.syntax,
+            Expr::MatchesExpr(it) => &it.syntax,
             Expr::MethodCallExpr(it) => &it.syntax,
             Expr::OffsetOfExpr(it) => &it.syntax,
             Expr::ParenExpr(it) => &it.syntax,
@@ -4902,6 +4931,7 @@ impl AstNode for AnyHasAttrs {
                 | MATCH_ARM
                 | MATCH_ARM_LIST
                 | MATCH_EXPR
+                | MATCHES_EXPR
                 | METHOD_CALL_EXPR
                 | MODULE
                 | OFFSET_OF_EXPR
@@ -5594,6 +5624,11 @@ impl std::fmt::Display for MatchExpr {
     }
 }
 impl std::fmt::Display for MatchGuard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for MatchesExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
