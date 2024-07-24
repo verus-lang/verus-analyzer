@@ -116,8 +116,8 @@ pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
 
 pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     p.bump(T![group]);
-    p.bump(IDENT);  // group name
-    p.expect(T!['{']); 
+    p.bump(IDENT); // group name
+    p.expect(T!['{']);
     while !p.at(EOF) && !p.at(T!['}']) {
         attributes::inner_attrs(p);
         paths::use_path(p);
@@ -131,7 +131,7 @@ pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker 
             dbg!("broadcast_group at: {:?}", p.current());
         }
     }
-    p.expect(T!['}']); 
+    p.expect(T!['}']);
     m.complete(p, BROADCAST_GROUP)
 }
 
@@ -149,7 +149,7 @@ pub(crate) fn broadcast_use_list(p: &mut Parser<'_>, m: Marker) -> CompletedMark
             dbg!("broadcast_use_list at: {:?}", p.current());
         }
     }
-    p.expect(T![;]); 
+    p.expect(T![;]);
     m.complete(p, BROADCAST_USE_LIST)
 }
 

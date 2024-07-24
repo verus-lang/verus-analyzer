@@ -189,13 +189,13 @@ impl InferenceContext<'_> {
             | Expr::Continue { .. }
             | Expr::Underscore => (),
             // verus:TODO
-            | Expr::IsExpr { expr, .. } => {
+            Expr::IsExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }
-            | Expr::ArrowExpr { expr, .. } => {
+            Expr::ArrowExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }
-            | Expr::MatchesExpr { expr, .. } => {
+            Expr::MatchesExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }
             Expr::Assert { .. } | Expr::Assume { .. } | Expr::View { .. } => (),

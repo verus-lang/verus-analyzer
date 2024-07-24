@@ -111,7 +111,7 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
         }
         EOF | T!['}'] => p.error("expected an item"),
         T![let] => error_let_stmt(p, "expected an item"),
-        _ => { dbg!("item_or_macro"); p.err_and_bump("expected an item") },
+        _ => p.err_and_bump("expected an item"),
     }
 }
 
@@ -270,7 +270,6 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
             if has_mods {
                 p.error("expected existential, fn, trait or impl");
             } else {
-                dbg!("opt_item");
                 p.error("expected an item");
             }
             m.complete(p, ERROR);
