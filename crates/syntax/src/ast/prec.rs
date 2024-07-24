@@ -176,7 +176,7 @@ impl Expr {
             AwaitExpr(_) | CallExpr(_) | MethodCallExpr(_) | IndexExpr(_) | TryExpr(_)
             | MacroExpr(_) => (29, 0),
 
-            FieldExpr(_) | IsExpr(_) | ArrowExpr(_) => (31, 32),
+            FieldExpr(_) | IsExpr(_) | ArrowExpr(_) | MatchesExpr(_) => (31, 32),
 
             ArrayExpr(_) | TupleExpr(_) | Literal(_) | PathExpr(_) | ParenExpr(_) | IfExpr(_)
             | WhileExpr(_) | ForExpr(_) | LoopExpr(_) | MatchExpr(_) | BlockExpr(_)
@@ -319,6 +319,7 @@ impl Expr {
                 ViewExpr(e) => e.at_token(),
                 ArrowExpr(e) => e.thin_arrow_token(),
                 IsExpr(e) => e.is_token(),
+                MatchesExpr(e) => e.matches_token(),
                 AssertExpr(_) | AssumeExpr(_) | AssertForallExpr(_) => None,
             };
 
@@ -350,7 +351,7 @@ impl Expr {
 
             //verus
             // ViewExpr(@) is similar to TryExpr(?)
-            ViewExpr(_) | IsExpr(_) | ArrowExpr(_) | AssertExpr(_) | AssumeExpr(_) | AssertForallExpr(_) => false,
+            ViewExpr(_) | IsExpr(_) | ArrowExpr(_) | MatchesExpr(_) | AssertExpr(_) | AssumeExpr(_) | AssertForallExpr(_) => false,
         }
     }
 }

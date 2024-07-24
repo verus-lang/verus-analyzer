@@ -157,7 +157,8 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "global",
         "broadcast",
         "group",
-        "is"
+        "is",
+        "matches",
     ],
     contextual_keywords: &[
         "auto",
@@ -350,6 +351,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "BROADCAST_GROUP",
         "IS_EXPR",
         "ARROW_EXPR",
+        "MATCHES_EXPR",
     ],
 };
 

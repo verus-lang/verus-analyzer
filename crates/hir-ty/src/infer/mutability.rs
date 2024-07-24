@@ -195,6 +195,9 @@ impl InferenceContext<'_> {
             | Expr::ArrowExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }
+            | Expr::MatchesExpr { expr, .. } => {
+                self.infer_mut_expr(*expr, Mutability::Not);
+            }
             Expr::Assert { .. } | Expr::Assume { .. } | Expr::View { .. } => (),
         }
     }

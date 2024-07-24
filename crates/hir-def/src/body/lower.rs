@@ -676,6 +676,11 @@ impl ExprCollector<'_> {
                 };
                 self.alloc_expr(Expr::ArrowExpr { expr, name }, syntax_ptr)
             }
+            ast::Expr::MatchesExpr(e) => {
+                let expr = self.collect_expr_opt(e.expr());
+                let pat = self.collect_pat_top(e.pat());
+                self.alloc_expr(Expr::MatchesExpr { expr, pat }, syntax_ptr)
+            }
             ast::Expr::AssertExpr(e) => {
                 let body = e.block_expr().map(|e| self.collect_block(e));
                 let condition = self.collect_expr_opt(e.expr());
