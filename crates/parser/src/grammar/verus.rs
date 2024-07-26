@@ -25,11 +25,9 @@ pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> () {
             p.expect(T![tracked]);
         }
         if p.at(T!['(']) && p.nth_at(1, IDENT) && p.nth_at(2, T![:]) {
-            dbg!("Verus named param");
             // verus named param
             p.bump(T!['(']);
-            //patterns::pattern(p);
-            p.bump(IDENT);
+            patterns::pattern(p);
             p.bump(T![:]);
             types::type_no_bounds(p);
             p.expect(T![')']);
