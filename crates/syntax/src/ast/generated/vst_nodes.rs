@@ -9,109 +9,109 @@ pub struct Abi {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArgList {
-    pub args: Vec<Expr>,
     pub l_paren_token: bool,
+    pub args: Vec<Expr>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::ArgList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
-    pub exprs: Vec<Expr>,
     pub l_brack_token: bool,
-    pub r_brack_token: bool,
+    pub exprs: Vec<Expr>,
+    pub expr: Box<Expr>,
     pub semicolon_token: bool,
+    pub r_brack_token: bool,
     pub cst: Option<super::nodes::ArrayExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayType {
-    pub const_arg: Box<ConstArg>,
-    pub ty: Option<Box<Type>>,
     pub l_brack_token: bool,
-    pub r_brack_token: bool,
+    pub ty: Option<Box<Type>>,
     pub semicolon_token: bool,
+    pub const_arg: Box<ConstArg>,
+    pub r_brack_token: bool,
     pub cst: Option<super::nodes::ArrayType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrowExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
-    pub name_ref: Option<Box<NameRef>>,
     pub thin_arrow_token: bool,
+    pub name_ref: Option<Box<NameRef>>,
     pub cst: Option<super::nodes::ArrowExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AsmExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
-    pub pound_token: bool,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub asm_token: bool,
     pub builtin_token: bool,
+    pub pound_token: bool,
+    pub asm_token: bool,
+    pub l_paren_token: bool,
+    pub expr: Box<Expr>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::AsmExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssertExpr {
     pub attrs: Vec<Attr>,
-    pub block_expr: Option<Box<BlockExpr>>,
+    pub assert_token: bool,
+    pub l_paren_token: bool,
     pub expr: Box<Expr>,
+    pub r_paren_token: bool,
+    pub by_token: bool,
     pub name: Option<Box<Name>>,
     pub requires_clause: Option<Box<RequiresClause>>,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub assert_token: bool,
-    pub by_token: bool,
+    pub block_expr: Option<Box<BlockExpr>>,
     pub cst: Option<super::nodes::AssertExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssertForallExpr {
     pub attrs: Vec<Attr>,
-    pub block_expr: Box<BlockExpr>,
-    pub closure_expr: Box<ClosureExpr>,
-    pub expr: Option<Box<Expr>>,
     pub assert_token: bool,
-    pub by_token: bool,
+    pub closure_expr: Box<ClosureExpr>,
     pub implies_token: bool,
+    pub expr: Option<Box<Expr>>,
+    pub by_token: bool,
+    pub block_expr: Box<BlockExpr>,
     pub cst: Option<super::nodes::AssertForallExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssocItemList {
-    pub assoc_items: Vec<AssocItem>,
-    pub attrs: Vec<Attr>,
     pub l_curly_token: bool,
+    pub attrs: Vec<Attr>,
+    pub assoc_items: Vec<AssocItem>,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::AssocItemList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssocTypeArg {
-    pub const_arg: Option<Box<ConstArg>>,
-    pub generic_arg_list: Option<Box<GenericArgList>>,
     pub name_ref: Box<NameRef>,
+    pub generic_arg_list: Option<Box<GenericArgList>>,
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
-    pub ty: Option<Box<Type>>,
-    pub type_bound_list: Box<TypeBoundList>,
     pub colon_token: bool,
+    pub type_bound_list: Box<TypeBoundList>,
     pub eq_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub const_arg: Option<Box<ConstArg>>,
     pub cst: Option<super::nodes::AssocTypeArg>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssumeExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
     pub assume_token: bool,
+    pub l_paren_token: bool,
+    pub expr: Box<Expr>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::AssumeExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Attr {
-    pub meta: Box<Meta>,
-    pub excl_token: bool,
     pub pound_token: bool,
+    pub excl_token: bool,
     pub l_brack_token: bool,
+    pub meta: Box<Meta>,
     pub r_brack_token: bool,
     pub cst: Option<super::nodes::Attr>,
 }
@@ -126,43 +126,43 @@ pub struct AwaitExpr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BecomeExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
     pub become_token: bool,
+    pub expr: Box<Expr>,
     pub cst: Option<super::nodes::BecomeExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BlockExpr {
     pub attrs: Vec<Attr>,
     pub label: Option<Box<Label>>,
-    pub stmt_list: Box<StmtList>,
-    pub async_token: bool,
-    pub const_token: bool,
     pub try_token: bool,
     pub unsafe_token: bool,
+    pub async_token: bool,
+    pub const_token: bool,
+    pub stmt_list: Box<StmtList>,
     pub cst: Option<super::nodes::BlockExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BoxPat {
-    pub pat: Option<Box<Pat>>,
     pub box_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub cst: Option<super::nodes::BoxPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BreakExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Option<Box<Expr>>,
-    pub lifetime: Option<Box<Lifetime>>,
     pub break_token: bool,
+    pub lifetime: Option<Box<Lifetime>>,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::BreakExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BroadcastGroup {
     pub attrs: Vec<Attr>,
-    pub broadcast_group_identifier: Box<BroadcastGroupIdentifier>,
-    pub broadcast_group_list: Box<BroadcastGroupList>,
     pub visibility: Option<Box<Visibility>>,
     pub broadcast_token: bool,
     pub group_token: bool,
+    pub broadcast_group_identifier: Box<BroadcastGroupIdentifier>,
+    pub broadcast_group_list: Box<BroadcastGroupList>,
     pub cst: Option<super::nodes::BroadcastGroup>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -172,8 +172,8 @@ pub struct BroadcastGroupIdentifier {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BroadcastGroupList {
-    pub broadcast_group_members: Vec<BroadcastGroupMember>,
     pub l_curly_token: bool,
+    pub broadcast_group_members: Vec<BroadcastGroupMember>,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::BroadcastGroupList>,
 }
@@ -186,10 +186,10 @@ pub struct BroadcastGroupMember {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BroadcastUse {
     pub attrs: Vec<Attr>,
-    pub broadcast_use_list: Box<BroadcastUseList>,
-    pub semicolon_token: bool,
     pub broadcast_token: bool,
     pub use_token: bool,
+    pub broadcast_use_list: Box<BroadcastUseList>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::BroadcastUse>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -199,48 +199,48 @@ pub struct BroadcastUseList {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CallExpr {
-    pub arg_list: Box<ArgList>,
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
+    pub arg_list: Box<ArgList>,
     pub cst: Option<super::nodes::CallExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CastExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
-    pub ty: Option<Box<Type>>,
     pub as_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::CastExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ClosureExpr {
     pub attrs: Vec<Attr>,
-    pub body: Box<Expr>,
+    pub for_token: bool,
     pub generic_param_list: Option<Box<GenericParamList>>,
+    pub const_token: bool,
+    pub static_token: bool,
+    pub async_token: bool,
+    pub move_token: bool,
+    pub forall_token: bool,
+    pub exists_token: bool,
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
-    pub async_token: bool,
-    pub const_token: bool,
-    pub exists_token: bool,
-    pub for_token: bool,
-    pub forall_token: bool,
-    pub move_token: bool,
-    pub static_token: bool,
+    pub body: Box<Expr>,
     pub cst: Option<super::nodes::ClosureExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Const {
     pub attrs: Vec<Attr>,
-    pub body: Option<Box<Expr>>,
-    pub name: Option<Box<Name>>,
-    pub ty: Option<Box<Type>>,
     pub visibility: Option<Box<Visibility>>,
-    pub colon_token: bool,
-    pub semicolon_token: bool,
-    pub eq_token: bool,
-    pub underscore_token: bool,
-    pub const_token: bool,
     pub default_token: bool,
+    pub const_token: bool,
+    pub name: Option<Box<Name>>,
+    pub underscore_token: bool,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub eq_token: bool,
+    pub body: Option<Box<Expr>>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::Const>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -250,26 +250,26 @@ pub struct ConstArg {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ConstBlockPat {
-    pub block_expr: Box<BlockExpr>,
     pub const_token: bool,
+    pub block_expr: Box<BlockExpr>,
     pub cst: Option<super::nodes::ConstBlockPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ConstParam {
     pub attrs: Vec<Attr>,
-    pub default_val: Option<Box<ConstArg>>,
-    pub name: Box<Name>,
-    pub ty: Option<Box<Type>>,
-    pub colon_token: bool,
-    pub eq_token: bool,
     pub const_token: bool,
+    pub name: Box<Name>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub eq_token: bool,
+    pub default_val: Option<Box<ConstArg>>,
     pub cst: Option<super::nodes::ConstParam>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ContinueExpr {
     pub attrs: Vec<Attr>,
-    pub lifetime: Option<Box<Lifetime>>,
     pub continue_token: bool,
+    pub lifetime: Option<Box<Lifetime>>,
     pub cst: Option<super::nodes::ContinueExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -280,32 +280,32 @@ pub struct DataMode {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DecreasesClause {
-    pub exprs: Vec<Expr>,
     pub decreases_token: bool,
+    pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::DecreasesClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynTraitType {
-    pub type_bound_list: Box<TypeBoundList>,
     pub dyn_token: bool,
+    pub type_bound_list: Box<TypeBoundList>,
     pub cst: Option<super::nodes::DynTraitType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnsuresClause {
-    pub exprs: Vec<Expr>,
     pub ensures_token: bool,
+    pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::EnsuresClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Enum {
     pub attrs: Vec<Attr>,
-    pub data_mode: Option<Box<DataMode>>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
-    pub variant_list: Box<VariantList>,
     pub visibility: Option<Box<Visibility>>,
-    pub where_clause: Option<Box<WhereClause>>,
+    pub data_mode: Option<Box<DataMode>>,
     pub enum_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub variant_list: Box<VariantList>,
     pub cst: Option<super::nodes::Enum>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -316,28 +316,28 @@ pub struct ExprStmt {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExternBlock {
-    pub abi: Box<Abi>,
     pub attrs: Vec<Attr>,
-    pub extern_item_list: Box<ExternItemList>,
     pub unsafe_token: bool,
+    pub abi: Box<Abi>,
+    pub extern_item_list: Box<ExternItemList>,
     pub cst: Option<super::nodes::ExternBlock>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExternCrate {
     pub attrs: Vec<Attr>,
+    pub visibility: Option<Box<Visibility>>,
+    pub extern_token: bool,
+    pub crate_token: bool,
     pub name_ref: Box<NameRef>,
     pub rename: Option<Box<Rename>>,
-    pub visibility: Option<Box<Visibility>>,
     pub semicolon_token: bool,
-    pub crate_token: bool,
-    pub extern_token: bool,
     pub cst: Option<super::nodes::ExternCrate>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExternItemList {
+    pub l_curly_token: bool,
     pub attrs: Vec<Attr>,
     pub extern_items: Vec<ExternItem>,
-    pub l_curly_token: bool,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::ExternItemList>,
 }
@@ -345,140 +345,140 @@ pub struct ExternItemList {
 pub struct FieldExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
-    pub name_ref: Box<NameRef>,
     pub dot_token: bool,
+    pub name_ref: Box<NameRef>,
     pub cst: Option<super::nodes::FieldExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Fn {
-    pub abi: Option<Box<Abi>>,
     pub attrs: Vec<Attr>,
-    pub body: Option<Box<BlockExpr>>,
-    pub ensures_clause: Option<Box<EnsuresClause>>,
-    pub fn_mode: Option<Box<FnMode>>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
-    pub param_list: Option<Box<ParamList>>,
-    pub prover: Option<Box<Prover>>,
-    pub publish: Option<Box<Publish>>,
-    pub recommends_clause: Option<Box<RecommendsClause>>,
-    pub requires_clause: Option<Box<RequiresClause>>,
-    pub ret_type: Option<Box<RetType>>,
-    pub signature_decreases: Option<Box<SignatureDecreases>>,
     pub visibility: Option<Box<Visibility>>,
-    pub where_clause: Option<Box<WhereClause>>,
-    pub semicolon_token: bool,
-    pub async_token: bool,
-    pub broadcast_token: bool,
-    pub const_token: bool,
+    pub publish: Option<Box<Publish>>,
     pub default_token: bool,
-    pub fn_token: bool,
+    pub const_token: bool,
+    pub async_token: bool,
     pub unsafe_token: bool,
+    pub abi: Option<Box<Abi>>,
+    pub broadcast_token: bool,
+    pub fn_mode: Option<Box<FnMode>>,
+    pub fn_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub param_list: Option<Box<ParamList>>,
+    pub ret_type: Option<Box<RetType>>,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub prover: Option<Box<Prover>>,
+    pub requires_clause: Option<Box<RequiresClause>>,
+    pub recommends_clause: Option<Box<RecommendsClause>>,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub signature_decreases: Option<Box<SignatureDecreases>>,
+    pub body: Option<Box<BlockExpr>>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::Fn>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnMode {
-    pub mode_spec_checked: Option<Box<ModeSpecChecked>>,
-    pub exec_token: bool,
-    pub proof_token: bool,
     pub spec_token: bool,
+    pub proof_token: bool,
+    pub exec_token: bool,
+    pub mode_spec_checked: Option<Box<ModeSpecChecked>>,
     pub cst: Option<super::nodes::FnMode>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FnPtrType {
+    pub const_token: bool,
+    pub async_token: bool,
+    pub unsafe_token: bool,
     pub abi: Option<Box<Abi>>,
+    pub fn_token: bool,
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
-    pub async_token: bool,
-    pub const_token: bool,
-    pub fn_token: bool,
-    pub unsafe_token: bool,
     pub cst: Option<super::nodes::FnPtrType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForExpr {
     pub attrs: Vec<Attr>,
-    pub iter_name: Option<Box<Name>>,
     pub label: Option<Box<Label>>,
-    pub loop_body: Box<BlockExpr>,
-    pub loop_clauses: Vec<LoopClause>,
-    pub pat: Option<Box<Pat>>,
-    pub colon_token: bool,
     pub for_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub in_token: bool,
+    pub iter_name: Option<Box<Name>>,
+    pub colon_token: bool,
+    pub loop_clauses: Vec<LoopClause>,
+    pub loop_body: Box<BlockExpr>,
     pub cst: Option<super::nodes::ForExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ForType {
+    pub for_token: bool,
     pub generic_param_list: Box<GenericParamList>,
     pub ty: Option<Box<Type>>,
-    pub for_token: bool,
     pub cst: Option<super::nodes::ForType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FormatArgsArg {
-    pub expr: Box<Expr>,
     pub name: Option<Box<Name>>,
     pub eq_token: bool,
+    pub expr: Box<Expr>,
     pub cst: Option<super::nodes::FormatArgsArg>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FormatArgsExpr {
-    pub args: Vec<FormatArgsArg>,
     pub attrs: Vec<Attr>,
-    pub template: Box<Expr>,
-    pub pound_token: bool,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub comma_token: bool,
     pub builtin_token: bool,
+    pub pound_token: bool,
     pub format_args_token: bool,
+    pub l_paren_token: bool,
+    pub template: Box<Expr>,
+    pub comma_token: bool,
+    pub args: Vec<FormatArgsArg>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::FormatArgsExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GenericArgList {
-    pub generic_args: Vec<GenericArg>,
     pub coloncolon_token: bool,
     pub l_angle_token: bool,
+    pub generic_args: Vec<GenericArg>,
     pub r_angle_token: bool,
     pub cst: Option<super::nodes::GenericArgList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GenericParamList {
-    pub generic_params: Vec<GenericParam>,
     pub l_angle_token: bool,
+    pub generic_params: Vec<GenericParam>,
     pub r_angle_token: bool,
     pub cst: Option<super::nodes::GenericParamList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IdentPat {
     pub attrs: Vec<Attr>,
-    pub name: Box<Name>,
-    pub pat: Option<Box<Pat>>,
-    pub at_token: bool,
-    pub mut_token: bool,
     pub ref_token: bool,
+    pub mut_token: bool,
+    pub name: Box<Name>,
+    pub at_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub cst: Option<super::nodes::IdentPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Impl {
-    pub assoc_item_list: Box<AssocItemList>,
     pub attrs: Vec<Attr>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
     pub visibility: Option<Box<Visibility>>,
-    pub where_clause: Option<Box<WhereClause>>,
-    pub excl_token: bool,
-    pub const_token: bool,
     pub default_token: bool,
-    pub for_token: bool,
-    pub impl_token: bool,
     pub unsafe_token: bool,
+    pub impl_token: bool,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub const_token: bool,
+    pub excl_token: bool,
+    pub for_token: bool,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub assoc_item_list: Box<AssocItemList>,
     pub cst: Option<super::nodes::Impl>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ImplTraitType {
-    pub type_bound_list: Box<TypeBoundList>,
     pub impl_token: bool,
+    pub type_bound_list: Box<TypeBoundList>,
     pub cst: Option<super::nodes::ImplTraitType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -488,29 +488,29 @@ pub struct InferType {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InvariantClause {
-    pub exprs: Vec<Expr>,
     pub invariant_token: bool,
+    pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::InvariantClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InvariantExceptBreakClause {
-    pub exprs: Vec<Expr>,
     pub invariant_except_break_token: bool,
+    pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::InvariantExceptBreakClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
-    pub ty: Option<Box<Type>>,
     pub is_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::IsExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemList {
+    pub l_curly_token: bool,
     pub attrs: Vec<Attr>,
     pub items: Vec<Item>,
-    pub l_curly_token: bool,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::ItemList>,
 }
@@ -522,32 +522,32 @@ pub struct Label {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LetElse {
-    pub block_expr: Box<BlockExpr>,
     pub else_token: bool,
+    pub block_expr: Box<BlockExpr>,
     pub cst: Option<super::nodes::LetElse>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LetExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
+    pub let_token: bool,
     pub pat: Option<Box<Pat>>,
     pub eq_token: bool,
-    pub let_token: bool,
+    pub expr: Box<Expr>,
     pub cst: Option<super::nodes::LetExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LetStmt {
     pub attrs: Vec<Attr>,
+    pub let_token: bool,
+    pub ghost_token: bool,
+    pub tracked_token: bool,
+    pub pat: Option<Box<Pat>>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub eq_token: bool,
     pub initializer: Box<Expr>,
     pub let_else: Option<Box<LetElse>>,
-    pub pat: Option<Box<Pat>>,
-    pub ty: Option<Box<Type>>,
-    pub colon_token: bool,
     pub semicolon_token: bool,
-    pub eq_token: bool,
-    pub ghost_token: bool,
-    pub let_token: bool,
-    pub tracked_token: bool,
     pub cst: Option<super::nodes::LetStmt>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -564,53 +564,53 @@ pub struct LifetimeArg {
 pub struct LifetimeParam {
     pub attrs: Vec<Attr>,
     pub lifetime: Box<Lifetime>,
-    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub colon_token: bool,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub cst: Option<super::nodes::LifetimeParam>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LiteralPat {
-    pub literal: Box<Literal>,
     pub minus_token: bool,
+    pub literal: Box<Literal>,
     pub cst: Option<super::nodes::LiteralPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LoopExpr {
     pub attrs: Vec<Attr>,
     pub label: Option<Box<Label>>,
-    pub loop_body: Box<BlockExpr>,
-    pub loop_clauses: Vec<LoopClause>,
     pub loop_token: bool,
+    pub loop_clauses: Vec<LoopClause>,
+    pub loop_body: Box<BlockExpr>,
     pub cst: Option<super::nodes::LoopExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MacroCall {
     pub attrs: Vec<Attr>,
     pub path: Box<Path>,
-    pub token_tree: Box<TokenTree>,
     pub excl_token: bool,
+    pub token_tree: Box<TokenTree>,
     pub semicolon_token: bool,
     pub cst: Option<super::nodes::MacroCall>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MacroDef {
-    pub args: Option<Box<TokenTree>>,
     pub attrs: Vec<Attr>,
-    pub body: Box<TokenTree>,
-    pub name: Box<Name>,
     pub visibility: Option<Box<Visibility>>,
     pub macro_token: bool,
+    pub name: Box<Name>,
+    pub args: Option<Box<TokenTree>>,
+    pub body: Box<TokenTree>,
     pub cst: Option<super::nodes::MacroDef>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MacroEagerInput {
-    pub exprs: Vec<Expr>,
     pub l_paren_token: bool,
+    pub exprs: Vec<Expr>,
     pub r_paren_token: bool,
-    pub l_brack_token: bool,
-    pub r_brack_token: bool,
     pub l_curly_token: bool,
     pub r_curly_token: bool,
+    pub l_brack_token: bool,
+    pub r_brack_token: bool,
     pub cst: Option<super::nodes::MacroEagerInput>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -631,17 +631,17 @@ pub struct MacroPat {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MacroRules {
     pub attrs: Vec<Attr>,
+    pub visibility: Option<Box<Visibility>>,
+    pub macro_rules_token: bool,
+    pub excl_token: bool,
     pub name: Box<Name>,
     pub token_tree: Box<TokenTree>,
-    pub visibility: Option<Box<Visibility>>,
-    pub excl_token: bool,
-    pub macro_rules_token: bool,
     pub cst: Option<super::nodes::MacroRules>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MacroStmts {
-    pub expr: Option<Box<Expr>>,
     pub statements: Vec<Stmt>,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::MacroStmts>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -652,27 +652,27 @@ pub struct MacroType {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchArm {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
-    pub guard: Option<Box<MatchGuard>>,
     pub pat: Option<Box<Pat>>,
-    pub comma_token: bool,
+    pub guard: Option<Box<MatchGuard>>,
     pub fat_arrow_token: bool,
+    pub expr: Box<Expr>,
+    pub comma_token: bool,
     pub cst: Option<super::nodes::MatchArm>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchArmList {
-    pub arms: Vec<MatchArm>,
-    pub attrs: Vec<Attr>,
     pub l_curly_token: bool,
+    pub attrs: Vec<Attr>,
+    pub arms: Vec<MatchArm>,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::MatchArmList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MatchExpr {
     pub attrs: Vec<Attr>,
+    pub match_token: bool,
     pub expr: Box<Expr>,
     pub match_arm_list: Box<MatchArmList>,
-    pub match_token: bool,
     pub cst: Option<super::nodes::MatchExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -684,47 +684,47 @@ pub struct MatchGuard {
 pub struct MatchesExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
-    pub pat: Option<Box<Pat>>,
     pub matches_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub cst: Option<super::nodes::MatchesExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Meta {
-    pub expr: Option<Box<Expr>>,
-    pub path: Box<Path>,
-    pub token_tree: Option<Box<TokenTree>>,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub eq_token: bool,
     pub unsafe_token: bool,
+    pub l_paren_token: bool,
+    pub path: Box<Path>,
+    pub eq_token: bool,
+    pub expr: Option<Box<Expr>>,
+    pub token_tree: Option<Box<TokenTree>>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::Meta>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MethodCallExpr {
-    pub arg_list: Box<ArgList>,
     pub attrs: Vec<Attr>,
-    pub generic_arg_list: Option<Box<GenericArgList>>,
-    pub name_ref: Box<NameRef>,
     pub receiver: Box<Expr>,
     pub dot_token: bool,
+    pub name_ref: Box<NameRef>,
+    pub generic_arg_list: Option<Box<GenericArgList>>,
+    pub arg_list: Box<ArgList>,
     pub cst: Option<super::nodes::MethodCallExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ModeSpecChecked {
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub checked_token: bool,
     pub spec_token: bool,
+    pub l_paren_token: bool,
+    pub checked_token: bool,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::ModeSpecChecked>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Module {
     pub attrs: Vec<Attr>,
-    pub item_list: Option<Box<ItemList>>,
-    pub name: Box<Name>,
     pub visibility: Option<Box<Visibility>>,
-    pub semicolon_token: bool,
     pub mod_token: bool,
+    pub name: Box<Name>,
+    pub item_list: Option<Box<ItemList>>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::Module>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -735,11 +735,11 @@ pub struct Name {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NameRef {
-    pub Self_token: bool,
-    pub crate_token: bool,
     pub ident_token: Option<String>,
     pub self_token: bool,
     pub super_token: bool,
+    pub crate_token: bool,
+    pub Self_token: bool,
     pub cst: Option<super::nodes::NameRef>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -750,14 +750,14 @@ pub struct NeverType {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OffsetOfExpr {
     pub attrs: Vec<Attr>,
-    pub fields: Vec<NameRef>,
-    pub ty: Option<Box<Type>>,
-    pub pound_token: bool,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub comma_token: bool,
     pub builtin_token: bool,
+    pub pound_token: bool,
     pub offset_of_token: bool,
+    pub l_paren_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub comma_token: bool,
+    pub fields: Vec<NameRef>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::OffsetOfExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -768,50 +768,50 @@ pub struct OrPat {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Param {
     pub attrs: Vec<Attr>,
+    pub tracked_token: bool,
     pub pat: Option<Box<Pat>>,
+    pub colon_token: bool,
     pub ty: Option<Box<Type>>,
     pub dotdotdot_token: bool,
-    pub colon_token: bool,
-    pub tracked_token: bool,
     pub cst: Option<super::nodes::Param>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ParamList {
-    pub params: Vec<Param>,
-    pub self_param: Option<Box<SelfParam>>,
     pub l_paren_token: bool,
-    pub r_paren_token: bool,
+    pub self_param: Option<Box<SelfParam>>,
     pub comma_token: bool,
+    pub params: Vec<Param>,
+    pub r_paren_token: bool,
     pub pipe_token: bool,
     pub cst: Option<super::nodes::ParamList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ParenExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
     pub l_paren_token: bool,
+    pub expr: Box<Expr>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::ParenExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ParenPat {
-    pub pat: Option<Box<Pat>>,
     pub l_paren_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::ParenPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ParenType {
-    pub ty: Option<Box<Type>>,
     pub l_paren_token: bool,
+    pub ty: Option<Box<Type>>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::ParenType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Path {
     pub qualifier: Option<Box<Path>>,
-    pub segment: Box<PathSegment>,
     pub coloncolon_token: bool,
+    pub segment: Box<PathSegment>,
     pub cst: Option<super::nodes::Path>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -827,16 +827,16 @@ pub struct PathPat {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathSegment {
-    pub generic_arg_list: Option<Box<GenericArgList>>,
-    pub name_ref: Box<NameRef>,
-    pub param_list: Option<Box<ParamList>>,
-    pub path_type: Option<Box<PathType>>,
-    pub ret_type: Option<Box<RetType>>,
-    pub ty: Option<Box<Type>>,
     pub coloncolon_token: bool,
+    pub name_ref: Box<NameRef>,
+    pub generic_arg_list: Option<Box<GenericArgList>>,
+    pub param_list: Option<Box<ParamList>>,
+    pub ret_type: Option<Box<RetType>>,
     pub l_angle_token: bool,
-    pub r_angle_token: bool,
+    pub ty: Option<Box<Type>>,
     pub as_token: bool,
+    pub path_type: Option<Box<PathType>>,
+    pub r_angle_token: bool,
     pub cst: Option<super::nodes::PathSegment>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -852,18 +852,18 @@ pub struct PrefixExpr {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Prover {
-    pub name: Box<Name>,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
     pub by_token: bool,
+    pub l_paren_token: bool,
+    pub name: Box<Name>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::Prover>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PtrType {
-    pub ty: Option<Box<Type>>,
     pub star_token: bool,
     pub const_token: bool,
     pub mut_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::PtrType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -883,10 +883,10 @@ pub struct RangePat {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecommendsClause {
-    pub expr: Option<Box<Expr>>,
-    pub exprs: Vec<Expr>,
     pub recommends_token: bool,
+    pub exprs: Vec<Expr>,
     pub via_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::RecommendsClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -898,35 +898,35 @@ pub struct RecordExpr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordExprField {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
     pub name_ref: Option<Box<NameRef>>,
     pub colon_token: bool,
+    pub expr: Box<Expr>,
     pub cst: Option<super::nodes::RecordExprField>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordExprFieldList {
+    pub l_curly_token: bool,
     pub attrs: Vec<Attr>,
     pub fields: Vec<RecordExprField>,
-    pub spread: Option<Box<Expr>>,
-    pub l_curly_token: bool,
-    pub r_curly_token: bool,
     pub dotdot_token: bool,
+    pub spread: Option<Box<Expr>>,
+    pub r_curly_token: bool,
     pub cst: Option<super::nodes::RecordExprFieldList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordField {
     pub attrs: Vec<Attr>,
+    pub visibility: Option<Box<Visibility>>,
     pub data_mode: Option<Box<DataMode>>,
     pub name: Box<Name>,
-    pub ty: Option<Box<Type>>,
-    pub visibility: Option<Box<Visibility>>,
     pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::RecordField>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordFieldList {
-    pub fields: Vec<RecordField>,
     pub l_curly_token: bool,
+    pub fields: Vec<RecordField>,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::RecordFieldList>,
 }
@@ -940,54 +940,54 @@ pub struct RecordPat {
 pub struct RecordPatField {
     pub attrs: Vec<Attr>,
     pub name_ref: Option<Box<NameRef>>,
-    pub pat: Option<Box<Pat>>,
     pub colon_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub cst: Option<super::nodes::RecordPatField>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordPatFieldList {
+    pub l_curly_token: bool,
     pub fields: Vec<RecordPatField>,
     pub rest_pat: Option<Box<RestPat>>,
-    pub l_curly_token: bool,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::RecordPatFieldList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Box<Expr>,
     pub amp_token: bool,
+    pub raw_token: bool,
     pub const_token: bool,
     pub mut_token: bool,
-    pub raw_token: bool,
+    pub expr: Box<Expr>,
     pub cst: Option<super::nodes::RefExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefPat {
-    pub pat: Option<Box<Pat>>,
     pub amp_token: bool,
     pub mut_token: bool,
+    pub pat: Option<Box<Pat>>,
     pub cst: Option<super::nodes::RefPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefType {
-    pub lifetime: Option<Box<Lifetime>>,
-    pub ty: Option<Box<Type>>,
     pub amp_token: bool,
+    pub lifetime: Option<Box<Lifetime>>,
     pub mut_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::RefType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Rename {
+    pub as_token: bool,
     pub name: Option<Box<Name>>,
     pub underscore_token: bool,
-    pub as_token: bool,
     pub cst: Option<super::nodes::Rename>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RequiresClause {
-    pub exprs: Vec<Expr>,
     pub requires_token: bool,
+    pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::RequiresClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -998,144 +998,144 @@ pub struct RestPat {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RetType {
-    pub pat: Option<Box<Pat>>,
-    pub ty: Option<Box<Type>>,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
     pub thin_arrow_token: bool,
-    pub colon_token: bool,
     pub tracked_token: bool,
+    pub l_paren_token: bool,
+    pub pat: Option<Box<Pat>>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::RetType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ReturnExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Option<Box<Expr>>,
     pub return_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::ReturnExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
     pub attrs: Vec<Attr>,
-    pub lifetime: Option<Box<Lifetime>>,
-    pub name: Box<Name>,
-    pub ty: Option<Box<Type>>,
     pub amp_token: bool,
-    pub colon_token: bool,
+    pub lifetime: Option<Box<Lifetime>>,
     pub mut_token: bool,
+    pub name: Box<Name>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::SelfParam>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SignatureDecreases {
     pub decreases_clause: Box<DecreasesClause>,
+    pub when_token: bool,
     pub expr: Option<Box<Expr>>,
     pub via_token: bool,
-    pub when_token: bool,
     pub cst: Option<super::nodes::SignatureDecreases>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SlicePat {
-    pub pats: Vec<Pat>,
     pub l_brack_token: bool,
+    pub pats: Vec<Pat>,
     pub r_brack_token: bool,
     pub cst: Option<super::nodes::SlicePat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SliceType {
-    pub ty: Option<Box<Type>>,
     pub l_brack_token: bool,
+    pub ty: Option<Box<Type>>,
     pub r_brack_token: bool,
     pub cst: Option<super::nodes::SliceType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SourceFile {
+    pub shebang_token: bool,
     pub attrs: Vec<Attr>,
     pub items: Vec<Item>,
-    pub shebang_token: bool,
     pub cst: Option<super::nodes::SourceFile>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Static {
     pub attrs: Vec<Attr>,
-    pub body: Option<Box<Expr>>,
-    pub name: Box<Name>,
-    pub ty: Option<Box<Type>>,
     pub visibility: Option<Box<Visibility>>,
-    pub colon_token: bool,
-    pub semicolon_token: bool,
-    pub eq_token: bool,
-    pub mut_token: bool,
     pub static_token: bool,
+    pub mut_token: bool,
+    pub name: Box<Name>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub eq_token: bool,
+    pub body: Option<Box<Expr>>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::Static>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StmtList {
+    pub l_curly_token: bool,
     pub attrs: Vec<Attr>,
     pub statements: Vec<Stmt>,
     pub tail_expr: Option<Box<Expr>>,
-    pub l_curly_token: bool,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::StmtList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Struct {
     pub attrs: Vec<Attr>,
-    pub data_mode: Option<Box<DataMode>>,
-    pub field_list: Option<Box<FieldList>>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
     pub visibility: Option<Box<Visibility>>,
+    pub data_mode: Option<Box<DataMode>>,
+    pub struct_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
     pub where_clause: Option<Box<WhereClause>>,
     pub semicolon_token: bool,
-    pub struct_token: bool,
+    pub field_list: Option<Box<FieldList>>,
     pub cst: Option<super::nodes::Struct>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TokenTree {
     pub l_paren_token: bool,
     pub r_paren_token: bool,
-    pub l_brack_token: bool,
-    pub r_brack_token: bool,
     pub l_curly_token: bool,
     pub r_curly_token: bool,
+    pub l_brack_token: bool,
+    pub r_brack_token: bool,
     pub cst: Option<super::nodes::TokenTree>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Trait {
-    pub assoc_item_list: Box<AssocItemList>,
     pub attrs: Vec<Attr>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
-    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub visibility: Option<Box<Visibility>>,
-    pub where_clause: Option<Box<WhereClause>>,
-    pub colon_token: bool,
+    pub unsafe_token: bool,
     pub auto_token: bool,
     pub trait_token: bool,
-    pub unsafe_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub colon_token: bool,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub assoc_item_list: Box<AssocItemList>,
     pub cst: Option<super::nodes::Trait>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TraitAlias {
     pub attrs: Vec<Attr>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
-    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub visibility: Option<Box<Visibility>>,
+    pub trait_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub eq_token: bool,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub where_clause: Option<Box<WhereClause>>,
     pub semicolon_token: bool,
-    pub eq_token: bool,
-    pub trait_token: bool,
     pub cst: Option<super::nodes::TraitAlias>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TriggerAttribute {
-    pub exprs: Vec<Expr>,
-    pub excl_token: bool,
     pub pound_token: bool,
+    pub excl_token: bool,
     pub l_brack_token: bool,
-    pub r_brack_token: bool,
     pub trigger_token: bool,
+    pub exprs: Vec<Expr>,
+    pub r_brack_token: bool,
     pub cst: Option<super::nodes::TriggerAttribute>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1148,61 +1148,61 @@ pub struct TryExpr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleExpr {
     pub attrs: Vec<Attr>,
-    pub fields: Vec<Expr>,
     pub l_paren_token: bool,
+    pub fields: Vec<Expr>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::TupleExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleField {
     pub attrs: Vec<Attr>,
-    pub ty: Option<Box<Type>>,
     pub visibility: Option<Box<Visibility>>,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::TupleField>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleFieldList {
-    pub fields: Vec<TupleField>,
     pub l_paren_token: bool,
+    pub fields: Vec<TupleField>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::TupleFieldList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TuplePat {
-    pub fields: Vec<Pat>,
     pub l_paren_token: bool,
+    pub fields: Vec<Pat>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::TuplePat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleStructPat {
-    pub fields: Vec<Pat>,
     pub path: Box<Path>,
     pub l_paren_token: bool,
+    pub fields: Vec<Pat>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::TupleStructPat>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TupleType {
-    pub fields: Vec<Type>,
     pub l_paren_token: bool,
+    pub fields: Vec<Type>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::TupleType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeAlias {
     pub attrs: Vec<Attr>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
-    pub ty: Option<Box<Type>>,
-    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub visibility: Option<Box<Visibility>>,
-    pub where_clause: Option<Box<WhereClause>>,
-    pub colon_token: bool,
-    pub semicolon_token: bool,
-    pub eq_token: bool,
     pub default_token: bool,
     pub type_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub colon_token: bool,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub eq_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::TypeAlias>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1213,11 +1213,11 @@ pub struct TypeArg {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeBound {
     pub lifetime: Option<Box<Lifetime>>,
-    pub ty: Option<Box<Type>>,
-    pub question_mark_token: bool,
-    pub async_token: bool,
-    pub const_token: bool,
     pub tilde_token: bool,
+    pub const_token: bool,
+    pub async_token: bool,
+    pub question_mark_token: bool,
+    pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::TypeBound>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1228,11 +1228,11 @@ pub struct TypeBoundList {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeParam {
     pub attrs: Vec<Attr>,
-    pub default_type: Option<Box<Type>>,
     pub name: Box<Name>,
-    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub colon_token: bool,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub eq_token: bool,
+    pub default_type: Option<Box<Type>>,
     pub cst: Option<super::nodes::TypeParam>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1244,63 +1244,63 @@ pub struct UnderscoreExpr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Union {
     pub attrs: Vec<Attr>,
-    pub generic_param_list: Option<Box<GenericParamList>>,
-    pub name: Box<Name>,
-    pub record_field_list: Box<RecordFieldList>,
     pub visibility: Option<Box<Visibility>>,
-    pub where_clause: Option<Box<WhereClause>>,
     pub union_token: bool,
+    pub name: Box<Name>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub record_field_list: Box<RecordFieldList>,
     pub cst: Option<super::nodes::Union>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Use {
     pub attrs: Vec<Attr>,
-    pub use_tree: Box<UseTree>,
     pub visibility: Option<Box<Visibility>>,
-    pub semicolon_token: bool,
     pub use_token: bool,
+    pub use_tree: Box<UseTree>,
+    pub semicolon_token: bool,
     pub cst: Option<super::nodes::Use>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UseTree {
     pub path: Option<Box<Path>>,
-    pub rename: Option<Box<Rename>>,
-    pub use_tree_list: Option<Box<UseTreeList>>,
-    pub star_token: bool,
     pub coloncolon_token: bool,
+    pub star_token: bool,
+    pub use_tree_list: Option<Box<UseTreeList>>,
+    pub rename: Option<Box<Rename>>,
     pub cst: Option<super::nodes::UseTree>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UseTreeList {
-    pub use_trees: Vec<UseTree>,
     pub l_curly_token: bool,
+    pub use_trees: Vec<UseTree>,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::UseTreeList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Variant {
     pub attrs: Vec<Attr>,
-    pub expr: Option<Box<Expr>>,
-    pub field_list: Option<Box<FieldList>>,
-    pub name: Box<Name>,
     pub visibility: Option<Box<Visibility>>,
+    pub name: Box<Name>,
+    pub field_list: Option<Box<FieldList>>,
     pub eq_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::Variant>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VariantList {
-    pub variants: Vec<Variant>,
     pub l_curly_token: bool,
+    pub variants: Vec<Variant>,
     pub r_curly_token: bool,
     pub cst: Option<super::nodes::VariantList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VerusGlobal {
     pub attrs: Vec<Attr>,
+    pub global_token: bool,
     pub name: Box<Name>,
     pub ty: Option<Box<Type>>,
     pub semicolon_token: bool,
-    pub global_token: bool,
     pub cst: Option<super::nodes::VerusGlobal>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1312,36 +1312,36 @@ pub struct ViewExpr {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Visibility {
-    pub path: Option<Box<Path>>,
-    pub l_paren_token: bool,
-    pub r_paren_token: bool,
-    pub in_token: bool,
     pub pub_token: bool,
+    pub l_paren_token: bool,
+    pub in_token: bool,
+    pub path: Option<Box<Path>>,
+    pub r_paren_token: bool,
     pub cst: Option<super::nodes::Visibility>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WhereClause {
-    pub predicates: Vec<WherePred>,
     pub where_token: bool,
+    pub predicates: Vec<WherePred>,
     pub cst: Option<super::nodes::WhereClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WherePred {
+    pub for_token: bool,
     pub generic_param_list: Option<Box<GenericParamList>>,
     pub lifetime: Option<Box<Lifetime>>,
     pub ty: Option<Box<Type>>,
-    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub colon_token: bool,
-    pub for_token: bool,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub cst: Option<super::nodes::WherePred>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WhileExpr {
     pub attrs: Vec<Attr>,
     pub label: Option<Box<Label>>,
-    pub loop_body: Box<BlockExpr>,
-    pub loop_clauses: Vec<LoopClause>,
     pub while_token: bool,
+    pub loop_clauses: Vec<LoopClause>,
+    pub loop_body: Box<BlockExpr>,
     pub cst: Option<super::nodes::WhileExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1352,16 +1352,16 @@ pub struct WildcardPat {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct YeetExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Option<Box<Expr>>,
     pub do_token: bool,
     pub yeet_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::YeetExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct YieldExpr {
     pub attrs: Vec<Attr>,
-    pub expr: Option<Box<Expr>>,
     pub yield_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::YieldExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1531,12 +1531,12 @@ impl TryFrom<super::nodes::ArgList> for ArgList {
     type Error = String;
     fn try_from(item: super::nodes::ArgList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             args: item
                 .args()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -1551,19 +1551,19 @@ impl TryFrom<super::nodes::ArrayExpr> for ArrayExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            expr: Box::new(
-                item.expr()
-                    .ok_or(format!("{}", stringify!(expr)))
-                    .map(|it| Expr::try_from(it))??,
-            ),
+            l_brack_token: item.l_brack_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            l_brack_token: item.l_brack_token().is_some(),
-            r_brack_token: item.r_brack_token().is_some(),
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
             semicolon_token: item.semicolon_token().is_some(),
+            r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1572,18 +1572,18 @@ impl TryFrom<super::nodes::ArrayType> for ArrayType {
     type Error = String;
     fn try_from(item: super::nodes::ArrayType) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_brack_token: item.l_brack_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            semicolon_token: item.semicolon_token().is_some(),
             const_arg: Box::new(
                 item.const_arg()
                     .ok_or(format!("{}", stringify!(const_arg)))
                     .map(|it| ConstArg::try_from(it))??,
             ),
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
-            l_brack_token: item.l_brack_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
-            semicolon_token: item.semicolon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1602,11 +1602,11 @@ impl TryFrom<super::nodes::ArrowExpr> for ArrowExpr {
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            thin_arrow_token: item.thin_arrow_token().is_some(),
             name_ref: match item.name_ref() {
                 Some(it) => Some(Box::new(NameRef::try_from(it)?)),
                 None => None,
             },
-            thin_arrow_token: item.thin_arrow_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1620,16 +1620,16 @@ impl TryFrom<super::nodes::AsmExpr> for AsmExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            builtin_token: item.builtin_token().is_some(),
+            pound_token: item.pound_token().is_some(),
+            asm_token: item.asm_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            pound_token: item.pound_token().is_some(),
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            asm_token: item.asm_token().is_some(),
-            builtin_token: item.builtin_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1643,15 +1643,15 @@ impl TryFrom<super::nodes::AssertExpr> for AssertExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            block_expr: match item.block_expr() {
-                Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
-                None => None,
-            },
+            assert_token: item.assert_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            r_paren_token: item.r_paren_token().is_some(),
+            by_token: item.by_token().is_some(),
             name: match item.name() {
                 Some(it) => Some(Box::new(Name::try_from(it)?)),
                 None => None,
@@ -1660,10 +1660,10 @@ impl TryFrom<super::nodes::AssertExpr> for AssertExpr {
                 Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
                 None => None,
             },
-            l_paren_token: item.l_paren_token().is_some(),
-            r_paren_token: item.r_paren_token().is_some(),
-            assert_token: item.assert_token().is_some(),
-            by_token: item.by_token().is_some(),
+            block_expr: match item.block_expr() {
+                Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -1672,17 +1672,17 @@ impl TryFrom<super::nodes::AssocItemList> for AssocItemList {
     type Error = String;
     fn try_from(item: super::nodes::AssocItemList) -> Result<Self, Self::Error> {
         Ok(Self {
-            assoc_items: item
-                .assoc_items()
-                .into_iter()
-                .map(AssocItem::try_from)
-                .collect::<Result<Vec<AssocItem>, String>>()?,
+            l_curly_token: item.l_curly_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
+            assoc_items: item
+                .assoc_items()
+                .into_iter()
+                .map(AssocItem::try_from)
+                .collect::<Result<Vec<AssocItem>, String>>()?,
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -1692,19 +1692,15 @@ impl TryFrom<super::nodes::AssocTypeArg> for AssocTypeArg {
     type Error = String;
     fn try_from(item: super::nodes::AssocTypeArg) -> Result<Self, Self::Error> {
         Ok(Self {
-            const_arg: match item.const_arg() {
-                Some(it) => Some(Box::new(ConstArg::try_from(it)?)),
-                None => None,
-            },
-            generic_arg_list: match item.generic_arg_list() {
-                Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
-                None => None,
-            },
             name_ref: Box::new(
                 item.name_ref()
                     .ok_or(format!("{}", stringify!(name_ref)))
                     .map(|it| NameRef::try_from(it))??,
             ),
+            generic_arg_list: match item.generic_arg_list() {
+                Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
+                None => None,
+            },
             param_list: match item.param_list() {
                 Some(it) => Some(Box::new(ParamList::try_from(it)?)),
                 None => None,
@@ -1713,17 +1709,21 @@ impl TryFrom<super::nodes::AssocTypeArg> for AssocTypeArg {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
                 None => None,
             },
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
+            colon_token: item.colon_token().is_some(),
             type_bound_list: Box::new(
                 item.type_bound_list()
                     .ok_or(format!("{}", stringify!(type_bound_list)))
                     .map(|it| TypeBoundList::try_from(it))??,
             ),
-            colon_token: item.colon_token().is_some(),
             eq_token: item.eq_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            const_arg: match item.const_arg() {
+                Some(it) => Some(Box::new(ConstArg::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -1737,14 +1737,14 @@ impl TryFrom<super::nodes::AssumeExpr> for AssumeExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            assume_token: item.assume_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            assume_token: item.assume_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1753,14 +1753,14 @@ impl TryFrom<super::nodes::Attr> for Attr {
     type Error = String;
     fn try_from(item: super::nodes::Attr) -> Result<Self, Self::Error> {
         Ok(Self {
+            pound_token: item.pound_token().is_some(),
+            excl_token: item.excl_token().is_some(),
+            l_brack_token: item.l_brack_token().is_some(),
             meta: Box::new(
                 item.meta()
                     .ok_or(format!("{}", stringify!(meta)))
                     .map(|it| Meta::try_from(it))??,
             ),
-            excl_token: item.excl_token().is_some(),
-            pound_token: item.pound_token().is_some(),
-            l_brack_token: item.l_brack_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -1795,12 +1795,12 @@ impl TryFrom<super::nodes::BecomeExpr> for BecomeExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            become_token: item.become_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            become_token: item.become_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1818,15 +1818,15 @@ impl TryFrom<super::nodes::BlockExpr> for BlockExpr {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
                 None => None,
             },
+            try_token: item.try_token().is_some(),
+            unsafe_token: item.unsafe_token().is_some(),
+            async_token: item.async_token().is_some(),
+            const_token: item.const_token().is_some(),
             stmt_list: Box::new(
                 item.stmt_list()
                     .ok_or(format!("{}", stringify!(stmt_list)))
                     .map(|it| StmtList::try_from(it))??,
             ),
-            async_token: item.async_token().is_some(),
-            const_token: item.const_token().is_some(),
-            try_token: item.try_token().is_some(),
-            unsafe_token: item.unsafe_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1835,11 +1835,11 @@ impl TryFrom<super::nodes::BoxPat> for BoxPat {
     type Error = String;
     fn try_from(item: super::nodes::BoxPat) -> Result<Self, Self::Error> {
         Ok(Self {
+            box_token: item.box_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
-            box_token: item.box_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1853,15 +1853,15 @@ impl TryFrom<super::nodes::BreakExpr> for BreakExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            expr: match item.expr() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
-                None => None,
-            },
+            break_token: item.break_token().is_some(),
             lifetime: match item.lifetime() {
                 Some(it) => Some(Box::new(Lifetime::try_from(it)?)),
                 None => None,
             },
-            break_token: item.break_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -1875,6 +1875,12 @@ impl TryFrom<super::nodes::BroadcastGroup> for BroadcastGroup {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            broadcast_token: item.broadcast_token().is_some(),
+            group_token: item.group_token().is_some(),
             broadcast_group_identifier: Box::new(
                 item.broadcast_group_identifier()
                     .ok_or(format!("{}", stringify!(broadcast_group_identifier)))
@@ -1885,12 +1891,6 @@ impl TryFrom<super::nodes::BroadcastGroup> for BroadcastGroup {
                     .ok_or(format!("{}", stringify!(broadcast_group_list)))
                     .map(|it| BroadcastGroupList::try_from(it))??,
             ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
-                None => None,
-            },
-            broadcast_token: item.broadcast_token().is_some(),
-            group_token: item.group_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1908,12 +1908,12 @@ impl TryFrom<super::nodes::BroadcastGroupList> for BroadcastGroupList {
     type Error = String;
     fn try_from(item: super::nodes::BroadcastGroupList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             broadcast_group_members: item
                 .broadcast_group_members()
                 .into_iter()
                 .map(BroadcastGroupMember::try_from)
                 .collect::<Result<Vec<BroadcastGroupMember>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -1946,14 +1946,14 @@ impl TryFrom<super::nodes::BroadcastUse> for BroadcastUse {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            broadcast_token: item.broadcast_token().is_some(),
+            use_token: item.use_token().is_some(),
             broadcast_use_list: Box::new(
                 item.broadcast_use_list()
                     .ok_or(format!("{}", stringify!(broadcast_use_list)))
                     .map(|it| BroadcastUseList::try_from(it))??,
             ),
             semicolon_token: item.semicolon_token().is_some(),
-            broadcast_token: item.broadcast_token().is_some(),
-            use_token: item.use_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -1975,11 +1975,6 @@ impl TryFrom<super::nodes::CallExpr> for CallExpr {
     type Error = String;
     fn try_from(item: super::nodes::CallExpr) -> Result<Self, Self::Error> {
         Ok(Self {
-            arg_list: Box::new(
-                item.arg_list()
-                    .ok_or(format!("{}", stringify!(arg_list)))
-                    .map(|it| ArgList::try_from(it))??,
-            ),
             attrs: item
                 .attrs()
                 .into_iter()
@@ -1989,6 +1984,11 @@ impl TryFrom<super::nodes::CallExpr> for CallExpr {
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
+            ),
+            arg_list: Box::new(
+                item.arg_list()
+                    .ok_or(format!("{}", stringify!(arg_list)))
+                    .map(|it| ArgList::try_from(it))??,
             ),
             cst: Some(item.clone()),
         })
@@ -2008,11 +2008,11 @@ impl TryFrom<super::nodes::CastExpr> for CastExpr {
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            as_token: item.as_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            as_token: item.as_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2026,15 +2026,17 @@ impl TryFrom<super::nodes::ClosureExpr> for ClosureExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            body: Box::new(
-                item.body()
-                    .ok_or(format!("{}", stringify!(body)))
-                    .map(|it| Expr::try_from(it))??,
-            ),
+            for_token: item.for_token().is_some(),
             generic_param_list: match item.generic_param_list() {
                 Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
+            const_token: item.const_token().is_some(),
+            static_token: item.static_token().is_some(),
+            async_token: item.async_token().is_some(),
+            move_token: item.move_token().is_some(),
+            forall_token: item.forall_token().is_some(),
+            exists_token: item.exists_token().is_some(),
             param_list: match item.param_list() {
                 Some(it) => Some(Box::new(ParamList::try_from(it)?)),
                 None => None,
@@ -2043,13 +2045,11 @@ impl TryFrom<super::nodes::ClosureExpr> for ClosureExpr {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
                 None => None,
             },
-            async_token: item.async_token().is_some(),
-            const_token: item.const_token().is_some(),
-            exists_token: item.exists_token().is_some(),
-            for_token: item.for_token().is_some(),
-            forall_token: item.forall_token().is_some(),
-            move_token: item.move_token().is_some(),
-            static_token: item.static_token().is_some(),
+            body: Box::new(
+                item.body()
+                    .ok_or(format!("{}", stringify!(body)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2063,28 +2063,28 @@ impl TryFrom<super::nodes::Const> for Const {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            body: match item.body() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
-                None => None,
-            },
-            name: match item.name() {
-                Some(it) => Some(Box::new(Name::try_from(it)?)),
-                None => None,
-            },
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
             visibility: match item.visibility() {
                 Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
-            semicolon_token: item.semicolon_token().is_some(),
-            eq_token: item.eq_token().is_some(),
-            underscore_token: item.underscore_token().is_some(),
-            const_token: item.const_token().is_some(),
             default_token: item.default_token().is_some(),
+            const_token: item.const_token().is_some(),
+            name: match item.name() {
+                Some(it) => Some(Box::new(Name::try_from(it)?)),
+                None => None,
+            },
+            underscore_token: item.underscore_token().is_some(),
+            colon_token: item.colon_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            eq_token: item.eq_token().is_some(),
+            body: match item.body() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
+            semicolon_token: item.semicolon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2106,12 +2106,12 @@ impl TryFrom<super::nodes::ConstBlockPat> for ConstBlockPat {
     type Error = String;
     fn try_from(item: super::nodes::ConstBlockPat) -> Result<Self, Self::Error> {
         Ok(Self {
+            const_token: item.const_token().is_some(),
             block_expr: Box::new(
                 item.block_expr()
                     .ok_or(format!("{}", stringify!(block_expr)))
                     .map(|it| BlockExpr::try_from(it))??,
             ),
-            const_token: item.const_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2125,22 +2125,22 @@ impl TryFrom<super::nodes::ConstParam> for ConstParam {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            default_val: match item.default_val() {
-                Some(it) => Some(Box::new(ConstArg::try_from(it)?)),
-                None => None,
-            },
+            const_token: item.const_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
+            colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
             eq_token: item.eq_token().is_some(),
-            const_token: item.const_token().is_some(),
+            default_val: match item.default_val() {
+                Some(it) => Some(Box::new(ConstArg::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -2154,11 +2154,11 @@ impl TryFrom<super::nodes::ContinueExpr> for ContinueExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            continue_token: item.continue_token().is_some(),
             lifetime: match item.lifetime() {
                 Some(it) => Some(Box::new(Lifetime::try_from(it)?)),
                 None => None,
             },
-            continue_token: item.continue_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2177,12 +2177,12 @@ impl TryFrom<super::nodes::DecreasesClause> for DecreasesClause {
     type Error = String;
     fn try_from(item: super::nodes::DecreasesClause) -> Result<Self, Self::Error> {
         Ok(Self {
+            decreases_token: item.decreases_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            decreases_token: item.decreases_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2191,12 +2191,12 @@ impl TryFrom<super::nodes::DynTraitType> for DynTraitType {
     type Error = String;
     fn try_from(item: super::nodes::DynTraitType) -> Result<Self, Self::Error> {
         Ok(Self {
+            dyn_token: item.dyn_token().is_some(),
             type_bound_list: Box::new(
                 item.type_bound_list()
                     .ok_or(format!("{}", stringify!(type_bound_list)))
                     .map(|it| TypeBoundList::try_from(it))??,
             ),
-            dyn_token: item.dyn_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2205,12 +2205,12 @@ impl TryFrom<super::nodes::EnsuresClause> for EnsuresClause {
     type Error = String;
     fn try_from(item: super::nodes::EnsuresClause) -> Result<Self, Self::Error> {
         Ok(Self {
+            ensures_token: item.ensures_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            ensures_token: item.ensures_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2224,33 +2224,33 @@ impl TryFrom<super::nodes::Enum> for Enum {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
             data_mode: match item.data_mode() {
                 Some(it) => Some(Box::new(DataMode::try_from(it)?)),
                 None => None,
             },
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
-                None => None,
-            },
+            enum_token: item.enum_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            variant_list: Box::new(
-                item.variant_list()
-                    .ok_or(format!("{}", stringify!(variant_list)))
-                    .map(|it| VariantList::try_from(it))??,
-            ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
             where_clause: match item.where_clause() {
                 Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
                 None => None,
             },
-            enum_token: item.enum_token().is_some(),
+            variant_list: Box::new(
+                item.variant_list()
+                    .ok_or(format!("{}", stringify!(variant_list)))
+                    .map(|it| VariantList::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2273,20 +2273,20 @@ impl TryFrom<super::nodes::ExternBlock> for ExternBlock {
     type Error = String;
     fn try_from(item: super::nodes::ExternBlock) -> Result<Self, Self::Error> {
         Ok(Self {
-            abi: Box::new(
-                item.abi().ok_or(format!("{}", stringify!(abi))).map(|it| Abi::try_from(it))??,
-            ),
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            unsafe_token: item.unsafe_token().is_some(),
+            abi: Box::new(
+                item.abi().ok_or(format!("{}", stringify!(abi))).map(|it| Abi::try_from(it))??,
+            ),
             extern_item_list: Box::new(
                 item.extern_item_list()
                     .ok_or(format!("{}", stringify!(extern_item_list)))
                     .map(|it| ExternItemList::try_from(it))??,
             ),
-            unsafe_token: item.unsafe_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2300,6 +2300,12 @@ impl TryFrom<super::nodes::ExternCrate> for ExternCrate {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            extern_token: item.extern_token().is_some(),
+            crate_token: item.crate_token().is_some(),
             name_ref: Box::new(
                 item.name_ref()
                     .ok_or(format!("{}", stringify!(name_ref)))
@@ -2309,13 +2315,7 @@ impl TryFrom<super::nodes::ExternCrate> for ExternCrate {
                 Some(it) => Some(Box::new(Rename::try_from(it)?)),
                 None => None,
             },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
-                None => None,
-            },
             semicolon_token: item.semicolon_token().is_some(),
-            crate_token: item.crate_token().is_some(),
-            extern_token: item.extern_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2324,6 +2324,7 @@ impl TryFrom<super::nodes::ExternItemList> for ExternItemList {
     type Error = String;
     fn try_from(item: super::nodes::ExternItemList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
@@ -2334,7 +2335,6 @@ impl TryFrom<super::nodes::ExternItemList> for ExternItemList {
                 .into_iter()
                 .map(ExternItem::try_from)
                 .collect::<Result<Vec<ExternItem>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -2354,12 +2354,12 @@ impl TryFrom<super::nodes::FieldExpr> for FieldExpr {
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            dot_token: item.dot_token().is_some(),
             name_ref: Box::new(
                 item.name_ref()
                     .ok_or(format!("{}", stringify!(name_ref)))
                     .map(|it| NameRef::try_from(it))??,
             ),
-            dot_token: item.dot_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2368,79 +2368,79 @@ impl TryFrom<super::nodes::Fn> for Fn {
     type Error = String;
     fn try_from(item: super::nodes::Fn) -> Result<Self, Self::Error> {
         Ok(Self {
-            abi: match item.abi() {
-                Some(it) => Some(Box::new(Abi::try_from(it)?)),
-                None => None,
-            },
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            body: match item.body() {
-                Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
-                None => None,
-            },
-            ensures_clause: match item.ensures_clause() {
-                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
-                None => None,
-            },
-            fn_mode: match item.fn_mode() {
-                Some(it) => Some(Box::new(FnMode::try_from(it)?)),
-                None => None,
-            },
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
-                None => None,
-            },
-            name: Box::new(
-                item.name()
-                    .ok_or(format!("{}", stringify!(name)))
-                    .map(|it| Name::try_from(it))??,
-            ),
-            param_list: match item.param_list() {
-                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
-                None => None,
-            },
-            prover: match item.prover() {
-                Some(it) => Some(Box::new(Prover::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
             publish: match item.publish() {
                 Some(it) => Some(Box::new(Publish::try_from(it)?)),
                 None => None,
             },
-            recommends_clause: match item.recommends_clause() {
-                Some(it) => Some(Box::new(RecommendsClause::try_from(it)?)),
+            default_token: item.default_token().is_some(),
+            const_token: item.const_token().is_some(),
+            async_token: item.async_token().is_some(),
+            unsafe_token: item.unsafe_token().is_some(),
+            abi: match item.abi() {
+                Some(it) => Some(Box::new(Abi::try_from(it)?)),
                 None => None,
             },
-            requires_clause: match item.requires_clause() {
-                Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
+            broadcast_token: item.broadcast_token().is_some(),
+            fn_mode: match item.fn_mode() {
+                Some(it) => Some(Box::new(FnMode::try_from(it)?)),
+                None => None,
+            },
+            fn_token: item.fn_token().is_some(),
+            name: Box::new(
+                item.name()
+                    .ok_or(format!("{}", stringify!(name)))
+                    .map(|it| Name::try_from(it))??,
+            ),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+                None => None,
+            },
+            param_list: match item.param_list() {
+                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
                 None => None,
             },
             ret_type: match item.ret_type() {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
                 None => None,
             },
-            signature_decreases: match item.signature_decreases() {
-                Some(it) => Some(Box::new(SignatureDecreases::try_from(it)?)),
-                None => None,
-            },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
-                None => None,
-            },
             where_clause: match item.where_clause() {
                 Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
                 None => None,
             },
+            prover: match item.prover() {
+                Some(it) => Some(Box::new(Prover::try_from(it)?)),
+                None => None,
+            },
+            requires_clause: match item.requires_clause() {
+                Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
+                None => None,
+            },
+            recommends_clause: match item.recommends_clause() {
+                Some(it) => Some(Box::new(RecommendsClause::try_from(it)?)),
+                None => None,
+            },
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            signature_decreases: match item.signature_decreases() {
+                Some(it) => Some(Box::new(SignatureDecreases::try_from(it)?)),
+                None => None,
+            },
+            body: match item.body() {
+                Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
+                None => None,
+            },
             semicolon_token: item.semicolon_token().is_some(),
-            async_token: item.async_token().is_some(),
-            broadcast_token: item.broadcast_token().is_some(),
-            const_token: item.const_token().is_some(),
-            default_token: item.default_token().is_some(),
-            fn_token: item.fn_token().is_some(),
-            unsafe_token: item.unsafe_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2449,13 +2449,13 @@ impl TryFrom<super::nodes::FnMode> for FnMode {
     type Error = String;
     fn try_from(item: super::nodes::FnMode) -> Result<Self, Self::Error> {
         Ok(Self {
+            spec_token: item.spec_token().is_some(),
+            proof_token: item.proof_token().is_some(),
+            exec_token: item.exec_token().is_some(),
             mode_spec_checked: match item.mode_spec_checked() {
                 Some(it) => Some(Box::new(ModeSpecChecked::try_from(it)?)),
                 None => None,
             },
-            exec_token: item.exec_token().is_some(),
-            proof_token: item.proof_token().is_some(),
-            spec_token: item.spec_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2464,10 +2464,14 @@ impl TryFrom<super::nodes::FnPtrType> for FnPtrType {
     type Error = String;
     fn try_from(item: super::nodes::FnPtrType) -> Result<Self, Self::Error> {
         Ok(Self {
+            const_token: item.const_token().is_some(),
+            async_token: item.async_token().is_some(),
+            unsafe_token: item.unsafe_token().is_some(),
             abi: match item.abi() {
                 Some(it) => Some(Box::new(Abi::try_from(it)?)),
                 None => None,
             },
+            fn_token: item.fn_token().is_some(),
             param_list: match item.param_list() {
                 Some(it) => Some(Box::new(ParamList::try_from(it)?)),
                 None => None,
@@ -2476,10 +2480,6 @@ impl TryFrom<super::nodes::FnPtrType> for FnPtrType {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
                 None => None,
             },
-            async_token: item.async_token().is_some(),
-            const_token: item.const_token().is_some(),
-            fn_token: item.fn_token().is_some(),
-            unsafe_token: item.unsafe_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2493,31 +2493,31 @@ impl TryFrom<super::nodes::ForExpr> for ForExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            iter_name: match item.iter_name() {
-                Some(it) => Some(Box::new(Name::try_from(it)?)),
-                None => None,
-            },
             label: match item.label() {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
                 None => None,
             },
-            loop_body: Box::new(
-                item.loop_body()
-                    .ok_or(format!("{}", stringify!(loop_body)))
-                    .map(|it| BlockExpr::try_from(it))??,
-            ),
+            for_token: item.for_token().is_some(),
+            pat: match item.pat() {
+                Some(it) => Some(Box::new(Pat::try_from(it)?)),
+                None => None,
+            },
+            in_token: item.in_token().is_some(),
+            iter_name: match item.iter_name() {
+                Some(it) => Some(Box::new(Name::try_from(it)?)),
+                None => None,
+            },
+            colon_token: item.colon_token().is_some(),
             loop_clauses: item
                 .loop_clauses()
                 .into_iter()
                 .map(LoopClause::try_from)
                 .collect::<Result<Vec<LoopClause>, String>>()?,
-            pat: match item.pat() {
-                Some(it) => Some(Box::new(Pat::try_from(it)?)),
-                None => None,
-            },
-            colon_token: item.colon_token().is_some(),
-            for_token: item.for_token().is_some(),
-            in_token: item.in_token().is_some(),
+            loop_body: Box::new(
+                item.loop_body()
+                    .ok_or(format!("{}", stringify!(loop_body)))
+                    .map(|it| BlockExpr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2526,6 +2526,7 @@ impl TryFrom<super::nodes::ForType> for ForType {
     type Error = String;
     fn try_from(item: super::nodes::ForType) -> Result<Self, Self::Error> {
         Ok(Self {
+            for_token: item.for_token().is_some(),
             generic_param_list: Box::new(
                 item.generic_param_list()
                     .ok_or(format!("{}", stringify!(generic_param_list)))
@@ -2535,7 +2536,6 @@ impl TryFrom<super::nodes::ForType> for ForType {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            for_token: item.for_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2544,16 +2544,16 @@ impl TryFrom<super::nodes::FormatArgsArg> for FormatArgsArg {
     type Error = String;
     fn try_from(item: super::nodes::FormatArgsArg) -> Result<Self, Self::Error> {
         Ok(Self {
-            expr: Box::new(
-                item.expr()
-                    .ok_or(format!("{}", stringify!(expr)))
-                    .map(|it| Expr::try_from(it))??,
-            ),
             name: match item.name() {
                 Some(it) => Some(Box::new(Name::try_from(it)?)),
                 None => None,
             },
             eq_token: item.eq_token().is_some(),
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2562,27 +2562,27 @@ impl TryFrom<super::nodes::FormatArgsExpr> for FormatArgsExpr {
     type Error = String;
     fn try_from(item: super::nodes::FormatArgsExpr) -> Result<Self, Self::Error> {
         Ok(Self {
-            args: item
-                .args()
-                .into_iter()
-                .map(FormatArgsArg::try_from)
-                .collect::<Result<Vec<FormatArgsArg>, String>>()?,
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            builtin_token: item.builtin_token().is_some(),
+            pound_token: item.pound_token().is_some(),
+            format_args_token: item.format_args_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             template: Box::new(
                 item.template()
                     .ok_or(format!("{}", stringify!(template)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            pound_token: item.pound_token().is_some(),
-            l_paren_token: item.l_paren_token().is_some(),
-            r_paren_token: item.r_paren_token().is_some(),
             comma_token: item.comma_token().is_some(),
-            builtin_token: item.builtin_token().is_some(),
-            format_args_token: item.format_args_token().is_some(),
+            args: item
+                .args()
+                .into_iter()
+                .map(FormatArgsArg::try_from)
+                .collect::<Result<Vec<FormatArgsArg>, String>>()?,
+            r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2591,13 +2591,13 @@ impl TryFrom<super::nodes::GenericArgList> for GenericArgList {
     type Error = String;
     fn try_from(item: super::nodes::GenericArgList) -> Result<Self, Self::Error> {
         Ok(Self {
+            coloncolon_token: item.coloncolon_token().is_some(),
+            l_angle_token: item.l_angle_token().is_some(),
             generic_args: item
                 .generic_args()
                 .into_iter()
                 .map(GenericArg::try_from)
                 .collect::<Result<Vec<GenericArg>, String>>()?,
-            coloncolon_token: item.coloncolon_token().is_some(),
-            l_angle_token: item.l_angle_token().is_some(),
             r_angle_token: item.r_angle_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -2607,12 +2607,12 @@ impl TryFrom<super::nodes::GenericParamList> for GenericParamList {
     type Error = String;
     fn try_from(item: super::nodes::GenericParamList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_angle_token: item.l_angle_token().is_some(),
             generic_params: item
                 .generic_params()
                 .into_iter()
                 .map(GenericParam::try_from)
                 .collect::<Result<Vec<GenericParam>, String>>()?,
-            l_angle_token: item.l_angle_token().is_some(),
             r_angle_token: item.r_angle_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -2627,18 +2627,18 @@ impl TryFrom<super::nodes::IdentPat> for IdentPat {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            ref_token: item.ref_token().is_some(),
+            mut_token: item.mut_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
+            at_token: item.at_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
-            at_token: item.at_token().is_some(),
-            mut_token: item.mut_token().is_some(),
-            ref_token: item.ref_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2647,34 +2647,34 @@ impl TryFrom<super::nodes::Impl> for Impl {
     type Error = String;
     fn try_from(item: super::nodes::Impl) -> Result<Self, Self::Error> {
         Ok(Self {
-            assoc_item_list: Box::new(
-                item.assoc_item_list()
-                    .ok_or(format!("{}", stringify!(assoc_item_list)))
-                    .map(|it| AssocItemList::try_from(it))??,
-            ),
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
-                None => None,
-            },
             visibility: match item.visibility() {
                 Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            default_token: item.default_token().is_some(),
+            unsafe_token: item.unsafe_token().is_some(),
+            impl_token: item.impl_token().is_some(),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+                None => None,
+            },
+            const_token: item.const_token().is_some(),
+            excl_token: item.excl_token().is_some(),
+            for_token: item.for_token().is_some(),
             where_clause: match item.where_clause() {
                 Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
                 None => None,
             },
-            excl_token: item.excl_token().is_some(),
-            const_token: item.const_token().is_some(),
-            default_token: item.default_token().is_some(),
-            for_token: item.for_token().is_some(),
-            impl_token: item.impl_token().is_some(),
-            unsafe_token: item.unsafe_token().is_some(),
+            assoc_item_list: Box::new(
+                item.assoc_item_list()
+                    .ok_or(format!("{}", stringify!(assoc_item_list)))
+                    .map(|it| AssocItemList::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2683,12 +2683,12 @@ impl TryFrom<super::nodes::ImplTraitType> for ImplTraitType {
     type Error = String;
     fn try_from(item: super::nodes::ImplTraitType) -> Result<Self, Self::Error> {
         Ok(Self {
+            impl_token: item.impl_token().is_some(),
             type_bound_list: Box::new(
                 item.type_bound_list()
                     .ok_or(format!("{}", stringify!(type_bound_list)))
                     .map(|it| TypeBoundList::try_from(it))??,
             ),
-            impl_token: item.impl_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2703,12 +2703,12 @@ impl TryFrom<super::nodes::InvariantClause> for InvariantClause {
     type Error = String;
     fn try_from(item: super::nodes::InvariantClause) -> Result<Self, Self::Error> {
         Ok(Self {
+            invariant_token: item.invariant_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            invariant_token: item.invariant_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2717,12 +2717,12 @@ impl TryFrom<super::nodes::InvariantExceptBreakClause> for InvariantExceptBreakC
     type Error = String;
     fn try_from(item: super::nodes::InvariantExceptBreakClause) -> Result<Self, Self::Error> {
         Ok(Self {
+            invariant_except_break_token: item.invariant_except_break_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            invariant_except_break_token: item.invariant_except_break_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2741,11 +2741,11 @@ impl TryFrom<super::nodes::IsExpr> for IsExpr {
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            is_token: item.is_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            is_token: item.is_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2754,6 +2754,7 @@ impl TryFrom<super::nodes::ItemList> for ItemList {
     type Error = String;
     fn try_from(item: super::nodes::ItemList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
@@ -2764,7 +2765,6 @@ impl TryFrom<super::nodes::ItemList> for ItemList {
                 .into_iter()
                 .map(Item::try_from)
                 .collect::<Result<Vec<Item>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -2788,12 +2788,12 @@ impl TryFrom<super::nodes::LetElse> for LetElse {
     type Error = String;
     fn try_from(item: super::nodes::LetElse) -> Result<Self, Self::Error> {
         Ok(Self {
+            else_token: item.else_token().is_some(),
             block_expr: Box::new(
                 item.block_expr()
                     .ok_or(format!("{}", stringify!(block_expr)))
                     .map(|it| BlockExpr::try_from(it))??,
             ),
-            else_token: item.else_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2807,17 +2807,17 @@ impl TryFrom<super::nodes::LetExpr> for LetExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            expr: Box::new(
-                item.expr()
-                    .ok_or(format!("{}", stringify!(expr)))
-                    .map(|it| Expr::try_from(it))??,
-            ),
+            let_token: item.let_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
             eq_token: item.eq_token().is_some(),
-            let_token: item.let_token().is_some(),
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2831,6 +2831,19 @@ impl TryFrom<super::nodes::LetStmt> for LetStmt {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            let_token: item.let_token().is_some(),
+            ghost_token: item.ghost_token().is_some(),
+            tracked_token: item.tracked_token().is_some(),
+            pat: match item.pat() {
+                Some(it) => Some(Box::new(Pat::try_from(it)?)),
+                None => None,
+            },
+            colon_token: item.colon_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            eq_token: item.eq_token().is_some(),
             initializer: Box::new(
                 item.initializer()
                     .ok_or(format!("{}", stringify!(initializer)))
@@ -2840,20 +2853,7 @@ impl TryFrom<super::nodes::LetStmt> for LetStmt {
                 Some(it) => Some(Box::new(LetElse::try_from(it)?)),
                 None => None,
             },
-            pat: match item.pat() {
-                Some(it) => Some(Box::new(Pat::try_from(it)?)),
-                None => None,
-            },
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
-            colon_token: item.colon_token().is_some(),
             semicolon_token: item.semicolon_token().is_some(),
-            eq_token: item.eq_token().is_some(),
-            ghost_token: item.ghost_token().is_some(),
-            let_token: item.let_token().is_some(),
-            tracked_token: item.tracked_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2894,11 +2894,11 @@ impl TryFrom<super::nodes::LifetimeParam> for LifetimeParam {
                     .ok_or(format!("{}", stringify!(lifetime)))
                     .map(|it| Lifetime::try_from(it))??,
             ),
+            colon_token: item.colon_token().is_some(),
             type_bound_list: match item.type_bound_list() {
                 Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2907,12 +2907,12 @@ impl TryFrom<super::nodes::LiteralPat> for LiteralPat {
     type Error = String;
     fn try_from(item: super::nodes::LiteralPat) -> Result<Self, Self::Error> {
         Ok(Self {
+            minus_token: item.minus_token().is_some(),
             literal: Box::new(
                 item.literal()
                     .ok_or(format!("{}", stringify!(literal)))
                     .map(|it| Literal::try_from(it))??,
             ),
-            minus_token: item.minus_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2930,17 +2930,17 @@ impl TryFrom<super::nodes::LoopExpr> for LoopExpr {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
                 None => None,
             },
-            loop_body: Box::new(
-                item.loop_body()
-                    .ok_or(format!("{}", stringify!(loop_body)))
-                    .map(|it| BlockExpr::try_from(it))??,
-            ),
+            loop_token: item.loop_token().is_some(),
             loop_clauses: item
                 .loop_clauses()
                 .into_iter()
                 .map(LoopClause::try_from)
                 .collect::<Result<Vec<LoopClause>, String>>()?,
-            loop_token: item.loop_token().is_some(),
+            loop_body: Box::new(
+                item.loop_body()
+                    .ok_or(format!("{}", stringify!(loop_body)))
+                    .map(|it| BlockExpr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -2959,12 +2959,12 @@ impl TryFrom<super::nodes::MacroCall> for MacroCall {
                     .ok_or(format!("{}", stringify!(path)))
                     .map(|it| Path::try_from(it))??,
             ),
+            excl_token: item.excl_token().is_some(),
             token_tree: Box::new(
                 item.token_tree()
                     .ok_or(format!("{}", stringify!(token_tree)))
                     .map(|it| TokenTree::try_from(it))??,
             ),
-            excl_token: item.excl_token().is_some(),
             semicolon_token: item.semicolon_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -2974,30 +2974,30 @@ impl TryFrom<super::nodes::MacroDef> for MacroDef {
     type Error = String;
     fn try_from(item: super::nodes::MacroDef) -> Result<Self, Self::Error> {
         Ok(Self {
-            args: match item.args() {
-                Some(it) => Some(Box::new(TokenTree::try_from(it)?)),
-                None => None,
-            },
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            body: Box::new(
-                item.body()
-                    .ok_or(format!("{}", stringify!(body)))
-                    .map(|it| TokenTree::try_from(it))??,
-            ),
-            name: Box::new(
-                item.name()
-                    .ok_or(format!("{}", stringify!(name)))
-                    .map(|it| Name::try_from(it))??,
-            ),
             visibility: match item.visibility() {
                 Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
             macro_token: item.macro_token().is_some(),
+            name: Box::new(
+                item.name()
+                    .ok_or(format!("{}", stringify!(name)))
+                    .map(|it| Name::try_from(it))??,
+            ),
+            args: match item.args() {
+                Some(it) => Some(Box::new(TokenTree::try_from(it)?)),
+                None => None,
+            },
+            body: Box::new(
+                item.body()
+                    .ok_or(format!("{}", stringify!(body)))
+                    .map(|it| TokenTree::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -3006,17 +3006,17 @@ impl TryFrom<super::nodes::MacroEagerInput> for MacroEagerInput {
     type Error = String;
     fn try_from(item: super::nodes::MacroEagerInput) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            l_brack_token: item.l_brack_token().is_some(),
-            r_brack_token: item.r_brack_token().is_some(),
             l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
+            l_brack_token: item.l_brack_token().is_some(),
+            r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3069,6 +3069,12 @@ impl TryFrom<super::nodes::MacroRules> for MacroRules {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            macro_rules_token: item.macro_rules_token().is_some(),
+            excl_token: item.excl_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
@@ -3079,12 +3085,6 @@ impl TryFrom<super::nodes::MacroRules> for MacroRules {
                     .ok_or(format!("{}", stringify!(token_tree)))
                     .map(|it| TokenTree::try_from(it))??,
             ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
-                None => None,
-            },
-            excl_token: item.excl_token().is_some(),
-            macro_rules_token: item.macro_rules_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3093,15 +3093,15 @@ impl TryFrom<super::nodes::MacroStmts> for MacroStmts {
     type Error = String;
     fn try_from(item: super::nodes::MacroStmts) -> Result<Self, Self::Error> {
         Ok(Self {
-            expr: match item.expr() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
-                None => None,
-            },
             statements: item
                 .statements()
                 .into_iter()
                 .map(Stmt::try_from)
                 .collect::<Result<Vec<Stmt>, String>>()?,
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -3128,21 +3128,21 @@ impl TryFrom<super::nodes::MatchArm> for MatchArm {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            pat: match item.pat() {
+                Some(it) => Some(Box::new(Pat::try_from(it)?)),
+                None => None,
+            },
+            guard: match item.guard() {
+                Some(it) => Some(Box::new(MatchGuard::try_from(it)?)),
+                None => None,
+            },
+            fat_arrow_token: item.fat_arrow_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            guard: match item.guard() {
-                Some(it) => Some(Box::new(MatchGuard::try_from(it)?)),
-                None => None,
-            },
-            pat: match item.pat() {
-                Some(it) => Some(Box::new(Pat::try_from(it)?)),
-                None => None,
-            },
             comma_token: item.comma_token().is_some(),
-            fat_arrow_token: item.fat_arrow_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3151,17 +3151,17 @@ impl TryFrom<super::nodes::MatchArmList> for MatchArmList {
     type Error = String;
     fn try_from(item: super::nodes::MatchArmList) -> Result<Self, Self::Error> {
         Ok(Self {
-            arms: item
-                .arms()
-                .into_iter()
-                .map(MatchArm::try_from)
-                .collect::<Result<Vec<MatchArm>, String>>()?,
+            l_curly_token: item.l_curly_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
+            arms: item
+                .arms()
+                .into_iter()
+                .map(MatchArm::try_from)
+                .collect::<Result<Vec<MatchArm>, String>>()?,
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3176,6 +3176,7 @@ impl TryFrom<super::nodes::MatchExpr> for MatchExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            match_token: item.match_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
@@ -3186,7 +3187,6 @@ impl TryFrom<super::nodes::MatchExpr> for MatchExpr {
                     .ok_or(format!("{}", stringify!(match_arm_list)))
                     .map(|it| MatchArmList::try_from(it))??,
             ),
-            match_token: item.match_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3211,11 +3211,11 @@ impl TryFrom<super::nodes::MatchesExpr> for MatchesExpr {
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            matches_token: item.matches_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
-            matches_token: item.matches_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3224,23 +3224,23 @@ impl TryFrom<super::nodes::Meta> for Meta {
     type Error = String;
     fn try_from(item: super::nodes::Meta) -> Result<Self, Self::Error> {
         Ok(Self {
-            expr: match item.expr() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
-                None => None,
-            },
+            unsafe_token: item.unsafe_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             path: Box::new(
                 item.path()
                     .ok_or(format!("{}", stringify!(path)))
                     .map(|it| Path::try_from(it))??,
             ),
+            eq_token: item.eq_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             token_tree: match item.token_tree() {
                 Some(it) => Some(Box::new(TokenTree::try_from(it)?)),
                 None => None,
             },
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            eq_token: item.eq_token().is_some(),
-            unsafe_token: item.unsafe_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3249,31 +3249,31 @@ impl TryFrom<super::nodes::MethodCallExpr> for MethodCallExpr {
     type Error = String;
     fn try_from(item: super::nodes::MethodCallExpr) -> Result<Self, Self::Error> {
         Ok(Self {
-            arg_list: Box::new(
-                item.arg_list()
-                    .ok_or(format!("{}", stringify!(arg_list)))
-                    .map(|it| ArgList::try_from(it))??,
-            ),
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            generic_arg_list: match item.generic_arg_list() {
-                Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
-                None => None,
-            },
-            name_ref: Box::new(
-                item.name_ref()
-                    .ok_or(format!("{}", stringify!(name_ref)))
-                    .map(|it| NameRef::try_from(it))??,
-            ),
             receiver: Box::new(
                 item.receiver()
                     .ok_or(format!("{}", stringify!(receiver)))
                     .map(|it| Expr::try_from(it))??,
             ),
             dot_token: item.dot_token().is_some(),
+            name_ref: Box::new(
+                item.name_ref()
+                    .ok_or(format!("{}", stringify!(name_ref)))
+                    .map(|it| NameRef::try_from(it))??,
+            ),
+            generic_arg_list: match item.generic_arg_list() {
+                Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
+                None => None,
+            },
+            arg_list: Box::new(
+                item.arg_list()
+                    .ok_or(format!("{}", stringify!(arg_list)))
+                    .map(|it| ArgList::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -3282,10 +3282,10 @@ impl TryFrom<super::nodes::ModeSpecChecked> for ModeSpecChecked {
     type Error = String;
     fn try_from(item: super::nodes::ModeSpecChecked) -> Result<Self, Self::Error> {
         Ok(Self {
-            l_paren_token: item.l_paren_token().is_some(),
-            r_paren_token: item.r_paren_token().is_some(),
-            checked_token: item.checked_token().is_some(),
             spec_token: item.spec_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            checked_token: item.checked_token().is_some(),
+            r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3299,21 +3299,21 @@ impl TryFrom<super::nodes::Module> for Module {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            item_list: match item.item_list() {
-                Some(it) => Some(Box::new(ItemList::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            mod_token: item.mod_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            item_list: match item.item_list() {
+                Some(it) => Some(Box::new(ItemList::try_from(it)?)),
                 None => None,
             },
             semicolon_token: item.semicolon_token().is_some(),
-            mod_token: item.mod_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3332,11 +3332,11 @@ impl TryFrom<super::nodes::NameRef> for NameRef {
     type Error = String;
     fn try_from(item: super::nodes::NameRef) -> Result<Self, Self::Error> {
         Ok(Self {
-            Self_token: item.Self_token().is_some(),
-            crate_token: item.crate_token().is_some(),
             ident_token: item.ident_token().map(|it| it.text().to_string()),
             self_token: item.self_token().is_some(),
             super_token: item.super_token().is_some(),
+            crate_token: item.crate_token().is_some(),
+            Self_token: item.Self_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3356,21 +3356,21 @@ impl TryFrom<super::nodes::OffsetOfExpr> for OffsetOfExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            builtin_token: item.builtin_token().is_some(),
+            pound_token: item.pound_token().is_some(),
+            offset_of_token: item.offset_of_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            comma_token: item.comma_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
                 .map(NameRef::try_from)
                 .collect::<Result<Vec<NameRef>, String>>()?,
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
-            pound_token: item.pound_token().is_some(),
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            comma_token: item.comma_token().is_some(),
-            builtin_token: item.builtin_token().is_some(),
-            offset_of_token: item.offset_of_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3397,17 +3397,17 @@ impl TryFrom<super::nodes::Param> for Param {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            tracked_token: item.tracked_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
+            colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
             dotdotdot_token: item.dotdotdot_token().is_some(),
-            colon_token: item.colon_token().is_some(),
-            tracked_token: item.tracked_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3416,18 +3416,18 @@ impl TryFrom<super::nodes::ParamList> for ParamList {
     type Error = String;
     fn try_from(item: super::nodes::ParamList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
+            self_param: match item.self_param() {
+                Some(it) => Some(Box::new(SelfParam::try_from(it)?)),
+                None => None,
+            },
+            comma_token: item.comma_token().is_some(),
             params: item
                 .params()
                 .into_iter()
                 .map(Param::try_from)
                 .collect::<Result<Vec<Param>, String>>()?,
-            self_param: match item.self_param() {
-                Some(it) => Some(Box::new(SelfParam::try_from(it)?)),
-                None => None,
-            },
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            comma_token: item.comma_token().is_some(),
             pipe_token: item.pipe_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3442,12 +3442,12 @@ impl TryFrom<super::nodes::ParenExpr> for ParenExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            l_paren_token: item.l_paren_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3457,11 +3457,11 @@ impl TryFrom<super::nodes::ParenPat> for ParenPat {
     type Error = String;
     fn try_from(item: super::nodes::ParenPat) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3471,11 +3471,11 @@ impl TryFrom<super::nodes::ParenType> for ParenType {
     type Error = String;
     fn try_from(item: super::nodes::ParenType) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3489,12 +3489,12 @@ impl TryFrom<super::nodes::Path> for Path {
                 Some(it) => Some(Box::new(Path::try_from(it)?)),
                 None => None,
             },
+            coloncolon_token: item.coloncolon_token().is_some(),
             segment: Box::new(
                 item.segment()
                     .ok_or(format!("{}", stringify!(segment)))
                     .map(|it| PathSegment::try_from(it))??,
             ),
-            coloncolon_token: item.coloncolon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3534,35 +3534,35 @@ impl TryFrom<super::nodes::PathSegment> for PathSegment {
     type Error = String;
     fn try_from(item: super::nodes::PathSegment) -> Result<Self, Self::Error> {
         Ok(Self {
-            generic_arg_list: match item.generic_arg_list() {
-                Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
-                None => None,
-            },
+            coloncolon_token: item.coloncolon_token().is_some(),
             name_ref: Box::new(
                 item.name_ref()
                     .ok_or(format!("{}", stringify!(name_ref)))
                     .map(|it| NameRef::try_from(it))??,
             ),
-            param_list: match item.param_list() {
-                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
+            generic_arg_list: match item.generic_arg_list() {
+                Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
                 None => None,
             },
-            path_type: match item.path_type() {
-                Some(it) => Some(Box::new(PathType::try_from(it)?)),
+            param_list: match item.param_list() {
+                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
                 None => None,
             },
             ret_type: match item.ret_type() {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
                 None => None,
             },
+            l_angle_token: item.l_angle_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            coloncolon_token: item.coloncolon_token().is_some(),
-            l_angle_token: item.l_angle_token().is_some(),
-            r_angle_token: item.r_angle_token().is_some(),
             as_token: item.as_token().is_some(),
+            path_type: match item.path_type() {
+                Some(it) => Some(Box::new(PathType::try_from(it)?)),
+                None => None,
+            },
+            r_angle_token: item.r_angle_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3602,14 +3602,14 @@ impl TryFrom<super::nodes::Prover> for Prover {
     type Error = String;
     fn try_from(item: super::nodes::Prover) -> Result<Self, Self::Error> {
         Ok(Self {
+            by_token: item.by_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            by_token: item.by_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3618,13 +3618,13 @@ impl TryFrom<super::nodes::PtrType> for PtrType {
     type Error = String;
     fn try_from(item: super::nodes::PtrType) -> Result<Self, Self::Error> {
         Ok(Self {
+            star_token: item.star_token().is_some(),
+            const_token: item.const_token().is_some(),
+            mut_token: item.mut_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            star_token: item.star_token().is_some(),
-            const_token: item.const_token().is_some(),
-            mut_token: item.mut_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3662,17 +3662,17 @@ impl TryFrom<super::nodes::RecommendsClause> for RecommendsClause {
     type Error = String;
     fn try_from(item: super::nodes::RecommendsClause) -> Result<Self, Self::Error> {
         Ok(Self {
-            expr: match item.expr() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
-                None => None,
-            },
+            recommends_token: item.recommends_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            recommends_token: item.recommends_token().is_some(),
             via_token: item.via_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -3704,16 +3704,16 @@ impl TryFrom<super::nodes::RecordExprField> for RecordExprField {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            expr: Box::new(
-                item.expr()
-                    .ok_or(format!("{}", stringify!(expr)))
-                    .map(|it| Expr::try_from(it))??,
-            ),
             name_ref: match item.name_ref() {
                 Some(it) => Some(Box::new(NameRef::try_from(it)?)),
                 None => None,
             },
             colon_token: item.colon_token().is_some(),
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -3722,6 +3722,7 @@ impl TryFrom<super::nodes::RecordExprFieldList> for RecordExprFieldList {
     type Error = String;
     fn try_from(item: super::nodes::RecordExprFieldList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
@@ -3732,13 +3733,12 @@ impl TryFrom<super::nodes::RecordExprFieldList> for RecordExprFieldList {
                 .into_iter()
                 .map(RecordExprField::try_from)
                 .collect::<Result<Vec<RecordExprField>, String>>()?,
+            dotdot_token: item.dotdot_token().is_some(),
             spread: match item.spread() {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
-            dotdot_token: item.dotdot_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3752,6 +3752,10 @@ impl TryFrom<super::nodes::RecordField> for RecordField {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
             data_mode: match item.data_mode() {
                 Some(it) => Some(Box::new(DataMode::try_from(it)?)),
                 None => None,
@@ -3761,15 +3765,11 @@ impl TryFrom<super::nodes::RecordField> for RecordField {
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
+            colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
-                None => None,
-            },
-            colon_token: item.colon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3778,12 +3778,12 @@ impl TryFrom<super::nodes::RecordFieldList> for RecordFieldList {
     type Error = String;
     fn try_from(item: super::nodes::RecordFieldList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
                 .map(RecordField::try_from)
                 .collect::<Result<Vec<RecordField>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3820,11 +3820,11 @@ impl TryFrom<super::nodes::RecordPatField> for RecordPatField {
                 Some(it) => Some(Box::new(NameRef::try_from(it)?)),
                 None => None,
             },
+            colon_token: item.colon_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3833,6 +3833,7 @@ impl TryFrom<super::nodes::RecordPatFieldList> for RecordPatFieldList {
     type Error = String;
     fn try_from(item: super::nodes::RecordPatFieldList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
@@ -3842,7 +3843,6 @@ impl TryFrom<super::nodes::RecordPatFieldList> for RecordPatFieldList {
                 Some(it) => Some(Box::new(RestPat::try_from(it)?)),
                 None => None,
             },
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -3857,15 +3857,15 @@ impl TryFrom<super::nodes::RefExpr> for RefExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            amp_token: item.amp_token().is_some(),
+            raw_token: item.raw_token().is_some(),
+            const_token: item.const_token().is_some(),
+            mut_token: item.mut_token().is_some(),
             expr: Box::new(
                 item.expr()
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
-            amp_token: item.amp_token().is_some(),
-            const_token: item.const_token().is_some(),
-            mut_token: item.mut_token().is_some(),
-            raw_token: item.raw_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3874,12 +3874,12 @@ impl TryFrom<super::nodes::RefPat> for RefPat {
     type Error = String;
     fn try_from(item: super::nodes::RefPat) -> Result<Self, Self::Error> {
         Ok(Self {
+            amp_token: item.amp_token().is_some(),
+            mut_token: item.mut_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
-            amp_token: item.amp_token().is_some(),
-            mut_token: item.mut_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3888,16 +3888,16 @@ impl TryFrom<super::nodes::RefType> for RefType {
     type Error = String;
     fn try_from(item: super::nodes::RefType) -> Result<Self, Self::Error> {
         Ok(Self {
+            amp_token: item.amp_token().is_some(),
             lifetime: match item.lifetime() {
                 Some(it) => Some(Box::new(Lifetime::try_from(it)?)),
                 None => None,
             },
+            mut_token: item.mut_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            amp_token: item.amp_token().is_some(),
-            mut_token: item.mut_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3906,12 +3906,12 @@ impl TryFrom<super::nodes::Rename> for Rename {
     type Error = String;
     fn try_from(item: super::nodes::Rename) -> Result<Self, Self::Error> {
         Ok(Self {
+            as_token: item.as_token().is_some(),
             name: match item.name() {
                 Some(it) => Some(Box::new(Name::try_from(it)?)),
                 None => None,
             },
             underscore_token: item.underscore_token().is_some(),
-            as_token: item.as_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3920,12 +3920,12 @@ impl TryFrom<super::nodes::RequiresClause> for RequiresClause {
     type Error = String;
     fn try_from(item: super::nodes::RequiresClause) -> Result<Self, Self::Error> {
         Ok(Self {
+            requires_token: item.requires_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            requires_token: item.requires_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3948,19 +3948,19 @@ impl TryFrom<super::nodes::RetType> for RetType {
     type Error = String;
     fn try_from(item: super::nodes::RetType) -> Result<Self, Self::Error> {
         Ok(Self {
+            thin_arrow_token: item.thin_arrow_token().is_some(),
+            tracked_token: item.tracked_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
             pat: match item.pat() {
                 Some(it) => Some(Box::new(Pat::try_from(it)?)),
                 None => None,
             },
+            colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            thin_arrow_token: item.thin_arrow_token().is_some(),
-            colon_token: item.colon_token().is_some(),
-            tracked_token: item.tracked_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3974,11 +3974,11 @@ impl TryFrom<super::nodes::ReturnExpr> for ReturnExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            return_token: item.return_token().is_some(),
             expr: match item.expr() {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
-            return_token: item.return_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3992,22 +3992,22 @@ impl TryFrom<super::nodes::SelfParam> for SelfParam {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            amp_token: item.amp_token().is_some(),
             lifetime: match item.lifetime() {
                 Some(it) => Some(Box::new(Lifetime::try_from(it)?)),
                 None => None,
             },
+            mut_token: item.mut_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
+            colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            amp_token: item.amp_token().is_some(),
-            colon_token: item.colon_token().is_some(),
-            mut_token: item.mut_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4021,12 +4021,12 @@ impl TryFrom<super::nodes::SignatureDecreases> for SignatureDecreases {
                     .ok_or(format!("{}", stringify!(decreases_clause)))
                     .map(|it| DecreasesClause::try_from(it))??,
             ),
+            when_token: item.when_token().is_some(),
             expr: match item.expr() {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
             via_token: item.via_token().is_some(),
-            when_token: item.when_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4035,12 +4035,12 @@ impl TryFrom<super::nodes::SlicePat> for SlicePat {
     type Error = String;
     fn try_from(item: super::nodes::SlicePat) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_brack_token: item.l_brack_token().is_some(),
             pats: item
                 .pats()
                 .into_iter()
                 .map(Pat::try_from)
                 .collect::<Result<Vec<Pat>, String>>()?,
-            l_brack_token: item.l_brack_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4050,11 +4050,11 @@ impl TryFrom<super::nodes::SliceType> for SliceType {
     type Error = String;
     fn try_from(item: super::nodes::SliceType) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_brack_token: item.l_brack_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            l_brack_token: item.l_brack_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4064,6 +4064,7 @@ impl TryFrom<super::nodes::SourceFile> for SourceFile {
     type Error = String;
     fn try_from(item: super::nodes::SourceFile) -> Result<Self, Self::Error> {
         Ok(Self {
+            shebang_token: item.shebang_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
@@ -4074,7 +4075,6 @@ impl TryFrom<super::nodes::SourceFile> for SourceFile {
                 .into_iter()
                 .map(Item::try_from)
                 .collect::<Result<Vec<Item>, String>>()?,
-            shebang_token: item.shebang_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4088,28 +4088,28 @@ impl TryFrom<super::nodes::Static> for Static {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            body: match item.body() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            static_token: item.static_token().is_some(),
+            mut_token: item.mut_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
+            colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            eq_token: item.eq_token().is_some(),
+            body: match item.body() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
             semicolon_token: item.semicolon_token().is_some(),
-            eq_token: item.eq_token().is_some(),
-            mut_token: item.mut_token().is_some(),
-            static_token: item.static_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4118,6 +4118,7 @@ impl TryFrom<super::nodes::StmtList> for StmtList {
     type Error = String;
     fn try_from(item: super::nodes::StmtList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             attrs: item
                 .attrs()
                 .into_iter()
@@ -4132,7 +4133,6 @@ impl TryFrom<super::nodes::StmtList> for StmtList {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4147,25 +4147,22 @@ impl TryFrom<super::nodes::Struct> for Struct {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
             data_mode: match item.data_mode() {
                 Some(it) => Some(Box::new(DataMode::try_from(it)?)),
                 None => None,
             },
-            field_list: match item.field_list() {
-                Some(it) => Some(Box::new(FieldList::try_from(it)?)),
-                None => None,
-            },
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
-                None => None,
-            },
+            struct_token: item.struct_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
             where_clause: match item.where_clause() {
@@ -4173,7 +4170,10 @@ impl TryFrom<super::nodes::Struct> for Struct {
                 None => None,
             },
             semicolon_token: item.semicolon_token().is_some(),
-            struct_token: item.struct_token().is_some(),
+            field_list: match item.field_list() {
+                Some(it) => Some(Box::new(FieldList::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -4184,10 +4184,10 @@ impl TryFrom<super::nodes::TokenTree> for TokenTree {
         Ok(Self {
             l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            l_brack_token: item.l_brack_token().is_some(),
-            r_brack_token: item.r_brack_token().is_some(),
             l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
+            l_brack_token: item.l_brack_token().is_some(),
+            r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4196,41 +4196,41 @@ impl TryFrom<super::nodes::Trait> for Trait {
     type Error = String;
     fn try_from(item: super::nodes::Trait) -> Result<Self, Self::Error> {
         Ok(Self {
-            assoc_item_list: Box::new(
-                item.assoc_item_list()
-                    .ok_or(format!("{}", stringify!(assoc_item_list)))
-                    .map(|it| AssocItemList::try_from(it))??,
-            ),
             attrs: item
                 .attrs()
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            unsafe_token: item.unsafe_token().is_some(),
+            auto_token: item.auto_token().is_some(),
+            trait_token: item.trait_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            type_bound_list: match item.type_bound_list() {
-                Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            colon_token: item.colon_token().is_some(),
+            type_bound_list: match item.type_bound_list() {
+                Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
                 None => None,
             },
             where_clause: match item.where_clause() {
                 Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
-            auto_token: item.auto_token().is_some(),
-            trait_token: item.trait_token().is_some(),
-            unsafe_token: item.unsafe_token().is_some(),
+            assoc_item_list: Box::new(
+                item.assoc_item_list()
+                    .ok_or(format!("{}", stringify!(assoc_item_list)))
+                    .map(|it| AssocItemList::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -4244,21 +4244,23 @@ impl TryFrom<super::nodes::TraitAlias> for TraitAlias {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            trait_token: item.trait_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            type_bound_list: match item.type_bound_list() {
-                Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            eq_token: item.eq_token().is_some(),
+            type_bound_list: match item.type_bound_list() {
+                Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
                 None => None,
             },
             where_clause: match item.where_clause() {
@@ -4266,8 +4268,6 @@ impl TryFrom<super::nodes::TraitAlias> for TraitAlias {
                 None => None,
             },
             semicolon_token: item.semicolon_token().is_some(),
-            eq_token: item.eq_token().is_some(),
-            trait_token: item.trait_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4276,16 +4276,16 @@ impl TryFrom<super::nodes::TriggerAttribute> for TriggerAttribute {
     type Error = String;
     fn try_from(item: super::nodes::TriggerAttribute) -> Result<Self, Self::Error> {
         Ok(Self {
+            pound_token: item.pound_token().is_some(),
+            excl_token: item.excl_token().is_some(),
+            l_brack_token: item.l_brack_token().is_some(),
+            trigger_token: item.trigger_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            excl_token: item.excl_token().is_some(),
-            pound_token: item.pound_token().is_some(),
-            l_brack_token: item.l_brack_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
-            trigger_token: item.trigger_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4318,12 +4318,12 @@ impl TryFrom<super::nodes::TupleExpr> for TupleExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            l_paren_token: item.l_paren_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4338,12 +4338,12 @@ impl TryFrom<super::nodes::TupleField> for TupleField {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
             visibility: match item.visibility() {
                 Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
             cst: Some(item.clone()),
@@ -4354,12 +4354,12 @@ impl TryFrom<super::nodes::TupleFieldList> for TupleFieldList {
     type Error = String;
     fn try_from(item: super::nodes::TupleFieldList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
                 .map(TupleField::try_from)
                 .collect::<Result<Vec<TupleField>, String>>()?,
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4369,12 +4369,12 @@ impl TryFrom<super::nodes::TuplePat> for TuplePat {
     type Error = String;
     fn try_from(item: super::nodes::TuplePat) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
                 .map(Pat::try_from)
                 .collect::<Result<Vec<Pat>, String>>()?,
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4384,17 +4384,17 @@ impl TryFrom<super::nodes::TupleStructPat> for TupleStructPat {
     type Error = String;
     fn try_from(item: super::nodes::TupleStructPat) -> Result<Self, Self::Error> {
         Ok(Self {
-            fields: item
-                .fields()
-                .into_iter()
-                .map(Pat::try_from)
-                .collect::<Result<Vec<Pat>, String>>()?,
             path: Box::new(
                 item.path()
                     .ok_or(format!("{}", stringify!(path)))
                     .map(|it| Path::try_from(it))??,
             ),
             l_paren_token: item.l_paren_token().is_some(),
+            fields: item
+                .fields()
+                .into_iter()
+                .map(Pat::try_from)
+                .collect::<Result<Vec<Pat>, String>>()?,
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4404,12 +4404,12 @@ impl TryFrom<super::nodes::TupleType> for TupleType {
     type Error = String;
     fn try_from(item: super::nodes::TupleType) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
             fields: item
                 .fields()
                 .into_iter()
                 .map(Type::try_from)
                 .collect::<Result<Vec<Type>, String>>()?,
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4424,36 +4424,36 @@ impl TryFrom<super::nodes::TypeAlias> for TypeAlias {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            default_token: item.default_token().is_some(),
+            type_token: item.type_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            ty: match item.ty() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
+            colon_token: item.colon_token().is_some(),
             type_bound_list: match item.type_bound_list() {
                 Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
-                None => None,
-            },
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
             where_clause: match item.where_clause() {
                 Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
-            semicolon_token: item.semicolon_token().is_some(),
             eq_token: item.eq_token().is_some(),
-            default_token: item.default_token().is_some(),
-            type_token: item.type_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            semicolon_token: item.semicolon_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4478,14 +4478,14 @@ impl TryFrom<super::nodes::TypeBound> for TypeBound {
                 Some(it) => Some(Box::new(Lifetime::try_from(it)?)),
                 None => None,
             },
+            tilde_token: item.tilde_token().is_some(),
+            const_token: item.const_token().is_some(),
+            async_token: item.async_token().is_some(),
+            question_mark_token: item.question_mark_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
-            question_mark_token: item.question_mark_token().is_some(),
-            async_token: item.async_token().is_some(),
-            const_token: item.const_token().is_some(),
-            tilde_token: item.tilde_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4512,21 +4512,21 @@ impl TryFrom<super::nodes::TypeParam> for TypeParam {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            default_type: match item.default_type() {
-                Some(it) => Some(Box::new(Type::try_from(it)?)),
-                None => None,
-            },
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
+            colon_token: item.colon_token().is_some(),
             type_bound_list: match item.type_bound_list() {
                 Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
             eq_token: item.eq_token().is_some(),
+            default_type: match item.default_type() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -4554,29 +4554,29 @@ impl TryFrom<super::nodes::Union> for Union {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            generic_param_list: match item.generic_param_list() {
-                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
+            union_token: item.union_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            record_field_list: Box::new(
-                item.record_field_list()
-                    .ok_or(format!("{}", stringify!(record_field_list)))
-                    .map(|it| RecordFieldList::try_from(it))??,
-            ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
             },
             where_clause: match item.where_clause() {
                 Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
                 None => None,
             },
-            union_token: item.union_token().is_some(),
+            record_field_list: Box::new(
+                item.record_field_list()
+                    .ok_or(format!("{}", stringify!(record_field_list)))
+                    .map(|it| RecordFieldList::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -4590,17 +4590,17 @@ impl TryFrom<super::nodes::Use> for Use {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            use_token: item.use_token().is_some(),
             use_tree: Box::new(
                 item.use_tree()
                     .ok_or(format!("{}", stringify!(use_tree)))
                     .map(|it| UseTree::try_from(it))??,
             ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
-                None => None,
-            },
             semicolon_token: item.semicolon_token().is_some(),
-            use_token: item.use_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4613,16 +4613,16 @@ impl TryFrom<super::nodes::UseTree> for UseTree {
                 Some(it) => Some(Box::new(Path::try_from(it)?)),
                 None => None,
             },
-            rename: match item.rename() {
-                Some(it) => Some(Box::new(Rename::try_from(it)?)),
-                None => None,
-            },
+            coloncolon_token: item.coloncolon_token().is_some(),
+            star_token: item.star_token().is_some(),
             use_tree_list: match item.use_tree_list() {
                 Some(it) => Some(Box::new(UseTreeList::try_from(it)?)),
                 None => None,
             },
-            star_token: item.star_token().is_some(),
-            coloncolon_token: item.coloncolon_token().is_some(),
+            rename: match item.rename() {
+                Some(it) => Some(Box::new(Rename::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -4631,12 +4631,12 @@ impl TryFrom<super::nodes::UseTreeList> for UseTreeList {
     type Error = String;
     fn try_from(item: super::nodes::UseTreeList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             use_trees: item
                 .use_trees()
                 .into_iter()
                 .map(UseTree::try_from)
                 .collect::<Result<Vec<UseTree>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4651,12 +4651,8 @@ impl TryFrom<super::nodes::Variant> for Variant {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
-            expr: match item.expr() {
-                Some(it) => Some(Box::new(Expr::try_from(it)?)),
-                None => None,
-            },
-            field_list: match item.field_list() {
-                Some(it) => Some(Box::new(FieldList::try_from(it)?)),
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
                 None => None,
             },
             name: Box::new(
@@ -4664,11 +4660,15 @@ impl TryFrom<super::nodes::Variant> for Variant {
                     .ok_or(format!("{}", stringify!(name)))
                     .map(|it| Name::try_from(it))??,
             ),
-            visibility: match item.visibility() {
-                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+            field_list: match item.field_list() {
+                Some(it) => Some(Box::new(FieldList::try_from(it)?)),
                 None => None,
             },
             eq_token: item.eq_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -4677,12 +4677,12 @@ impl TryFrom<super::nodes::VariantList> for VariantList {
     type Error = String;
     fn try_from(item: super::nodes::VariantList) -> Result<Self, Self::Error> {
         Ok(Self {
+            l_curly_token: item.l_curly_token().is_some(),
             variants: item
                 .variants()
                 .into_iter()
                 .map(Variant::try_from)
                 .collect::<Result<Vec<Variant>, String>>()?,
-            l_curly_token: item.l_curly_token().is_some(),
             r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -4697,6 +4697,7 @@ impl TryFrom<super::nodes::VerusGlobal> for VerusGlobal {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            global_token: item.global_token().is_some(),
             name: Box::new(
                 item.name()
                     .ok_or(format!("{}", stringify!(name)))
@@ -4707,7 +4708,6 @@ impl TryFrom<super::nodes::VerusGlobal> for VerusGlobal {
                 None => None,
             },
             semicolon_token: item.semicolon_token().is_some(),
-            global_token: item.global_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4735,14 +4735,14 @@ impl TryFrom<super::nodes::Visibility> for Visibility {
     type Error = String;
     fn try_from(item: super::nodes::Visibility) -> Result<Self, Self::Error> {
         Ok(Self {
+            pub_token: item.pub_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            in_token: item.in_token().is_some(),
             path: match item.path() {
                 Some(it) => Some(Box::new(Path::try_from(it)?)),
                 None => None,
             },
-            l_paren_token: item.l_paren_token().is_some(),
             r_paren_token: item.r_paren_token().is_some(),
-            in_token: item.in_token().is_some(),
-            pub_token: item.pub_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4751,12 +4751,12 @@ impl TryFrom<super::nodes::WhereClause> for WhereClause {
     type Error = String;
     fn try_from(item: super::nodes::WhereClause) -> Result<Self, Self::Error> {
         Ok(Self {
+            where_token: item.where_token().is_some(),
             predicates: item
                 .predicates()
                 .into_iter()
                 .map(WherePred::try_from)
                 .collect::<Result<Vec<WherePred>, String>>()?,
-            where_token: item.where_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4765,6 +4765,7 @@ impl TryFrom<super::nodes::WherePred> for WherePred {
     type Error = String;
     fn try_from(item: super::nodes::WherePred) -> Result<Self, Self::Error> {
         Ok(Self {
+            for_token: item.for_token().is_some(),
             generic_param_list: match item.generic_param_list() {
                 Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
                 None => None,
@@ -4777,12 +4778,11 @@ impl TryFrom<super::nodes::WherePred> for WherePred {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
+            colon_token: item.colon_token().is_some(),
             type_bound_list: match item.type_bound_list() {
                 Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
                 None => None,
             },
-            colon_token: item.colon_token().is_some(),
-            for_token: item.for_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4800,17 +4800,17 @@ impl TryFrom<super::nodes::WhileExpr> for WhileExpr {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
                 None => None,
             },
-            loop_body: Box::new(
-                item.loop_body()
-                    .ok_or(format!("{}", stringify!(loop_body)))
-                    .map(|it| BlockExpr::try_from(it))??,
-            ),
+            while_token: item.while_token().is_some(),
             loop_clauses: item
                 .loop_clauses()
                 .into_iter()
                 .map(LoopClause::try_from)
                 .collect::<Result<Vec<LoopClause>, String>>()?,
-            while_token: item.while_token().is_some(),
+            loop_body: Box::new(
+                item.loop_body()
+                    .ok_or(format!("{}", stringify!(loop_body)))
+                    .map(|it| BlockExpr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -4830,12 +4830,12 @@ impl TryFrom<super::nodes::YeetExpr> for YeetExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            do_token: item.do_token().is_some(),
+            yeet_token: item.yeet_token().is_some(),
             expr: match item.expr() {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
-            do_token: item.do_token().is_some(),
-            yeet_token: item.yeet_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -4849,11 +4849,11 @@ impl TryFrom<super::nodes::YieldExpr> for YieldExpr {
                 .into_iter()
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
+            yield_token: item.yield_token().is_some(),
             expr: match item.expr() {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
                 None => None,
             },
-            yield_token: item.yield_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -5131,23 +5131,23 @@ impl std::fmt::Display for ArrayExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_brack_token {
             let mut tmp = stringify!(l_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_brack_token {
-            let mut tmp = stringify!(r_brack_token).to_string();
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5158,26 +5158,26 @@ impl std::fmt::Display for ArrayExpr {
 impl std::fmt::Display for ArrayType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.const_arg.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.l_brack_token {
             let mut tmp = stringify!(l_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_brack_token {
-            let mut tmp = stringify!(r_brack_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.semicolon_token {
             let mut tmp = stringify!(semicolon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.const_arg.to_string());
+        s.push_str(" ");
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5191,14 +5191,14 @@ impl std::fmt::Display for ArrowExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.name_ref {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.thin_arrow_token {
             let mut tmp = stringify!(thin_arrow_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.name_ref {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5208,22 +5208,14 @@ impl std::fmt::Display for AsmExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
+        if self.builtin_token {
+            let mut tmp = stringify!(builtin_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if self.pound_token {
             let mut tmp = stringify!(pound_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.l_paren_token {
-            let mut tmp = stringify!(l_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5234,8 +5226,16 @@ impl std::fmt::Display for AsmExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.builtin_token {
-            let mut tmp = stringify!(builtin_token).to_string();
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5247,18 +5247,22 @@ impl std::fmt::Display for AssertForallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.block_expr.to_string());
-        s.push_str(" ");
-        s.push_str(&self.closure_expr.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.assert_token {
             let mut tmp = stringify!(assert_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.closure_expr.to_string());
+        s.push_str(" ");
+        if self.implies_token {
+            let mut tmp = stringify!(implies_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.by_token {
@@ -5267,28 +5271,24 @@ impl std::fmt::Display for AssertForallExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.implies_token {
-            let mut tmp = stringify!(implies_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
+        s.push_str(&self.block_expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for AssocItemList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.assoc_items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
-        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(
+            &self.assoc_items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -5301,16 +5301,12 @@ impl std::fmt::Display for AssocItemList {
 impl std::fmt::Display for AssocTypeArg {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.const_arg {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
+        s.push_str(&self.name_ref.to_string());
+        s.push_str(" ");
         if let Some(it) = &self.generic_arg_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        s.push_str(&self.name_ref.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.param_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -5319,22 +5315,26 @@ impl std::fmt::Display for AssocTypeArg {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.type_bound_list.to_string());
-        s.push_str(" ");
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.type_bound_list.to_string());
+        s.push_str(" ");
         if self.eq_token {
             let mut tmp = stringify!(eq_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.const_arg {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5344,22 +5344,22 @@ impl std::fmt::Display for AssumeExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
+        if self.assume_token {
+            let mut tmp = stringify!(assume_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.assume_token {
-            let mut tmp = stringify!(assume_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5370,16 +5370,14 @@ impl std::fmt::Display for AssumeExpr {
 impl std::fmt::Display for Attr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.meta.to_string());
-        s.push_str(" ");
-        if self.excl_token {
-            let mut tmp = stringify!(excl_token).to_string();
+        if self.pound_token {
+            let mut tmp = stringify!(pound_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.pound_token {
-            let mut tmp = stringify!(pound_token).to_string();
+        if self.excl_token {
+            let mut tmp = stringify!(excl_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5390,6 +5388,8 @@ impl std::fmt::Display for Attr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.meta.to_string());
+        s.push_str(" ");
         if self.r_brack_token {
             let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -5424,14 +5424,14 @@ impl std::fmt::Display for BecomeExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
         if self.become_token {
             let mut tmp = stringify!(become_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -5441,20 +5441,6 @@ impl std::fmt::Display for BlockExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if let Some(it) = &self.label {
             s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.stmt_list.to_string());
-        s.push_str(" ");
-        if self.async_token {
-            let mut tmp = stringify!(async_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.const_token {
-            let mut tmp = stringify!(const_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.try_token {
@@ -5469,20 +5455,34 @@ impl std::fmt::Display for BlockExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.async_token {
+            let mut tmp = stringify!(async_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.const_token {
+            let mut tmp = stringify!(const_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.stmt_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for BoxPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.box_token {
             let mut tmp = stringify!(box_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5492,18 +5492,18 @@ impl std::fmt::Display for BreakExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
+        if self.break_token {
+            let mut tmp = stringify!(break_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if let Some(it) = &self.lifetime {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.break_token {
-            let mut tmp = stringify!(break_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5513,10 +5513,6 @@ impl std::fmt::Display for BroadcastGroup {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.broadcast_group_identifier.to_string());
-        s.push_str(" ");
-        s.push_str(&self.broadcast_group_list.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -5533,6 +5529,10 @@ impl std::fmt::Display for BroadcastGroup {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.broadcast_group_identifier.to_string());
+        s.push_str(" ");
+        s.push_str(&self.broadcast_group_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -5549,6 +5549,12 @@ impl std::fmt::Display for BroadcastGroupIdentifier {
 impl std::fmt::Display for BroadcastGroupList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         s.push_str(
             &self
                 .broadcast_group_members
@@ -5557,12 +5563,6 @@ impl std::fmt::Display for BroadcastGroupList {
                 .collect::<Vec<String>>()
                 .join(" "),
         );
-        if self.l_curly_token {
-            let mut tmp = stringify!(l_curly_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -5585,14 +5585,6 @@ impl std::fmt::Display for BroadcastUse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.broadcast_use_list.to_string());
-        s.push_str(" ");
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.broadcast_token {
             let mut tmp = stringify!(broadcast_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -5601,6 +5593,14 @@ impl std::fmt::Display for BroadcastUse {
         }
         if self.use_token {
             let mut tmp = stringify!(use_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.broadcast_use_list.to_string());
+        s.push_str(" ");
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5618,10 +5618,10 @@ impl std::fmt::Display for BroadcastUseList {
 impl std::fmt::Display for CallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.arg_list.to_string());
-        s.push_str(" ");
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        s.push_str(&self.arg_list.to_string());
         s.push_str(" ");
         write!(f, "{s}")
     }
@@ -5632,14 +5632,14 @@ impl std::fmt::Display for CastExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.as_token {
             let mut tmp = stringify!(as_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5649,52 +5649,18 @@ impl std::fmt::Display for ClosureExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.body.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ret_type {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.async_token {
-            let mut tmp = stringify!(async_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.const_token {
-            let mut tmp = stringify!(const_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.exists_token {
-            let mut tmp = stringify!(exists_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.for_token {
             let mut tmp = stringify!(for_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.forall_token {
-            let mut tmp = stringify!(forall_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.move_token {
-            let mut tmp = stringify!(move_token).to_string();
+        if self.const_token {
+            let mut tmp = stringify!(const_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5705,6 +5671,40 @@ impl std::fmt::Display for ClosureExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.async_token {
+            let mut tmp = stringify!(async_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.move_token {
+            let mut tmp = stringify!(move_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.forall_token {
+            let mut tmp = stringify!(forall_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.exists_token {
+            let mut tmp = stringify!(exists_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.body.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -5712,42 +5712,12 @@ impl std::fmt::Display for Const {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.body {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.name {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.eq_token {
-            let mut tmp = stringify!(eq_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.underscore_token {
-            let mut tmp = stringify!(underscore_token).to_string();
+        if self.default_token {
+            let mut tmp = stringify!(default_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5758,8 +5728,38 @@ impl std::fmt::Display for Const {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.default_token {
-            let mut tmp = stringify!(default_token).to_string();
+        if let Some(it) = &self.name {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.underscore_token {
+            let mut tmp = stringify!(underscore_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.eq_token {
+            let mut tmp = stringify!(eq_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.body {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5778,14 +5778,14 @@ impl std::fmt::Display for ConstArg {
 impl std::fmt::Display for ConstBlockPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.block_expr.to_string());
-        s.push_str(" ");
         if self.const_token {
             let mut tmp = stringify!(const_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.block_expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -5793,20 +5793,22 @@ impl std::fmt::Display for ConstParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.default_val {
-            s.push_str(&it.to_string());
+        if self.const_token {
+            let mut tmp = stringify!(const_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.eq_token {
@@ -5815,10 +5817,8 @@ impl std::fmt::Display for ConstParam {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.const_token {
-            let mut tmp = stringify!(const_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.default_val {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5828,14 +5828,14 @@ impl std::fmt::Display for ContinueExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.lifetime {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.continue_token {
             let mut tmp = stringify!(continue_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.lifetime {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -5862,40 +5862,40 @@ impl std::fmt::Display for DataMode {
 impl std::fmt::Display for DecreasesClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.decreases_token {
             let mut tmp = stringify!(decreases_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for DynTraitType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.type_bound_list.to_string());
-        s.push_str(" ");
         if self.dyn_token {
             let mut tmp = stringify!(dyn_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.type_bound_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for EnsuresClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.ensures_token {
             let mut tmp = stringify!(ensures_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
@@ -5903,23 +5903,11 @@ impl std::fmt::Display for Enum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.data_mode {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        s.push_str(&self.variant_list.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.where_clause {
+        if let Some(it) = &self.data_mode {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -5929,6 +5917,18 @@ impl std::fmt::Display for Enum {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.variant_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -5949,17 +5949,17 @@ impl std::fmt::Display for ExprStmt {
 impl std::fmt::Display for ExternBlock {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.abi.to_string());
-        s.push_str(" ");
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.extern_item_list.to_string());
-        s.push_str(" ");
         if self.unsafe_token {
             let mut tmp = stringify!(unsafe_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.abi.to_string());
+        s.push_str(" ");
+        s.push_str(&self.extern_item_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -5967,18 +5967,12 @@ impl std::fmt::Display for ExternCrate {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.name_ref.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.rename {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
+        if self.extern_token {
+            let mut tmp = stringify!(extern_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -5989,8 +5983,14 @@ impl std::fmt::Display for ExternCrate {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.extern_token {
-            let mut tmp = stringify!(extern_token).to_string();
+        s.push_str(&self.name_ref.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.rename {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6001,16 +6001,16 @@ impl std::fmt::Display for ExternCrate {
 impl std::fmt::Display for ExternItemList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(
-            &self.extern_items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(
+            &self.extern_items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6026,48 +6026,22 @@ impl std::fmt::Display for FieldExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
         s.push_str(" ");
-        s.push_str(&self.name_ref.to_string());
-        s.push_str(" ");
         if self.dot_token {
             let mut tmp = stringify!(dot_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.name_ref.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for Fn {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.abi {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.body {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ensures_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.fn_mode {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.prover {
+        if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -6075,44 +6049,8 @@ impl std::fmt::Display for Fn {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.recommends_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.requires_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ret_type {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.signature_decreases {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.visibility {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.where_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.async_token {
-            let mut tmp = stringify!(async_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.broadcast_token {
-            let mut tmp = stringify!(broadcast_token).to_string();
+        if self.default_token {
+            let mut tmp = stringify!(default_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6123,10 +6061,30 @@ impl std::fmt::Display for Fn {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.default_token {
-            let mut tmp = stringify!(default_token).to_string();
+        if self.async_token {
+            let mut tmp = stringify!(async_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.unsafe_token {
+            let mut tmp = stringify!(unsafe_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.abi {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.broadcast_token {
+            let mut tmp = stringify!(broadcast_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.fn_mode {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.fn_token {
@@ -6135,8 +6093,50 @@ impl std::fmt::Display for Fn {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.unsafe_token {
-            let mut tmp = stringify!(unsafe_token).to_string();
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.prover {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.requires_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.recommends_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.signature_decreases {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.body {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6147,12 +6147,8 @@ impl std::fmt::Display for Fn {
 impl std::fmt::Display for FnMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.mode_spec_checked {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.exec_token {
-            let mut tmp = stringify!(exec_token).to_string();
+        if self.spec_token {
+            let mut tmp = stringify!(spec_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6163,10 +6159,14 @@ impl std::fmt::Display for FnMode {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.spec_token {
-            let mut tmp = stringify!(spec_token).to_string();
+        if self.exec_token {
+            let mut tmp = stringify!(exec_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.mode_spec_checked {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -6175,32 +6175,14 @@ impl std::fmt::Display for FnMode {
 impl std::fmt::Display for FnPtrType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.abi {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ret_type {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.async_token {
-            let mut tmp = stringify!(async_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.const_token {
             let mut tmp = stringify!(const_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.fn_token {
-            let mut tmp = stringify!(fn_token).to_string();
+        if self.async_token {
+            let mut tmp = stringify!(async_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6211,6 +6193,24 @@ impl std::fmt::Display for FnPtrType {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.abi {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.fn_token {
+            let mut tmp = stringify!(fn_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -6218,20 +6218,27 @@ impl std::fmt::Display for ForExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.iter_name {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.label {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        s.push_str(&self.loop_body.to_string());
-        s.push_str(" ");
-        s.push_str(
-            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
+        if self.for_token {
+            let mut tmp = stringify!(for_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.in_token {
+            let mut tmp = stringify!(in_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.iter_name {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -6241,34 +6248,27 @@ impl std::fmt::Display for ForExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.for_token {
-            let mut tmp = stringify!(for_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.in_token {
-            let mut tmp = stringify!(in_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
+        s.push_str(&self.loop_body.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for ForType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.generic_param_list.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.for_token {
             let mut tmp = stringify!(for_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.generic_param_list.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -6277,8 +6277,6 @@ impl std::fmt::Display for ForType {
 impl std::fmt::Display for FormatArgsArg {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.name {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -6289,42 +6287,23 @@ impl std::fmt::Display for FormatArgsArg {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for FormatArgsExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.args.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.template.to_string());
-        s.push_str(" ");
-        if self.pound_token {
-            let mut tmp = stringify!(pound_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.l_paren_token {
-            let mut tmp = stringify!(l_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.comma_token {
-            let mut tmp = stringify!(comma_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.builtin_token {
             let mut tmp = stringify!(builtin_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.pound_token {
+            let mut tmp = stringify!(pound_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6335,15 +6314,33 @@ impl std::fmt::Display for FormatArgsExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.template.to_string());
+        s.push_str(" ");
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.args.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for GenericArgList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.generic_args.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.coloncolon_token {
             let mut tmp = stringify!(coloncolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6356,6 +6353,9 @@ impl std::fmt::Display for GenericArgList {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.generic_args.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.r_angle_token {
             let mut tmp = stringify!(r_angle_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6368,15 +6368,15 @@ impl std::fmt::Display for GenericArgList {
 impl std::fmt::Display for GenericParamList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.generic_params.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.l_angle_token {
             let mut tmp = stringify!(l_angle_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.generic_params.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.r_angle_token {
             let mut tmp = stringify!(r_angle_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6390,14 +6390,8 @@ impl std::fmt::Display for IdentPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.at_token {
-            let mut tmp = stringify!(at_token).to_string();
+        if self.ref_token {
+            let mut tmp = stringify!(ref_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6408,10 +6402,16 @@ impl std::fmt::Display for IdentPat {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.ref_token {
-            let mut tmp = stringify!(ref_token).to_string();
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if self.at_token {
+            let mut tmp = stringify!(at_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -6420,47 +6420,13 @@ impl std::fmt::Display for IdentPat {
 impl std::fmt::Display for Impl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.assoc_item_list.to_string());
-        s.push_str(" ");
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.where_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.excl_token {
-            let mut tmp = stringify!(excl_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.const_token {
-            let mut tmp = stringify!(const_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.default_token {
             let mut tmp = stringify!(default_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.for_token {
-            let mut tmp = stringify!(for_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.impl_token {
-            let mut tmp = stringify!(impl_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6471,20 +6437,54 @@ impl std::fmt::Display for Impl {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        write!(f, "{s}")
-    }
-}
-impl std::fmt::Display for ImplTraitType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut s = String::new();
-        s.push_str(&self.type_bound_list.to_string());
-        s.push_str(" ");
         if self.impl_token {
             let mut tmp = stringify!(impl_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.const_token {
+            let mut tmp = stringify!(const_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.excl_token {
+            let mut tmp = stringify!(excl_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.for_token {
+            let mut tmp = stringify!(for_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.assoc_item_list.to_string());
+        s.push_str(" ");
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ImplTraitType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.impl_token {
+            let mut tmp = stringify!(impl_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.type_bound_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -6503,26 +6503,26 @@ impl std::fmt::Display for InferType {
 impl std::fmt::Display for InvariantClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.invariant_token {
             let mut tmp = stringify!(invariant_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for InvariantExceptBreakClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.invariant_except_break_token {
             let mut tmp = stringify!(invariant_except_break_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
@@ -6532,14 +6532,14 @@ impl std::fmt::Display for IsExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.is_token {
             let mut tmp = stringify!(is_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -6548,14 +6548,14 @@ impl std::fmt::Display for IsExpr {
 impl std::fmt::Display for ItemList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6582,14 +6582,14 @@ impl std::fmt::Display for Label {
 impl std::fmt::Display for LetElse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.block_expr.to_string());
-        s.push_str(" ");
         if self.else_token {
             let mut tmp = stringify!(else_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.block_expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -6597,8 +6597,12 @@ impl std::fmt::Display for LetExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
+        if self.let_token {
+            let mut tmp = stringify!(let_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.pat {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -6609,12 +6613,8 @@ impl std::fmt::Display for LetExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.let_token {
-            let mut tmp = stringify!(let_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -6622,34 +6622,8 @@ impl std::fmt::Display for LetStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.initializer.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.let_else {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.eq_token {
-            let mut tmp = stringify!(eq_token).to_string();
+        if self.let_token {
+            let mut tmp = stringify!(let_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6660,14 +6634,40 @@ impl std::fmt::Display for LetStmt {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.let_token {
-            let mut tmp = stringify!(let_token).to_string();
+        if self.tracked_token {
+            let mut tmp = stringify!(tracked_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.tracked_token {
-            let mut tmp = stringify!(tracked_token).to_string();
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.eq_token {
+            let mut tmp = stringify!(eq_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.initializer.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.let_else {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6699,14 +6699,14 @@ impl std::fmt::Display for LifetimeParam {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.lifetime.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.type_bound_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.type_bound_list {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -6715,14 +6715,14 @@ impl std::fmt::Display for LifetimeParam {
 impl std::fmt::Display for LiteralPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.literal.to_string());
-        s.push_str(" ");
         if self.minus_token {
             let mut tmp = stringify!(minus_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.literal.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -6734,17 +6734,17 @@ impl std::fmt::Display for LoopExpr {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        s.push_str(&self.loop_body.to_string());
-        s.push_str(" ");
-        s.push_str(
-            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.loop_token {
             let mut tmp = stringify!(loop_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
+        s.push_str(&self.loop_body.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -6754,14 +6754,14 @@ impl std::fmt::Display for MacroCall {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.path.to_string());
         s.push_str(" ");
-        s.push_str(&self.token_tree.to_string());
-        s.push_str(" ");
         if self.excl_token {
             let mut tmp = stringify!(excl_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.token_tree.to_string());
+        s.push_str(" ");
         if self.semicolon_token {
             let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6774,15 +6774,7 @@ impl std::fmt::Display for MacroCall {
 impl std::fmt::Display for MacroDef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.args {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.body.to_string());
-        s.push_str(" ");
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -6793,33 +6785,29 @@ impl std::fmt::Display for MacroDef {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.args {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.body.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for MacroEagerInput {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.l_brack_token {
-            let mut tmp = stringify!(l_brack_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.r_brack_token {
-            let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6832,6 +6820,18 @@ impl std::fmt::Display for MacroEagerInput {
         }
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6866,18 +6866,8 @@ impl std::fmt::Display for MacroRules {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        s.push_str(&self.token_tree.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.excl_token {
-            let mut tmp = stringify!(excl_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.macro_rules_token {
@@ -6886,19 +6876,29 @@ impl std::fmt::Display for MacroRules {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.excl_token {
+            let mut tmp = stringify!(excl_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        s.push_str(&self.token_tree.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for MacroStmts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        s.push_str(
+            &self.statements.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if let Some(it) = &self.expr {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        s.push_str(
-            &self.statements.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         write!(f, "{s}")
     }
 }
@@ -6914,24 +6914,24 @@ impl std::fmt::Display for MatchArm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.guard {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.pat {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.comma_token {
-            let mut tmp = stringify!(comma_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.guard {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.fat_arrow_token {
             let mut tmp = stringify!(fat_arrow_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6942,14 +6942,14 @@ impl std::fmt::Display for MatchArm {
 impl std::fmt::Display for MatchArmList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.arms.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.arms.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6963,16 +6963,16 @@ impl std::fmt::Display for MatchExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
-        s.push_str(&self.match_arm_list.to_string());
-        s.push_str(" ");
         if self.match_token {
             let mut tmp = stringify!(match_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        s.push_str(&self.match_arm_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -6994,14 +6994,14 @@ impl std::fmt::Display for MatchesExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.matches_token {
             let mut tmp = stringify!(matches_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7010,14 +7010,10 @@ impl std::fmt::Display for MatchesExpr {
 impl std::fmt::Display for Meta {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.path.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.token_tree {
-            s.push_str(&it.to_string());
+        if self.unsafe_token {
+            let mut tmp = stringify!(unsafe_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.l_paren_token {
@@ -7026,20 +7022,24 @@ impl std::fmt::Display for Meta {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
+        s.push_str(&self.path.to_string());
+        s.push_str(" ");
         if self.eq_token {
             let mut tmp = stringify!(eq_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.unsafe_token {
-            let mut tmp = stringify!(unsafe_token).to_string();
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.token_tree {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7050,15 +7050,7 @@ impl std::fmt::Display for Meta {
 impl std::fmt::Display for MethodCallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.arg_list.to_string());
-        s.push_str(" ");
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.generic_arg_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name_ref.to_string());
-        s.push_str(" ");
         s.push_str(&self.receiver.to_string());
         s.push_str(" ");
         if self.dot_token {
@@ -7067,20 +7059,28 @@ impl std::fmt::Display for MethodCallExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.name_ref.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.generic_arg_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.arg_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for ModeSpecChecked {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if self.l_paren_token {
-            let mut tmp = stringify!(l_paren_token).to_string();
+        if self.spec_token {
+            let mut tmp = stringify!(spec_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7091,8 +7091,8 @@ impl std::fmt::Display for ModeSpecChecked {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.spec_token {
-            let mut tmp = stringify!(spec_token).to_string();
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7104,24 +7104,24 @@ impl std::fmt::Display for Module {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.item_list {
+        if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.mod_token {
+            let mut tmp = stringify!(mod_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.visibility {
+        if let Some(it) = &self.item_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.semicolon_token {
             let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.mod_token {
-            let mut tmp = stringify!(mod_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7148,18 +7148,6 @@ impl std::fmt::Display for Name {
 impl std::fmt::Display for NameRef {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if self.Self_token {
-            let mut tmp = stringify!(Self_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.crate_token {
-            let mut tmp = stringify!(crate_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if let Some(it) = &self.ident_token {
             s.push_str(&it);
             s.push_str(" ");
@@ -7172,6 +7160,18 @@ impl std::fmt::Display for NameRef {
         }
         if self.super_token {
             let mut tmp = stringify!(super_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.crate_token {
+            let mut tmp = stringify!(crate_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.Self_token {
+            let mut tmp = stringify!(Self_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7195,13 +7195,20 @@ impl std::fmt::Display for OffsetOfExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
+        if self.builtin_token {
+            let mut tmp = stringify!(builtin_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.pound_token {
             let mut tmp = stringify!(pound_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.offset_of_token {
+            let mut tmp = stringify!(offset_of_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7212,10 +7219,8 @@ impl std::fmt::Display for OffsetOfExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.comma_token {
@@ -7224,14 +7229,9 @@ impl std::fmt::Display for OffsetOfExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.builtin_token {
-            let mut tmp = stringify!(builtin_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.offset_of_token {
-            let mut tmp = stringify!(offset_of_token).to_string();
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7250,8 +7250,20 @@ impl std::fmt::Display for Param {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.tracked_token {
+            let mut tmp = stringify!(tracked_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.pat {
             s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if let Some(it) = &self.ty {
@@ -7264,18 +7276,6 @@ impl std::fmt::Display for Param {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.tracked_token {
-            let mut tmp = stringify!(tracked_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         write!(f, "{s}")
     }
 }
@@ -7283,14 +7283,14 @@ impl std::fmt::Display for ParenExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7303,14 +7303,14 @@ impl std::fmt::Display for ParenExpr {
 impl std::fmt::Display for ParenPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.r_paren_token {
@@ -7325,14 +7325,14 @@ impl std::fmt::Display for ParenPat {
 impl std::fmt::Display for ParenType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.r_paren_token {
@@ -7351,14 +7351,14 @@ impl std::fmt::Display for Path {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        s.push_str(&self.segment.to_string());
-        s.push_str(" ");
         if self.coloncolon_token {
             let mut tmp = stringify!(coloncolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.segment.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -7382,32 +7382,24 @@ impl std::fmt::Display for PathPat {
 impl std::fmt::Display for PathSegment {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.generic_arg_list {
-            s.push_str(&it.to_string());
+        if self.coloncolon_token {
+            let mut tmp = stringify!(coloncolon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         s.push_str(&self.name_ref.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.param_list {
+        if let Some(it) = &self.generic_arg_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.path_type {
+        if let Some(it) = &self.param_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if let Some(it) = &self.ret_type {
             s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.coloncolon_token {
-            let mut tmp = stringify!(coloncolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.l_angle_token {
@@ -7416,14 +7408,22 @@ impl std::fmt::Display for PathSegment {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_angle_token {
-            let mut tmp = stringify!(r_angle_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.as_token {
             let mut tmp = stringify!(as_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.path_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_angle_token {
+            let mut tmp = stringify!(r_angle_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7451,22 +7451,22 @@ impl std::fmt::Display for PrefixExpr {
 impl std::fmt::Display for Prover {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
+        if self.by_token {
+            let mut tmp = stringify!(by_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.by_token {
-            let mut tmp = stringify!(by_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7477,10 +7477,6 @@ impl std::fmt::Display for Prover {
 impl std::fmt::Display for PtrType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.star_token {
             let mut tmp = stringify!(star_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7497,6 +7493,10 @@ impl std::fmt::Display for PtrType {
             let mut tmp = stringify!(mut_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7536,21 +7536,21 @@ impl std::fmt::Display for RangePat {
 impl std::fmt::Display for RecommendsClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.recommends_token {
             let mut tmp = stringify!(recommends_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.via_token {
             let mut tmp = stringify!(via_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7570,8 +7570,6 @@ impl std::fmt::Display for RecordExprField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.name_ref {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -7582,34 +7580,36 @@ impl std::fmt::Display for RecordExprField {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for RecordExprFieldList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "));
-        s.push_str(
-            &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
-        );
-        if let Some(it) = &self.spread {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_curly_token {
-            let mut tmp = stringify!(r_curly_token).to_string();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "));
+        s.push_str(
+            &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
+        );
+        if self.dotdot_token {
+            let mut tmp = stringify!(dotdot_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.dotdot_token {
-            let mut tmp = stringify!(dotdot_token).to_string();
+        if let Some(it) = &self.spread {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_curly_token {
+            let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7621,24 +7621,24 @@ impl std::fmt::Display for RecordField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if let Some(it) = &self.visibility {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.data_mode {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.visibility {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7647,15 +7647,15 @@ impl std::fmt::Display for RecordField {
 impl std::fmt::Display for RecordFieldList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
-        );
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
+        );
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7683,14 +7683,14 @@ impl std::fmt::Display for RecordPatField {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7699,17 +7699,17 @@ impl std::fmt::Display for RecordPatField {
 impl std::fmt::Display for RecordPatFieldList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         s.push_str(
             &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
         );
         if let Some(it) = &self.rest_pat {
             s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.l_curly_token {
-            let mut tmp = stringify!(l_curly_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.r_curly_token {
@@ -7725,10 +7725,14 @@ impl std::fmt::Display for RefExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
         if self.amp_token {
             let mut tmp = stringify!(amp_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.raw_token {
+            let mut tmp = stringify!(raw_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7745,22 +7749,14 @@ impl std::fmt::Display for RefExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.raw_token {
-            let mut tmp = stringify!(raw_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for RefPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.amp_token {
             let mut tmp = stringify!(amp_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7771,6 +7767,10 @@ impl std::fmt::Display for RefPat {
             let mut tmp = stringify!(mut_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7779,18 +7779,14 @@ impl std::fmt::Display for RefPat {
 impl std::fmt::Display for RefType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.lifetime {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.amp_token {
             let mut tmp = stringify!(amp_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.lifetime {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.mut_token {
@@ -7799,12 +7795,22 @@ impl std::fmt::Display for RefType {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for Rename {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        if self.as_token {
+            let mut tmp = stringify!(as_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.name {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -7815,25 +7821,19 @@ impl std::fmt::Display for Rename {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.as_token {
-            let mut tmp = stringify!(as_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for RequiresClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.requires_token {
             let mut tmp = stringify!(requires_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
@@ -7853,12 +7853,16 @@ impl std::fmt::Display for RestPat {
 impl std::fmt::Display for RetType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.pat {
-            s.push_str(&it.to_string());
+        if self.thin_arrow_token {
+            let mut tmp = stringify!(thin_arrow_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
+        if self.tracked_token {
+            let mut tmp = stringify!(tracked_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.l_paren_token {
@@ -7867,16 +7871,8 @@ impl std::fmt::Display for RetType {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.thin_arrow_token {
-            let mut tmp = stringify!(thin_arrow_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.colon_token {
@@ -7885,8 +7881,12 @@ impl std::fmt::Display for RetType {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.tracked_token {
-            let mut tmp = stringify!(tracked_token).to_string();
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -7898,14 +7898,14 @@ impl std::fmt::Display for ReturnExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.return_token {
             let mut tmp = stringify!(return_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7915,32 +7915,32 @@ impl std::fmt::Display for SelfParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.lifetime {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.amp_token {
             let mut tmp = stringify!(amp_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.lifetime {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.mut_token {
             let mut tmp = stringify!(mut_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -7951,6 +7951,12 @@ impl std::fmt::Display for SignatureDecreases {
         let mut s = String::new();
         s.push_str(&self.decreases_clause.to_string());
         s.push_str(" ");
+        if self.when_token {
+            let mut tmp = stringify!(when_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.expr {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -7961,25 +7967,19 @@ impl std::fmt::Display for SignatureDecreases {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.when_token {
-            let mut tmp = stringify!(when_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for SlicePat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.pats.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_brack_token {
             let mut tmp = stringify!(l_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.pats.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_brack_token {
             let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7992,14 +7992,14 @@ impl std::fmt::Display for SlicePat {
 impl std::fmt::Display for SliceType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.l_brack_token {
             let mut tmp = stringify!(l_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.r_brack_token {
@@ -8014,14 +8014,14 @@ impl std::fmt::Display for SliceType {
 impl std::fmt::Display for SourceFile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.shebang_token {
             let mut tmp = stringify!(shebang_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.items.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         write!(f, "{s}")
     }
 }
@@ -8029,34 +8029,12 @@ impl std::fmt::Display for Static {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.body {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.eq_token {
-            let mut tmp = stringify!(eq_token).to_string();
+        if self.static_token {
+            let mut tmp = stringify!(static_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8067,8 +8045,30 @@ impl std::fmt::Display for Static {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.static_token {
-            let mut tmp = stringify!(static_token).to_string();
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.eq_token {
+            let mut tmp = stringify!(eq_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.body {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8079,6 +8079,12 @@ impl std::fmt::Display for Static {
 impl std::fmt::Display for StmtList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         s.push_str(
             &self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join("\n    "),
         );
@@ -8094,12 +8100,6 @@ impl std::fmt::Display for StmtList {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.l_curly_token {
-            let mut tmp = stringify!(l_curly_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8113,21 +8113,23 @@ impl std::fmt::Display for Struct {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if let Some(it) = &self.visibility {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.data_mode {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.field_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
+        if self.struct_token {
+            let mut tmp = stringify!(struct_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.visibility {
+        if let Some(it) = &self.generic_param_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -8141,10 +8143,8 @@ impl std::fmt::Display for Struct {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.struct_token {
-            let mut tmp = stringify!(struct_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.field_list {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -8165,18 +8165,6 @@ impl std::fmt::Display for TokenTree {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.l_brack_token {
-            let mut tmp = stringify!(l_brack_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.r_brack_token {
-            let mut tmp = stringify!(r_brack_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8189,35 +8177,31 @@ impl std::fmt::Display for TokenTree {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for Trait {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.assoc_item_list.to_string());
-        s.push_str(" ");
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.type_bound_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.where_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
+        if self.unsafe_token {
+            let mut tmp = stringify!(unsafe_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8234,12 +8218,28 @@ impl std::fmt::Display for Trait {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.unsafe_token {
-            let mut tmp = stringify!(unsafe_token).to_string();
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.type_bound_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.assoc_item_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -8247,17 +8247,29 @@ impl std::fmt::Display for TraitAlias {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.generic_param_list {
+        if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.trait_token {
+            let mut tmp = stringify!(trait_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.type_bound_list {
+        if let Some(it) = &self.generic_param_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.visibility {
+        if self.eq_token {
+            let mut tmp = stringify!(eq_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.type_bound_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -8271,33 +8283,20 @@ impl std::fmt::Display for TraitAlias {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.eq_token {
-            let mut tmp = stringify!(eq_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.trait_token {
-            let mut tmp = stringify!(trait_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for TriggerAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if self.excl_token {
-            let mut tmp = stringify!(excl_token).to_string();
+        if self.pound_token {
+            let mut tmp = stringify!(pound_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.pound_token {
-            let mut tmp = stringify!(pound_token).to_string();
+        if self.excl_token {
+            let mut tmp = stringify!(excl_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8308,14 +8307,15 @@ impl std::fmt::Display for TriggerAttribute {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_brack_token {
-            let mut tmp = stringify!(r_brack_token).to_string();
+        if self.trigger_token {
+            let mut tmp = stringify!(trigger_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.trigger_token {
-            let mut tmp = stringify!(trigger_token).to_string();
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8342,13 +8342,13 @@ impl std::fmt::Display for TupleExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8362,11 +8362,11 @@ impl std::fmt::Display for TupleField {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.ty {
+        if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.visibility {
+        if let Some(it) = &self.ty {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -8376,15 +8376,15 @@ impl std::fmt::Display for TupleField {
 impl std::fmt::Display for TupleFieldList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
-        );
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
+        );
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8397,13 +8397,13 @@ impl std::fmt::Display for TupleFieldList {
 impl std::fmt::Display for TuplePat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8416,7 +8416,6 @@ impl std::fmt::Display for TuplePat {
 impl std::fmt::Display for TupleStructPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.path.to_string());
         s.push_str(" ");
         if self.l_paren_token {
@@ -8425,6 +8424,7 @@ impl std::fmt::Display for TupleStructPat {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8437,13 +8437,13 @@ impl std::fmt::Display for TupleStructPat {
 impl std::fmt::Display for TupleType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.l_paren_token {
             let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8457,44 +8457,8 @@ impl std::fmt::Display for TypeAlias {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.type_bound_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.where_clause {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.colon_token {
-            let mut tmp = stringify!(colon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.eq_token {
-            let mut tmp = stringify!(eq_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.default_token {
@@ -8505,6 +8469,42 @@ impl std::fmt::Display for TypeAlias {
         }
         if self.type_token {
             let mut tmp = stringify!(type_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.type_bound_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.eq_token {
+            let mut tmp = stringify!(eq_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8529,18 +8529,8 @@ impl std::fmt::Display for TypeBound {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.ty {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.question_mark_token {
-            let mut tmp = stringify!(question_mark_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.async_token {
-            let mut tmp = stringify!(async_token).to_string();
+        if self.tilde_token {
+            let mut tmp = stringify!(tilde_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8551,10 +8541,20 @@ impl std::fmt::Display for TypeBound {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.tilde_token {
-            let mut tmp = stringify!(tilde_token).to_string();
+        if self.async_token {
+            let mut tmp = stringify!(async_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.question_mark_token {
+            let mut tmp = stringify!(question_mark_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -8571,26 +8571,26 @@ impl std::fmt::Display for TypeParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.default_type {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.type_bound_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.type_bound_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.eq_token {
             let mut tmp = stringify!(eq_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.default_type {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -8613,19 +8613,7 @@ impl std::fmt::Display for Union {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.generic_param_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
-        s.push_str(&self.record_field_list.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.visibility {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.where_clause {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -8635,6 +8623,18 @@ impl std::fmt::Display for Union {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(&self.record_field_list.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -8642,20 +8642,20 @@ impl std::fmt::Display for Use {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.use_tree.to_string());
-        s.push_str(" ");
         if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if self.semicolon_token {
-            let mut tmp = stringify!(semicolon_token).to_string();
+        if self.use_token {
+            let mut tmp = stringify!(use_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.use_token {
-            let mut tmp = stringify!(use_token).to_string();
+        s.push_str(&self.use_tree.to_string());
+        s.push_str(" ");
+        if self.semicolon_token {
+            let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8670,12 +8670,10 @@ impl std::fmt::Display for UseTree {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.rename {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.use_tree_list {
-            s.push_str(&it.to_string());
+        if self.coloncolon_token {
+            let mut tmp = stringify!(coloncolon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.star_token {
@@ -8684,10 +8682,12 @@ impl std::fmt::Display for UseTree {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.coloncolon_token {
-            let mut tmp = stringify!(coloncolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.use_tree_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.rename {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -8696,15 +8696,15 @@ impl std::fmt::Display for UseTree {
 impl std::fmt::Display for UseTreeList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.use_trees.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.use_trees.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8718,17 +8718,13 @@ impl std::fmt::Display for Variant {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if let Some(it) = &self.field_list {
+        if let Some(it) = &self.visibility {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
-        if let Some(it) = &self.visibility {
+        if let Some(it) = &self.field_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -8738,21 +8734,25 @@ impl std::fmt::Display for Variant {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for VariantList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.variants.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
-        );
         if self.l_curly_token {
             let mut tmp = stringify!(l_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.variants.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(", "),
+        );
         if self.r_curly_token {
             let mut tmp = stringify!(r_curly_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8766,6 +8766,12 @@ impl std::fmt::Display for VerusGlobal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.global_token {
+            let mut tmp = stringify!(global_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         s.push_str(&self.name.to_string());
         s.push_str(" ");
         if let Some(it) = &self.ty {
@@ -8774,12 +8780,6 @@ impl std::fmt::Display for VerusGlobal {
         }
         if self.semicolon_token {
             let mut tmp = stringify!(semicolon_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
-            s.push_str(" ");
-        }
-        if self.global_token {
-            let mut tmp = stringify!(global_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8805,18 +8805,14 @@ impl std::fmt::Display for ViewExpr {
 impl std::fmt::Display for Visibility {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        if let Some(it) = &self.path {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
-        if self.l_paren_token {
-            let mut tmp = stringify!(l_paren_token).to_string();
+        if self.pub_token {
+            let mut tmp = stringify!(pub_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.r_paren_token {
-            let mut tmp = stringify!(r_paren_token).to_string();
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8827,8 +8823,12 @@ impl std::fmt::Display for Visibility {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.pub_token {
-            let mut tmp = stringify!(pub_token).to_string();
+        if let Some(it) = &self.path {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -8839,21 +8839,27 @@ impl std::fmt::Display for Visibility {
 impl std::fmt::Display for WhereClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
-        s.push_str(
-            &self.predicates.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.where_token {
             let mut tmp = stringify!(where_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.predicates.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
         write!(f, "{s}")
     }
 }
 impl std::fmt::Display for WherePred {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
+        if self.for_token {
+            let mut tmp = stringify!(for_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.generic_param_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -8866,20 +8872,14 @@ impl std::fmt::Display for WherePred {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        if let Some(it) = &self.type_bound_list {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        if self.for_token {
-            let mut tmp = stringify!(for_token).to_string();
-            tmp.truncate(tmp.len() - 6);
-            s.push_str(token_ascii(&tmp));
+        if let Some(it) = &self.type_bound_list {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -8893,17 +8893,17 @@ impl std::fmt::Display for WhileExpr {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
-        s.push_str(&self.loop_body.to_string());
-        s.push_str(" ");
-        s.push_str(
-            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
-        );
         if self.while_token {
             let mut tmp = stringify!(while_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
+        s.push_str(&self.loop_body.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -8923,10 +8923,6 @@ impl std::fmt::Display for YeetExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.do_token {
             let mut tmp = stringify!(do_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8939,6 +8935,10 @@ impl std::fmt::Display for YeetExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -8946,14 +8946,14 @@ impl std::fmt::Display for YieldExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        if let Some(it) = &self.expr {
-            s.push_str(&it.to_string());
-            s.push_str(" ");
-        }
         if self.yield_token {
             let mut tmp = stringify!(yield_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -9787,7 +9787,7 @@ impl Abi {
 }
 impl ArgList {
     pub fn new() -> Self {
-        Self { args: vec![], l_paren_token: true, r_paren_token: true, cst: None }
+        Self { l_paren_token: true, args: vec![], r_paren_token: true, cst: None }
     }
 }
 impl ArrayExpr {
@@ -9797,11 +9797,11 @@ impl ArrayExpr {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
-            exprs: vec![],
             l_brack_token: true,
-            r_brack_token: true,
+            exprs: vec![],
+            expr: Box::new(expr.into()),
             semicolon_token: true,
+            r_brack_token: true,
             cst: None,
         }
     }
@@ -9809,11 +9809,11 @@ impl ArrayExpr {
 impl ArrayType {
     pub fn new(const_arg: ConstArg) -> Self {
         Self {
-            const_arg: Box::new(const_arg),
-            ty: None,
             l_brack_token: true,
-            r_brack_token: true,
+            ty: None,
             semicolon_token: true,
+            const_arg: Box::new(const_arg),
+            r_brack_token: true,
             cst: None,
         }
     }
@@ -9826,8 +9826,8 @@ impl ArrowExpr {
         Self {
             attrs: vec![],
             expr: Box::new(expr.into()),
-            name_ref: None,
             thin_arrow_token: true,
+            name_ref: None,
             cst: None,
         }
     }
@@ -9839,12 +9839,12 @@ impl AsmExpr {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
-            pound_token: true,
-            l_paren_token: true,
-            r_paren_token: true,
-            asm_token: true,
             builtin_token: true,
+            pound_token: true,
+            asm_token: true,
+            l_paren_token: true,
+            expr: Box::new(expr.into()),
+            r_paren_token: true,
             cst: None,
         }
     }
@@ -9856,28 +9856,28 @@ impl AssertExpr {
     {
         Self {
             attrs: vec![],
-            block_expr: None,
+            assert_token: true,
+            l_paren_token: true,
             expr: Box::new(expr.into()),
+            r_paren_token: true,
+            by_token: false,
             name: None,
             requires_clause: None,
-            l_paren_token: true,
-            r_paren_token: true,
-            assert_token: true,
-            by_token: false,
+            block_expr: None,
             cst: None,
         }
     }
 }
 impl AssertForallExpr {
-    pub fn new(block_expr: BlockExpr, closure_expr: ClosureExpr) -> Self {
+    pub fn new(closure_expr: ClosureExpr, block_expr: BlockExpr) -> Self {
         Self {
             attrs: vec![],
-            block_expr: Box::new(block_expr),
-            closure_expr: Box::new(closure_expr),
-            expr: None,
             assert_token: true,
-            by_token: true,
+            closure_expr: Box::new(closure_expr),
             implies_token: false,
+            expr: None,
+            by_token: true,
+            block_expr: Box::new(block_expr),
             cst: None,
         }
     }
@@ -9885,9 +9885,9 @@ impl AssertForallExpr {
 impl AssocItemList {
     pub fn new() -> Self {
         Self {
-            assoc_items: vec![],
-            attrs: vec![],
             l_curly_token: true,
+            attrs: vec![],
+            assoc_items: vec![],
             r_curly_token: true,
             cst: None,
         }
@@ -9896,15 +9896,15 @@ impl AssocItemList {
 impl AssocTypeArg {
     pub fn new(name_ref: NameRef, type_bound_list: TypeBoundList) -> Self {
         Self {
-            const_arg: None,
-            generic_arg_list: None,
             name_ref: Box::new(name_ref),
+            generic_arg_list: None,
             param_list: None,
             ret_type: None,
-            ty: None,
-            type_bound_list: Box::new(type_bound_list),
             colon_token: true,
+            type_bound_list: Box::new(type_bound_list),
             eq_token: true,
+            ty: None,
+            const_arg: None,
             cst: None,
         }
     }
@@ -9916,10 +9916,10 @@ impl AssumeExpr {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
-            l_paren_token: true,
-            r_paren_token: true,
             assume_token: true,
+            l_paren_token: true,
+            expr: Box::new(expr.into()),
+            r_paren_token: true,
             cst: None,
         }
     }
@@ -9927,10 +9927,10 @@ impl AssumeExpr {
 impl Attr {
     pub fn new(meta: Meta) -> Self {
         Self {
-            meta: Box::new(meta),
-            excl_token: false,
             pound_token: true,
+            excl_token: false,
             l_brack_token: true,
+            meta: Box::new(meta),
             r_brack_token: true,
             cst: None,
         }
@@ -9955,7 +9955,7 @@ impl BecomeExpr {
     where
         ET0: Into<Expr>,
     {
-        Self { attrs: vec![], expr: Box::new(expr.into()), become_token: true, cst: None }
+        Self { attrs: vec![], become_token: true, expr: Box::new(expr.into()), cst: None }
     }
 }
 impl BlockExpr {
@@ -9963,21 +9963,21 @@ impl BlockExpr {
         Self {
             attrs: vec![],
             label: None,
-            stmt_list: Box::new(stmt_list),
-            async_token: false,
-            const_token: false,
             try_token: false,
             unsafe_token: false,
+            async_token: false,
+            const_token: false,
+            stmt_list: Box::new(stmt_list),
             cst: None,
         }
     }
 }
 impl BoxPat {
-    pub fn new() -> Self { Self { pat: None, box_token: true, cst: None } }
+    pub fn new() -> Self { Self { box_token: true, pat: None, cst: None } }
 }
 impl BreakExpr {
     pub fn new() -> Self {
-        Self { attrs: vec![], expr: None, lifetime: None, break_token: true, cst: None }
+        Self { attrs: vec![], break_token: true, lifetime: None, expr: None, cst: None }
     }
 }
 impl BroadcastGroup {
@@ -9987,11 +9987,11 @@ impl BroadcastGroup {
     ) -> Self {
         Self {
             attrs: vec![],
-            broadcast_group_identifier: Box::new(broadcast_group_identifier),
-            broadcast_group_list: Box::new(broadcast_group_list),
             visibility: None,
             broadcast_token: true,
             group_token: true,
+            broadcast_group_identifier: Box::new(broadcast_group_identifier),
+            broadcast_group_list: Box::new(broadcast_group_list),
             cst: None,
         }
     }
@@ -10002,8 +10002,8 @@ impl BroadcastGroupIdentifier {
 impl BroadcastGroupList {
     pub fn new() -> Self {
         Self {
-            broadcast_group_members: vec![],
             l_curly_token: true,
+            broadcast_group_members: vec![],
             r_curly_token: true,
             cst: None,
         }
@@ -10016,10 +10016,10 @@ impl BroadcastUse {
     pub fn new(broadcast_use_list: BroadcastUseList) -> Self {
         Self {
             attrs: vec![],
-            broadcast_use_list: Box::new(broadcast_use_list),
-            semicolon_token: true,
             broadcast_token: true,
             use_token: true,
+            broadcast_use_list: Box::new(broadcast_use_list),
+            semicolon_token: true,
             cst: None,
         }
     }
@@ -10028,11 +10028,11 @@ impl BroadcastUseList {
     pub fn new() -> Self { Self { paths: vec![], cst: None } }
 }
 impl CallExpr {
-    pub fn new<ET0>(arg_list: ArgList, expr: ET0) -> Self
+    pub fn new<ET0>(expr: ET0, arg_list: ArgList) -> Self
     where
         ET0: Into<Expr>,
     {
-        Self { arg_list: Box::new(arg_list), attrs: vec![], expr: Box::new(expr.into()), cst: None }
+        Self { attrs: vec![], expr: Box::new(expr.into()), arg_list: Box::new(arg_list), cst: None }
     }
 }
 impl CastExpr {
@@ -10040,7 +10040,7 @@ impl CastExpr {
     where
         ET0: Into<Expr>,
     {
-        Self { attrs: vec![], expr: Box::new(expr.into()), ty: None, as_token: true, cst: None }
+        Self { attrs: vec![], expr: Box::new(expr.into()), as_token: true, ty: None, cst: None }
     }
 }
 impl ClosureExpr {
@@ -10050,17 +10050,17 @@ impl ClosureExpr {
     {
         Self {
             attrs: vec![],
-            body: Box::new(body.into()),
+            for_token: false,
             generic_param_list: None,
+            const_token: false,
+            static_token: false,
+            async_token: false,
+            move_token: false,
+            forall_token: false,
+            exists_token: false,
             param_list: None,
             ret_type: None,
-            async_token: false,
-            const_token: false,
-            exists_token: false,
-            for_token: false,
-            forall_token: false,
-            move_token: false,
-            static_token: false,
+            body: Box::new(body.into()),
             cst: None,
         }
     }
@@ -10069,16 +10069,16 @@ impl Const {
     pub fn new() -> Self {
         Self {
             attrs: vec![],
-            body: None,
-            name: None,
-            ty: None,
             visibility: None,
-            colon_token: true,
-            semicolon_token: true,
-            eq_token: false,
-            underscore_token: false,
-            const_token: true,
             default_token: false,
+            const_token: true,
+            name: None,
+            underscore_token: false,
+            colon_token: true,
+            ty: None,
+            eq_token: false,
+            body: None,
+            semicolon_token: true,
             cst: None,
         }
     }
@@ -10093,51 +10093,51 @@ impl ConstArg {
 }
 impl ConstBlockPat {
     pub fn new(block_expr: BlockExpr) -> Self {
-        Self { block_expr: Box::new(block_expr), const_token: true, cst: None }
+        Self { const_token: true, block_expr: Box::new(block_expr), cst: None }
     }
 }
 impl ConstParam {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            default_val: None,
-            name: Box::new(name),
-            ty: None,
-            colon_token: true,
-            eq_token: false,
             const_token: true,
+            name: Box::new(name),
+            colon_token: true,
+            ty: None,
+            eq_token: false,
+            default_val: None,
             cst: None,
         }
     }
 }
 impl ContinueExpr {
-    pub fn new() -> Self { Self { attrs: vec![], lifetime: None, continue_token: true, cst: None } }
+    pub fn new() -> Self { Self { attrs: vec![], continue_token: true, lifetime: None, cst: None } }
 }
 impl DataMode {
     pub fn new() -> Self { Self { ghost_token: false, tracked_token: false, cst: None } }
 }
 impl DecreasesClause {
-    pub fn new() -> Self { Self { exprs: vec![], decreases_token: true, cst: None } }
+    pub fn new() -> Self { Self { decreases_token: true, exprs: vec![], cst: None } }
 }
 impl DynTraitType {
     pub fn new(type_bound_list: TypeBoundList) -> Self {
-        Self { type_bound_list: Box::new(type_bound_list), dyn_token: false, cst: None }
+        Self { dyn_token: false, type_bound_list: Box::new(type_bound_list), cst: None }
     }
 }
 impl EnsuresClause {
-    pub fn new() -> Self { Self { exprs: vec![], ensures_token: true, cst: None } }
+    pub fn new() -> Self { Self { ensures_token: true, exprs: vec![], cst: None } }
 }
 impl Enum {
     pub fn new(name: Name, variant_list: VariantList) -> Self {
         Self {
             attrs: vec![],
-            data_mode: None,
-            generic_param_list: None,
-            name: Box::new(name),
-            variant_list: Box::new(variant_list),
             visibility: None,
-            where_clause: None,
+            data_mode: None,
             enum_token: true,
+            name: Box::new(name),
+            generic_param_list: None,
+            where_clause: None,
+            variant_list: Box::new(variant_list),
             cst: None,
         }
     }
@@ -10145,10 +10145,10 @@ impl Enum {
 impl ExternBlock {
     pub fn new(abi: Abi, extern_item_list: ExternItemList) -> Self {
         Self {
-            abi: Box::new(abi),
             attrs: vec![],
-            extern_item_list: Box::new(extern_item_list),
             unsafe_token: false,
+            abi: Box::new(abi),
+            extern_item_list: Box::new(extern_item_list),
             cst: None,
         }
     }
@@ -10157,12 +10157,12 @@ impl ExternCrate {
     pub fn new(name_ref: NameRef) -> Self {
         Self {
             attrs: vec![],
+            visibility: None,
+            extern_token: true,
+            crate_token: true,
             name_ref: Box::new(name_ref),
             rename: None,
-            visibility: None,
             semicolon_token: true,
-            crate_token: true,
-            extern_token: true,
             cst: None,
         }
     }
@@ -10170,9 +10170,9 @@ impl ExternCrate {
 impl ExternItemList {
     pub fn new() -> Self {
         Self {
+            l_curly_token: true,
             attrs: vec![],
             extern_items: vec![],
-            l_curly_token: true,
             r_curly_token: true,
             cst: None,
         }
@@ -10186,8 +10186,8 @@ impl FieldExpr {
         Self {
             attrs: vec![],
             expr: Box::new(expr.into()),
-            name_ref: Box::new(name_ref),
             dot_token: true,
+            name_ref: Box::new(name_ref),
             cst: None,
         }
     }
@@ -10195,29 +10195,29 @@ impl FieldExpr {
 impl Fn {
     pub fn new(name: Name) -> Self {
         Self {
-            abi: None,
             attrs: vec![],
-            body: None,
-            ensures_clause: None,
-            fn_mode: None,
-            generic_param_list: None,
-            name: Box::new(name),
-            param_list: None,
-            prover: None,
-            publish: None,
-            recommends_clause: None,
-            requires_clause: None,
-            ret_type: None,
-            signature_decreases: None,
             visibility: None,
-            where_clause: None,
-            semicolon_token: false,
-            async_token: false,
-            broadcast_token: false,
-            const_token: false,
+            publish: None,
             default_token: false,
-            fn_token: true,
+            const_token: false,
+            async_token: false,
             unsafe_token: false,
+            abi: None,
+            broadcast_token: false,
+            fn_mode: None,
+            fn_token: true,
+            name: Box::new(name),
+            generic_param_list: None,
+            param_list: None,
+            ret_type: None,
+            where_clause: None,
+            prover: None,
+            requires_clause: None,
+            recommends_clause: None,
+            ensures_clause: None,
+            signature_decreases: None,
+            body: None,
+            semicolon_token: false,
             cst: None,
         }
     }
@@ -10225,10 +10225,10 @@ impl Fn {
 impl FnMode {
     pub fn new() -> Self {
         Self {
-            mode_spec_checked: None,
-            exec_token: false,
-            proof_token: false,
             spec_token: false,
+            proof_token: false,
+            exec_token: false,
+            mode_spec_checked: None,
             cst: None,
         }
     }
@@ -10236,13 +10236,13 @@ impl FnMode {
 impl FnPtrType {
     pub fn new() -> Self {
         Self {
+            const_token: false,
+            async_token: false,
+            unsafe_token: false,
             abi: None,
+            fn_token: true,
             param_list: None,
             ret_type: None,
-            async_token: false,
-            const_token: false,
-            fn_token: true,
-            unsafe_token: false,
             cst: None,
         }
     }
@@ -10251,14 +10251,14 @@ impl ForExpr {
     pub fn new(loop_body: BlockExpr) -> Self {
         Self {
             attrs: vec![],
-            iter_name: None,
             label: None,
-            loop_body: Box::new(loop_body),
-            loop_clauses: vec![],
-            pat: None,
-            colon_token: false,
             for_token: true,
+            pat: None,
             in_token: true,
+            iter_name: None,
+            colon_token: false,
+            loop_clauses: vec![],
+            loop_body: Box::new(loop_body),
             cst: None,
         }
     }
@@ -10266,9 +10266,9 @@ impl ForExpr {
 impl ForType {
     pub fn new(generic_param_list: GenericParamList) -> Self {
         Self {
+            for_token: true,
             generic_param_list: Box::new(generic_param_list),
             ty: None,
-            for_token: true,
             cst: None,
         }
     }
@@ -10278,7 +10278,7 @@ impl FormatArgsArg {
     where
         ET0: Into<Expr>,
     {
-        Self { expr: Box::new(expr.into()), name: None, eq_token: false, cst: None }
+        Self { name: None, eq_token: false, expr: Box::new(expr.into()), cst: None }
     }
 }
 impl FormatArgsExpr {
@@ -10287,15 +10287,15 @@ impl FormatArgsExpr {
         ET0: Into<Expr>,
     {
         Self {
-            args: vec![],
             attrs: vec![],
-            template: Box::new(template.into()),
-            pound_token: true,
-            l_paren_token: true,
-            r_paren_token: true,
-            comma_token: false,
             builtin_token: true,
+            pound_token: true,
             format_args_token: true,
+            l_paren_token: true,
+            template: Box::new(template.into()),
+            comma_token: false,
+            args: vec![],
+            r_paren_token: true,
             cst: None,
         }
     }
@@ -10303,9 +10303,9 @@ impl FormatArgsExpr {
 impl GenericArgList {
     pub fn new() -> Self {
         Self {
-            generic_args: vec![],
             coloncolon_token: false,
             l_angle_token: true,
+            generic_args: vec![],
             r_angle_token: true,
             cst: None,
         }
@@ -10313,18 +10313,18 @@ impl GenericArgList {
 }
 impl GenericParamList {
     pub fn new() -> Self {
-        Self { generic_params: vec![], l_angle_token: true, r_angle_token: true, cst: None }
+        Self { l_angle_token: true, generic_params: vec![], r_angle_token: true, cst: None }
     }
 }
 impl IdentPat {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            name: Box::new(name),
-            pat: None,
-            at_token: false,
-            mut_token: false,
             ref_token: false,
+            mut_token: false,
+            name: Box::new(name),
+            at_token: false,
+            pat: None,
             cst: None,
         }
     }
@@ -10332,46 +10332,46 @@ impl IdentPat {
 impl Impl {
     pub fn new(assoc_item_list: AssocItemList) -> Self {
         Self {
-            assoc_item_list: Box::new(assoc_item_list),
             attrs: vec![],
-            generic_param_list: None,
             visibility: None,
-            where_clause: None,
-            excl_token: false,
-            const_token: false,
             default_token: false,
-            for_token: false,
-            impl_token: true,
             unsafe_token: false,
+            impl_token: true,
+            generic_param_list: None,
+            const_token: false,
+            excl_token: false,
+            for_token: false,
+            where_clause: None,
+            assoc_item_list: Box::new(assoc_item_list),
             cst: None,
         }
     }
 }
 impl ImplTraitType {
     pub fn new(type_bound_list: TypeBoundList) -> Self {
-        Self { type_bound_list: Box::new(type_bound_list), impl_token: true, cst: None }
+        Self { impl_token: true, type_bound_list: Box::new(type_bound_list), cst: None }
     }
 }
 impl InferType {
     pub fn new() -> Self { Self { underscore_token: true, cst: None } }
 }
 impl InvariantClause {
-    pub fn new() -> Self { Self { exprs: vec![], invariant_token: true, cst: None } }
+    pub fn new() -> Self { Self { invariant_token: true, exprs: vec![], cst: None } }
 }
 impl InvariantExceptBreakClause {
-    pub fn new() -> Self { Self { exprs: vec![], invariant_except_break_token: true, cst: None } }
+    pub fn new() -> Self { Self { invariant_except_break_token: true, exprs: vec![], cst: None } }
 }
 impl IsExpr {
     pub fn new<ET0>(expr: ET0) -> Self
     where
         ET0: Into<Expr>,
     {
-        Self { attrs: vec![], expr: Box::new(expr.into()), ty: None, is_token: true, cst: None }
+        Self { attrs: vec![], expr: Box::new(expr.into()), is_token: true, ty: None, cst: None }
     }
 }
 impl ItemList {
     pub fn new() -> Self {
-        Self { attrs: vec![], items: vec![], l_curly_token: true, r_curly_token: true, cst: None }
+        Self { l_curly_token: true, attrs: vec![], items: vec![], r_curly_token: true, cst: None }
     }
 }
 impl Label {
@@ -10381,7 +10381,7 @@ impl Label {
 }
 impl LetElse {
     pub fn new(block_expr: BlockExpr) -> Self {
-        Self { block_expr: Box::new(block_expr), else_token: true, cst: None }
+        Self { else_token: true, block_expr: Box::new(block_expr), cst: None }
     }
 }
 impl LetExpr {
@@ -10391,10 +10391,10 @@ impl LetExpr {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
+            let_token: true,
             pat: None,
             eq_token: true,
-            let_token: true,
+            expr: Box::new(expr.into()),
             cst: None,
         }
     }
@@ -10406,16 +10406,16 @@ impl LetStmt {
     {
         Self {
             attrs: vec![],
+            let_token: true,
+            ghost_token: false,
+            tracked_token: false,
+            pat: None,
+            colon_token: false,
+            ty: None,
+            eq_token: true,
             initializer: Box::new(initializer.into()),
             let_else: None,
-            pat: None,
-            ty: None,
-            colon_token: false,
             semicolon_token: true,
-            eq_token: true,
-            ghost_token: false,
-            let_token: true,
-            tracked_token: false,
             cst: None,
         }
     }
@@ -10431,15 +10431,15 @@ impl LifetimeParam {
         Self {
             attrs: vec![],
             lifetime: Box::new(lifetime),
-            type_bound_list: None,
             colon_token: false,
+            type_bound_list: None,
             cst: None,
         }
     }
 }
 impl LiteralPat {
     pub fn new(literal: Literal) -> Self {
-        Self { literal: Box::new(literal), minus_token: false, cst: None }
+        Self { minus_token: false, literal: Box::new(literal), cst: None }
     }
 }
 impl LoopExpr {
@@ -10447,9 +10447,9 @@ impl LoopExpr {
         Self {
             attrs: vec![],
             label: None,
-            loop_body: Box::new(loop_body),
-            loop_clauses: vec![],
             loop_token: true,
+            loop_clauses: vec![],
+            loop_body: Box::new(loop_body),
             cst: None,
         }
     }
@@ -10459,22 +10459,22 @@ impl MacroCall {
         Self {
             attrs: vec![],
             path: Box::new(path),
-            token_tree: Box::new(token_tree),
             excl_token: true,
+            token_tree: Box::new(token_tree),
             semicolon_token: false,
             cst: None,
         }
     }
 }
 impl MacroDef {
-    pub fn new(body: TokenTree, name: Name) -> Self {
+    pub fn new(name: Name, body: TokenTree) -> Self {
         Self {
-            args: None,
             attrs: vec![],
-            body: Box::new(body),
-            name: Box::new(name),
             visibility: None,
             macro_token: true,
+            name: Box::new(name),
+            args: None,
+            body: Box::new(body),
             cst: None,
         }
     }
@@ -10482,13 +10482,13 @@ impl MacroDef {
 impl MacroEagerInput {
     pub fn new() -> Self {
         Self {
-            exprs: vec![],
             l_paren_token: true,
+            exprs: vec![],
             r_paren_token: true,
-            l_brack_token: true,
-            r_brack_token: true,
             l_curly_token: true,
             r_curly_token: true,
+            l_brack_token: true,
+            r_brack_token: true,
             cst: None,
         }
     }
@@ -10510,17 +10510,17 @@ impl MacroRules {
     pub fn new(name: Name, token_tree: TokenTree) -> Self {
         Self {
             attrs: vec![],
+            visibility: None,
+            macro_rules_token: true,
+            excl_token: true,
             name: Box::new(name),
             token_tree: Box::new(token_tree),
-            visibility: None,
-            excl_token: true,
-            macro_rules_token: true,
             cst: None,
         }
     }
 }
 impl MacroStmts {
-    pub fn new() -> Self { Self { expr: None, statements: vec![], cst: None } }
+    pub fn new() -> Self { Self { statements: vec![], expr: None, cst: None } }
 }
 impl MacroType {
     pub fn new(macro_call: MacroCall) -> Self {
@@ -10529,7 +10529,7 @@ impl MacroType {
 }
 impl MatchArmList {
     pub fn new() -> Self {
-        Self { arms: vec![], attrs: vec![], l_curly_token: true, r_curly_token: true, cst: None }
+        Self { l_curly_token: true, attrs: vec![], arms: vec![], r_curly_token: true, cst: None }
     }
 }
 impl MatchExpr {
@@ -10539,9 +10539,9 @@ impl MatchExpr {
     {
         Self {
             attrs: vec![],
+            match_token: true,
             expr: Box::new(expr.into()),
             match_arm_list: Box::new(match_arm_list),
-            match_token: true,
             cst: None,
         }
     }
@@ -10557,8 +10557,8 @@ impl MatchesExpr {
         Self {
             attrs: vec![],
             expr: Box::new(expr.into()),
-            pat: None,
             matches_token: true,
+            pat: None,
             cst: None,
         }
     }
@@ -10566,29 +10566,29 @@ impl MatchesExpr {
 impl Meta {
     pub fn new(path: Path) -> Self {
         Self {
-            expr: None,
-            path: Box::new(path),
-            token_tree: None,
-            l_paren_token: true,
-            r_paren_token: true,
-            eq_token: false,
             unsafe_token: true,
+            l_paren_token: true,
+            path: Box::new(path),
+            eq_token: false,
+            expr: None,
+            token_tree: None,
+            r_paren_token: true,
             cst: None,
         }
     }
 }
 impl MethodCallExpr {
-    pub fn new<ET0>(arg_list: ArgList, name_ref: NameRef, receiver: ET0) -> Self
+    pub fn new<ET0>(receiver: ET0, name_ref: NameRef, arg_list: ArgList) -> Self
     where
         ET0: Into<Expr>,
     {
         Self {
-            arg_list: Box::new(arg_list),
             attrs: vec![],
-            generic_arg_list: None,
-            name_ref: Box::new(name_ref),
             receiver: Box::new(receiver.into()),
             dot_token: true,
+            name_ref: Box::new(name_ref),
+            generic_arg_list: None,
+            arg_list: Box::new(arg_list),
             cst: None,
         }
     }
@@ -10596,10 +10596,10 @@ impl MethodCallExpr {
 impl ModeSpecChecked {
     pub fn new() -> Self {
         Self {
-            l_paren_token: true,
-            r_paren_token: true,
-            checked_token: true,
             spec_token: true,
+            l_paren_token: true,
+            checked_token: true,
+            r_paren_token: true,
             cst: None,
         }
     }
@@ -10608,11 +10608,11 @@ impl Module {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            item_list: None,
-            name: Box::new(name),
             visibility: None,
-            semicolon_token: false,
             mod_token: true,
+            name: Box::new(name),
+            item_list: None,
+            semicolon_token: false,
             cst: None,
         }
     }
@@ -10623,11 +10623,11 @@ impl Name {
 impl NameRef {
     pub fn new() -> Self {
         Self {
-            Self_token: false,
-            crate_token: false,
             ident_token: None,
             self_token: false,
             super_token: false,
+            crate_token: false,
+            Self_token: false,
             cst: None,
         }
     }
@@ -10639,14 +10639,14 @@ impl OffsetOfExpr {
     pub fn new() -> Self {
         Self {
             attrs: vec![],
-            fields: vec![],
-            ty: None,
-            pound_token: true,
-            l_paren_token: true,
-            r_paren_token: true,
-            comma_token: true,
             builtin_token: true,
+            pound_token: true,
             offset_of_token: true,
+            l_paren_token: true,
+            ty: None,
+            comma_token: true,
+            fields: vec![],
+            r_paren_token: true,
             cst: None,
         }
     }
@@ -10658,11 +10658,11 @@ impl Param {
     pub fn new() -> Self {
         Self {
             attrs: vec![],
+            tracked_token: false,
             pat: None,
+            colon_token: false,
             ty: None,
             dotdotdot_token: false,
-            colon_token: false,
-            tracked_token: false,
             cst: None,
         }
     }
@@ -10670,11 +10670,11 @@ impl Param {
 impl ParamList {
     pub fn new() -> Self {
         Self {
-            params: vec![],
-            self_param: None,
             l_paren_token: true,
-            r_paren_token: true,
+            self_param: None,
             comma_token: false,
+            params: vec![],
+            r_paren_token: true,
             pipe_token: true,
             cst: None,
         }
@@ -10687,22 +10687,22 @@ impl ParenExpr {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
             l_paren_token: true,
+            expr: Box::new(expr.into()),
             r_paren_token: true,
             cst: None,
         }
     }
 }
 impl ParenPat {
-    pub fn new() -> Self { Self { pat: None, l_paren_token: true, r_paren_token: true, cst: None } }
+    pub fn new() -> Self { Self { l_paren_token: true, pat: None, r_paren_token: true, cst: None } }
 }
 impl ParenType {
-    pub fn new() -> Self { Self { ty: None, l_paren_token: true, r_paren_token: true, cst: None } }
+    pub fn new() -> Self { Self { l_paren_token: true, ty: None, r_paren_token: true, cst: None } }
 }
 impl Path {
     pub fn new(segment: PathSegment) -> Self {
-        Self { qualifier: None, segment: Box::new(segment), coloncolon_token: false, cst: None }
+        Self { qualifier: None, coloncolon_token: false, segment: Box::new(segment), cst: None }
     }
 }
 impl PathExpr {
@@ -10714,16 +10714,16 @@ impl PathPat {
 impl PathSegment {
     pub fn new(name_ref: NameRef) -> Self {
         Self {
-            generic_arg_list: None,
-            name_ref: Box::new(name_ref),
-            param_list: None,
-            path_type: None,
-            ret_type: None,
-            ty: None,
             coloncolon_token: false,
+            name_ref: Box::new(name_ref),
+            generic_arg_list: None,
+            param_list: None,
+            ret_type: None,
             l_angle_token: true,
-            r_angle_token: true,
+            ty: None,
             as_token: false,
+            path_type: None,
+            r_angle_token: true,
             cst: None,
         }
     }
@@ -10742,17 +10742,17 @@ impl PrefixExpr {
 impl Prover {
     pub fn new(name: Name) -> Self {
         Self {
-            name: Box::new(name),
-            l_paren_token: true,
-            r_paren_token: true,
             by_token: true,
+            l_paren_token: true,
+            name: Box::new(name),
+            r_paren_token: true,
             cst: None,
         }
     }
 }
 impl PtrType {
     pub fn new() -> Self {
-        Self { ty: None, star_token: true, const_token: false, mut_token: false, cst: None }
+        Self { star_token: true, const_token: false, mut_token: false, ty: None, cst: None }
     }
 }
 impl Publish {
@@ -10766,7 +10766,7 @@ impl RangePat {
 }
 impl RecommendsClause {
     pub fn new() -> Self {
-        Self { expr: None, exprs: vec![], recommends_token: true, via_token: false, cst: None }
+        Self { recommends_token: true, exprs: vec![], via_token: false, expr: None, cst: None }
     }
 }
 impl RecordExpr {
@@ -10785,9 +10785,9 @@ impl RecordExprField {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
             name_ref: None,
             colon_token: false,
+            expr: Box::new(expr.into()),
             cst: None,
         }
     }
@@ -10795,12 +10795,12 @@ impl RecordExprField {
 impl RecordExprFieldList {
     pub fn new() -> Self {
         Self {
+            l_curly_token: true,
             attrs: vec![],
             fields: vec![],
-            spread: None,
-            l_curly_token: true,
-            r_curly_token: true,
             dotdot_token: false,
+            spread: None,
+            r_curly_token: true,
             cst: None,
         }
     }
@@ -10809,18 +10809,18 @@ impl RecordField {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
+            visibility: None,
             data_mode: None,
             name: Box::new(name),
-            ty: None,
-            visibility: None,
             colon_token: true,
+            ty: None,
             cst: None,
         }
     }
 }
 impl RecordFieldList {
     pub fn new() -> Self {
-        Self { fields: vec![], l_curly_token: true, r_curly_token: true, cst: None }
+        Self { l_curly_token: true, fields: vec![], r_curly_token: true, cst: None }
     }
 }
 impl RecordPat {
@@ -10834,12 +10834,12 @@ impl RecordPat {
 }
 impl RecordPatField {
     pub fn new() -> Self {
-        Self { attrs: vec![], name_ref: None, pat: None, colon_token: false, cst: None }
+        Self { attrs: vec![], name_ref: None, colon_token: false, pat: None, cst: None }
     }
 }
 impl RecordPatFieldList {
     pub fn new() -> Self {
-        Self { fields: vec![], rest_pat: None, l_curly_token: true, r_curly_token: true, cst: None }
+        Self { l_curly_token: true, fields: vec![], rest_pat: None, r_curly_token: true, cst: None }
     }
 }
 impl RefExpr {
@@ -10849,28 +10849,28 @@ impl RefExpr {
     {
         Self {
             attrs: vec![],
-            expr: Box::new(expr.into()),
             amp_token: true,
+            raw_token: true,
             const_token: false,
             mut_token: true,
-            raw_token: true,
+            expr: Box::new(expr.into()),
             cst: None,
         }
     }
 }
 impl RefPat {
-    pub fn new() -> Self { Self { pat: None, amp_token: true, mut_token: false, cst: None } }
+    pub fn new() -> Self { Self { amp_token: true, mut_token: false, pat: None, cst: None } }
 }
 impl RefType {
     pub fn new() -> Self {
-        Self { lifetime: None, ty: None, amp_token: true, mut_token: false, cst: None }
+        Self { amp_token: true, lifetime: None, mut_token: false, ty: None, cst: None }
     }
 }
 impl Rename {
-    pub fn new() -> Self { Self { name: None, underscore_token: false, as_token: true, cst: None } }
+    pub fn new() -> Self { Self { as_token: true, name: None, underscore_token: false, cst: None } }
 }
 impl RequiresClause {
-    pub fn new() -> Self { Self { exprs: vec![], requires_token: true, cst: None } }
+    pub fn new() -> Self { Self { requires_token: true, exprs: vec![], cst: None } }
 }
 impl RestPat {
     pub fn new() -> Self { Self { attrs: vec![], dotdot_token: true, cst: None } }
@@ -10878,30 +10878,30 @@ impl RestPat {
 impl RetType {
     pub fn new() -> Self {
         Self {
-            pat: None,
-            ty: None,
-            l_paren_token: true,
-            r_paren_token: true,
             thin_arrow_token: true,
-            colon_token: true,
             tracked_token: false,
+            l_paren_token: true,
+            pat: None,
+            colon_token: true,
+            ty: None,
+            r_paren_token: true,
             cst: None,
         }
     }
 }
 impl ReturnExpr {
-    pub fn new() -> Self { Self { attrs: vec![], expr: None, return_token: true, cst: None } }
+    pub fn new() -> Self { Self { attrs: vec![], return_token: true, expr: None, cst: None } }
 }
 impl SelfParam {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            lifetime: None,
-            name: Box::new(name),
-            ty: None,
             amp_token: false,
-            colon_token: true,
+            lifetime: None,
             mut_token: false,
+            name: Box::new(name),
+            colon_token: true,
+            ty: None,
             cst: None,
         }
     }
@@ -10910,37 +10910,37 @@ impl SignatureDecreases {
     pub fn new(decreases_clause: DecreasesClause) -> Self {
         Self {
             decreases_clause: Box::new(decreases_clause),
+            when_token: false,
             expr: None,
             via_token: false,
-            when_token: false,
             cst: None,
         }
     }
 }
 impl SlicePat {
     pub fn new() -> Self {
-        Self { pats: vec![], l_brack_token: true, r_brack_token: true, cst: None }
+        Self { l_brack_token: true, pats: vec![], r_brack_token: true, cst: None }
     }
 }
 impl SliceType {
-    pub fn new() -> Self { Self { ty: None, l_brack_token: true, r_brack_token: true, cst: None } }
+    pub fn new() -> Self { Self { l_brack_token: true, ty: None, r_brack_token: true, cst: None } }
 }
 impl SourceFile {
-    pub fn new() -> Self { Self { attrs: vec![], items: vec![], shebang_token: false, cst: None } }
+    pub fn new() -> Self { Self { shebang_token: false, attrs: vec![], items: vec![], cst: None } }
 }
 impl Static {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            body: None,
-            name: Box::new(name),
-            ty: None,
             visibility: None,
-            colon_token: true,
-            semicolon_token: true,
-            eq_token: false,
-            mut_token: false,
             static_token: true,
+            mut_token: false,
+            name: Box::new(name),
+            colon_token: true,
+            ty: None,
+            eq_token: false,
+            body: None,
+            semicolon_token: true,
             cst: None,
         }
     }
@@ -10948,10 +10948,10 @@ impl Static {
 impl StmtList {
     pub fn new() -> Self {
         Self {
+            l_curly_token: true,
             attrs: vec![],
             statements: vec![],
             tail_expr: None,
-            l_curly_token: true,
             r_curly_token: true,
             cst: None,
         }
@@ -10961,14 +10961,14 @@ impl Struct {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            data_mode: None,
-            field_list: None,
-            generic_param_list: None,
-            name: Box::new(name),
             visibility: None,
+            data_mode: None,
+            struct_token: true,
+            name: Box::new(name),
+            generic_param_list: None,
             where_clause: None,
             semicolon_token: false,
-            struct_token: true,
+            field_list: None,
             cst: None,
         }
     }
@@ -10978,28 +10978,28 @@ impl TokenTree {
         Self {
             l_paren_token: true,
             r_paren_token: true,
-            l_brack_token: true,
-            r_brack_token: true,
             l_curly_token: true,
             r_curly_token: true,
+            l_brack_token: true,
+            r_brack_token: true,
             cst: None,
         }
     }
 }
 impl Trait {
-    pub fn new(assoc_item_list: AssocItemList, name: Name) -> Self {
+    pub fn new(name: Name, assoc_item_list: AssocItemList) -> Self {
         Self {
-            assoc_item_list: Box::new(assoc_item_list),
             attrs: vec![],
-            generic_param_list: None,
-            name: Box::new(name),
-            type_bound_list: None,
             visibility: None,
-            where_clause: None,
-            colon_token: false,
+            unsafe_token: false,
             auto_token: false,
             trait_token: true,
-            unsafe_token: false,
+            name: Box::new(name),
+            generic_param_list: None,
+            colon_token: false,
+            type_bound_list: None,
+            where_clause: None,
+            assoc_item_list: Box::new(assoc_item_list),
             cst: None,
         }
     }
@@ -11008,14 +11008,14 @@ impl TraitAlias {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            generic_param_list: None,
-            name: Box::new(name),
-            type_bound_list: None,
             visibility: None,
+            trait_token: true,
+            name: Box::new(name),
+            generic_param_list: None,
+            eq_token: true,
+            type_bound_list: None,
             where_clause: None,
             semicolon_token: true,
-            eq_token: true,
-            trait_token: true,
             cst: None,
         }
     }
@@ -11023,12 +11023,12 @@ impl TraitAlias {
 impl TriggerAttribute {
     pub fn new() -> Self {
         Self {
-            exprs: vec![],
-            excl_token: true,
             pound_token: true,
+            excl_token: true,
             l_brack_token: true,
-            r_brack_token: true,
             trigger_token: true,
+            exprs: vec![],
+            r_brack_token: true,
             cst: None,
         }
     }
@@ -11043,28 +11043,28 @@ impl TryExpr {
 }
 impl TupleExpr {
     pub fn new() -> Self {
-        Self { attrs: vec![], fields: vec![], l_paren_token: true, r_paren_token: true, cst: None }
+        Self { attrs: vec![], l_paren_token: true, fields: vec![], r_paren_token: true, cst: None }
     }
 }
 impl TupleField {
-    pub fn new() -> Self { Self { attrs: vec![], ty: None, visibility: None, cst: None } }
+    pub fn new() -> Self { Self { attrs: vec![], visibility: None, ty: None, cst: None } }
 }
 impl TupleFieldList {
     pub fn new() -> Self {
-        Self { fields: vec![], l_paren_token: true, r_paren_token: true, cst: None }
+        Self { l_paren_token: true, fields: vec![], r_paren_token: true, cst: None }
     }
 }
 impl TuplePat {
     pub fn new() -> Self {
-        Self { fields: vec![], l_paren_token: true, r_paren_token: true, cst: None }
+        Self { l_paren_token: true, fields: vec![], r_paren_token: true, cst: None }
     }
 }
 impl TupleStructPat {
     pub fn new(path: Path) -> Self {
         Self {
-            fields: vec![],
             path: Box::new(path),
             l_paren_token: true,
+            fields: vec![],
             r_paren_token: true,
             cst: None,
         }
@@ -11072,24 +11072,24 @@ impl TupleStructPat {
 }
 impl TupleType {
     pub fn new() -> Self {
-        Self { fields: vec![], l_paren_token: true, r_paren_token: true, cst: None }
+        Self { l_paren_token: true, fields: vec![], r_paren_token: true, cst: None }
     }
 }
 impl TypeAlias {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            generic_param_list: None,
-            name: Box::new(name),
-            ty: None,
-            type_bound_list: None,
             visibility: None,
-            where_clause: None,
-            colon_token: false,
-            semicolon_token: true,
-            eq_token: false,
             default_token: false,
             type_token: true,
+            name: Box::new(name),
+            generic_param_list: None,
+            colon_token: false,
+            type_bound_list: None,
+            where_clause: None,
+            eq_token: false,
+            ty: None,
+            semicolon_token: true,
             cst: None,
         }
     }
@@ -11101,11 +11101,11 @@ impl TypeBound {
     pub fn new() -> Self {
         Self {
             lifetime: None,
-            ty: None,
-            question_mark_token: false,
-            async_token: false,
-            const_token: false,
             tilde_token: false,
+            const_token: false,
+            async_token: false,
+            question_mark_token: false,
+            ty: None,
             cst: None,
         }
     }
@@ -11117,11 +11117,11 @@ impl TypeParam {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            default_type: None,
             name: Box::new(name),
-            type_bound_list: None,
             colon_token: false,
+            type_bound_list: None,
             eq_token: false,
+            default_type: None,
             cst: None,
         }
     }
@@ -11133,12 +11133,12 @@ impl Union {
     pub fn new(name: Name, record_field_list: RecordFieldList) -> Self {
         Self {
             attrs: vec![],
-            generic_param_list: None,
-            name: Box::new(name),
-            record_field_list: Box::new(record_field_list),
             visibility: None,
-            where_clause: None,
             union_token: true,
+            name: Box::new(name),
+            generic_param_list: None,
+            where_clause: None,
+            record_field_list: Box::new(record_field_list),
             cst: None,
         }
     }
@@ -11147,10 +11147,10 @@ impl Use {
     pub fn new(use_tree: UseTree) -> Self {
         Self {
             attrs: vec![],
-            use_tree: Box::new(use_tree),
             visibility: None,
-            semicolon_token: true,
             use_token: true,
+            use_tree: Box::new(use_tree),
+            semicolon_token: true,
             cst: None,
         }
     }
@@ -11159,45 +11159,45 @@ impl UseTree {
     pub fn new() -> Self {
         Self {
             path: None,
-            rename: None,
-            use_tree_list: None,
-            star_token: false,
             coloncolon_token: false,
+            star_token: false,
+            use_tree_list: None,
+            rename: None,
             cst: None,
         }
     }
 }
 impl UseTreeList {
     pub fn new() -> Self {
-        Self { use_trees: vec![], l_curly_token: true, r_curly_token: true, cst: None }
+        Self { l_curly_token: true, use_trees: vec![], r_curly_token: true, cst: None }
     }
 }
 impl Variant {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
-            expr: None,
-            field_list: None,
-            name: Box::new(name),
             visibility: None,
+            name: Box::new(name),
+            field_list: None,
             eq_token: false,
+            expr: None,
             cst: None,
         }
     }
 }
 impl VariantList {
     pub fn new() -> Self {
-        Self { variants: vec![], l_curly_token: true, r_curly_token: true, cst: None }
+        Self { l_curly_token: true, variants: vec![], r_curly_token: true, cst: None }
     }
 }
 impl VerusGlobal {
     pub fn new(name: Name) -> Self {
         Self {
             attrs: vec![],
+            global_token: true,
             name: Box::new(name),
             ty: None,
             semicolon_token: true,
-            global_token: true,
             cst: None,
         }
     }
@@ -11213,27 +11213,27 @@ impl ViewExpr {
 impl Visibility {
     pub fn new() -> Self {
         Self {
-            path: None,
-            l_paren_token: false,
-            r_paren_token: false,
-            in_token: false,
             pub_token: true,
+            l_paren_token: false,
+            in_token: false,
+            path: None,
+            r_paren_token: false,
             cst: None,
         }
     }
 }
 impl WhereClause {
-    pub fn new() -> Self { Self { predicates: vec![], where_token: true, cst: None } }
+    pub fn new() -> Self { Self { where_token: true, predicates: vec![], cst: None } }
 }
 impl WherePred {
     pub fn new() -> Self {
         Self {
+            for_token: false,
             generic_param_list: None,
             lifetime: None,
             ty: None,
-            type_bound_list: None,
             colon_token: true,
-            for_token: false,
+            type_bound_list: None,
             cst: None,
         }
     }
@@ -11243,9 +11243,9 @@ impl WhileExpr {
         Self {
             attrs: vec![],
             label: None,
-            loop_body: Box::new(loop_body),
-            loop_clauses: vec![],
             while_token: true,
+            loop_clauses: vec![],
+            loop_body: Box::new(loop_body),
             cst: None,
         }
     }
@@ -11255,11 +11255,11 @@ impl WildcardPat {
 }
 impl YeetExpr {
     pub fn new() -> Self {
-        Self { attrs: vec![], expr: None, do_token: true, yeet_token: true, cst: None }
+        Self { attrs: vec![], do_token: true, yeet_token: true, expr: None, cst: None }
     }
 }
 impl YieldExpr {
-    pub fn new() -> Self { Self { attrs: vec![], expr: None, yield_token: true, cst: None } }
+    pub fn new() -> Self { Self { attrs: vec![], yield_token: true, expr: None, cst: None } }
 }
 impl From<ArrayExpr> for Stmt {
     fn from(item: ArrayExpr) -> Self { Stmt::from(Expr::from(item)) }
