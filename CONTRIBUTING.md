@@ -50,3 +50,22 @@ code --install-extension /path/to/rust-analyzer.vsix
 ```
 Or in VS Code, you can open the Extensions panel, click the '...' button in the upper-right
 portion of the panel, and select "Install from VSIX..."
+
+
+If you see this complaint:
+```
+Cannot find base config file "@tsconfig/strictest/tsconfig.json"
+```
+Try running:
+```
+npm install --save-dev @tsconfig/strictest
+yarn add --dev @tsconfig/strictest
+```
+
+**NOTE** To include a build of the server in the VSIX file, you must run:
+```
+cargo xtask dist --client-patch-version 42
+```
+which will cause a copy of the server to be places in `editors/code/server/`
+The number you pass in will be concatenated to "0.4" to form the extension's
+version number.
