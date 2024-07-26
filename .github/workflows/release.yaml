@@ -102,34 +102,34 @@ jobs:
 
       - name: Package Extension (release)
         if: github.ref == 'refs/heads/release' && matrix.code-target
-        run: npx vsce package -o "../../dist/rust-analyzer-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }}
+        run: npx vsce package -o "../../dist/verus-analyzer-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }}
         working-directory: editors/code
 
       - name: Package Extension (nightly)
         if: github.ref != 'refs/heads/release' && matrix.code-target
-        run: npx vsce package -o "../../dist/rust-analyzer-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }} --pre-release
+        run: npx vsce package -o "../../dist/verus-analyzer-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }} --pre-release
         working-directory: editors/code
 
       - if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: rm -rf editors/code/server
 
       - if: matrix.target == 'x86_64-unknown-linux-gnu' && github.ref == 'refs/heads/release'
-        run: npx vsce package -o ../../dist/rust-analyzer-no-server.vsix
+        run: npx vsce package -o ../../dist/verus-analyzer-no-server.vsix
         working-directory: editors/code
 
       - if: matrix.target == 'x86_64-unknown-linux-gnu' && github.ref != 'refs/heads/release'
-        run: npx vsce package -o ../../dist/rust-analyzer-no-server.vsix --pre-release
+        run: npx vsce package -o ../../dist/verus-analyzer-no-server.vsix --pre-release
         working-directory: editors/code
 
-      - name: Run analysis-stats on rust-analyzer
+      - name: Run analysis-stats on verus-analyzer
         if: matrix.target == 'x86_64-unknown-linux-gnu'
-        run: target/${{ matrix.target }}/release/rust-analyzer analysis-stats .
+        run: target/${{ matrix.target }}/release/verus-analyzer analysis-stats .
 
       - name: Run analysis-stats on rust std library
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         env:
           RUSTC_BOOTSTRAP: 1
-        run: target/${{ matrix.target }}/release/rust-analyzer analysis-stats --with-deps $(rustc --print sysroot)/lib/rustlib/src/rust/library/std
+        run: target/${{ matrix.target }}/release/verus-analyzer analysis-stats --with-deps $(rustc --print sysroot)/lib/rustlib/src/rust/library/std
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
@@ -166,12 +166,12 @@ jobs:
 
       - name: Package Extension (release)
         if: github.ref == 'refs/heads/release'
-        run: npx vsce package -o "../../dist/rust-analyzer-alpine-x64.vsix" --target alpine-x64
+        run: npx vsce package -o "../../dist/verus-analyzer-alpine-x64.vsix" --target alpine-x64
         working-directory: editors/code
 
       - name: Package Extension (nightly)
         if: github.ref != 'refs/heads/release'
-        run: npx vsce package -o "../../dist/rust-analyzer-alpine-x64.vsix" --target alpine-x64 --pre-release
+        run: npx vsce package -o "../../dist/verus-analyzer-alpine-x64.vsix" --target alpine-x64 --pre-release
         working-directory: editors/code
 
       - run: rm -rf editors/code/server
@@ -251,30 +251,30 @@ jobs:
           name: ${{ env.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: rm dist/rust-analyzer-no-server.vsix
+      - run: rm dist/verus-analyzer-no-server.vsix
 
       - run: npm ci
         working-directory: ./editors/code
 
       - name: Publish Extension (Code Marketplace, release)
-        if: github.ref == 'refs/heads/release' && (github.repository == 'rust-analyzer/rust-analyzer' || github.repository == 'rust-lang/rust-analyzer')
+        if: github.ref == 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
         working-directory: ./editors/code
-        # token from https://dev.azure.com/rust-analyzer/
-        run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/rust-analyzer-*.vsix
+        # token from https://dev.azure.com/verus-analyzer/
+        run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
 
       - name: Publish Extension (OpenVSX, release)
-        if: github.ref == 'refs/heads/release' && (github.repository == 'rust-analyzer/rust-analyzer' || github.repository == 'rust-lang/rust-analyzer')
+        if: github.ref == 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
         working-directory: ./editors/code
-        run: npx ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../../dist/rust-analyzer-*.vsix
+        run: npx ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
         timeout-minutes: 2
 
       - name: Publish Extension (Code Marketplace, nightly)
-        if: github.ref != 'refs/heads/release' && (github.repository == 'rust-analyzer/rust-analyzer' || github.repository == 'rust-lang/rust-analyzer')
+        if: github.ref != 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
         working-directory: ./editors/code
-        run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/rust-analyzer-*.vsix --pre-release
+        run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix --pre-release
 
       - name: Publish Extension (OpenVSX, nightly)
-        if: github.ref != 'refs/heads/release' && (github.repository == 'rust-analyzer/rust-analyzer' || github.repository == 'rust-lang/rust-analyzer')
+        if: github.ref != 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
         working-directory: ./editors/code
-        run: npx ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../../dist/rust-analyzer-*.vsix
+        run: npx ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
         timeout-minutes: 2
