@@ -2,12 +2,8 @@
 
 use crate::AssistContext;
 use std::{
-    collections::hash_map::DefaultHasher,
-    env,
     fs::File,
-    hash::{Hash, Hasher},
     io::Write,
-    path::Path,
     process::Command,
     time::Instant,
 };
