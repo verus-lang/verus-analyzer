@@ -1271,6 +1271,7 @@ dependencies = [
  "smallvec",
  "stdx",
  "syntax",
+ "tempfile",
  "test-fixture",
  "test-utils",
  "text-edit",

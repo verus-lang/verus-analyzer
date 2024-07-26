@@ -78,19 +78,14 @@ impl<'a> AssistContext<'a> {
 
         // REIVEW: instead of writing to a file in the tmp directory, consider using `memfd_create` for an anonymous file
         // refer to `man memfd_create` or `dev/shm`
-        let mut hasher = DefaultHasher::new();
-        let now = Instant::now();
-        now.hash(&mut hasher);
-        // in linux, set env TMPDIR to set the tmp directory. Otherwise, it fails
-        let tmp_dir = env::temp_dir();
-        let tmp_name =
-            format!("{}/_verus_assert_comment_{:?}_.rs", tmp_dir.display(), hasher.finish());
-        dbg!(&tmp_name);
-        let path = Path::new(&tmp_name);
-        let display = path.display();
+        // REVIEW: Is this true? In linux, set env TMPDIR to set the tmp directory. Otherwise, it fails
+        let tmp_dir = tempfile::TempDir::new().ok()?;
+        let file_path = tmp_dir.path().join("verus_proof_action_scratch_file.rs");
+        dbg!(&file_path);
+        let display = file_path.display();
 
         // Open a file in write-only mode, returns `io::Result<File>`
-        let mut file = match File::create(&path) {
+        let mut file = match File::create(&file_path) {
             Err(why) => {
                 dbg!("couldn't create {}: {}", display, why);
                 return None;
@@ -109,7 +104,7 @@ impl<'a> AssistContext<'a> {
 
         let now = Instant::now();
         let output = Command::new(verus_exec_path)
-            .arg(path)
+            .arg(file_path)
             .arg("--multiple-errors")
             .arg("10") // we want many errors as proof-action reads this. By default, Verus gives a couple of errors as a human reads those.
             .output();
