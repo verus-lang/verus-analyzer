@@ -213,6 +213,8 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     this.refreshServerStatus();
                 },
             );
+            const ext = process.platform === "win32" ? ".exe" : "";
+            process.env['VERUS_BINARY_PATH'] = vscode.Uri.joinPath(this.extCtx.extensionUri, "verus", `verus${ext}`).toString();
             const newEnv = Object.assign({}, process.env, this.config.serverExtraEnv);
             const run: lc.Executable = {
                 command: this._serverPath,
