@@ -355,7 +355,7 @@ impl FlycheckActor {
 
                             self.report_progress(Progress::VerusResult(format!(
                                 "Started running the following Verus command: {:?}",
-                                self.run_verus(filename),
+                                &formatted_command,
                             )));
                             self.report_progress(Progress::DidStart); // this is important -- otherwise, previous diagnostic does not disappear
                             self.status = FlycheckStatus::Started;
