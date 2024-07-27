@@ -13,7 +13,7 @@ export type RunnableEnvCfgItem = {
 export type RunnableEnvCfg = undefined | Record<string, string> | RunnableEnvCfgItem[];
 
 export class Config {
-    readonly extensionId = "rust-lang.verus-analyzer";
+    readonly extensionId = "verus-lang.verus-analyzer";
     configureLang: vscode.Disposable | undefined;
 
     readonly rootSection = "verus-analyzer";
