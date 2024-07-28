@@ -1,12 +1,7 @@
 //! Run Verus and return the verification result
 
 use crate::AssistContext;
-use std::{
-    fs::File,
-    io::Write,
-    process::Command,
-    time::Instant,
-};
+use std::{fs::File, io::Write, process::Command, time::Instant};
 use syntax::ast::{self, vst, HasModuleItem, HasName};
 
 impl<'a> AssistContext<'a> {

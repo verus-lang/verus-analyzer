@@ -533,7 +533,9 @@ impl FlycheckActor {
                     (cmd, args.clone())
                 }
             }
-            FlycheckConfig::VerusCommand { args:_ } => { return None; }      // Verus doesn't have a check mode (yet)
+            FlycheckConfig::VerusCommand { args: _ } => {
+                return None;
+            } // Verus doesn't have a check mode (yet)
         };
 
         cmd.args(args);
@@ -546,7 +548,7 @@ impl FlycheckActor {
             FlycheckConfig::CargoCommand { .. } => {
                 panic!("verus analyzer does not yet support cargo commands")
             }
-            FlycheckConfig::CustomCommand { ..  } => { 
+            FlycheckConfig::CustomCommand { .. } => {
                 panic!("verus analyzer does not yet support custom commands")
             }
             FlycheckConfig::VerusCommand { args } => {
@@ -554,11 +556,13 @@ impl FlycheckActor {
                     Ok(path) => path,
                     Err(_) => {
                         tracing::warn!("VERUS_BINARY_PATH was not set!");
-                        "verus".to_string()    // Hope that it's in the PATH
+                        "verus".to_string() // Hope that it's in the PATH
                     }
                 };
 
-                let verus_exec_path = Path::new(&verus_binary_str).canonicalize().expect("We expect to succeed with canonicalizing the Verus binary path");
+                let verus_exec_path = Path::new(&verus_binary_str)
+                    .canonicalize()
+                    .expect("We expect to succeed with canonicalizing the Verus binary path");
                 let mut cmd = Command::new(verus_exec_path);
 
                 // Try to locate a Cargo.toml file that might contain custom Verus arguments
@@ -617,10 +621,10 @@ impl FlycheckActor {
                         // This file appears to be part of a Rust project.
                         // If it's not the root file, then we need to
                         // invoke Verus on the root file and then filter for results in the current file
-                        let root_file = if toml_dir.join("src/main.rs").exists() { 
-                                    Some(toml_dir.join("src/main.rs"))
+                        let root_file = if toml_dir.join("src/main.rs").exists() {
+                            Some(toml_dir.join("src/main.rs"))
                         } else if toml_dir.join("src/lib.rs").exists() {
-                                    Some(toml_dir.join("src/lib.rs"))
+                            Some(toml_dir.join("src/lib.rs"))
                         } else {
                             None
                         };
@@ -634,7 +638,7 @@ impl FlycheckActor {
                                         .unwrap()
                                         .replace("/", "::")
                                         .replace(".rs", ""),
-                                    );
+                                );
 
                                 args.insert(0, root_file.to_str().unwrap().to_string());
                                 if file == root_file {
@@ -653,7 +657,6 @@ impl FlycheckActor {
                                 args.push("lib".to_string());
                             }
                         }
-
                     }
                 }
 

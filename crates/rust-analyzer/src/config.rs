@@ -1950,42 +1950,7 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args() }
-           /* 
-            FlycheckConfig::CargoCommand {
-                command: self.check_command().clone(),
-                options: CargoOptions {
-                    target_triples: self
-                        .check_targets()
-                        .clone()
-                        .and_then(|targets| match &targets.0[..] {
-                            [] => None,
-                            targets => Some(targets.into()),
-                        })
-                        .unwrap_or_else(|| self.cargo_target().clone().into_iter().collect()),
-                    all_targets: self.check_allTargets().unwrap_or(*self.cargo_allTargets()),
-                    no_default_features: self
-                        .check_noDefaultFeatures()
-                        .unwrap_or(*self.cargo_noDefaultFeatures()),
-                    all_features: matches!(
-                        self.check_features().as_ref().unwrap_or(self.cargo_features()),
-                        CargoFeaturesDef::All
-                    ),
-                    features: match self
-                        .check_features()
-                        .clone()
-                        .unwrap_or_else(|| self.cargo_features().clone())
-                    {
-                        CargoFeaturesDef::All => vec![],
-                        CargoFeaturesDef::Selected(it) => it,
-                    },
-                    extra_args: self.check_extra_args(),
-                    extra_env: self.check_extra_env(),
-                    target_dir: self.target_dir_from_config(),
-                },
-                ansi_color_output: self.color_diagnostic_output(),
-            },
-            */
+            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args() },
         }
     }
 
