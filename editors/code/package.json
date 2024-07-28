@@ -6,7 +6,7 @@
     "icon": "icon.png",
     "version": "0.5.0-dev",
     "releaseTag": null,
-    "publisher": "rust-lang",
+    "publisher": "verus-lang",
     "repository": {
         "url": "https://github.com/verus-lang/verus-analyzer.git",
         "type": "git"
