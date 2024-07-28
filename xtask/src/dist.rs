@@ -60,9 +60,14 @@ fn dist_client(
     release_tag: &str,
     target: &Target,
 ) -> anyhow::Result<()> {
+    let mut target_binary = "verus-analyzer".to_string();
+    if target.name.contains("-windows-") {
+        target_binary.push_str(".exe");
+    }
     let bundle_path = Path::new("editors").join("code").join("server");
+    let target_binary_path = bundle_path.join(target_binary);
     sh.create_dir(&bundle_path)?;
-    sh.copy_file(&target.server_path, &bundle_path)?;
+    sh.copy_file(&target.server_path, &target_binary_path)?;
     if let Some(symbols_path) = &target.symbols_path {
         sh.copy_file(symbols_path, &bundle_path)?;
     }

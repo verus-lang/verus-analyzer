@@ -43,7 +43,9 @@ async function getServer(
         }
         return explicitPath;
     }
-    if (config.package.releaseTag === null) return "verus-analyzer";
+    if (config.package.releaseTag === null) {
+        return "verus-analyzer";
+    }
 
     const ext = process.platform === "win32" ? ".exe" : "";
     const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `verus-analyzer${ext}`);
@@ -65,7 +67,7 @@ async function getServer(
             "You need to manually clone the verus-analyzer repository and " +
             "run `cargo xtask install --server` to build the language server from sources. " +
             "If you feel that your platform should be supported, please create an issue " +
-            "about that [here]() and we " +
+            "about that [here](https://github.com/verus-lang/verus-analyzer/issues) and we " +
             "will consider it.",
     );
     return undefined;

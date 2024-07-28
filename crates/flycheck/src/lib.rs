@@ -559,6 +559,7 @@ impl FlycheckActor {
                         "verus".to_string() // Hope that it's in the PATH
                     }
                 };
+                dbg!(&verus_binary_str);
 
                 let verus_exec_path = Path::new(&verus_binary_str)
                     .canonicalize()
