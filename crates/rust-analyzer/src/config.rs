@@ -3,6 +3,7 @@
 //! Of particular interest is the `feature_flags` hash map: while other fields
 //! configure the server itself, feature flags are passed into analysis, and
 //! tweak things like automatic insertion of `()` in completions.
+#![allow(dead_code)]
 use std::{fmt, iter, ops::Not, sync::OnceLock};
 
 use cfg::{CfgAtom, CfgDiff};
@@ -1949,7 +1950,9 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::CargoCommand {
+            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args() }
+           /* 
+            FlycheckConfig::CargoCommand {
                 command: self.check_command().clone(),
                 options: CargoOptions {
                     target_triples: self
@@ -1982,6 +1985,7 @@ impl Config {
                 },
                 ansi_color_output: self.color_diagnostic_output(),
             },
+            */
         }
     }
 

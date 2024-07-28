@@ -690,6 +690,7 @@ impl GlobalState {
         let invocation_strategy = match config {
             FlycheckConfig::CargoCommand { .. } => flycheck::InvocationStrategy::PerWorkspace,
             FlycheckConfig::CustomCommand { invocation_strategy, .. } => invocation_strategy,
+            FlycheckConfig::VerusCommand { .. } => flycheck::InvocationStrategy::PerWorkspace,
         };
 
         self.flycheck = match invocation_strategy {

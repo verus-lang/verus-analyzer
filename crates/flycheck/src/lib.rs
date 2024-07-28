@@ -93,6 +93,9 @@ pub enum FlycheckConfig {
         invocation_strategy: InvocationStrategy,
         invocation_location: InvocationLocation,
     },
+    VerusCommand {
+        args: Vec<String>,
+    },
 }
 
 impl fmt::Display for FlycheckConfig {
@@ -102,6 +105,7 @@ impl fmt::Display for FlycheckConfig {
             FlycheckConfig::CustomCommand { command, args, .. } => {
                 write!(f, "{command} {}", args.join(" "))
             }
+            FlycheckConfig::VerusCommand { args } => write!(f, "verus {}", args.join(" ")),
         }
     }
 }
@@ -529,6 +533,7 @@ impl FlycheckActor {
                     (cmd, args.clone())
                 }
             }
+            FlycheckConfig::VerusCommand { args:_ } => { return None; }      // Verus doesn't have a check mode (yet)
         };
 
         cmd.args(args);
@@ -539,22 +544,27 @@ impl FlycheckActor {
     fn run_verus(&self, file: String) -> Command {
         let (mut cmd, args) = match &self.config {
             FlycheckConfig::CargoCommand { .. } => {
-                panic!("verus: please set cargo override command")
+                panic!("verus analyzer does not yet support cargo commands")
             }
-            FlycheckConfig::CustomCommand {
-                command,
-                args,
-                extra_env,
-                invocation_strategy,
-                invocation_location,
-            } => {
-                tracing::error!(?command, ?args, ?extra_env, "run_verus");
-                let mut cmd = Command::new(command);
+            FlycheckConfig::CustomCommand { ..  } => { 
+                panic!("verus analyzer does not yet support custom commands")
+            }
+            FlycheckConfig::VerusCommand { args } => {
+                let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
+                    Ok(path) => path,
+                    Err(_) => {
+                        tracing::warn!("VERUS_BINARY_PATH was not set!");
+                        "verus".to_string()    // Hope that it's in the PATH
+                    }
+                };
 
+                let verus_exec_path = Path::new(&verus_binary_str).canonicalize().expect("We expect to succeed with canonicalizing the Verus binary path");
+                let mut cmd = Command::new(verus_exec_path);
+
+                // Try to locate a Cargo.toml file that might contain custom Verus arguments
                 let file = Path::new(&file);
-                let mut file_as_module = None;
-                let mut root: Option<std::path::PathBuf> = None;
-                let mut extra_args_from_toml = None;
+                let mut toml_dir: Option<std::path::PathBuf> = None;
+                let mut extra_args_from_toml = Vec::new();
                 for ans in file.ancestors() {
                     if ans.join("Cargo.toml").exists() {
                         let toml = std::fs::read_to_string(ans.join("Cargo.toml")).unwrap();
@@ -580,7 +590,7 @@ impl FlycheckActor {
                                         .split(" ")
                                         .map(|it| it.to_string())
                                         .collect::<Vec<_>>();
-                                    extra_args_from_toml = Some(arguments_vec);
+                                    extra_args_from_toml.extend(arguments_vec);
                                 }
                                 break;
                             }
@@ -588,68 +598,70 @@ impl FlycheckActor {
                                 found_verus_settings = true;
                             }
                         }
-
-                        if ans.join("src/main.rs").exists() {
-                            root = Some(ans.join("src/main.rs"));
-                            file_as_module = Some(
-                                file.strip_prefix(ans.join("src"))
-                                    .unwrap()
-                                    .to_str()
-                                    .unwrap()
-                                    .replace("/", "::")
-                                    .replace(".rs", ""),
-                            );
-                        } else if ans.join("src/lib.rs").exists() {
-                            root = Some(ans.join("src/lib.rs"));
-                            file_as_module = Some(
-                                file.strip_prefix(ans.join("src"))
-                                    .unwrap()
-                                    .to_str()
-                                    .unwrap()
-                                    .replace("/", "::")
-                                    .replace(".rs", ""),
-                            );
-                        } else {
-                            continue;
-                        }
+                        toml_dir = Some(ans.to_path_buf());
                         break;
                     }
                 }
 
+                // We may need to add additional arguments
                 let mut args = args.to_vec();
+                match toml_dir {
+                    None => {
+                        // This file doesn't appear to be part of a larger project
+                        // Try to invoke Verus on it directly, but try to avoid
+                        // complaints about missing `fn main()`
+                        args.push("--crate-type".to_string());
+                        args.push("lib".to_string());
+                    }
+                    Some(toml_dir) => {
+                        // This file appears to be part of a Rust project.
+                        // If it's not the root file, then we need to
+                        // invoke Verus on the root file and then filter for results in the current file
+                        let root_file = if toml_dir.join("src/main.rs").exists() { 
+                                    Some(toml_dir.join("src/main.rs"))
+                        } else if toml_dir.join("src/lib.rs").exists() {
+                                    Some(toml_dir.join("src/lib.rs"))
+                        } else {
+                            None
+                        };
 
-                let root = root.unwrap(); // FIXME
-                args.insert(0, root.to_str().unwrap().to_string());
-                if root == file {
-                    tracing::error!("root == file");
-                } else {
-                    tracing::error!(?root, "root");
-                    args.insert(1, "--verify-module".to_string());
-                    args.insert(2, file_as_module.unwrap().to_string());
-                }
+                        match root_file {
+                            Some(root_file) => {
+                                let file_as_module = Some(
+                                    file.strip_prefix(toml_dir.join("src"))
+                                        .unwrap()
+                                        .to_str()
+                                        .unwrap()
+                                        .replace("/", "::")
+                                        .replace(".rs", ""),
+                                    );
 
-                args.append(&mut extra_args_from_toml.unwrap_or_default());
-                args.push("--".to_string());
-                args.push("--error-format=json".to_string());
-                cmd.envs(extra_env);
-
-                match invocation_location {
-                    InvocationLocation::Workspace => {
-                        match invocation_strategy {
-                            InvocationStrategy::Once => {
-                                cmd.current_dir(&self.root);
+                                args.insert(0, root_file.to_str().unwrap().to_string());
+                                if file == root_file {
+                                    tracing::info!("file == root_file");
+                                } else {
+                                    tracing::info!(?root_file, "root_file");
+                                    args.insert(1, "--verify-module".to_string());
+                                    args.insert(2, file_as_module.unwrap().to_string());
+                                }
                             }
-                            InvocationStrategy::PerWorkspace => {
-                                // FIXME: cmd.current_dir(&affected_workspace);
-                                cmd.current_dir(&self.root);
+                            None => {
+                                // Puzzling -- we found a Cargo.toml but no root file.
+                                // Do our best by trying to run directly on the file supplied
+                                args.insert(0, file.to_str().unwrap().to_string());
+                                args.push("--crate-type".to_string());
+                                args.push("lib".to_string());
                             }
                         }
-                    }
-                    InvocationLocation::Root(root) => {
-                        cmd.current_dir(root);
+
                     }
                 }
 
+                args.append(&mut extra_args_from_toml);
+                args.push("--".to_string());
+                args.push("--error-format=json".to_string());
+
+                cmd.current_dir(&self.root);
                 (cmd, args)
             }
         };
