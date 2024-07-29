@@ -19,7 +19,7 @@ export type Env = {
 
 export const log = new (class {
     private enabled = true;
-    private readonly output = vscode.window.createOutputChannel("Rust Analyzer Client");
+    private readonly output = vscode.window.createOutputChannel("Verus Analyzer Client");
 
     setEnabled(yes: boolean): void {
         log.enabled = yes;
