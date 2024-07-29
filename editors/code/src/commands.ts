@@ -924,6 +924,7 @@ export function gotoLocation(ctx: CtxInit): Cmd {
 }
 
 export function openDocs(ctx: CtxInit): Cmd {
+    void vscode.window.showInformationMessage("openDocs");
     return async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -1000,6 +1001,7 @@ export function runFlycheck(ctx: CtxInit): Cmd {
         const editor = ctx.activeRustEditor;
         const client = ctx.client;
         const params = editor ? { uri: editor.document.uri.toString() } : null;
+        vscode.window.showInformationMessage("runFlycheck");
 
         await client.sendNotification(ra.runFlycheck, { textDocument: params });
     };

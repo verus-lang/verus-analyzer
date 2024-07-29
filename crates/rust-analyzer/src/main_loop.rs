@@ -821,6 +821,7 @@ impl GlobalState {
     }
 
     fn handle_flycheck_msg(&mut self, message: flycheck::Message) {
+        tracing::warn!(?message, "handling flycheck message");
         match message {
             flycheck::Message::AddDiagnostic { id, workspace_root, diagnostic } => {
                 // register verus errors

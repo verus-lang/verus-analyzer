@@ -204,7 +204,7 @@ impl GlobalState {
     }
 
     pub(crate) fn fetch_workspaces(&mut self, cause: Cause, force_crate_graph_reload: bool) {
-        tracing::info!(%cause, "will fetch workspaces");
+        tracing::warn!(%cause, "will fetch workspaces");
 
         self.task_pool.handle.spawn_with_sender(ThreadIntent::Worker, {
             let linked_projects = self.config.linked_or_discovered_projects();
