@@ -7,7 +7,6 @@ import * as diagnostics from "./diagnostics";
 import { activateTaskProvider } from "./tasks";
 import { setContextValue } from "./util";
 import type { JsonProject } from "./rust_project";
-import { log } from "./util";
 
 const RUST_PROJECT_CONTEXT_NAME = "inRustProject";
 
@@ -26,25 +25,18 @@ export async function deactivate() {
 export async function activate(
     context: vscode.ExtensionContext,
 ): Promise<RustAnalyzerExtensionApi> {
-    log.warn("Activating verus-analyzer extension");
-    void vscode.window.showInformationMessage("Activating verus-analyzer extension");
-
     checkConflictingExtensions();
 
     const ctx = new Ctx(context, createCommands(), fetchWorkspace());
     // VS Code doesn't show a notification when an extension fails to activate
     // so we do it ourselves.
-    log.info("Created a new context");
-    void vscode.window.showInformationMessage("Created a new context");
     const api = await activateServer(ctx).catch((err) => {
         void vscode.window.showErrorMessage(
             `Cannot activate verus-analyzer extension: ${err.message}`,
         );
         throw err;
     });
-    void vscode.window.showInformationMessage("Activated the server");
     await setContextValue(RUST_PROJECT_CONTEXT_NAME, true);
-    void vscode.window.showInformationMessage("Returning from activate");
     return api;
 }
 

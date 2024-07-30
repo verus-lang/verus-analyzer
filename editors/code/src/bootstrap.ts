@@ -49,15 +49,10 @@ async function getServer(
 
     const ext = process.platform === "win32" ? ".exe" : "";
     const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `verus-analyzer${ext}`);
-    log.info("Checking for a bundled server at", bundled.fsPath);
-    void vscode.window.showInformationMessage("Checking for bundled server at " + bundled.fsPath);
     const bundledExists = await vscode.workspace.fs.stat(bundled).then(
         () => true,
         () => false,
     );
-    log.info("Bundled server exists:", bundledExists);
-    void vscode.window.showInformationMessage("Bundled server exists: " + bundledExists);
-
     if (bundledExists) {
         let server = bundled;
         if (await isNixOs()) {
