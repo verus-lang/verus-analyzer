@@ -891,7 +891,6 @@ impl GlobalState {
 
                 // When we're running multiple flychecks, we have to include a disambiguator in
                 // the title, or the editor complains. Note that this is a user-facing string.
-                tracing::warn!("flycheck progress: {id}");
                 let title = if self.flycheck.len() == 1 {
                     format!("{}", self.config.flycheck())
                 } else {

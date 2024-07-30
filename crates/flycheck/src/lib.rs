@@ -155,7 +155,7 @@ impl FlycheckHandle {
 
     /// Schedule a re-start of the cargo check worker.
     pub fn restart_verus(&self, file: String) {
-        tracing::warn!("restart verus for {:?}", file);
+        tracing::debug!("restart verus for {:?}", file);
         self.sender.send(StateChange::RestartVerus(file)).unwrap();
     }
 
@@ -302,7 +302,6 @@ impl FlycheckActor {
                     self.cancel_check_process();
                 }
                 Event::RequestStateChange(StateChange::Restart { package, saved_file }) => {
-                    tracing::warn!("RequestStateChange::Restart");
                     // Cancel the previously spawned process
                     self.cancel_check_process();
                     while let Ok(restart) = inbox.recv_timeout(Duration::from_millis(50)) {
@@ -338,7 +337,6 @@ impl FlycheckActor {
                     }
                 }
                 Event::RequestStateChange(StateChange::RestartVerus(filename)) => {
-                    tracing::warn!("RequestStateChange::RestartVerus");
                     // verus: copied from above `Event::RequestStateChange(StateChange::Restart)`
                     // Cancel the previously spawned process
                     self.cancel_check_process();
@@ -348,15 +346,14 @@ impl FlycheckActor {
                             continue 'event;
                         }
                     }
-                    tracing::warn!("RequestStateChange::RestartVerus: Past while loop");
 
                     let command = self.run_verus(filename.clone());
                     let formatted_command = format!("{command:?}");
-                    tracing::warn!(?command, "will restart flycheck");
+                    tracing::debug!(?command, "will restart flycheck");
                     let (sender, receiver) = unbounded();
                     match CommandHandle::spawn(command, sender) {
                         Ok(command_handle) => {
-                            tracing::warn!("did  restart Verus");
+                            tracing::error!("did  restart Verus");
                             self.command_handle = Some(command_handle);
                             self.command_receiver = Some(receiver);
 
@@ -424,7 +421,6 @@ impl FlycheckActor {
                         self.status = FlycheckStatus::DiagnosticSent;
                     }
                     CargoCheckMessage::VerusResult(res) => {
-                        tracing::warn!("verus result received");
                         self.report_progress(Progress::VerusResult(res));
                     }
                 },
@@ -538,7 +534,6 @@ impl FlycheckActor {
                 }
             }
             FlycheckConfig::VerusCommand { args: _ } => {
-                tracing::warn!("verus does not support check_command");
                 return None;
             } // Verus doesn't have a check mode (yet)
         };
@@ -549,7 +544,6 @@ impl FlycheckActor {
 
     // copied from above check_command
     fn run_verus(&self, file: String) -> Command {
-        dbg!("run_verus...");
         let (mut cmd, args) = match &self.config {
             FlycheckConfig::CargoCommand { .. } => {
                 panic!("verus analyzer does not yet support cargo commands")
@@ -577,7 +571,6 @@ impl FlycheckActor {
                 let mut toml_dir: Option<std::path::PathBuf> = None;
                 let mut extra_args_from_toml = Vec::new();
                 for ans in file.ancestors() {
-                    tracing::warn!("ans: {:?}", ans);
                     if ans.join("Cargo.toml").exists() {
                         let toml = std::fs::read_to_string(ans.join("Cargo.toml")).unwrap();
                         let mut found_verus_settings = false;
@@ -622,7 +615,6 @@ impl FlycheckActor {
                         // This file doesn't appear to be part of a larger project
                         // Try to invoke Verus on it directly, but try to avoid
                         // complaints about missing `fn main()`
-                        args.insert(0, file.to_str().unwrap().to_string());
                         args.push("--crate-type".to_string());
                         args.push("lib".to_string());
                     }
@@ -679,7 +671,7 @@ impl FlycheckActor {
         };
 
         cmd.args(args);
-        dbg!("...run_verus: {}", &cmd);
+        dbg!(&cmd);
         cmd
     }
 
@@ -715,7 +707,6 @@ impl ParseFromLine for CargoCheckMessage {
             };
         } else {
             // verus
-            tracing::warn!("Got Verus result: {:?}", line);
             // forward verification result if present
             // TODO: We should ask Verus for json output and then parse it properly here
             if line.contains("verification results::") {

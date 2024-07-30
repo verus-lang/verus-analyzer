@@ -71,7 +71,6 @@ impl GlobalState {
     }
 
     pub(crate) fn update_configuration(&mut self, config: Config) {
-        tracing::warn!("updating configuration");
         let _p = tracing::info_span!("GlobalState::update_configuration").entered();
         let old_config = mem::replace(&mut self.config, Arc::new(config));
         if self.config.lru_parse_query_capacity() != old_config.lru_parse_query_capacity() {
@@ -273,7 +272,7 @@ impl GlobalState {
                     ));
                 }
 
-                tracing::warn!("did fetch workspaces {:?}", workspaces);
+                tracing::info!("did fetch workspaces {:?}", workspaces);
                 sender
                     .send(Task::FetchWorkspace(ProjectWorkspaceProgress::End(
                         workspaces,
@@ -285,7 +284,7 @@ impl GlobalState {
     }
 
     pub(crate) fn fetch_build_data(&mut self, cause: Cause) {
-        tracing::warn!(%cause, "will fetch build data");
+        tracing::info!(%cause, "will fetch build data");
         let workspaces = Arc::clone(&self.workspaces);
         let config = self.config.cargo();
         let root_path = self.config.root_path().clone();
@@ -305,7 +304,6 @@ impl GlobalState {
                 &progress,
                 &root_path,
             );
-            tracing::warn!("did fetch build data {:?}", res);
 
             sender.send(Task::FetchBuildData(BuildDataProgress::End((workspaces, res)))).unwrap();
         });
@@ -376,7 +374,6 @@ impl GlobalState {
     pub(crate) fn switch_workspaces(&mut self, cause: Cause) {
         let _p = tracing::info_span!("GlobalState::switch_workspaces").entered();
         tracing::info!(%cause, "will switch workspaces");
-        tracing::warn!(%cause, "will switch workspaces");
 
         let Some((workspaces, force_reload_crate_graph)) =
             self.fetch_workspaces_queue.last_op_result()
@@ -386,7 +383,6 @@ impl GlobalState {
 
         if self.fetch_workspace_error().is_err() && !self.workspaces.is_empty() {
             if *force_reload_crate_graph {
-                tracing::warn!("switch_workspaces: force_reload_crate_graph");
                 self.recreate_crate_graph(cause);
             }
             // It only makes sense to switch to a partially broken workspace
@@ -422,7 +418,6 @@ impl GlobalState {
             } else {
                 tracing::info!("build scripts do not match the version of the active workspace");
                 if *force_reload_crate_graph {
-                    tracing::warn!("switch_workspaces: build scripts do not match the version of the active workspace");
                     self.recreate_crate_graph(cause);
                 }
 
@@ -578,14 +573,13 @@ impl GlobalState {
         });
         self.source_root_config = project_folders.source_root_config;
         self.local_roots_parent_map = Arc::new(self.source_root_config.source_root_parent_map());
-        tracing::warn!("switch_workspaces: set source root config");
+
         self.recreate_crate_graph(cause);
 
-        tracing::warn!("did switch workspaces");
+        tracing::info!("did switch workspaces");
     }
 
     fn recreate_crate_graph(&mut self, cause: String) {
-        tracing::warn!("recreating crate graph");
         self.report_progress(
             "Building CrateGraph",
             crate::lsp::utils::Progress::Begin,
@@ -691,13 +685,12 @@ impl GlobalState {
 
     fn reload_flycheck(&mut self) {
         let _p = tracing::info_span!("GlobalState::reload_flycheck").entered();
-        tracing::warn!("reload_flycheck");
         let config = self.config.flycheck();
         let sender = self.flycheck_sender.clone();
         let invocation_strategy = match config {
             FlycheckConfig::CargoCommand { .. } => flycheck::InvocationStrategy::PerWorkspace,
             FlycheckConfig::CustomCommand { invocation_strategy, .. } => invocation_strategy,
-            FlycheckConfig::VerusCommand { .. } => flycheck::InvocationStrategy::Once,
+            FlycheckConfig::VerusCommand { .. } => flycheck::InvocationStrategy::PerWorkspace,
         };
 
         self.flycheck = match invocation_strategy {

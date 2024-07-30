@@ -1928,7 +1928,6 @@ impl Config {
     }
 
     pub fn flycheck(&self) -> FlycheckConfig {
-        tracing::warn!("flycheck() invoked");
         match &self.check_overrideCommand() {
             Some(args) if !args.is_empty() => {
                 let mut args = args.clone();
