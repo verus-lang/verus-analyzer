@@ -4,6 +4,7 @@ import type { Config } from "./config";
 import { type Env, log } from "./util";
 import type { PersistentState } from "./persistent_state";
 import { exec, spawnSync } from "child_process";
+import fetch from "cross-fetch";
 
 export async function bootstrap(
     context: vscode.ExtensionContext,
@@ -63,7 +64,7 @@ async function getServer(
     }
 
     await vscode.window.showErrorMessage(
-        "Unfortunately we don't ship binaries for your platform yet. " +
+        "Unfortunately we don't ship verus-analyzer server binaries for your platform yet. " +
             "You need to manually clone the verus-analyzer repository and " +
             "run `cargo xtask install --server` to build the language server from sources. " +
             "If you feel that your platform should be supported, please create an issue " +
@@ -71,6 +72,95 @@ async function getServer(
             "will consider it.",
     );
     return undefined;
+}
+
+
+export async function getVerus(
+    context: vscode.ExtensionContext,
+    _config: Config,
+): Promise<string|undefined> {
+    // TODO: Add a config flag for setting the Verus binary path
+
+    // const explicitPath = process.env["__RA_LSP_SERVER_DEBUG"] ?? config.serverPath;
+    // if (explicitPath) {
+    //     if (explicitPath.startsWith("~/")) {
+    //         return os.homedir() + explicitPath.slice("~".length);
+    //     }
+    //     return explicitPath;
+    // }
+
+    const target_dir = vscode.Uri.joinPath(context.extensionUri, "verus");
+    const ext = process.platform === "win32" ? ".exe" : "";
+    const target_binary = vscode.Uri.joinPath(target_dir, `verus${ext}`);
+    const target_dir_exists = await vscode.workspace.fs.stat(target_dir).then(
+        () => true,
+        () => false,
+    );
+    if (target_dir_exists) {
+        return target_binary.fsPath;
+    } else {
+        const result = await fetch ('https://api.github.com/repos/verus-lang/verus/releases',
+            {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28',
+                }
+            }
+        );
+
+        if (result.status >= 400) {
+            throw new Error("Bad response from server when attempting to fetch the latest Verus release.");
+        }
+          
+        var platform = "";
+        var release_dir = "";
+        if (process.platform === "win32") { 
+            platform = "win" 
+            release_dir = "verus-x86-win";
+        } else if (process.platform === "darwin") { 
+            platform = "macos" 
+            release_dir = "verus-arm64-macos";
+        } else if (process.platform === "linux") { 
+            platform = "linux" 
+            release_dir = "verus-x86-linux";
+        } else {
+            await vscode.window.showErrorMessage(
+                "Unfortunately we don't ship Verus binaries for your platform yet. " +
+                    "You need to manually clone the verus repository and build it from sources. " +
+                    "If you feel that your platform should be supported, please create an issue " +
+                    "about that [here](https://github.com/verus-lang/verus/issues) and we " +
+                    "will consider it.",
+            );
+            return;
+        }
+        log.warn("Platform:", platform);
+        log.warn("Release dir:", release_dir);
+
+        const release_data = await result.json(); //JSON.parse(await result.json());
+        for (const asset of release_data[0].assets) {
+            log.warn("Asset:", asset.name);
+            log.info("index: ", asset.name.indexOf(platform));
+            if (asset.name.indexOf(platform) >= 0) {
+                // Download and store the release
+                const url = asset.browser_download_url;
+                log.warn("URL:", url);
+                const response = await fetch(url);
+                const downloaded_release = vscode.Uri.joinPath(context.extensionUri, asset.name);
+                await vscode.workspace.fs.writeFile(downloaded_release, new Uint8Array(await response.arrayBuffer()));
+                // Unzip it
+                const decompress = require('decompress');
+                const t = vscode.Uri.joinPath(context.extensionUri, "unzipped"); //context.extensionUri.fsPath
+                await decompress(downloaded_release.fsPath, t.fsPath);
+                // Move it to a well-known location
+                const src_dir = vscode.Uri.joinPath(t, release_dir); //context.extensionUri, release_dir);
+                await vscode.workspace.fs.rename(src_dir, target_dir);
+
+                return target_binary.fsPath;
+            }
+        }
+        return;
+    }
 }
 
 export function isValidExecutable(path: string, extraEnv: Env): boolean {

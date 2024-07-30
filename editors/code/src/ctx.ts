@@ -21,7 +21,7 @@ import {
 } from "./dependencies_provider";
 import { execRevealDependency } from "./commands";
 import { PersistentState } from "./persistent_state";
-import { bootstrap } from "./bootstrap";
+import { bootstrap, getVerus } from "./bootstrap";
 import type { RustAnalyzerExtensionApi } from "./main";
 import type { JsonProject } from "./rust_project";
 import { prepareTestExplorer } from "./test_explorer";
@@ -213,8 +213,11 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     this.refreshServerStatus();
                 },
             );
-            const ext = process.platform === "win32" ? ".exe" : "";
-            process.env['VERUS_BINARY_PATH'] = vscode.Uri.joinPath(this.extCtx.extensionUri, "verus", `verus${ext}`).fsPath;
+            const verusPath = await getVerus(this.extCtx, this.config);
+            log.info("Using verus binary at", verusPath);
+            process.env['VERUS_BINARY_PATH'] = verusPath;
+            // const ext = process.platform === "win32" ? ".exe" : "";
+            // process.env['VERUS_BINARY_PATH'] = vscode.Uri.joinPath(this.extCtx.extensionUri, "verus", `verus${ext}`).fsPath;
             const newEnv = Object.assign({}, process.env, this.config.serverExtraEnv);
             const run: lc.Executable = {
                 command: this._serverPath,
