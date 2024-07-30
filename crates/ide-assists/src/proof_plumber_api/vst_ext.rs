@@ -108,8 +108,8 @@ where
             }
         }
         _ => {
-            dbg!("note(warning): base case map expr");
-            dbg!(&exp.to_string());
+            //dgb!("note(warning): base case map expr");
+            //dgb!(&exp.to_string());
             exp.clone()
         }
     };
@@ -139,8 +139,8 @@ pub fn vst_preorder_expr(exp: &vst::Expr, cb: &mut dyn FnMut(vst::Expr) -> bool)
             vst_preorder_expr(&e.expr, cb);
         }
         _ => {
-            dbg!("note(warning): base case vst_preorder_expr");
-            dbg!(&exp.to_string());
+            //dgb!("note(warning): base case vst_preorder_expr");
+            //dgb!(&exp.to_string());
         }
     }
 }
@@ -194,8 +194,8 @@ where
             vst::Expr::IfExpr(e)
         }
         _ => {
-            dbg!("note(warning): base case vst_map_each_tail_expr");
-            dbg!(&exp.to_string());
+            //dgb!("note(warning): base case vst_map_each_tail_expr");
+            //dgb!(&exp.to_string());
             cb(&mut exp.clone())?
         }
     };

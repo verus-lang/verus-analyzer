@@ -54,13 +54,13 @@ pub(crate) fn vst_rewriter_split_smaller_or_equal_to(
         let (lhs, rhs) = match *c.body {
             Expr::BinExpr(b) => {
                 if b.op != BinaryOp::CmpOp(CmpOp::Ord { ordering: Ordering::Less, strict: false }) {
-                    dbg!("not an <=");
+                    //dgb!("not an <=");
                     return None;
                 }
                 (*b.lhs, *b.rhs)
             }
             _ => {
-                dbg!("not a binexpr");
+                //dgb!("not a binexpr");
                 return None;
             }
         };

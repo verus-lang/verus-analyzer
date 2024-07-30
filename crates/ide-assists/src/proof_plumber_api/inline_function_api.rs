@@ -24,7 +24,7 @@ impl<'a> AssistContext<'a> {
         expr_to_inline: vst::Expr, // the expression to inline --- this expression will replace the function body
     ) -> Option<vst::Expr> {
         use crate::handlers::inline_call::*;
-        dbg!("vst_inline_call");
+        //dbg!("vst_inline_call");
         let name_ref: ast::NameRef = name_ref.cst?;
         let call_info = CallInfo::from_name_ref(name_ref.clone())?;
         let (function, _label) = match &call_info.node {

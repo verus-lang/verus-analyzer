@@ -41,7 +41,7 @@ pub(crate) fn vst_rewriter_intro_forall(assert: AssertExpr) -> Option<AssertFora
     let assert_forall_expr = match *assert.expr {
         Expr::ClosureExpr(c) => {
             if !c.forall_token {
-                dbg!("not a forall");
+                //dgb!("not a forall");
                 return None;
             }
             AssertForallExpr::new(
@@ -50,7 +50,7 @@ pub(crate) fn vst_rewriter_intro_forall(assert: AssertExpr) -> Option<AssertFora
             )
         }
         _ => {
-            dbg!("not a ClosureExpr");
+            //dgb!("not a ClosureExpr");
             return None;
         }
     };

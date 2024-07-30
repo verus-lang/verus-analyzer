@@ -61,7 +61,7 @@ impl<'a> AssistContext<'a> {
                 }
             }
         }
-        dbg!(&text_string);
+        //dbg!(&text_string);
 
         // let verify_func_flag = "--verify-function";
         // let verify_root_flag = "--verify-root"; // TODO: figure out the surrounding module of `token`
@@ -72,7 +72,7 @@ impl<'a> AssistContext<'a> {
         // REVIEW: Is this true? In linux, set env TMPDIR to set the tmp directory. Otherwise, it fails
         let tmp_dir = tempfile::TempDir::new().ok()?;
         let file_path = tmp_dir.path().join("verus_proof_action_scratch_file.rs");
-        dbg!(&file_path);
+        //dbg!(&file_path);
         let display = file_path.display();
 
         // Open a file in write-only mode, returns `io::Result<File>`
@@ -90,7 +90,7 @@ impl<'a> AssistContext<'a> {
                 dbg!("couldn't write to {}: {}", display, why);
                 return None;
             }
-            Ok(_) => dbg!("successfully wrote to {}", display),
+            Ok(_) => (),//dbg!("successfully wrote to {}", display),
         };
 
         let now = Instant::now();
@@ -109,7 +109,7 @@ impl<'a> AssistContext<'a> {
             // disambiguate verification failure     VS    compile error etc
             match std::str::from_utf8(&output.stdout) {
                 Ok(out) => {
-                    dbg!(out);
+                    //dbg!(out);
                     if out.contains("verification results:: verified: 0 errors: 0") {
                         // failure from other errors. (e.g. compile error)
                         return None;

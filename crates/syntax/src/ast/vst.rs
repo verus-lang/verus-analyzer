@@ -411,7 +411,6 @@ impl TryFrom<generated::nodes::AssertForallExpr> for AssertForallExpr {
             expr: match item.exprs().nth(1) {
                 // TODO: bug in item.expr() it gives closure_expr
                 Some(it) => {
-                    dbg!(&it);
                     Some(Box::new(Expr::try_from(it)?))
                 }
                 None => None,

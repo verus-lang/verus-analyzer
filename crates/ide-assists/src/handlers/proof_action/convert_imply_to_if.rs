@@ -41,7 +41,7 @@ pub(crate) fn vst_rewriter_imply_to_if(assert: AssertExpr) -> Option<IfExpr> {
     let ifstmt = match *assert.expr {
         Expr::BinExpr(b) => {
             if b.op != BinaryOp::LogicOp(LogicOp::Imply) {
-                dbg!("not an implication");
+                //dbg!("not an implication");
                 return None;
             }
             let rhs_as_assertion = AssertExpr::new(*b.rhs.clone());
@@ -50,7 +50,7 @@ pub(crate) fn vst_rewriter_imply_to_if(assert: AssertExpr) -> Option<IfExpr> {
             IfExpr::new(*b.lhs, blockexpr)
         }
         _ => {
-            dbg!("not a binexpr");
+            //dbg!("not a binexpr");
             return None;
         }
     };

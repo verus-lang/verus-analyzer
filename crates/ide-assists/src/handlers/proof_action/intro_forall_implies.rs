@@ -41,7 +41,7 @@ pub(crate) fn vst_rewriter_intro_forall_implies(assert: AssertExpr) -> Option<As
     let assert_forall_expr = match *assert.expr {
         Expr::ClosureExpr(c) => {
             if !c.forall_token {
-                dbg!("not a forall");
+                //dgb!("not a forall");
                 return None;
             }
             let mut c_clone = *c.clone();
@@ -49,13 +49,13 @@ pub(crate) fn vst_rewriter_intro_forall_implies(assert: AssertExpr) -> Option<As
             let (lhs, rhs) = match *c.body {
                 Expr::BinExpr(b) => {
                     if b.op != BinaryOp::LogicOp(LogicOp::Imply) {
-                        dbg!("not an implication");
+                        //dgb!("not an implication");
                         return None;
                     }
                     (*b.lhs, *b.rhs)
                 }
                 _ => {
-                    dbg!("not a binexpr");
+                    //dgb!("not a binexpr");
                     return None;
                 }
             };
@@ -70,7 +70,7 @@ pub(crate) fn vst_rewriter_intro_forall_implies(assert: AssertExpr) -> Option<As
             assert_forall
         }
         _ => {
-            dbg!("not a ClosureExpr");
+            //dgb!("not a ClosureExpr");
             return None;
         }
     };
