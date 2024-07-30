@@ -1262,15 +1262,6 @@ impl Config {
 
 impl Config {
     pub fn assist(&self, source_root: Option<SourceRootId>) -> AssistConfig {
-        let verus_path = match &self.check_overrideCommand() {
-            Some(args) if !args.is_empty() => {
-                let mut args = args.clone();
-                let command = args.remove(0);
-                command
-            }
-            _ => String::new(),
-        };
-
         AssistConfig {
             snippet_cap: self.snippet_cap(),
             allowed: None,
@@ -1279,8 +1270,6 @@ impl Config {
             assist_emit_must_use: self.assist_emitMustUse(source_root).to_owned(),
             prefer_prelude: self.imports_preferPrelude(source_root).to_owned(),
             term_search_fuel: self.assist_termSearch_fuel(source_root).to_owned() as u64,
-            verus_path,
-            fmt_path: String::from("/home/chanhee/verusfmt/target/debug/verusfmt"), // TODO: get this from user config file
         }
     }
 

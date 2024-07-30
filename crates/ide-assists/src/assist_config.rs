@@ -17,7 +17,4 @@ pub struct AssistConfig {
     pub prefer_prelude: bool,
     pub assist_emit_must_use: bool,
     pub term_search_fuel: u64,
-    // verus
-    pub verus_path: String,
-    pub fmt_path: String,
 }
