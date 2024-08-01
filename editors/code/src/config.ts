@@ -57,7 +57,7 @@ export class Config {
         log.setEnabled(this.traceExtension ?? false);
         log.info("Extension version:", this.package.version);
 
-        const cfg = Object.entries(this.cfg).filter(([_, val]) => !(val instanceof Function));
+        //const cfg = Object.entries(this.cfg).filter(([_, val]) => !(val instanceof Function));
         //log.info("Using configuration", Object.fromEntries(cfg));
     }
 
