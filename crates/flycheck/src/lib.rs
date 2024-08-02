@@ -355,12 +355,11 @@ impl FlycheckActor {
                         Ok(command_handle) => {
                             self.command_handle = Some(command_handle);
                             self.command_receiver = Some(receiver);
-
-                            self.report_progress(Progress::VerusResult(format!(
-                                //"Started running the following Verus command: {:?}",
-                                "Running Verus...",
-                                //&formatted_command,
-                            )));
+                            // self.report_progress(Progress::VerusResult(format!(
+                            //     //"Started running the following Verus command: {:?}",
+                            //     "Running Verus...",
+                            //     //&formatted_command,
+                            // )));
                             self.report_progress(Progress::DidStart); // this is important -- otherwise, previous diagnostic does not disappear
                             self.status = FlycheckStatus::Started;
                         }
@@ -671,7 +670,6 @@ impl FlycheckActor {
         };
 
         cmd.args(args);
-        dbg!(&cmd);
         cmd
     }
 
