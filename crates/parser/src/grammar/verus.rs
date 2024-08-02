@@ -262,7 +262,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
             {
                 break;
             } else {
-                comma_cond(p);
+                comma_expr(p);
             }
         } else {
             dbg!("requires parse error");
@@ -299,7 +299,7 @@ pub(crate) fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
             {
                 break;
             } else {
-                comma_cond(p);
+                comma_expr(p);
             }
         } else {
             dbg!("recommends parse error");
@@ -334,7 +334,7 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
             {
                 break;
             } else {
-                comma_cond(p);
+                comma_expr(p);
             }
         } else {
             dbg!("ensures parse error");
@@ -371,7 +371,7 @@ pub(crate) fn invariants_except_break(p: &mut Parser<'_>) -> CompletedMarker {
             {
                 break;
             } else {
-                comma_cond(p);
+                comma_expr(p);
             }
         } else {
             dbg!("invariant_except_breakss parse error");
@@ -402,7 +402,7 @@ pub(crate) fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
             {
                 break;
             } else {
-                comma_cond(p);
+                comma_expr(p);
             }
         } else {
             dbg!("invariants parse error");
@@ -440,7 +440,7 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
             {
                 break;
             } else {
-                comma_cond(p);
+                comma_expr(p);
             }
         } else {
             dbg!("decreases parsing error");
@@ -468,7 +468,7 @@ pub(crate) fn signature_decreases(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SIGNATURE_DECREASES)
 }
 
-fn comma_cond(p: &mut Parser<'_>) -> () {
+fn comma_expr(p: &mut Parser<'_>) -> () {
     p.expect(T![,]);
     expressions::expr_no_struct(p);
 }
