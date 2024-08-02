@@ -624,6 +624,8 @@ impl FlycheckActor {
                         let root_file = if toml_dir.join("src/main.rs").exists() {
                             Some(toml_dir.join("src/main.rs"))
                         } else if toml_dir.join("src/lib.rs").exists() {
+                            args.push("--crate-type".to_string());
+                            args.push("lib".to_string());
                             Some(toml_dir.join("src/lib.rs"))
                         } else {
                             None
