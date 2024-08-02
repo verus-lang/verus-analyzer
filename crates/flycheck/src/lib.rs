@@ -353,13 +353,13 @@ impl FlycheckActor {
                     let (sender, receiver) = unbounded();
                     match CommandHandle::spawn(command, sender) {
                         Ok(command_handle) => {
-                            tracing::error!("did  restart Verus");
                             self.command_handle = Some(command_handle);
                             self.command_receiver = Some(receiver);
 
                             self.report_progress(Progress::VerusResult(format!(
-                                "Started running the following Verus command: {:?}",
-                                &formatted_command,
+                                //"Started running the following Verus command: {:?}",
+                                "Running Verus...",
+                                //&formatted_command,
                             )));
                             self.report_progress(Progress::DidStart); // this is important -- otherwise, previous diagnostic does not disappear
                             self.status = FlycheckStatus::Started;
