@@ -28,7 +28,7 @@ pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> () {
             // verus named param
             p.bump(T!['(']);
             patterns::pattern(p);
-            p.bump(T![:]);
+            p.expect(T![:]);
             types::type_no_bounds(p);
             p.expect(T![')']);
         } else {
@@ -265,8 +265,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
                 comma_expr(p);
             }
         } else {
-            dbg!("requires parse error");
-            p.error("TODO: please add COMMA after each requires clause.");
+            p.error("Expected a requires expression to be followed by a comma, a keyword, or an open brace.");
             return m.complete(p, ERROR);
         }
     }
@@ -302,8 +301,7 @@ pub(crate) fn recommends(p: &mut Parser<'_>) -> CompletedMarker {
                 comma_expr(p);
             }
         } else {
-            dbg!("recommends parse error");
-            p.error("TODO: please add COMMA after each recommends clause.");
+            p.error("Expected a recommends expression to be followed by a comma, a keyword, or an open brace.");
             return m.complete(p, ERROR);
         }
     }
@@ -337,8 +335,7 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
                 comma_expr(p);
             }
         } else {
-            dbg!("ensures parse error");
-            p.error("TODO: please add COMMA after each ensures clause.");
+            p.error("Expected an ensures expression to be followed by a comma, a keyword, or an open brace.");
             return m.complete(p, ERROR);
         }
     }
@@ -374,8 +371,7 @@ pub(crate) fn invariants_except_break(p: &mut Parser<'_>) -> CompletedMarker {
                 comma_expr(p);
             }
         } else {
-            dbg!("invariant_except_breakss parse error");
-            p.error("TODO: please add COMMA after each invariant_except_break clause.");
+            p.error("Expected an invariants_except_break expression to be followed by a comma, a keyword, or an open brace.");
             return m.complete(p, ERROR);
         }
     }
@@ -405,8 +401,7 @@ pub(crate) fn invariants(p: &mut Parser<'_>) -> CompletedMarker {
                 comma_expr(p);
             }
         } else {
-            dbg!("invariants parse error");
-            p.error("TODO: please add COMMA after each invariants clause.");
+            p.error("Expected an invariant expression to be followed by a comma, a keyword, or an open brace.");
             return m.complete(p, ERROR);
         }
     }
@@ -443,8 +438,7 @@ pub(crate) fn decreases(p: &mut Parser<'_>) -> CompletedMarker {
                 comma_expr(p);
             }
         } else {
-            dbg!("decreases parsing error");
-            p.error("TODO: please add COMMA after each decreases clause.");
+            p.error("Expected a decreases expression to be followed by a comma, a keyword, or an open brace.");
             return m.complete(p, ERROR);
         }
     }
