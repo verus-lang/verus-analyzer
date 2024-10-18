@@ -71,10 +71,10 @@ fn main() {
             println!("processing crate: {crate_name}, module: {}", vfs.file_path(file_id));
             for def in module.declarations(&db) {
                 if let ModuleDef::Function(foo) = def {
-                    let cst = foo.source(&db).expect("source not found");
-                    dbg!(&cst);
-                    let vst: vst::Fn = cst.value.try_into().expect("vst lifting failure");
-                    dbg!(&vst);
+                    let fn_cst = foo.source(&db).expect("source not found");
+                    //dbg!(&cst);
+                    let fn_vst: vst::Fn = fn_cst.value.try_into().expect("vst lifting failure");
+                    dbg!(&fn_vst.name);
 
                     // TODO: use the source-level proof rewrite
                     // probably using vst rewriting functions inside proof actions
