@@ -19,7 +19,8 @@
         "rust"
       ],
       "args": [
-        "${workspaceFolder}/crates/va-test/examples/vstd-dep"
+        "${workspaceFolder}/crates/va-test/examples/trigger-bug"
+        //"${workspaceFolder}/crates/va-test/examples/vstd-dep"
       ],
       "preLaunchTask": "Build Server",
     },
