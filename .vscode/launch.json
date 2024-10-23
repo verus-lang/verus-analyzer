@@ -19,9 +19,9 @@
         "rust"
       ],
       "args": [
-        "${workspaceFolder}/crates/va-test/examples/schemars-bug"
+        "${workspaceFolder}/crates/va-test/examples/vstd-dep"
       ],
-      "preLaunchTask": "Build Extension",
+      "preLaunchTask": "Build Server",
     },
     {
       // Used for testing the extension with the installed LSP server.

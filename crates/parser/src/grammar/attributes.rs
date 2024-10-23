@@ -39,6 +39,7 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
         p.expect(T![trigger]);
         p.expect(T![']']);
         attr.complete(p, ERROR);
+        eprint!("We should not have found a trigger attribute here, since it should have been handled earlier");
         return;
     }
 
