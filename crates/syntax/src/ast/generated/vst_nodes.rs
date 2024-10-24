@@ -2204,6 +2204,13 @@ impl TryFrom<super::nodes::DynTraitType> for DynTraitType {
 impl TryFrom<super::nodes::EnsuresClause> for EnsuresClause {
     type Error = String;
     fn try_from(item: super::nodes::EnsuresClause) -> Result<Self, Self::Error> {
+        for e in item.exprs() {
+            println!("Processing: {:?}", e);
+            match Expr::try_from(e) {
+                Ok(e) => println!("\tSuccess: {:?}", e),
+                Err(e) => println!("\tError: {:?}", e),
+            };
+        }
         Ok(Self {
             ensures_token: item.ensures_token().is_some(),
             exprs: item

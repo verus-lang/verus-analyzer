@@ -166,6 +166,12 @@ impl TryFrom<generated::nodes::Literal> for Literal {
     type Error = String;
     fn try_from(item: generated::nodes::Literal) -> Result<Self, Self::Error> {
         use ast::expr_ext::LiteralKind;
+        for a in item.attrs() {
+            match Attr::try_from(a.clone()) {
+                Ok(new_a) => { print!("Converted attr {:?} into {:?}", a, new_a); }
+                Err(e) => { print!("Failed to convert attr {:?} because {:?}", a, e); }
+            }
+        }
         Ok(Self {
             attrs: item
                 .attrs()
