@@ -37,9 +37,12 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
         p.expect(T![#]);
         p.expect(T!['[']);
         p.expect(T![trigger]);
+        let meta = p.start();
+        let path = p.start();
+        path.complete(p, PATH);
+        meta.complete(p, META);
         p.expect(T![']']);
-        attr.complete(p, ERROR);
-        eprint!("We should not have found a trigger attribute here, since it should have been handled earlier");
+        attr.complete(p, ATTR);
         return;
     }
 

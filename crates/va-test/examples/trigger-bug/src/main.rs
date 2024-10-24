@@ -2,7 +2,7 @@ verus! {
 
 fn lemma()
     ensures
-        #![trigger x]
+        #[trigger]
         true, 
 {
 }
