@@ -307,15 +307,11 @@ pub enum LiteralKind {
 
 impl ast::Literal {
     pub fn token(&self) -> SyntaxToken {
-        let mut tokens = self.syntax().children_with_tokens();
-        let r = tokens.find(|e| e.kind() != ATTR && !e.kind().is_trivia());
-        let t = r.clone().and_then(|e| e.into_token());
-        match t {
-            Some(v) => v,
-            None => panic!("Failed to find non-trivial token in tokens: {:?}\nGot r = {:?}", tokens, r),
-        }
-
-        //    .unwrap()
+        self.syntax()
+            .children_with_tokens()
+            .find(|e| e.kind() != ATTR && !e.kind().is_trivia())
+            .and_then(|e| e.into_token())
+            .unwrap()
     }
 
     pub fn kind(&self) -> LiteralKind {
