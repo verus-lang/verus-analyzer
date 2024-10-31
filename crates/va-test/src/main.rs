@@ -95,7 +95,12 @@ fn main() {
                 if let ModuleDef::Function(foo) = def {
                     let fn_cst = foo.source(&db).expect("source not found");
                     //dbg!(&cst);
-                    let fn_vst: vst::Fn = fn_cst.value.try_into().expect("vst lifting failure");
+                    let fn_vst_result = fn_cst.value.try_into();
+                    if fn_vst_result.is_err() {
+                        println!("Failed to lift function: got error: {:?}", fn_vst_result);
+                        continue;
+                    }
+                    let fn_vst: vst::Fn = fn_vst_result.expect("shouldn't have been an Error at this point"); //fn_cst.value.try_into().expect("vst lifting failure");
                     dbg!(&fn_vst.name);
 
                     // TODO: use the source-level proof rewrite
