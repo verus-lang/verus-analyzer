@@ -23,7 +23,7 @@ $ git clone https://github.com/verus-lang/verus-analyzer.git
 $ cd verus-analyzer
 ```
 
-**2. Compiler the verus-analyzer binary**
+**2. Compile the verus-analyzer binary**
 ```bash
 $ cargo xtask dist
 ```
