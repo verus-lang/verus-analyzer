@@ -19,13 +19,22 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
     let attr = p.start();
     p.bump(T![#]);
 
-    if inner {
+    // REVIEW: This is more permissive than Rust/rust-analyzer,
+    // because Verus uses inner-attribute syntax for #![trigger e]
+    // in places where Rust only expects outer attributes
+    let mut true_inner = inner;
+    if p.at(T![!]) {
         p.bump(T![!]);
+        true_inner = true;
     }
+    // if inner {
+    //     p.bump(T![!]);
+    // }
 
     if p.eat(T!['[']) {
         if p.at(T![trigger]) {
-            verus::trigger_attribute(p, inner);
+            dbg!(true_inner);
+            verus::trigger_attribute(p, true_inner);
         } else {
             meta(p);
         }
