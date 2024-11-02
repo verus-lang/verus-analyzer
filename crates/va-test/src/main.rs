@@ -59,10 +59,10 @@ fn main() {
             module.krate().display_name(&db).as_deref().unwrap_or("unknown").to_string();
         println!("processing crate: {crate_name}, module: {}", vfs.file_path(file_id));
         let parse = db.parse(file_id);
-        println!("Got parse: {:?}", parse);
+        //println!("Got parse: {:?}", parse);
         println!("Encountered {} parse errors", parse.errors().len());
         for e in parse.errors() {
-            println!("parse error: {:?}", e);
+            println!("\tparse error: {:?}", e);
         }
     }
 
