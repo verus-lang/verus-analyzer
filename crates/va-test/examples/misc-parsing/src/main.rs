@@ -1,14 +1,11 @@
 verus! {
 
-pub fn write(in_v: V) where V: Copy
-    requires
-        old(perm).pptr() == self,
-    ensures
-        perm.pptr() === old(perm).pptr(),
-        perm.mem_contents() === MemContents::Init(in_v),
-    opens_invariants none
-    no_unwind
-{
+#[cfg(verus_keep_ghost)]
+#[verifier::proof]
+#[verifier::custom_req_err("unable to prove assertion safety condition")] /* vattr */
+pub fn assert_safety(b: bool) {
+    requires(b);
+    ensures(b);
 }
 
 } // verus!

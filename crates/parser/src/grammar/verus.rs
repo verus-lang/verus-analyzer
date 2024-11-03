@@ -99,14 +99,9 @@ pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
 
 pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    if p.at(T![proof]) {
-        p.bump(T![proof]);
+    if p.eat_contextual_kw(T![exec]) || p.eat_contextual_kw(T![proof]) {
         m.complete(p, FN_MODE)
-    } else if p.at(T![exec]) {
-        p.bump(T![exec]);
-        m.complete(p, FN_MODE)
-    } else if p.at(T![spec]) {
-        p.bump(T![spec]);
+    } else if p.eat_contextual_kw(T![spec]) {
         if p.at(T!['(']) {
             p.expect(T!['(']);
             p.expect_contextual_kw(T![checked]);

@@ -531,6 +531,12 @@ fn verus_walkthrough0() {
         proof fn sq(x: nat) -> (squared: nat) {
             x
         }
+        #[cfg(verus_keep_ghost)]
+        #[verifier::proof]
+        pub fn assert_safety(b: bool) {
+            requires(b);
+            ensures(b);
+        }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
