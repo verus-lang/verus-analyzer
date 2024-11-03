@@ -373,6 +373,8 @@ pub struct Fn {
     pub recommends_clause: Option<Box<RecommendsClause>>,
     pub ensures_clause: Option<Box<EnsuresClause>>,
     pub signature_decreases: Option<Box<SignatureDecreases>>,
+    pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
+    pub no_unwind_clause: Option<Box<NoUnwindClause>>,
     pub body: Option<Box<BlockExpr>>,
     pub semicolon_token: bool,
     pub cst: Option<super::nodes::Fn>,
@@ -749,6 +751,13 @@ pub struct NeverType {
     pub cst: Option<super::nodes::NeverType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoUnwindClause {
+    pub no_unwind_token: bool,
+    pub when_token: bool,
+    pub expr: Option<Box<Expr>>,
+    pub cst: Option<super::nodes::NoUnwindClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OffsetOfExpr {
     pub attrs: Vec<Attr>,
     pub builtin_token: bool,
@@ -760,6 +769,16 @@ pub struct OffsetOfExpr {
     pub fields: Vec<NameRef>,
     pub r_paren_token: bool,
     pub cst: Option<super::nodes::OffsetOfExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpensInvariantsClause {
+    pub opens_invariants_token: bool,
+    pub none_token: bool,
+    pub any_token: bool,
+    pub l_brack_token: bool,
+    pub exprs: Vec<Expr>,
+    pub r_brack_token: bool,
+    pub cst: Option<super::nodes::OpensInvariantsClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrPat {
@@ -2436,6 +2455,14 @@ impl TryFrom<super::nodes::Fn> for Fn {
                 Some(it) => Some(Box::new(SignatureDecreases::try_from(it)?)),
                 None => None,
             },
+            opens_invariants_clause: match item.opens_invariants_clause() {
+                Some(it) => Some(Box::new(OpensInvariantsClause::try_from(it)?)),
+                None => None,
+            },
+            no_unwind_clause: match item.no_unwind_clause() {
+                Some(it) => Some(Box::new(NoUnwindClause::try_from(it)?)),
+                None => None,
+            },
             body: match item.body() {
                 Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
                 None => None,
@@ -3347,6 +3374,20 @@ impl TryFrom<super::nodes::NeverType> for NeverType {
         Ok(Self { excl_token: item.excl_token().is_some(), cst: Some(item.clone()) })
     }
 }
+impl TryFrom<super::nodes::NoUnwindClause> for NoUnwindClause {
+    type Error = String;
+    fn try_from(item: super::nodes::NoUnwindClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            no_unwind_token: item.no_unwind_token().is_some(),
+            when_token: item.when_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
+            cst: Some(item.clone()),
+        })
+    }
+}
 impl TryFrom<super::nodes::OffsetOfExpr> for OffsetOfExpr {
     type Error = String;
     fn try_from(item: super::nodes::OffsetOfExpr) -> Result<Self, Self::Error> {
@@ -3371,6 +3412,24 @@ impl TryFrom<super::nodes::OffsetOfExpr> for OffsetOfExpr {
                 .map(NameRef::try_from)
                 .collect::<Result<Vec<NameRef>, String>>()?,
             r_paren_token: item.r_paren_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::OpensInvariantsClause> for OpensInvariantsClause {
+    type Error = String;
+    fn try_from(item: super::nodes::OpensInvariantsClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            opens_invariants_token: item.opens_invariants_token().is_some(),
+            none_token: item.none_token().is_some(),
+            any_token: item.any_token().is_some(),
+            l_brack_token: item.l_brack_token().is_some(),
+            exprs: item
+                .exprs()
+                .into_iter()
+                .map(Expr::try_from)
+                .collect::<Result<Vec<Expr>, String>>()?,
+            r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -6133,6 +6192,14 @@ impl std::fmt::Display for Fn {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
+        if let Some(it) = &self.opens_invariants_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.no_unwind_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.body {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -7193,6 +7260,28 @@ impl std::fmt::Display for NeverType {
         write!(f, "{s}")
     }
 }
+impl std::fmt::Display for NoUnwindClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.no_unwind_token {
+            let mut tmp = stringify!(no_unwind_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.when_token {
+            let mut tmp = stringify!(when_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
 impl std::fmt::Display for OffsetOfExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
@@ -7234,6 +7323,43 @@ impl std::fmt::Display for OffsetOfExpr {
         s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if self.r_paren_token {
             let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for OpensInvariantsClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.opens_invariants_token {
+            let mut tmp = stringify!(opens_invariants_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.none_token {
+            let mut tmp = stringify!(none_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.any_token {
+            let mut tmp = stringify!(any_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -10195,6 +10321,8 @@ impl Fn {
             recommends_clause: None,
             ensures_clause: None,
             signature_decreases: None,
+            opens_invariants_clause: None,
+            no_unwind_clause: None,
             body: None,
             semicolon_token: false,
             cst: None,
@@ -10614,6 +10742,11 @@ impl NameRef {
 impl NeverType {
     pub fn new() -> Self { Self { excl_token: true, cst: None } }
 }
+impl NoUnwindClause {
+    pub fn new() -> Self {
+        Self { no_unwind_token: true, when_token: false, expr: None, cst: None }
+    }
+}
 impl OffsetOfExpr {
     pub fn new() -> Self {
         Self {
@@ -10626,6 +10759,19 @@ impl OffsetOfExpr {
             comma_token: true,
             fields: vec![],
             r_paren_token: true,
+            cst: None,
+        }
+    }
+}
+impl OpensInvariantsClause {
+    pub fn new() -> Self {
+        Self {
+            opens_invariants_token: true,
+            none_token: false,
+            any_token: false,
+            l_brack_token: true,
+            exprs: vec![],
+            r_brack_token: true,
             cst: None,
         }
     }

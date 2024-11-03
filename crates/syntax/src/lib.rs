@@ -531,6 +531,12 @@ fn verus_walkthrough0() {
         proof fn sq(x: nat) -> (squared: nat) {
             x
         }
+        #[cfg(verus_keep_ghost)]
+        #[verifier::proof]
+        pub fn assert_safety(b: bool) {
+            requires(b);
+            ensures(b);
+        }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
@@ -685,6 +691,11 @@ fn verus_walkthrough3() {
             assert(my_spec_fun(10, 20) == 30);
             assert(exists|x: int, y: int| my_spec_fun(x, y) == 30);
         }
+        fn test() {
+            if exists|i: int| 0 <= i {
+                let x = 1;
+            }
+        }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
@@ -727,6 +738,10 @@ fn verus_walkthrough4() {
                 let (x_witness, y_witness): (int, int) = choose|x: int, y: int| f1(x) + f1(y) == 30;
                 assert(f1(x_witness) + f1(y_witness) == 30);
             }
+        }
+        fn test(s: Set<int>) {
+            let x = s.choose();
+            choose|x: int| f1(x)
         }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
@@ -786,6 +801,17 @@ fn verus_walkthrough6() {
         {
             i + j
         }
+
+        spec fn spec_index()
+            recommends
+                0 <= i,
+        ;
+        fn closed_under_incl()
+            requires
+                Self::op(a, b).valid(),
+            ensures
+                a.valid(),
+        ;
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
@@ -816,6 +842,13 @@ fn verus_walkthrough7() {
                 #![trigger f1(x), f1(y)]
                 f1(x) < 100 && f1(y) < 100 ==> my_spec_fun(x, y) >= x
             );
+        }
+
+        fn test() {
+            assert(p % p == 0) by (nonlinear_arith)
+                requires
+                p != 0,
+            ;
         }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
@@ -1660,7 +1693,6 @@ fn test() {
     }
 }
 
-// TODO: Restore once we have while loops in a better state
 #[test]
 fn verus_for_loops() {
     use ast::HasModuleItem;
@@ -1829,6 +1861,152 @@ fn f() { let group = Group::new(Delimiter::Bracket, bracketed.build()); let mut 
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
+    }
+}
+
+#[test]
+fn verus_where_clauses() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub fn spawn<F, Ret>(f: F) -> (handle: JoinHandle<Ret>) where
+    F: FnOnce() -> Ret,
+    requires
+        f.requires(()),
+    ensures
+        forall|ret: Ret| #[trigger] handle.predicate(ret) ==> f.ensures((), ret),
+{
+}
+pub fn write(in_v: V) where V: Copy
+    requires
+        old(perm).pptr() == self,
+    ensures
+        perm.pptr() === old(perm).pptr(),
+        perm.mem_contents() === MemContents::Init(in_v),
+    opens_invariants none
+    no_unwind
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_opens_invariants() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn inv1()
+    opens_invariants none
+{
+}
+
+fn inv2()
+    opens_invariants any
+{
+}
+
+fn inv3()
+    opens_invariants [a, b, c]
+{
+}
+
+fn inv4()
+    ensures true,
+    opens_invariants any
+{
+}
+
+fn inv5()
+    requires true,
+    opens_invariants any
+{
+}
+
+fn put()
+    requires
+        self.id() === old(perm)@.pptr,
+        old(perm)@.value === None,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+        perm@.value === Some(v),
+    opens_invariants none
+    no_unwind
+{
+}
+
+fn kw_test() {
+    let any = 5;
+}
+
+}";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_tracked() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn is_nonnull(tracked &self)
+{
+}
+
+fn into_raw() -> (tracked points_to_raw: PointsToRaw)
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_higher_order_functions() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub fn spawn(f: F) 
+    requires
+        f.requires(true),
+    ensures
+        f.ensures(ret),
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 

@@ -515,6 +515,10 @@ impl Fn {
     pub fn body(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
+    pub fn no_unwind_clause(&self) -> Option<NoUnwindClause> { support::child(&self.syntax) }
+    pub fn opens_invariants_clause(&self) -> Option<OpensInvariantsClause> {
+        support::child(&self.syntax)
+    }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn prover(&self) -> Option<Prover> { support::child(&self.syntax) }
     pub fn publish(&self) -> Option<Publish> { support::child(&self.syntax) }
@@ -1079,6 +1083,18 @@ impl NeverType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoUnwindClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NoUnwindClause {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn no_unwind_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![no_unwind])
+    }
+    pub fn when_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![when]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OffsetOfExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1093,6 +1109,21 @@ impl OffsetOfExpr {
     pub fn builtin_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![builtin]) }
     pub fn offset_of_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![offset_of])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OpensInvariantsClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OpensInvariantsClause {
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
+    pub fn any_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![any]) }
+    pub fn none_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![none]) }
+    pub fn opens_invariants_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![opens_invariants])
     }
 }
 
@@ -3168,8 +3199,30 @@ impl AstNode for NeverType {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for NoUnwindClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == NO_UNWIND_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for OffsetOfExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == OFFSET_OF_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for OpensInvariantsClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == OPENS_INVARIANTS_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -5665,7 +5718,17 @@ impl std::fmt::Display for NeverType {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for NoUnwindClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for OffsetOfExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for OpensInvariantsClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
