@@ -32,7 +32,6 @@ fn inv4()
     opens_invariants any
 {
 }
-*/
 
 fn put()
     requires
@@ -43,6 +42,13 @@ fn put()
         perm@.value === Some(v),
     opens_invariants none
     no_unwind
+{
+}
+
+*/
+fn inv5()
+    requires true,
+    opens_invariants any
 {
 }
 

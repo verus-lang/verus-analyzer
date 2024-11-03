@@ -264,6 +264,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
             if p.nth_at(1, T![recommends])
                 || p.nth_at(1, T![ensures])
                 || p.nth_at(1, T![decreases])
+                || p.nth_at(1, T![opens_invariants])
                 || p.nth_at(1, T!['{'])
             {
                 break;
