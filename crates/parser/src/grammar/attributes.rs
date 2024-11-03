@@ -32,7 +32,7 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
     // }
 
     if p.eat(T!['[']) {
-        if p.at(T![trigger]) {
+        if p.at_contextual_kw(T![trigger]) {
             verus::trigger_attribute(p, true_inner);
         } else {
             meta(p);

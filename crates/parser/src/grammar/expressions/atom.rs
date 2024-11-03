@@ -429,16 +429,16 @@ fn loop_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     p.bump(T![loop]);
 
     // verus
-    if p.at(T![invariant_except_break]) {
+    if p.at_contextual_kw(T![invariant_except_break]) {
         verus::invariants_except_break(p);
     }
-    if p.at(T![invariant]) {
+    if p.at_contextual_kw(T![invariant]) {
         verus::invariants(p);
     }
-    if p.at(T![ensures]) {
+    if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
-    if p.at(T![decreases]) {
+    if p.at_contextual_kw(T![decreases]) {
         verus::decreases(p);
     }
 
@@ -459,16 +459,16 @@ fn while_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     expr_no_struct(p);
 
     // verus
-    if p.at(T![invariant_except_break]) {
+    if p.at_contextual_kw(T![invariant_except_break]) {
         verus::invariants_except_break(p);
     }
-    if p.at(T![invariant]) {
+    if p.at_contextual_kw(T![invariant]) {
         verus::invariants(p);
     }
-    if p.at(T![ensures]) {
+    if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
-    if p.at(T![decreases]) {
+    if p.at_contextual_kw(T![decreases]) {
         verus::decreases(p);
     }
 
@@ -498,16 +498,16 @@ fn for_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     expr_no_struct(p);
 
     // verus
-    if p.at(T![invariant_except_break]) {
+    if p.at_contextual_kw(T![invariant_except_break]) {
         verus::invariants_except_break(p);
     }
-    if p.at(T![invariant]) {
+    if p.at_contextual_kw(T![invariant]) {
         verus::invariants(p);
     }
-    if p.at(T![ensures]) {
+    if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
-    if p.at(T![decreases]) {
+    if p.at_contextual_kw(T![decreases]) {
         verus::decreases(p);
     }
 
