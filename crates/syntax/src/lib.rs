@@ -786,6 +786,11 @@ fn verus_walkthrough6() {
         {
             i + j
         }
+
+        spec fn spec_index()
+            recommends
+                0 <= i,
+        ;
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
