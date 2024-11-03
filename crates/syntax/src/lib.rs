@@ -1660,7 +1660,6 @@ fn test() {
     }
 }
 
-// TODO: Restore once we have while loops in a better state
 #[test]
 fn verus_for_loops() {
     use ast::HasModuleItem;
@@ -1829,6 +1828,117 @@ fn f() { let group = Group::new(Delimiter::Bracket, bracketed.build()); let mut 
     dbg!(&file);
     for item in file.items() {
         dbg!(&item);
+    }
+}
+
+
+#[test]
+fn verus_opens_invariants() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn inv1()
+    opens_invariants none
+{
+}
+
+fn inv2()
+    opens_invariants any
+{
+}
+
+fn inv3()
+    opens_invariants [a, b, c]
+{
+}
+
+fn inv4()
+    ensures true,
+    opens_invariants any
+{
+}
+
+fn inv5()
+    requires true,
+    opens_invariants any
+{
+}
+
+fn put()
+    requires
+        self.id() === old(perm)@.pptr,
+        old(perm)@.value === None,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+        perm@.value === Some(v),
+    opens_invariants none
+    no_unwind
+{
+}
+
+fn kw_test() {
+    let any = 5;
+}
+
+}";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_tracked() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn is_nonnull(tracked &self)
+{
+}
+
+fn into_raw() -> (tracked points_to_raw: PointsToRaw)
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_higher_order_functions() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub fn spawn(f: F) 
+    requires
+        f.requires(true),
+    ensures
+        f.ensures(ret),
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
     }
 }
 
