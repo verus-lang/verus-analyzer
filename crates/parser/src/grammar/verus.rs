@@ -1,12 +1,14 @@
 use super::{items::ITEM_RECOVERY_SET, *};
 
 // referenced atom::closure_expr
-pub(crate) fn verus_closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
-    let m = p.start();
-
+pub(crate) fn verus_closure_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+    let m = match m {
+        Some(m) => m,
+        None => p.start(),
+    };
     p.eat(T![forall]);
     p.eat(T![exists]);
-    p.eat(T![choose]);
+    p.eat_contextual_kw(T![choose]);
 
     if !p.at(T![|]) {
         p.error("expected `|`");
@@ -224,7 +226,7 @@ pub(crate) fn assert_forall(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
         p.error("assert forall must start with forall");
     }
 
-    verus_closure_expr(p);
+    verus_closure_expr(p, None);
     if p.at_contextual_kw(T![implies]) {
         p.bump_remap(T![implies]);
         expressions::expr(p);

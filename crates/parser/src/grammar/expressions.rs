@@ -36,6 +36,17 @@ pub(super) fn expr_stmt(
         let pred_expr = if p.at_contextual_kw(T![assert]) { verus::assert(p, m) } else { verus::assume(p, m) };
         return Some((pred_expr, BlockLike::NotBlock));
     }
+    if p.at_contextual_kw(T![choose]) {
+        let m = m.unwrap_or_else(|| {
+            let m = p.start();
+            attributes::outer_attrs(p);
+            m
+        });
+        let pred_expr = verus::verus_closure_expr(p, Some(m)); //if p.at_contextual_kw(T![assert]) { verus::assert(p, m) } else { verus::assume(p, m) };
+        return Some((pred_expr, BlockLike::NotBlock));
+    } else {
+        dbg!("expr_stmt at: {:?}", p.current());
+    }
 
     let r = Restrictions { forbid_structs: false, prefer_stmt: true };
     expr_bp(p, m, r, 1)

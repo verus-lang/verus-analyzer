@@ -728,6 +728,10 @@ fn verus_walkthrough4() {
                 assert(f1(x_witness) + f1(y_witness) == 30);
             }
         }
+        fn test(s: Set<int>) {
+            let x = s.choose();
+            choose|x: int| f1(x)
+        }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
