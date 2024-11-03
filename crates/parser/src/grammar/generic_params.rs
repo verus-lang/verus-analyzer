@@ -209,6 +209,10 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
             T!['{'] | T![;] | T![=] => break,
             _ => (),
         }
+        // verus
+        if p.at_contextual_kw(T![requires]) || p.at_contextual_kw(T![ensures]) || p.at_contextual_kw(T![decreases]) {
+            break
+        } 
 
         if !comma {
             p.error("expected comma");

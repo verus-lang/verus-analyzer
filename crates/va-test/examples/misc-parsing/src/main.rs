@@ -1,12 +1,15 @@
 verus! {
 
-fn test() {
-    assert(p % p == 0) by (nonlinear_arith)
-        requires
-        p != 0,
-    ;
+pub fn write(in_v: V) where V: Copy
+    requires
+        old(perm).pptr() == self,
+    ensures
+        perm.pptr() === old(perm).pptr(),
+        perm.mem_contents() === MemContents::Init(in_v),
+    opens_invariants none
+    no_unwind
+{
 }
-
 
 } // verus!
 

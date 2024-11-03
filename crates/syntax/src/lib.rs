@@ -1865,6 +1865,16 @@ pub fn spawn<F, Ret>(f: F) -> (handle: JoinHandle<Ret>) where
         forall|ret: Ret| #[trigger] handle.predicate(ret) ==> f.ensures((), ret),
 {
 }
+pub fn write(in_v: V) where V: Copy
+    requires
+        old(perm).pptr() == self,
+    ensures
+        perm.pptr() === old(perm).pptr(),
+        perm.mem_contents() === MemContents::Init(in_v),
+    opens_invariants none
+    no_unwind
+{
+}
 }";
 
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
