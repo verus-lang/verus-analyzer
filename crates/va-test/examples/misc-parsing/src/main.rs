@@ -35,13 +35,13 @@ fn inv4()
 */
 
 fn put()
-//    requires
-//        self.id() === old(perm)@.pptr,
-//        old(perm)@.value === None,
-//    ensures
-//        perm@.pptr === old(perm)@.pptr,
-//        perm@.value === Some(v),
-//    opens_invariants none
+    requires
+        self.id() === old(perm)@.pptr,
+        old(perm)@.value === None,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+        perm@.value === Some(v),
+    opens_invariants none
     no_unwind
 {
 }
