@@ -7,7 +7,6 @@ fn is_nonnull(&self)
 fn into_raw() -> (tracked points_to_raw: PointsToRaw)
 {
 }
-*/
 
 fn inv1()
     opens_invariants none
@@ -26,6 +25,13 @@ fn inv3()
 
 fn kw_test() {
     let any = 5;
+}
+*/
+
+fn inv4()
+    ensures true,
+    opens_invariants any
+{
 }
 
 } // verus!

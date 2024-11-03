@@ -329,13 +329,13 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     expressions::expr_no_struct(p);
 
     while !p.at(EOF) && !p.at(T![decreases]) && !p.at(T![opens_invariants]) && !p.at(T!['{']) && !p.at(T![;]) {
-        if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
+        if p.at(T![recommends]) || p.at(T!['{']) {
             break;
         }
         if p.at(T![,]) {
             if p.nth_at(1, T![recommends])
-                || p.nth_at(1, T![ensures])
                 || p.nth_at(1, T![decreases])
+                || p.nth_at(1, T![opens_invariants])
                 || p.nth_at(1, T!['{'])
             {
                 break;
