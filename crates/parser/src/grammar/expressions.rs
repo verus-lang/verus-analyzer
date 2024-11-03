@@ -42,7 +42,7 @@ pub(super) fn expr_stmt(
             attributes::outer_attrs(p);
             m
         });
-        let pred_expr = verus::verus_closure_expr(p, Some(m)); //if p.at_contextual_kw(T![assert]) { verus::assert(p, m) } else { verus::assume(p, m) };
+        let pred_expr = verus::verus_closure_expr(p, Some(m), false); //if p.at_contextual_kw(T![assert]) { verus::assert(p, m) } else { verus::assume(p, m) };
         return Some((pred_expr, BlockLike::NotBlock));
     }
 

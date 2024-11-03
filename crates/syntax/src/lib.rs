@@ -691,6 +691,11 @@ fn verus_walkthrough3() {
             assert(my_spec_fun(10, 20) == 30);
             assert(exists|x: int, y: int| my_spec_fun(x, y) == 30);
         }
+        fn test() {
+            if exists|i: int| 0 <= i {
+                let x = 1;
+            }
+        }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);

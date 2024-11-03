@@ -1,7 +1,7 @@
 use super::{items::ITEM_RECOVERY_SET, *};
 
 // referenced atom::closure_expr
-pub(crate) fn verus_closure_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+pub(crate) fn verus_closure_expr(p: &mut Parser<'_>, m: Option<Marker>, forbid_structs: bool) -> CompletedMarker {
     let m = match m {
         Some(m) => m,
         None => p.start(),
@@ -16,7 +16,11 @@ pub(crate) fn verus_closure_expr(p: &mut Parser<'_>, m: Option<Marker>) -> Compl
     }
     params::param_list_closure(p);
     attributes::inner_attrs(p);
-    expressions::expr(p);
+    if forbid_structs {
+        expressions::expr_no_struct(p);
+    } else {
+        expressions::expr(p);
+    }
     m.complete(p, CLOSURE_EXPR)
 }
 
@@ -221,7 +225,7 @@ pub(crate) fn assert_forall(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
         p.error("assert forall must start with forall");
     }
 
-    verus_closure_expr(p, None);
+    verus_closure_expr(p, None, true);
     if p.at_contextual_kw(T![implies]) {
         p.bump_remap(T![implies]);
         expressions::expr(p);

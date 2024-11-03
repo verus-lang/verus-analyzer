@@ -84,7 +84,7 @@ pub(super) fn atom_expr(
         return Some((builtin_expr(p)?, BlockLike::NotBlock));
     }
     if p.at_contextual_kw(T![choose]) {
-        let pred_expr = verus::verus_closure_expr(p, None);
+        let pred_expr = verus::verus_closure_expr(p, None, r.forbid_structs);
         return Some((pred_expr, BlockLike::NotBlock));
     }
     if paths::is_path_start(p) {
@@ -172,7 +172,7 @@ pub(super) fn atom_expr(
         }
 
         T![const] | T![static] | T![async] | T![move] | T![|] => closure_expr(p),
-        T![forall] | T![exists] | T![choose] => verus::verus_closure_expr(p, None), // verus
+        T![forall] | T![exists] | T![choose] => verus::verus_closure_expr(p, None, r.forbid_structs), // verus
         T![for] if la == T![<] => closure_expr(p),
         T![for] => for_expr(p, None),
 
