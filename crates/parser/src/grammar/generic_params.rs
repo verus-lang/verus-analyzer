@@ -218,6 +218,15 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
     m.complete(p, WHERE_CLAUSE);
 
     fn is_where_predicate(p: &mut Parser<'_>) -> bool {
+        // verus: We need these, since they're all contextual keywords
+        if p.at_contextual_kw(T![requires])
+        || p.at_contextual_kw(T![ensures])
+        || p.at_contextual_kw(T![decreases])
+        || p.at_contextual_kw(T![opens_invariants])
+        || p.at_contextual_kw(T![no_unwind])
+        {
+            return false;
+        }
         match p.current() {
             LIFETIME_IDENT => true,
             T![impl] => false,

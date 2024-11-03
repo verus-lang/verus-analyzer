@@ -1831,6 +1831,31 @@ fn f() { let group = Group::new(Delimiter::Bracket, bracketed.build()); let mut 
     }
 }
 
+#[test]
+fn verus_where_clauses() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub fn spawn<F, Ret>(f: F) -> (handle: JoinHandle<Ret>) where
+    F: FnOnce() -> Ret,
+    requires
+        f.requires(()),
+    ensures
+        forall|ret: Ret| #[trigger] handle.predicate(ret) ==> f.ensures((), ret),
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
 
 #[test]
 fn verus_opens_invariants() {
