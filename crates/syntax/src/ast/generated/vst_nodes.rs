@@ -374,6 +374,7 @@ pub struct Fn {
     pub ensures_clause: Option<Box<EnsuresClause>>,
     pub signature_decreases: Option<Box<SignatureDecreases>>,
     pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
+    pub no_unwind_clause: Option<Box<NoUnwindClause>>,
     pub body: Option<Box<BlockExpr>>,
     pub semicolon_token: bool,
     pub cst: Option<super::nodes::Fn>,
@@ -748,6 +749,13 @@ pub struct NameRef {
 pub struct NeverType {
     pub excl_token: bool,
     pub cst: Option<super::nodes::NeverType>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoUnwindClause {
+    pub no_unwind_token: bool,
+    pub when_token: bool,
+    pub expr: Option<Box<Expr>>,
+    pub cst: Option<super::nodes::NoUnwindClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OffsetOfExpr {
@@ -2451,6 +2459,10 @@ impl TryFrom<super::nodes::Fn> for Fn {
                 Some(it) => Some(Box::new(OpensInvariantsClause::try_from(it)?)),
                 None => None,
             },
+            no_unwind_clause: match item.no_unwind_clause() {
+                Some(it) => Some(Box::new(NoUnwindClause::try_from(it)?)),
+                None => None,
+            },
             body: match item.body() {
                 Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
                 None => None,
@@ -3360,6 +3372,20 @@ impl TryFrom<super::nodes::NeverType> for NeverType {
     type Error = String;
     fn try_from(item: super::nodes::NeverType) -> Result<Self, Self::Error> {
         Ok(Self { excl_token: item.excl_token().is_some(), cst: Some(item.clone()) })
+    }
+}
+impl TryFrom<super::nodes::NoUnwindClause> for NoUnwindClause {
+    type Error = String;
+    fn try_from(item: super::nodes::NoUnwindClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            no_unwind_token: item.no_unwind_token().is_some(),
+            when_token: item.when_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
+            cst: Some(item.clone()),
+        })
     }
 }
 impl TryFrom<super::nodes::OffsetOfExpr> for OffsetOfExpr {
@@ -6170,6 +6196,10 @@ impl std::fmt::Display for Fn {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
+        if let Some(it) = &self.no_unwind_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.body {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -7225,6 +7255,28 @@ impl std::fmt::Display for NeverType {
             let mut tmp = stringify!(excl_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for NoUnwindClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.no_unwind_token {
+            let mut tmp = stringify!(no_unwind_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.when_token {
+            let mut tmp = stringify!(when_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -10270,6 +10322,7 @@ impl Fn {
             ensures_clause: None,
             signature_decreases: None,
             opens_invariants_clause: None,
+            no_unwind_clause: None,
             body: None,
             semicolon_token: false,
             cst: None,
@@ -10688,6 +10741,11 @@ impl NameRef {
 }
 impl NeverType {
     pub fn new() -> Self { Self { excl_token: true, cst: None } }
+}
+impl NoUnwindClause {
+    pub fn new() -> Self {
+        Self { no_unwind_token: true, when_token: false, expr: None, cst: None }
+    }
 }
 impl OffsetOfExpr {
     pub fn new() -> Self {

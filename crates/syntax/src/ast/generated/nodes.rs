@@ -515,6 +515,7 @@ impl Fn {
     pub fn body(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
+    pub fn no_unwind_clause(&self) -> Option<NoUnwindClause> { support::child(&self.syntax) }
     pub fn opens_invariants_clause(&self) -> Option<OpensInvariantsClause> {
         support::child(&self.syntax)
     }
@@ -1079,6 +1080,18 @@ pub struct NeverType {
 }
 impl NeverType {
     pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoUnwindClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NoUnwindClause {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn no_unwind_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![no_unwind])
+    }
+    pub fn when_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![when]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3177,6 +3190,17 @@ impl AstNode for NameRef {
 }
 impl AstNode for NeverType {
     fn can_cast(kind: SyntaxKind) -> bool { kind == NEVER_TYPE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for NoUnwindClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == NO_UNWIND_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -5690,6 +5714,11 @@ impl std::fmt::Display for NameRef {
     }
 }
 impl std::fmt::Display for NeverType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for NoUnwindClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
