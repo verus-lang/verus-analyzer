@@ -511,6 +511,9 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     if p.at(T![decreases]) {
         verus::signature_decreases(p);
     }
+    if p.at(T![opens_invariants]) {
+        verus::opens_invariants(p);
+    }
 
     if p.at(T![;]) {
         // test fn_decl

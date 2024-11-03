@@ -158,6 +158,9 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "broadcast",
         "is",
         "matches",
+        "opens_invariants",
+        "any",
+        "none",
     ],
     contextual_keywords: &[
         "auto",
@@ -328,6 +331,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "ENSURES_CLAUSE",
         "DECREASES_CLAUSE",
         "RECOMMENDS_CLAUSE",
+        "OPENS_INVARIANTS_CLAUSE",
         "LOOP_CLAUSE",
         "INVARIANT_EXCEPT_BREAK_CLAUSE",
         "INVARIANT_CLAUSE",

@@ -253,6 +253,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
         && !p.at(T![recommends])
         && !p.at(T![ensures])
         && !p.at(T![decreases])
+        && !p.at(T![opens_invariants])
         && !p.at(T!['{'])
         && !p.at(T![;])
     {
@@ -327,7 +328,7 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(T![ensures]);
     expressions::expr_no_struct(p);
 
-    while !p.at(EOF) && !p.at(T![decreases]) && !p.at(T!['{']) && !p.at(T![;]) {
+    while !p.at(EOF) && !p.at(T![decreases]) && !p.at(T![opens_invariants]) && !p.at(T!['{']) && !p.at(T![;]) {
         if p.at(T![recommends]) || p.at(T![ensures]) || p.at(T![decreases]) || p.at(T!['{']) {
             break;
         }
@@ -352,6 +353,31 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     }
     m.complete(p, ENSURES_CLAUSE)
 }
+
+
+pub(crate) fn opens_invariants(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect(T![opens_invariants]);
+    if p.at(T![any]) {
+        p.bump(T![any]);
+    } else if p.at(T![none]) {
+        p.bump(T![none]);
+    } else if p.at(T!['[']) {
+        p.bump(T!['[']);
+        // Consume the list of opened invariants
+        while !p.at(EOF) && !p.at(T![']']) {
+            expressions::expr_no_struct(p);
+            if p.at(T![,]) {
+                p.bump(T![,]);
+            }
+        }
+        if p.at(T![']']) {
+            p.bump(T![']']);
+        }
+    }
+    m.complete(p, OPENS_INVARIANTS_CLAUSE)
+}
+
 
 pub(crate) fn invariants_except_break(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
