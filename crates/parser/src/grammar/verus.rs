@@ -358,10 +358,10 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
 pub(crate) fn opens_invariants(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(T![opens_invariants]);
-    if p.at(T![any]) {
-        p.bump(T![any]);
-    } else if p.at(T![none]) {
-        p.bump(T![none]);
+    if p.at_contextual_kw(T![any]) {
+        p.bump_remap(T![any]);
+    } else if p.at_contextual_kw(T![none]) {
+        p.bump_remap(T![none]);
     } else if p.at(T!['[']) {
         p.bump(T!['[']);
         // Consume the list of opened invariants

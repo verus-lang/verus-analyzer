@@ -159,8 +159,6 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "is",
         "matches",
         "opens_invariants",
-        "any",
-        "none",
     ],
     contextual_keywords: &[
         "auto",
@@ -175,6 +173,8 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "asm",
         "format_args",
         "group",    // verus: Only a key word when it follows 'broadcast'
+        "any",      // verus: Only a key word when following 'open_invariants'
+        "none",     // verus: Only a key word when following 'open_invariants'
     ],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING", "C_STRING"],
     tokens: &["ERROR", "IDENT", "WHITESPACE", "LIFETIME_IDENT", "COMMENT", "SHEBANG"],
