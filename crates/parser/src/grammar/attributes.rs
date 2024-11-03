@@ -33,7 +33,6 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
 
     if p.eat(T!['[']) {
         if p.at(T![trigger]) {
-            dbg!(true_inner);
             verus::trigger_attribute(p, true_inner);
         } else {
             meta(p);
