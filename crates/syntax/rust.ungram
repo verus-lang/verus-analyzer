@@ -155,7 +155,7 @@ UseTreeList =
 Fn =
  Attr* Visibility? Publish?
  'default'? 'const'? 'async'? 'unsafe'? Abi? 'broadcast'? FnMode?
- 'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? SignatureDecreases? OpensInvariantsClause?
+ 'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
  (body:BlockExpr | ';')
 
 Abi =
@@ -765,6 +765,9 @@ DecreasesClause =
 
 OpensInvariantsClause =
   'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']')
+
+NoUnwindClause =
+  'no_unwind' ('when' Expr)?
 
 SignatureDecreases =
   DecreasesClause ('when' Expr)? ('via' Expr)?

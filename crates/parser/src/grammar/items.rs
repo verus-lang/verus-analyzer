@@ -514,6 +514,12 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     if p.at(T![opens_invariants]) {
         verus::opens_invariants(p);
     }
+    if p.at_contextual_kw(T![no_unwind]) {
+        p.bump_remap(T![no_unwind]);
+        if p.at(T![when]) {
+            p.bump(T![when]);
+        }
+    }
 
     if p.at(T![;]) {
         // test fn_decl

@@ -175,6 +175,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "group",    // verus: Only a key word when it follows 'broadcast'
         "any",      // verus: Only a key word when following 'open_invariants'
         "none",     // verus: Only a key word when following 'open_invariants'
+        "no_unwind",// verus: Only a key word at the end of a function signature
     ],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING", "C_STRING"],
     tokens: &["ERROR", "IDENT", "WHITESPACE", "LIFETIME_IDENT", "COMMENT", "SHEBANG"],
@@ -332,6 +333,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "DECREASES_CLAUSE",
         "RECOMMENDS_CLAUSE",
         "OPENS_INVARIANTS_CLAUSE",
+        "NO_UNWIND_CLAUSE",
         "LOOP_CLAUSE",
         "INVARIANT_EXCEPT_BREAK_CLAUSE",
         "INVARIANT_CLAUSE",

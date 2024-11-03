@@ -26,11 +26,23 @@ fn inv3()
 fn kw_test() {
     let any = 5;
 }
-*/
 
 fn inv4()
     ensures true,
     opens_invariants any
+{
+}
+*/
+
+fn put()
+//    requires
+//        self.id() === old(perm)@.pptr,
+//        old(perm)@.value === None,
+//    ensures
+//        perm@.pptr === old(perm)@.pptr,
+//        perm@.value === Some(v),
+//    opens_invariants none
+    no_unwind
 {
 }
 
