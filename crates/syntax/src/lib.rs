@@ -795,6 +795,12 @@ fn verus_walkthrough6() {
             recommends
                 0 <= i,
         ;
+        fn closed_under_incl()
+            requires
+                Self::op(a, b).valid(),
+            ensures
+                a.valid(),
+        ;
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
@@ -825,6 +831,13 @@ fn verus_walkthrough7() {
                 #![trigger f1(x), f1(y)]
                 f1(x) < 100 && f1(y) < 100 ==> my_spec_fun(x, y) >= x
             );
+        }
+
+        fn test() {
+            assert(p % p == 0) by (nonlinear_arith)
+                requires
+                p != 0,
+            ;
         }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);

@@ -268,6 +268,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
                 || p.nth_at_contextual_kw(1, T![decreases])
                 || p.nth_at_contextual_kw(1, T![opens_invariants])
                 || p.nth_at(1, T!['{'])
+                || p.nth_at(1, T![;])
             {
                 break;
             } else {
