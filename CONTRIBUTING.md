@@ -66,6 +66,6 @@ yarn add --dev @tsconfig/strictest
 ```
 cargo xtask dist --client-patch-version 42
 ```
-which will cause a copy of the server to be places in `editors/code/server/`
+which will cause a copy of the server to be placed in `editors/code/server/`
 The number you pass in will be concatenated to "0.4" to form the extension's
 version number.
