@@ -140,7 +140,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         (body:BlockExpr | ';')
     */
     // verus--publish : after visibility, before const
-    if p.at(T![open]) || p.at(T![closed]) {
+    if p.at_contextual_kw(T![open]) || p.at_contextual_kw(T![closed]) {
         verus::publish(p);
     }
 
@@ -164,8 +164,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         has_mods = true;
     }
 
-    if p.at(T![broadcast]) {
-        p.bump(T![broadcast]);
+    if p.eat_contextual_kw(T![broadcast]) {
         has_mods = true;
         saw_broadcast = true;
     }
@@ -186,7 +185,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         (body:BlockExpr | ';')
     */
     // verus--fnmode : spec proof exec
-    if p.at(T![spec]) || p.at(T![proof]) || p.at(T![exec]) {
+    if p.at_contextual_kw(T![spec]) || p.at_contextual_kw(T![proof]) || p.at_contextual_kw(T![exec]) {
         verus::fn_mode(p);
     }
 
@@ -496,20 +495,27 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     generic_params::opt_where_clause(p);
 
     // Note: prover -> requires -> recommends -> ensures -> decreases
-    if p.at(T![by]) {
+    if p.at_contextual_kw(T![by]) {
         verus::prover(p);
     }
-    if p.at(T![requires]) {
+    if p.at_contextual_kw(T![requires]) {
         verus::requires(p);
     }
-    if p.at(T![recommends]) {
+    if p.at_contextual_kw(T![recommends]) {
         verus::recommends(p);
     }
-    if p.at(T![ensures]) {
+    if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
-    if p.at(T![decreases]) {
+    if p.at_contextual_kw(T![decreases]) {
         verus::signature_decreases(p);
+    }
+    if p.at_contextual_kw(T![opens_invariants]) {
+        verus::opens_invariants(p);
+    }
+    if p.at_contextual_kw(T![no_unwind]) {
+        p.bump_remap(T![no_unwind]);
+        p.eat_contextual_kw(T![when]);
     }
 
     if p.at(T![;]) {

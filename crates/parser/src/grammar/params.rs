@@ -182,6 +182,10 @@ fn variadic_param(p: &mut Parser<'_>) -> bool {
 //     fn e(mut self) {}
 // }
 fn opt_self_param(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
+    // verus allows tracked self
+    if p.at(T![tracked]) {
+        p.expect(T![tracked]);
+    }
     if p.at(T![self]) || p.at(T![mut]) && p.nth(1) == T![self] {
         p.eat(T![mut]);
         self_as_name(p);
