@@ -21,7 +21,7 @@ import {
 } from "./dependencies_provider";
 import { execRevealDependency } from "./commands";
 import { PersistentState } from "./persistent_state";
-import { bootstrap, getVerus } from "./bootstrap";
+import { bootstrap, findRustup, getVerus, validRustToolchain} from "./bootstrap";
 import type { RustAnalyzerExtensionApi } from "./main";
 import type { JsonProject } from "./rust_project";
 import { prepareTestExplorer } from "./test_explorer";
@@ -213,6 +213,11 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     this.refreshServerStatus();
                 },
             );
+            const haveValidRustToolchain:Boolean = await validRustToolchain();
+            if (!haveValidRustToolchain) {
+                log.info("Failed to find rustup");
+                return;
+            }
             const verusPath = await getVerus(this.extCtx, this.config);
             log.info("Using verus binary at", verusPath);
             process.env['VERUS_BINARY_PATH'] = verusPath;

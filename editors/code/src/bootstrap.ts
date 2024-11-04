@@ -5,6 +5,12 @@ import { type Env, log } from "./util";
 import type { PersistentState } from "./persistent_state";
 import { exec, spawnSync } from "child_process";
 import fetch from "cross-fetch";
+//import * as which from 'which';
+//import which from "which";
+import which = require("which");
+import * as fs from 'fs';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
 export async function bootstrap(
     context: vscode.ExtensionContext,
@@ -160,6 +166,75 @@ export async function getVerus(
             }
         }
         return;
+    }
+}
+
+
+export async function findRustup(): Promise<{path: string|undefined}> {
+    try {
+        const resolvedPath = await which("rustup");
+        log.info("Found rustup at: " + resolvedPath);
+        return {path: resolvedPath };
+    } catch(error: unknown) {
+        log.warn("Caught an error while running `which(rustup)`: " + error);
+        return { path: undefined };
+    }
+}
+
+const execFileAsync = promisify(execFile);
+
+export async function validRustToolchain(): Promise<Boolean> {
+    // TODO: Add a config flag for the expected toolchain version
+    const TOOLCHAIN_FULL = 1;
+    const TOOLCHAIN_MAJOR = 79;
+    const TOOLCHAIN_MINOR = 0;
+
+    const { path: rustup_executable } = await findRustup();
+    if (!rustup_executable) {
+        await vscode.window.showErrorMessage(
+            "Failed to find rustup executable!",
+        );
+        return false;
+    }
+    try {
+      const stats = await fs.promises.stat(rustup_executable);
+      if(!stats.isFile()) {
+        await vscode.window.showErrorMessage(
+            rustup_executable + ' is not a valid file.'
+        );
+        return false;
+      }
+      const { stdout } = await execFileAsync(rustup_executable, [ "toolchain", "list" ]);
+      const version_regex = /(\d+)\.(\d+)\.(\d+)-/ig;
+      const toolchainVersions = [ ...stdout.matchAll(version_regex) ]
+        .map(match => {
+            if (match[1] == undefined || match[2] == undefined || match[3] == undefined) {
+                log.warn("Undefined match groups: ", match)
+                return { full: 0, major: 0, minor: 0 };
+            } else {
+                const full = parseInt(match[1], 10);
+                const major = parseInt(match[2], 10);
+                const minor = parseInt(match[3], 10);
+                log.info(`Found Rust toolchain version: ${full}.${major}.${minor}`);
+                return { full, major, minor };
+            }
+        });
+      if(toolchainVersions.find(({ full, major, minor }) =>
+            full == TOOLCHAIN_FULL && major == TOOLCHAIN_MAJOR && minor == TOOLCHAIN_MINOR) == undefined) {
+        const toolchain_str = `${TOOLCHAIN_FULL}.${TOOLCHAIN_MAJOR}.${TOOLCHAIN_MINOR}`;
+        const cmd = `rustup toolchain install ${toolchain_str}`;
+        await vscode.window.showErrorMessage(
+            "Failed to find Rust toolchain needed for Verus.  Try installing it by running: " + cmd
+        );
+        return false;
+      } else {
+        log.info("Found the expected rustup version");
+        return true;
+      }
+    } catch(error: unknown) {
+      const errorMsg = `Error invoking ${rustup_executable} toolchain list: ${error}`;
+      console.error(errorMsg);
+      return false//
     }
 }
 
