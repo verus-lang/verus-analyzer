@@ -38,19 +38,33 @@ You also need to install the `vscode-languageclient` package via:
 npm install vscode-languageclient
 ```
 
+We include a build of the server in the VSIX file, so in the base of this repo, run:
+```
+cargo xtask dist --client-patch-version 42
+```
+which will cause a copy of the server to be placed in `editors/code/server/`
+The number you pass in will be concatenated to "0.4" to form the extension's
+version number.
+
 Now, in `verus-analyzer/editors/code`, run:
 ```
 npx vsce package -o ../../dist/verus-analyzer-aarch64-apple-darwin.vsix --target darwin-arm64
 ```
-(updating `aarch64-apple-darwin` as appropriate).
+You should update `aarch64-apple-darwin` as appropriate.  Choices include:
+  - `x86_64-unknown-linux-gnu`
+  - `aarch64-unknown-linux-gnu`
+  - `x86_64-pc-windows-msvc`
+  - `x86_64-apple-darwin`
+  - `aarch64-apple-darwin`
 
-You can install the resulting `.vsix` file from the commandline via:
+You can install the resulting `.vsix` file from the commandline.  In the base of the repo, run:
 ```
-code --install-extension /path/to/rust-analyzer.vsix
+code --install-extension ./dist/verus-analyzer-[your-arch-choice].vsix
 ```
 Or in VS Code, you can open the Extensions panel, click the '...' button in the upper-right
 portion of the panel, and select "Install from VSIX..."
 
+### Notes
 
 If you see this complaint:
 ```
@@ -62,10 +76,3 @@ npm install --save-dev @tsconfig/strictest
 yarn add --dev @tsconfig/strictest
 ```
 
-**NOTE** To include a build of the server in the VSIX file, you must run:
-```
-cargo xtask dist --client-patch-version 42
-```
-which will cause a copy of the server to be placed in `editors/code/server/`
-The number you pass in will be concatenated to "0.4" to form the extension's
-version number.
