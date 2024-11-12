@@ -18,14 +18,14 @@ export async function bootstrap(
     state: PersistentState,
 ): Promise<string> {
     const path = await getServer(context, config, state);
-    if (!path) {
+    if (path) {
+        log.info("Found Verus Analyzer server at: " + path);
+    } else {
         throw new Error(
             "verus-analyzer Language Server is not available. " +
                 "Please, ensure its [proper installation](https://github.com/verus-lang/verus-analyzer/).",
         );
     }
-
-    log.info("Using server binary at", path);
 
     if (!isValidExecutable(path, config.serverExtraEnv)) {
         throw new Error(
@@ -103,8 +103,10 @@ export async function getVerus(
         () => false,
     );
     if (target_dir_exists) {
+        log.info("Verus is already installed at: ", target_binary.fsPath, ".  No further work needed.")
         return target_binary.fsPath;
     } else {
+        await vscode.window.showInformationMessage("Attempting to determine the version of Verus's latest release...");
         const result = await fetch ('https://api.github.com/repos/verus-lang/verus/releases',
             {
                 method: 'get',
@@ -140,17 +142,18 @@ export async function getVerus(
             );
             return;
         }
-        log.warn("Platform:", platform);
-        log.warn("Release dir:", release_dir);
+        log.info("Looking for a release for your platform, which we have identified as:", platform);
+        log.info("We will save the downloaded Verus binaries in:", release_dir);
 
-        const release_data = await result.json(); //JSON.parse(await result.json());
+        const release_data = await result.json();
         for (const asset of release_data[0].assets) {
-            log.warn("Asset:", asset.name);
-            log.info("index: ", asset.name.indexOf(platform));
+            log.info("Found release asset: ", asset.name);
+            log.info("Index of your platform in the asset's name: ", asset.name.indexOf(platform));
             if (asset.name.indexOf(platform) >= 0) {
+                await vscode.window.showInformationMessage(`Attempting to download Verus's latest release (${asset.name})...`);
                 // Download and store the release
                 const url = asset.browser_download_url;
-                log.warn("URL:", url);
+                log.info("Retrieving release from this URL:", url);
                 const response = await fetch(url);
                 const downloaded_release = vscode.Uri.joinPath(context.extensionUri, asset.name);
                 await vscode.workspace.fs.writeFile(downloaded_release, new Uint8Array(await response.arrayBuffer()));
@@ -161,10 +164,15 @@ export async function getVerus(
                 // Move it to a well-known location
                 const src_dir = vscode.Uri.joinPath(t, release_dir); //context.extensionUri, release_dir);
                 await vscode.workspace.fs.rename(src_dir, target_dir);
+                await vscode.window.showInformationMessage("Verus downloaded completed successfully");
 
                 return target_binary.fsPath;
             }
         }
+        await vscode.window.showErrorMessage(
+            "We failed to find a Verus release asset matching your platform!" +
+            `Consider manually installing it from [here](https://github.com/verus-lang/verus/) into: ${target_dir}`,
+        );
         return;
     }
 }
@@ -209,13 +217,13 @@ export async function validRustToolchain(): Promise<Boolean> {
       const toolchainVersions = [ ...stdout.matchAll(version_regex) ]
         .map(match => {
             if (match[1] == undefined || match[2] == undefined || match[3] == undefined) {
-                log.warn("Undefined match groups: ", match)
+                log.warn("Undefined rustup version match groups: ", match)
                 return { full: 0, major: 0, minor: 0 };
             } else {
                 const full = parseInt(match[1], 10);
                 const major = parseInt(match[2], 10);
                 const minor = parseInt(match[3], 10);
-                log.info(`Found Rust toolchain version: ${full}.${major}.${minor}`);
+                log.info(`Found a Rust toolchain version: ${full}.${major}.${minor}`);
                 return { full, major, minor };
             }
         });
@@ -224,7 +232,7 @@ export async function validRustToolchain(): Promise<Boolean> {
         const toolchain_str = `${TOOLCHAIN_FULL}.${TOOLCHAIN_MAJOR}.${TOOLCHAIN_MINOR}`;
         const cmd = `rustup toolchain install ${toolchain_str}`;
         await vscode.window.showErrorMessage(
-            "Failed to find Rust toolchain needed for Verus.  Try installing it by running: " + cmd
+            "Failed to find the Rust toolchain needed for Verus.  Try installing it by running: " + cmd
         );
         return false;
       } else {
