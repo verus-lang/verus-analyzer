@@ -349,7 +349,7 @@ impl FlycheckActor {
 
                     let command = self.run_verus(filename.clone());
                     let formatted_command = format!("{command:?}");
-                    tracing::debug!(?command, "will restart flycheck");
+                    tracing::info!(?command, "will restart flycheck");
                     let (sender, receiver) = unbounded();
                     match CommandHandle::spawn(command, sender) {
                         Ok(command_handle) => {
@@ -559,6 +559,7 @@ impl FlycheckActor {
                     }
                 };
                 dbg!(&verus_binary_str);
+                tracing::info!("Using Verus binary: {}", &verus_binary_str);
 
                 let verus_exec_path = Path::new(&verus_binary_str)
                     .canonicalize()
