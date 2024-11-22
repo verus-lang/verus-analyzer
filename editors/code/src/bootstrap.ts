@@ -164,7 +164,8 @@ export async function getVerus(
                 // Move it to a well-known location
                 const src_dir = vscode.Uri.joinPath(t, release_dir); //context.extensionUri, release_dir);
                 await vscode.workspace.fs.rename(src_dir, target_dir);
-                vscode.window.showInformationMessage("Verus downloaded completed successfully.  Verus will run each time you save your file.");
+                vscode.window.showInformationMessage("Verus downloaded completed successfully.");
+                vscode.window.showInformationMessage("Verus will run each time you save your file.");
 
                 return target_binary.fsPath;
             }
