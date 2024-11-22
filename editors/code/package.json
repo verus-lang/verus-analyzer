@@ -2276,7 +2276,7 @@
                 "properties": {
                     "verus-analyzer.procMacro.attributes.enable": {
                         "markdownDescription": "Expand attribute macros. Requires `#verus-analyzer.procMacro.enable#` to be set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2286,7 +2286,7 @@
                 "properties": {
                     "verus-analyzer.procMacro.enable": {
                         "markdownDescription": "Enable support for procedural macros, implies `#verus-analyzer.cargo.buildScripts.enable#`.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }

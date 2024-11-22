@@ -587,9 +587,9 @@ config_data! {
         numThreads: Option<NumThreads> = None,
 
         /// Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.
-        procMacro_attributes_enable: bool = true,
+        procMacro_attributes_enable: bool = false,
         /// Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.
-        procMacro_enable: bool                     = true,
+        procMacro_enable: bool                     = false,
         /// Internal config, path to proc-macro server executable.
         procMacro_server: Option<Utf8PathBuf>          = None,
 
