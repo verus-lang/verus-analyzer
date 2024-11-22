@@ -57,6 +57,20 @@ You should update `aarch64-apple-darwin` as appropriate.  Choices include:
   - `x86_64-apple-darwin`
   - `aarch64-apple-darwin`
 
+You should also update the argument to `--target` appropriately.  Choices include:
+ - `win32-x64`
+ - `win32-arm64`
+ - `linux-x64`
+ - `linux-arm64`
+ - `linux-armhf`
+ - `alpine-x64`
+ - `alpine-arm64`
+ - `darwin-x64`
+ - `darwin-arm64`
+ - `web`
+If you don't pass the `--target` flag, the package will be used as a fallback
+for all platforms that have no platform-specific package.
+
 You can install the resulting `.vsix` file from the commandline.  In the base of the repo, run:
 ```
 code --install-extension ./dist/verus-analyzer-[your-arch-choice].vsix
