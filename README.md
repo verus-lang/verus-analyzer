@@ -14,18 +14,19 @@ fixes are always welcome, although it is unlikely they will be reviewed immediat
 
 ### Requirements
 
-The main requirement is that `verus-analyzer` expects you to "Open folder" on
-a directory containing a standard Rust project layout and metadata(`Cargo.toml`) file.
-`verus-analyzer` scans the project root(`lib.rs` or `main.rs`) and all files
+The main requirement is that `verus-analyzer` expects you to "Open Folder..." on
+a directory containing a standard Rust project layout and metadata (`Cargo.toml`) file.
+`verus-analyzer` scans the project root (`src/lib.rs` or `src/main.rs`) and all files
 that are reachable from the root. If the file you are working on is not
-reachable from the project root, most of the IDE features like "Goto
+reachable from the project root, most of the IDE features like "Go to
 Definition" will not work. For example, if you have a file named `foo.rs`
-next to `main.rs`, but you do not import `foo.rs` in `main.rs`(i.e., did not add
-`mod foo` on top of `main.rs`), the IDE features will not work for `foo.rs`.
+next to `main.rs`, but you do not import `foo.rs` in `main.rs`(i.e., you haven't added
+`mod foo` in `main.rs`), then the IDE features will not work for `foo.rs`.
 
-We also need `Cargo.toml` files as in standard Rust projects. For a small
-project, you could start with `cargo new`, and it will automatically generate a
-`Cargo.toml` file for you. For a larger project, you could use
+As mentioned above, `verus-analyzer` also expects to find a `Cargo.toml` metadata file,
+as is in standard in Rust projects. For a small
+project, you could start by running `cargo new`, which will automatically generate a
+suitable `Cargo.toml` file for you. For a larger project, you could use
 [workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to
 manage multiple crates.
 
@@ -47,12 +48,12 @@ You can find more documentation of the IDE features by following these links.
 - [Find all References](https://rust-analyzer.github.io/manual.html#find-all-references)
 - [Hover](https://rust-analyzer.github.io/manual.html#hover)
 
-#### 2.1 TODOs for IDE functionalities
-- Code scanning is incomplete for Verus-specific items. To be specific, requires/ensures/decreases/invariant/assert-by-block/assert-forall-block are not fully scanned for IDE purposes (e.g., might not be able to "goto definition" of the function used in requires/ensures, "find all references" might omit occurrences inside requires/ensures).
+#### 2.1 TODOs for IDE features
+- Code scanning is incomplete for Verus-specific items. To be specific, `requires`, `ensures`, `decreases`, `invariant`, `assert-by-block`, and `assert-forall-block` are not fully scanned for IDE purposes (e.g., you might not be able to use "Go to Definition" on a function mentioned in a `requires` or `ensures` expression, or "Find All References" might omit occurrences inside `requires` and `ensures` expressions).
 
-- Although Verus' custom operators are parsed, they are not registered for IDE purposes. For example, type inference around such operators might not work. (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are Booleans).
+- Although Verus' custom operators are parsed, they are not registered for IDE purposes. For example, type inference around such operators might not work (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are Booleans).
 
-- `builtin` and `vstd` are not scanned. For example, the builtin types like `int` and `nat` could be shown as `unknown`. Auto completion for `vstd` might not work.
+- Currently, `builtin` and `vstd` are not scanned. For example, the builtin types like `int` and `nat` could be shown as `unknown`. Auto completion for `vstd` might not work.
 
 ### 3. Running Verus
 
@@ -66,10 +67,10 @@ Each time you save a file in your project, Verus should run and report proof fai
 - Syntax might not be updated to the latest version of Verus.
 
 ## Misc
-- `verus-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
-- `Developer: Reload Window` can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
-- Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in the workspace setting can disable the syntax error messages in VS Code. You could also add `unresolved-module` to the above list to disable the error message for unresolved modules.
-- There is no proper support for `buildin`/`vstd`. However, in your project's `Cargo.toml` file, you can add `vstd` in `dependencices` or `dev-dependencies`, which might make verus-analyzer scan `vstd` and `builtin`. For example,
+- The `verus-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
+- The `Developer: Reload Window` command can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
+- Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in your workspace's settings can disable the syntax error messages in VS Code. You could also add `unresolved-module` to the above list to disable the error message for unresolved modules.
+- There is no proper support for `buildin`/`vstd`. However, in your project's `Cargo.toml` file, you can add `vstd` in `dependencices` or `dev-dependencies`, which might make `verus-analyzer` scan `vstd` and `builtin`. For example, you can try adding:
 ```
 [dependencies]
 vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in the same directory
