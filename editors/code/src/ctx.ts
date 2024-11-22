@@ -21,7 +21,7 @@ import {
 } from "./dependencies_provider";
 import { execRevealDependency } from "./commands";
 import { PersistentState } from "./persistent_state";
-import { bootstrap, findRustup, getVerus, validRustToolchain} from "./bootstrap";
+import { bootstrap, getVerus, validRustToolchain} from "./bootstrap";
 import type { RustAnalyzerExtensionApi } from "./main";
 import type { JsonProject } from "./rust_project";
 import { prepareTestExplorer } from "./test_explorer";
