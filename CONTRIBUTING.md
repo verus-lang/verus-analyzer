@@ -29,6 +29,20 @@ it out of scope (be it due to generally not fitting in with rust-analyzer, or ju
 maintenance capacity). If there already is a feature issue open but it is not clear whether it is
 considered accepted feel free to just drop a comment and ask!
 
+## Interacting with Verus
+
+Verus runs each time you save a file in your project.  This is primarily implemented in
+`crates/flycheck/lib.rs` in `run_verus`.
+
+## Adding or Changing Proof Actions
+
+Proof action code primarily lives in `crates/ide-assists/src/`.  In `lib.rs`,
+you can find `all()`, which contains the list of enabled IDE assists, including proof actions.
+Each proof action has an implementation in `handlers/proof_action/[name].rs`.
+To make it more pleasant to author proof actions, we provide the Proof Plumber API
+in the `proof_plumber_api` directory.  Part of this API depends on lifting verus-analyzer's
+CST to a VST (Verus Syntax Tree).  This part is largely automated via the code in `xtask/src/codegen/grammar/sourcegen_vst.rs`.
+
 ## How to update verus-analyzer when Verus syntax changes
 
 ### Summary:
@@ -102,7 +116,7 @@ npm install vscode-languageclient
 
 We include a build of the server in the VSIX file, so in the base of this repo, run:
 ```
-cargo xtask dist --client-patch-version 42
+cargo xtask dist --proof-action --client-patch-version 42
 ```
 which will cause a copy of the server to be placed in `editors/code/server/`
 The number you pass in will be concatenated to "0.4" to form the extension's
