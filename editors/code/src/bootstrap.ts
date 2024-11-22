@@ -106,7 +106,7 @@ export async function getVerus(
         log.info("Verus is already installed at: ", target_binary.fsPath, ".  No further work needed.")
         return target_binary.fsPath;
     } else {
-        await vscode.window.showInformationMessage("Attempting to determine the version of Verus's latest release...");
+        vscode.window.showInformationMessage("Attempting to determine the version of Verus's latest release...");
         const result = await fetch ('https://api.github.com/repos/verus-lang/verus/releases',
             {
                 method: 'get',
@@ -150,7 +150,7 @@ export async function getVerus(
             log.info("Found release asset: ", asset.name);
             log.info("Index of your platform in the asset's name: ", asset.name.indexOf(platform));
             if (asset.name.indexOf(platform) >= 0) {
-                await vscode.window.showInformationMessage(`Attempting to download Verus's latest release (${asset.name})...`);
+                vscode.window.showInformationMessage(`Attempting to download Verus's latest release (${asset.name})...`);
                 // Download and store the release
                 const url = asset.browser_download_url;
                 log.info("Retrieving release from this URL:", url);
@@ -164,7 +164,7 @@ export async function getVerus(
                 // Move it to a well-known location
                 const src_dir = vscode.Uri.joinPath(t, release_dir); //context.extensionUri, release_dir);
                 await vscode.workspace.fs.rename(src_dir, target_dir);
-                await vscode.window.showInformationMessage("Verus downloaded completed successfully");
+                vscode.window.showInformationMessage("Verus downloaded completed successfully.  Verus will run each time you save your file.");
 
                 return target_binary.fsPath;
             }
