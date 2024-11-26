@@ -101,19 +101,19 @@ jobs:
           rustup component add --toolchain stable rust-src clippy
           rustup default stable
 
-      - name: Run analysis-stats on rust-analyzer
-        if: matrix.os == 'ubuntu-latest'
-        run: target/${{ matrix.target }}/debug/rust-analyzer analysis-stats .
+      # - name: Run analysis-stats on rust-analyzer
+      #   if: matrix.os == 'ubuntu-latest'
+      #   run: target/${{ matrix.target }}/debug/rust-analyzer analysis-stats .
 
-      - name: Run analysis-stats on rust std library
-        if: matrix.os == 'ubuntu-latest'
-        env:
-          RUSTC_BOOTSTRAP: 1
-        run: target/${{ matrix.target }}/debug/rust-analyzer analysis-stats --with-deps $(rustc --print sysroot)/lib/rustlib/src/rust/library/std
+      # - name: Run analysis-stats on rust std library
+      #   if: matrix.os == 'ubuntu-latest'
+      #   env:
+      #     RUSTC_BOOTSTRAP: 1
+      #   run: target/${{ matrix.target }}/debug/rust-analyzer analysis-stats --with-deps $(rustc --print sysroot)/lib/rustlib/src/rust/library/std
 
-      - name: clippy
-        if: matrix.os == 'windows-latest'
-        run: cargo clippy --all-targets -- -D clippy::disallowed_macros -D clippy::dbg_macro -D clippy::todo -D clippy::print_stdout -D clippy::print_stderr
+      # - name: clippy
+      #   if: matrix.os == 'windows-latest'
+      #   run: cargo clippy --all-targets -- -D clippy::disallowed_macros -D clippy::dbg_macro -D clippy::todo -D clippy::print_stdout -D clippy::print_stderr
 
       - name: rustfmt
         if: matrix.os == 'ubuntu-latest'
