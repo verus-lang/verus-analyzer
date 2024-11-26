@@ -1,6 +1,6 @@
 # Contributing to verus-analyzer
 
-Thank you for your interest in contributing to vust-analyzer! There are many ways to contribute
+Thank you for your interest in contributing to verus-analyzer! There are many ways to contribute
 and we appreciate all of them.
 
 To get a quick overview of the crates and structure of the project take a look at the
