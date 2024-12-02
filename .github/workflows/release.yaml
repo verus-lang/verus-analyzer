@@ -260,7 +260,7 @@ jobs:
         if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/infra') && github.repository == 'verus-lang/verus-analyzer'
         working-directory: ./editors/code
         # token from https://dev.azure.com/verus-analyzer/
-        run:
+        run: |
           ls 
           ls ../
           ls ../../
