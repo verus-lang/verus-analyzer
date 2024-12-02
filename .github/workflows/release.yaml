@@ -260,7 +260,12 @@ jobs:
         if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/infra') && github.repository == 'verus-lang/verus-analyzer'
         working-directory: ./editors/code
         # token from https://dev.azure.com/verus-analyzer/
-        run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
+        run:
+          ls 
+          ls ../
+          ls ../../
+          ls ../../dist
+          npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
 
       # - name: Publish Extension (OpenVSX, release)
       #   if: github.ref == 'refs/heads/release' && github.repository == 'verus-analyzer/verus-analyzer'
