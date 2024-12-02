@@ -251,30 +251,30 @@ jobs:
           name: ${{ env.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: rm dist/verus-analyzer-no-server.vsix
+      - run: rm -f dist/verus-analyzer-no-server.vsix
 
       - run: npm ci
         working-directory: ./editors/code
 
       - name: Publish Extension (Code Marketplace, release)
-        if: github.ref == 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
+        if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/infra') && github.repository == 'verus-analyzer/verus-analyzer'
         working-directory: ./editors/code
         # token from https://dev.azure.com/verus-analyzer/
         run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
 
       # - name: Publish Extension (OpenVSX, release)
-      #   if: github.ref == 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
+      #   if: github.ref == 'refs/heads/release' && github.repository == 'verus-analyzer/verus-analyzer'
       #   working-directory: ./editors/code
       #   run: npx ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
       #   timeout-minutes: 2
 
       # - name: Publish Extension (Code Marketplace, nightly)
-      #   if: github.ref != 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
+      #   if: github.ref != 'refs/heads/release' && github.repository == 'verus-analyzer/verus-analyzer'
       #   working-directory: ./editors/code
       #   run: npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix --pre-release
 
       # - name: Publish Extension (OpenVSX, nightly)
-      #   if: github.ref != 'refs/heads/release' && (github.repository == 'verus-analyzer/verus-analyzer' || github.repository == 'rust-lang/verus-analyzer')
+      #   if: github.ref != 'refs/heads/release' && github.repository == 'verus-analyzer/verus-analyzer'
       #   working-directory: ./editors/code
       #   run: npx ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
       #   timeout-minutes: 2
