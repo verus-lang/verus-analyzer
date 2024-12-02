@@ -26,7 +26,7 @@ text-edit.workspace = true
 ide-db.workspace = true
 hir.workspace = true
 
-verusfmt = "0.4.0"
+verusfmt = { version = "0.4.0", default-features = false }
 tempfile = "3.10.1"
 
 #[dev-dependencies]
