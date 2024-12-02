@@ -101,7 +101,7 @@ jobs:
         working-directory: editors/code
 
       - name: Package Extension (release)
-        if: github.ref == 'refs/heads/release' && matrix.code-target
+        if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/infra') && matrix.code-target
         run: npx vsce package -o "../../dist/verus-analyzer-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }}
         working-directory: editors/code
 
@@ -261,9 +261,6 @@ jobs:
         working-directory: ./editors/code
         # token from https://dev.azure.com/verus-analyzer/
         run: |
-          ls 
-          ls ../
-          ls ../../
           ls ../../dist
           npx vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../../dist/verus-analyzer-*.vsix
 
