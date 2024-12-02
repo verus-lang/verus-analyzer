@@ -26,7 +26,8 @@ text-edit.workspace = true
 ide-db.workspace = true
 hir.workspace = true
 
-verusfmt = { version = "0.4.0", default-features = false }
+# verusfmt = { version = "0.4.0", default-features = false }
+verusfmt = { git = "https://github.com/verus-lang/verusfmt.git", branch = "optional-updater", default-features = false }
 tempfile = "3.10.1"
 
 #[dev-dependencies]
