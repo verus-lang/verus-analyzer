@@ -80,7 +80,8 @@ vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in
 
 ## Proof Actions
 
-Proof actions are an **experimental** feature to assist developers when debugging proof failures.
+[Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) 
+are an **experimental** feature to assist developers when debugging proof failures.
 They show up as light bulb icons in the IDE when you hover over a failed proof.
 
 ### Proof Action Demo

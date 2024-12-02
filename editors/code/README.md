@@ -3,7 +3,20 @@
 This extension provides support for the [Verus programming language](https://github.com/verus-lang/verus).
 It is derived from [rust-analyzer](https://rust-analyzer.github.io/)
 
-## Features
+This extension is **experimental** and subject to change; some features are likely broken.
+At present, it works best on small, self-contained Verus projects.  Anything more complex
+will likely fail. 
+
+## Verus-specific Features
+
+- Support for Verus syntax
+- Each time you save a file in your project, Verus runs and reports proof failures and warnings
+- [Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) are an **experimental** 
+  feature to assist developers when debugging proof failures.  They show up as
+  light bulb icons in the IDE when you hover over a failed proof.
+
+
+## Features Extended from Rust Analyzer
 
 - [code completion] with [imports insertion]
 - go to [definition], [implementation], [type definition]
@@ -35,13 +48,13 @@ It is derived from [rust-analyzer](https://rust-analyzer.github.io/)
 2. Install the [verus-analyzer extension].
 
 [rustup]: https://rustup.rs
-[verus-analyzer extension]: https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer
+[verus-analyzer extension]: https://marketplace.visualstudio.com/items?itemName=verus-lang.verus-analyzer
 
 ## Configuration
 
 This extension provides configurations through VSCode's configuration settings. All configurations are under `verus-analyzer.*`.
 
-See [the Rust analyzer manual](https://rust-analyzer.github.io/manual.html#vs-code-2) for more information on VSCode specific configurations.
+See [the Rust analyzer manual](https://rust-analyzer.github.io/manual.html#vs-code-2) for more information on VSCode-specific configurations.
 
 ## Communication
 
