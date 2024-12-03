@@ -7,6 +7,12 @@ This extension is **experimental** and subject to change; some features are like
 At present, it works best on small, self-contained Verus projects.  Anything more complex
 will likely fail. 
 
+**WARNING**: `verus-analyzer` expects you to "Open Folder..." on
+a directory containing a standard Rust project layout and metadata (`Cargo.toml`) file.
+`verus-analyzer` scans the project root (`src/lib.rs` or `src/main.rs`) and all files
+that are reachable from the root. If the file you are working on is not
+reachable from the project root, most of the IDE features like "Go to Definition" will not work.
+
 ## Verus-specific Features
 
 - Support for Verus syntax
