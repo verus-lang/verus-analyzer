@@ -50,7 +50,7 @@ reachable from the project root, most of the IDE features like "Go to Definition
 
 ## Quick start
 
-1. Install [rustup].
+1. Ensure you have [rustup] installed.
 2. Install the [verus-analyzer extension].
 
 [rustup]: https://rustup.rs
