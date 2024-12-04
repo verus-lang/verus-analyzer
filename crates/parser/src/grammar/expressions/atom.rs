@@ -171,7 +171,7 @@ pub(super) fn atom_expr(
             m.complete(p, BLOCK_EXPR)
         }
 
-        T![const] | T![static] | T![async] | T![move] | T![|] => closure_expr(p),
+        T![const] | T![static] | T![async] | T![move] /* | T![|] */ => closure_expr(p),
         T![forall] | T![exists] | T![choose] => verus::verus_closure_expr(p, None, r.forbid_structs), // verus
         T![for] if la == T![<] => closure_expr(p),
         T![for] => for_expr(p, None),
