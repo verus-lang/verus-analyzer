@@ -26,7 +26,7 @@ next to `main.rs`, but you do not import `foo.rs` in `main.rs`(i.e., you haven't
 As mentioned above, `verus-analyzer` also expects to find a `Cargo.toml` metadata file,
 as is in standard in Rust projects. For a small
 project, you could start by running `cargo new`, which will automatically generate a
-suitable `Cargo.toml` file for you. For a larger project, you could use
+suitable `Cargo.toml` file for you. For a larger project, you could use a Rust
 [workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to
 manage multiple crates.
 
