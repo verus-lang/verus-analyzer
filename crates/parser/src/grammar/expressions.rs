@@ -217,7 +217,11 @@ pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
 
     attributes::inner_attrs(p);
 
+    let c1 = p.current();
+    dbg!(c1);
     while !p.at(EOF) && !p.at(T!['}']) {
+        let c = p.current();
+        dbg!(c);
         // test nocontentexpr
         // fn foo(){
         //     ;;;some_expr();;;;{;;;};;;;Ok(())
@@ -257,6 +261,7 @@ enum Associativity {
 fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
     use Associativity::*;
     const NOT_AN_OP: (u8, SyntaxKind, Associativity) = (0, T![@], Left);
+    let c = p.current();
     match p.current() {
         T![|] if p.at(T![|||]) => (1, T![|||], Left), // verus
         T![|] if p.at(T![||])  => (3,  T![||],  Left),
