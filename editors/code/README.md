@@ -1,9 +1,28 @@
-# rust-analyzer
+# verus-analyzer
 
-This extension provides support for the [Rust programming language](https://www.rust-lang.org/).
-It is recommended over and replaces `rust-lang.rust`.
+This extension provides support for the [Verus programming language](https://github.com/verus-lang/verus).
+It is derived from [rust-analyzer](https://rust-analyzer.github.io/)
 
-## Features
+This extension is **experimental** and subject to change; some features are likely broken.
+At present, it works best on small, self-contained Verus projects.  Anything more complex
+will likely fail. 
+
+**WARNING**: `verus-analyzer` expects you to "Open Folder..." on
+a directory containing a standard Rust project layout and metadata (`Cargo.toml`) file.
+`verus-analyzer` scans the project root (`src/lib.rs` or `src/main.rs`) and all files
+that are reachable from the root. If the file you are working on is not
+reachable from the project root, most of the IDE features like "Go to Definition" will not work.
+
+## Verus-specific Features
+
+- Support for Verus syntax
+- Each time you save a file in your project, Verus runs and reports proof failures and warnings
+- [Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) are an **experimental** 
+  feature to assist developers when debugging proof failures.  They show up as
+  light bulb icons in the IDE when you hover over a failed proof.
+
+
+## Features Extended from Rust Analyzer
 
 - [code completion] with [imports insertion]
 - go to [definition], [implementation], [type definition]
@@ -31,22 +50,22 @@ It is recommended over and replaces `rust-lang.rust`.
 
 ## Quick start
 
-1. Install [rustup].
-2. Install the [rust-analyzer extension].
+1. Ensure you have [rustup] installed.
+2. Install the [verus-analyzer extension].
 
 [rustup]: https://rustup.rs
-[rust-analyzer extension]: https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer
+[verus-analyzer extension]: https://marketplace.visualstudio.com/items?itemName=verus-lang.verus-analyzer
 
 ## Configuration
 
-This extension provides configurations through VSCode's configuration settings. All configurations are under `rust-analyzer.*`.
+This extension provides configurations through VSCode's configuration settings. All configurations are under `verus-analyzer.*`.
 
-See [the manual](https://rust-analyzer.github.io/manual.html#vs-code-2) for more information on VSCode specific configurations.
+See [the Rust analyzer manual](https://rust-analyzer.github.io/manual.html#vs-code-2) for more information on VSCode-specific configurations.
 
 ## Communication
 
-For usage and troubleshooting requests, please use the ["IDEs and Editors" category of the Rust forum](https://users.rust-lang.org/c/ide/14).
+For usage and troubleshooting requests, please use the [Verus Zulip](https://verus-lang.zulipchat.com/).
 
 ## Documentation
 
-See [rust-analyzer.github.io](https://rust-analyzer.github.io/) for more information.
+See [rust-analyzer.github.io](https://rust-analyzer.github.io/) for more information about the original Rust analyzer.

@@ -3,6 +3,7 @@
 //! Of particular interest is the `feature_flags` hash map: while other fields
 //! configure the server itself, feature flags are passed into analysis, and
 //! tweak things like automatic insertion of `()` in completions.
+#![allow(dead_code)]
 use std::{fmt, iter, ops::Not, sync::OnceLock};
 
 use cfg::{CfgAtom, CfgDiff};
@@ -586,9 +587,9 @@ config_data! {
         numThreads: Option<NumThreads> = None,
 
         /// Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.
-        procMacro_attributes_enable: bool = true,
+        procMacro_attributes_enable: bool = false,
         /// Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.
-        procMacro_enable: bool                     = true,
+        procMacro_enable: bool                     = false,
         /// Internal config, path to proc-macro server executable.
         procMacro_server: Option<Utf8PathBuf>          = None,
 
@@ -1261,15 +1262,6 @@ impl Config {
 
 impl Config {
     pub fn assist(&self, source_root: Option<SourceRootId>) -> AssistConfig {
-        let verus_path = match &self.check_overrideCommand() {
-            Some(args) if !args.is_empty() => {
-                let mut args = args.clone();
-                let command = args.remove(0);
-                command
-            }
-            _ => String::new(),
-        };
-
         AssistConfig {
             snippet_cap: self.snippet_cap(),
             allowed: None,
@@ -1278,8 +1270,6 @@ impl Config {
             assist_emit_must_use: self.assist_emitMustUse(source_root).to_owned(),
             prefer_prelude: self.imports_preferPrelude(source_root).to_owned(),
             term_search_fuel: self.assist_termSearch_fuel(source_root).to_owned() as u64,
-            verus_path,
-            fmt_path: String::from("/home/chanhee/verusfmt/target/debug/verusfmt"), // TODO: get this from user config file
         }
     }
 
@@ -1949,39 +1939,7 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::CargoCommand {
-                command: self.check_command().clone(),
-                options: CargoOptions {
-                    target_triples: self
-                        .check_targets()
-                        .clone()
-                        .and_then(|targets| match &targets.0[..] {
-                            [] => None,
-                            targets => Some(targets.into()),
-                        })
-                        .unwrap_or_else(|| self.cargo_target().clone().into_iter().collect()),
-                    all_targets: self.check_allTargets().unwrap_or(*self.cargo_allTargets()),
-                    no_default_features: self
-                        .check_noDefaultFeatures()
-                        .unwrap_or(*self.cargo_noDefaultFeatures()),
-                    all_features: matches!(
-                        self.check_features().as_ref().unwrap_or(self.cargo_features()),
-                        CargoFeaturesDef::All
-                    ),
-                    features: match self
-                        .check_features()
-                        .clone()
-                        .unwrap_or_else(|| self.cargo_features().clone())
-                    {
-                        CargoFeaturesDef::All => vec![],
-                        CargoFeaturesDef::Selected(it) => it,
-                    },
-                    extra_args: self.check_extra_args(),
-                    extra_env: self.check_extra_env(),
-                    target_dir: self.target_dir_from_config(),
-                },
-                ansi_color_output: self.color_diagnostic_output(),
-            },
+            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args() },
         }
     }
 

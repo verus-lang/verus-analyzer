@@ -81,7 +81,11 @@ impl<'a> AssistContext<'a> {
         fn_as_text.insert_str(0, "verus!{\n");
         fn_as_text.push_str("\n}");
 
-        let verusfmt_options = verusfmt::RunOptions { file_name: None, run_rustfmt: false, rustfmt_config: Default::default() };
+        let verusfmt_options = verusfmt::RunOptions {
+            file_name: None,
+            run_rustfmt: false,
+            rustfmt_config: Default::default(),
+        };
         let fmt_result = verusfmt::run(&fn_as_text, verusfmt_options);
         match fmt_result {
             Ok(formatted) => {

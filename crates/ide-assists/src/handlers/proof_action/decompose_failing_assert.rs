@@ -108,13 +108,13 @@ fn split_expr(ctx: &AssistContext<'_>, exp: &Expr) -> Option<Vec<Expr>> {
             return None;
         }
         Expr::CallExpr(call) => {
-            dbg!("inline call for decomposing failing assertion");
+            //dbg!("inline call for decomposing failing assertion");
             let name_ref = ctx.name_ref_from_call_expr(call)?;
             let func = ctx.vst_find_fn(&call)?;
             let spec_func_body_expr = *func.body?.clone().stmt_list.tail_expr?;
             let inlined_exp = ctx.vst_inline_call(name_ref.clone(), spec_func_body_expr)?;
-            dbg!("get recursive");
-            dbg!("{}", &inlined_exp.to_string());
+            //dbg!("get recursive");
+            //dbg!("{}", &inlined_exp.to_string());
             return split_expr(ctx, &inlined_exp);
         }
         // TODO: match, if, not, quant(forall)
@@ -147,18 +147,18 @@ pub(crate) fn vst_rewriter_localize_error_minimized(
     let this_fn = ctx.vst_find_node_at_offset::<Fn, ast::Fn>()?;
     let exp = &assertion.expr;
     let split_exprs = split_expr(ctx, exp)?;
-    for e in &split_exprs {
-        dbg!({}, e.to_string());
-    }
+    // for e in &split_exprs {
+    //     //dbg!({}, e.to_string());
+    // }
     let mut stmts: StmtList = StmtList::new();
     for e in split_exprs {
-        dbg!("{}", &e.to_string());
+        //dbg!("{}", &e.to_string());
         let split_assert = AssertExpr::new(e);
         let modified_fn =
             ctx.replace_statement(&this_fn, assertion.clone(), split_assert.clone())?;
         let verif_result = ctx.try_verus(&modified_fn)?;
         if verif_result.is_failing(&split_assert) {
-            dbg!(verif_result);
+            //dbg!(verif_result);
             // this is not enough -- need to retrieve failing assertions
             // and check if this split assertion is failing
             stmts.statements.push(split_assert.into());

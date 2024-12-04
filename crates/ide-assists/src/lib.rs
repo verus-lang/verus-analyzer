@@ -411,16 +411,16 @@ pub(crate) mod handlers {
             proof_action::insert_failing_postcondition::intro_failing_ensures,
             #[cfg(feature="proof-action")]
             proof_action::insert_failing_precondition::intro_failing_requires,
-            #[cfg(feature="proof-action")]
-            proof_action::intro_matching_assertions::intro_match,
+            //#[cfg(feature="proof-action")]
+            //proof_action::intro_matching_assertions::intro_match,
             #[cfg(feature="proof-action")]
             proof_action::weakest_pre_step::wp_move_assertion,
-            #[cfg(feature="proof-action")]
-            proof_action::apply_induction::apply_induction,
-            #[cfg(feature="proof-action")]
-            proof_action::decompose_failing_assert::localize_error,
-            #[cfg(feature="proof-action")]
-            proof_action::remove_redundant_assertion::remove_dead_assertions,
+            //#[cfg(feature="proof-action")]
+            //proof_action::apply_induction::apply_induction,
+            //#[cfg(feature="proof-action")]
+            //proof_action::decompose_failing_assert::localize_error,
+            //#[cfg(feature="proof-action")]
+            //proof_action::remove_redundant_assertion::remove_dead_assertions,
             #[cfg(feature="proof-action")]
             proof_action::reveal_opaque_in_by_block::assert_by_reveal,
             #[cfg(feature="proof-action")]

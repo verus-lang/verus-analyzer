@@ -29,7 +29,7 @@ use intern::{Internable, Interned};
 use itertools::Itertools;
 use la_arena::ArenaMap;
 use smallvec::SmallVec;
-use stdx::{never, IsNoneOr};
+use stdx::never;
 use triomphe::Arc;
 
 use crate::{

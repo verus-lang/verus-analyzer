@@ -1,16 +1,7 @@
 //! Run Verus and return the verification result
 
 use crate::AssistContext;
-use std::{
-    collections::hash_map::DefaultHasher,
-    env,
-    fs::File,
-    hash::{Hash, Hasher},
-    io::Write,
-    path::Path,
-    process::Command,
-    time::Instant,
-};
+use std::{fs::File, io::Write, process::Command, time::Instant};
 use syntax::ast::{self, vst, HasModuleItem, HasName};
 
 impl<'a> AssistContext<'a> {
@@ -70,7 +61,7 @@ impl<'a> AssistContext<'a> {
                 }
             }
         }
-        dbg!(&text_string);
+        //dbg!(&text_string);
 
         // let verify_func_flag = "--verify-function";
         // let verify_root_flag = "--verify-root"; // TODO: figure out the surrounding module of `token`
@@ -78,19 +69,14 @@ impl<'a> AssistContext<'a> {
 
         // REIVEW: instead of writing to a file in the tmp directory, consider using `memfd_create` for an anonymous file
         // refer to `man memfd_create` or `dev/shm`
-        let mut hasher = DefaultHasher::new();
-        let now = Instant::now();
-        now.hash(&mut hasher);
-        // in linux, set env TMPDIR to set the tmp directory. Otherwise, it fails
-        let tmp_dir = env::temp_dir();
-        let tmp_name =
-            format!("{}/_verus_assert_comment_{:?}_.rs", tmp_dir.display(), hasher.finish());
-        dbg!(&tmp_name);
-        let path = Path::new(&tmp_name);
-        let display = path.display();
+        // REVIEW: Is this true? In linux, set env TMPDIR to set the tmp directory. Otherwise, it fails
+        let tmp_dir = tempfile::TempDir::new().ok()?;
+        let file_path = tmp_dir.path().join("verus_proof_action_scratch_file.rs");
+        //dbg!(&file_path);
+        let display = file_path.display();
 
         // Open a file in write-only mode, returns `io::Result<File>`
-        let mut file = match File::create(&path) {
+        let mut file = match File::create(&file_path) {
             Err(why) => {
                 dbg!("couldn't create {}: {}", display, why);
                 return None;
@@ -104,12 +90,12 @@ impl<'a> AssistContext<'a> {
                 dbg!("couldn't write to {}: {}", display, why);
                 return None;
             }
-            Ok(_) => dbg!("successfully wrote to {}", display),
+            Ok(_) => (),//dbg!("successfully wrote to {}", display),
         };
 
         let now = Instant::now();
         let output = Command::new(verus_exec_path)
-            .arg(path)
+            .arg(file_path)
             .arg("--multiple-errors")
             .arg("10") // we want many errors as proof-action reads this. By default, Verus gives a couple of errors as a human reads those.
             .output();
@@ -123,7 +109,7 @@ impl<'a> AssistContext<'a> {
             // disambiguate verification failure     VS    compile error etc
             match std::str::from_utf8(&output.stdout) {
                 Ok(out) => {
-                    dbg!(out);
+                    //dbg!(out);
                     if out.contains("verification results:: verified: 0 errors: 0") {
                         // failure from other errors. (e.g. compile error)
                         return None;

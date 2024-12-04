@@ -13,10 +13,10 @@ export type RunnableEnvCfgItem = {
 export type RunnableEnvCfg = undefined | Record<string, string> | RunnableEnvCfgItem[];
 
 export class Config {
-    readonly extensionId = "rust-lang.rust-analyzer";
+    readonly extensionId = "verus-lang.verus-analyzer";
     configureLang: vscode.Disposable | undefined;
 
-    readonly rootSection = "rust-analyzer";
+    readonly rootSection = "verus-analyzer";
     private readonly requiresServerReloadOpts = [
         "cargo",
         "procMacro",
@@ -57,8 +57,8 @@ export class Config {
         log.setEnabled(this.traceExtension ?? false);
         log.info("Extension version:", this.package.version);
 
-        const cfg = Object.entries(this.cfg).filter(([_, val]) => !(val instanceof Function));
-        log.info("Using configuration", Object.fromEntries(cfg));
+        //const cfg = Object.entries(this.cfg).filter(([_, val]) => !(val instanceof Function));
+        //log.info("Using configuration", Object.fromEntries(cfg));
     }
 
     public discoveredWorkspaces: JsonProject[];
@@ -88,7 +88,7 @@ export class Config {
         if (!requiresServerReloadOpt) return;
 
         if (this.restartServerOnConfigChange) {
-            await vscode.commands.executeCommand("rust-analyzer.restartServer");
+            await vscode.commands.executeCommand("verus-analyzer.restartServer");
             return;
         }
 
@@ -96,7 +96,7 @@ export class Config {
         const userResponse = await vscode.window.showInformationMessage(message, "Restart now");
 
         if (userResponse) {
-            const command = "rust-analyzer.restartServer";
+            const command = "verus-analyzer.restartServer";
             await vscode.commands.executeCommand(command);
         }
     }
@@ -204,7 +204,7 @@ export class Config {
      * const nullableNum = vscode
      *  .workspace
      *  .getConfiguration
-     *  .getConfiguration("rust-analyzer")
+     *  .getConfiguration("verus-analyzer")
      *  .get<number | null>(path)!;
      *
      * // What happens is that type of `nullableNum` is `number` but not `null | number`:

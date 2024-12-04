@@ -65,7 +65,6 @@ fn main() {
             println!("\tparse error: {:?}", e);
         }
     }
-    return;
 
     let work = all_modules.into_iter().filter(|module| {
         let file_id = module.definition_source_file_id(&db).original_file(&db);

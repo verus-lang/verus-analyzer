@@ -5,7 +5,7 @@ Crates in this directory are published to [crates.io](https://crates.io) and obe
 They _could_ live in a separate repo, but we want to experiment with a monorepo setup.
 
 We use these crates from crates.io, not the local copies because we want to ensure that
-rust-analyzer works with the versions that are published. This means if you add a new API to these
+verus-analyzer works with the versions that are published. This means if you add a new API to these
 crates, you need to release a new version to crates.io before you can use that API in rust-analyzer.
 
 To release new versions of these packages, change their version in Cargo.toml. Once your PR is merged into master a workflow will automatically publish the new version to crates.io.

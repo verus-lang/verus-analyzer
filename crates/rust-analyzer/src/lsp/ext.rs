@@ -22,7 +22,7 @@ pub enum InternalTestingFetchConfig {}
 impl Request for InternalTestingFetchConfig {
     type Params = InternalTestingFetchConfigParams;
     type Result = serde_json::Value;
-    const METHOD: &'static str = "rust-analyzer-internal/internalTestingFetchConfig";
+    const METHOD: &'static str = "verus-analyzer-internal/internalTestingFetchConfig";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -36,7 +36,7 @@ pub enum AnalyzerStatus {}
 impl Request for AnalyzerStatus {
     type Params = AnalyzerStatusParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/analyzerStatus";
+    const METHOD: &'static str = "verus-analyzer/analyzerStatus";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -57,7 +57,7 @@ pub enum FetchDependencyList {}
 impl Request for FetchDependencyList {
     type Params = FetchDependencyListParams;
     type Result = FetchDependencyListResult;
-    const METHOD: &'static str = "rust-analyzer/fetchDependencyList";
+    const METHOD: &'static str = "verus-analyzer/fetchDependencyList";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -75,7 +75,7 @@ pub enum MemoryUsage {}
 impl Request for MemoryUsage {
     type Params = ();
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/memoryUsage";
+    const METHOD: &'static str = "verus-analyzer/memoryUsage";
 }
 
 pub enum ShuffleCrateGraph {}
@@ -83,7 +83,7 @@ pub enum ShuffleCrateGraph {}
 impl Request for ShuffleCrateGraph {
     type Params = ();
     type Result = ();
-    const METHOD: &'static str = "rust-analyzer/shuffleCrateGraph";
+    const METHOD: &'static str = "verus-analyzer/shuffleCrateGraph";
 }
 
 pub enum ReloadWorkspace {}
@@ -91,7 +91,7 @@ pub enum ReloadWorkspace {}
 impl Request for ReloadWorkspace {
     type Params = ();
     type Result = ();
-    const METHOD: &'static str = "rust-analyzer/reloadWorkspace";
+    const METHOD: &'static str = "verus-analyzer/reloadWorkspace";
 }
 
 pub enum RebuildProcMacros {}
@@ -99,7 +99,7 @@ pub enum RebuildProcMacros {}
 impl Request for RebuildProcMacros {
     type Params = ();
     type Result = ();
-    const METHOD: &'static str = "rust-analyzer/rebuildProcMacros";
+    const METHOD: &'static str = "verus-analyzer/rebuildProcMacros";
 }
 
 pub enum SyntaxTree {}
@@ -107,7 +107,7 @@ pub enum SyntaxTree {}
 impl Request for SyntaxTree {
     type Params = SyntaxTreeParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/syntaxTree";
+    const METHOD: &'static str = "verus-analyzer/syntaxTree";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -122,7 +122,7 @@ pub enum ViewHir {}
 impl Request for ViewHir {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewHir";
+    const METHOD: &'static str = "verus-analyzer/viewHir";
 }
 
 pub enum ViewMir {}
@@ -130,7 +130,7 @@ pub enum ViewMir {}
 impl Request for ViewMir {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewMir";
+    const METHOD: &'static str = "verus-analyzer/viewMir";
 }
 
 pub enum InterpretFunction {}
@@ -138,7 +138,7 @@ pub enum InterpretFunction {}
 impl Request for InterpretFunction {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/interpretFunction";
+    const METHOD: &'static str = "verus-analyzer/interpretFunction";
 }
 
 pub enum ViewFileText {}
@@ -146,7 +146,7 @@ pub enum ViewFileText {}
 impl Request for ViewFileText {
     type Params = lsp_types::TextDocumentIdentifier;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewFileText";
+    const METHOD: &'static str = "verus-analyzer/viewFileText";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -161,7 +161,7 @@ pub enum ViewCrateGraph {}
 impl Request for ViewCrateGraph {
     type Params = ViewCrateGraphParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewCrateGraph";
+    const METHOD: &'static str = "verus-analyzer/viewCrateGraph";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -175,7 +175,7 @@ pub enum ViewItemTree {}
 impl Request for ViewItemTree {
     type Params = ViewItemTreeParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewItemTree";
+    const METHOD: &'static str = "verus-analyzer/viewItemTree";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -293,7 +293,7 @@ pub enum ExpandMacro {}
 impl Request for ExpandMacro {
     type Params = ExpandMacroParams;
     type Result = Option<ExpandedMacro>;
-    const METHOD: &'static str = "rust-analyzer/expandMacro";
+    const METHOD: &'static str = "verus-analyzer/expandMacro";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -315,7 +315,7 @@ pub enum ViewRecursiveMemoryLayout {}
 impl Request for ViewRecursiveMemoryLayout {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = Option<RecursiveMemoryLayout>;
-    const METHOD: &'static str = "rust-analyzer/viewRecursiveMemoryLayout";
+    const METHOD: &'static str = "verus-analyzer/viewRecursiveMemoryLayout";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -341,28 +341,28 @@ pub enum CancelFlycheck {}
 
 impl Notification for CancelFlycheck {
     type Params = ();
-    const METHOD: &'static str = "rust-analyzer/cancelFlycheck";
+    const METHOD: &'static str = "verus-analyzer/cancelFlycheck";
 }
 
 pub enum RunFlycheck {}
 
 impl Notification for RunFlycheck {
     type Params = RunFlycheckParams;
-    const METHOD: &'static str = "rust-analyzer/runFlycheck";
+    const METHOD: &'static str = "verus-analyzer/runFlycheck";
 }
 
 pub enum ClearFlycheck {}
 
 impl Notification for ClearFlycheck {
     type Params = ();
-    const METHOD: &'static str = "rust-analyzer/clearFlycheck";
+    const METHOD: &'static str = "verus-analyzer/clearFlycheck";
 }
 
 pub enum OpenServerLogs {}
 
 impl Notification for OpenServerLogs {
     type Params = ();
-    const METHOD: &'static str = "rust-analyzer/openServerLogs";
+    const METHOD: &'static str = "verus-analyzer/openServerLogs";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -489,7 +489,7 @@ pub enum RelatedTests {}
 impl Request for RelatedTests {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = Vec<TestInfo>;
-    const METHOD: &'static str = "rust-analyzer/relatedTests";
+    const METHOD: &'static str = "verus-analyzer/relatedTests";
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -861,7 +861,7 @@ pub enum UnindexedProject {}
 
 impl Notification for UnindexedProject {
     type Params = UnindexedProjectParams;
-    const METHOD: &'static str = "rust-analyzer/unindexedProject";
+    const METHOD: &'static str = "verus-analyzer/unindexedProject";
 }
 
 #[derive(Deserialize, Serialize, Debug)]

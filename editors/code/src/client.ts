@@ -79,7 +79,7 @@ export async function createClient(
                         (diag.message === "file not included in crate hierarchy" ||
                             diag.message.startsWith("This file is not included in any crates"))
                     ) {
-                        const config = vscode.workspace.getConfiguration("rust-analyzer");
+                        const config = vscode.workspace.getConfiguration("verus-analyzer");
                         if (config.get("showUnlinkedFileNotification")) {
                             unlinkedFiles.push(uri);
                             const folder = vscode.workspace.getWorkspaceFolder(uri)?.uri.fsPath;
@@ -250,7 +250,7 @@ export async function createClient(
                             const action = new vscode.CodeAction(item.title, kind);
                             const group = (item as any).group;
                             action.command = {
-                                command: "rust-analyzer.resolveCodeAction",
+                                command: "verus-analyzer.resolveCodeAction",
                                 title: item.title,
                                 arguments: [item],
                             };
@@ -279,7 +279,7 @@ export async function createClient(
                                 const item = unwrapUndefinable(items[0]);
                                 action.kind = item.kind;
                                 action.command = {
-                                    command: "rust-analyzer.applyActionGroup",
+                                    command: "verus-analyzer.applyActionGroup",
                                     title: "",
                                     arguments: [
                                         items.map((item) => {
@@ -309,8 +309,8 @@ export async function createClient(
     };
 
     const client = new RaLanguageClient(
-        "rust-analyzer",
-        "Rust Analyzer Language Server",
+        "verus-analyzer",
+        "Verus Analyzer Language Server",
         serverOptions,
         clientOptions,
     );
@@ -343,10 +343,10 @@ class ExperimentalFeatures implements lc.StaticFeature {
             testExplorer: this.testExplorer,
             commands: {
                 commands: [
-                    "rust-analyzer.runSingle",
-                    "rust-analyzer.debugSingle",
-                    "rust-analyzer.showReferences",
-                    "rust-analyzer.gotoLocation",
+                    "verus-analyzer.runSingle",
+                    "verus-analyzer.debugSingle",
+                    "verus-analyzer.showReferences",
+                    "verus-analyzer.gotoLocation",
                     "editor.action.triggerParameterHints",
                 ],
             },
@@ -404,7 +404,7 @@ export let HOVER_REFERENCE_COMMAND: ra.CommandLink | undefined = undefined;
 
 function renderCommand(cmd: ra.CommandLink): string {
     HOVER_REFERENCE_COMMAND = cmd;
-    return `[${cmd.title}](command:rust-analyzer.hoverRefCommandProxy '${cmd.tooltip}')`;
+    return `[${cmd.title}](command:verus-analyzer.hoverRefCommandProxy '${cmd.tooltip}')`;
 }
 
 function renderHoverActions(actions: ra.CommandLinkGroup[]): vscode.MarkdownString {

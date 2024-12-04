@@ -61,7 +61,7 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
             item_or_macro(p, true);
         }
         let m = p.start();
-        p.bump(T!['}']);
+        p.expect(T!['}']);
         m.abandon(p);
         return;
     }

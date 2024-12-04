@@ -44,13 +44,13 @@ pub(crate) fn vst_rewriter_split_imply_ensures(mut func: Fn) -> Option<String> {
     let (new_req, new_ens) = match ensures_expr {
         Expr::BinExpr(b) => {
             if b.op != BinaryOp::LogicOp(LogicOp::Imply) {
-                dbg!("not an implication");
+                //dgb!("not an implication");
                 return None;
             }
             (*b.lhs, *b.rhs)
         }
         _ => {
-            dbg!("not a binexpr");
+            //dgb!("not a binexpr");
             return None;
         }
     };

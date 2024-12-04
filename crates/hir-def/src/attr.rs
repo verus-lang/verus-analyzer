@@ -589,7 +589,7 @@ impl<'attr> AttrQuery<'attr> {
     /// #[doc(html_root_url = "url")]
     ///       ^^^^^^^^^^^^^ key
     /// ```
-    pub fn find_string_value_in_tt(self, key: &'attr str) -> Option<&SmolStr> {
+    pub fn find_string_value_in_tt(self, key: &'attr str) -> Option<&'attr SmolStr> {
         self.tt_values().find_map(|tt| {
             let name = tt.token_trees.iter()
                 .skip_while(|tt| !matches!(tt, tt::TokenTree::Leaf(tt::Leaf::Ident(tt::Ident { text, ..} )) if text == key))

@@ -4,6 +4,13 @@ import type { Config } from "./config";
 import { type Env, log } from "./util";
 import type { PersistentState } from "./persistent_state";
 import { exec, spawnSync } from "child_process";
+import fetch from "cross-fetch";
+//import * as which from 'which';
+//import which from "which";
+import which = require("which");
+import * as fs from 'fs';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 
 export async function bootstrap(
     context: vscode.ExtensionContext,
@@ -11,14 +18,14 @@ export async function bootstrap(
     state: PersistentState,
 ): Promise<string> {
     const path = await getServer(context, config, state);
-    if (!path) {
+    if (path) {
+        log.info("Found Verus Analyzer server at: " + path);
+    } else {
         throw new Error(
-            "rust-analyzer Language Server is not available. " +
-                "Please, ensure its [proper installation](https://rust-analyzer.github.io/manual.html#installation).",
+            "verus-analyzer Language Server is not available. " +
+                "Please, ensure its [proper installation](https://github.com/verus-lang/verus-analyzer/).",
         );
     }
-
-    log.info("Using server binary at", path);
 
     if (!isValidExecutable(path, config.serverExtraEnv)) {
         throw new Error(
@@ -43,10 +50,12 @@ async function getServer(
         }
         return explicitPath;
     }
-    if (config.package.releaseTag === null) return "rust-analyzer";
+    if (config.package.releaseTag === null) {
+        return "verus-analyzer";
+    }
 
     const ext = process.platform === "win32" ? ".exe" : "";
-    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `rust-analyzer${ext}`);
+    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `verus-analyzer${ext}`);
     const bundledExists = await vscode.workspace.fs.stat(bundled).then(
         () => true,
         () => false,
@@ -61,14 +70,181 @@ async function getServer(
     }
 
     await vscode.window.showErrorMessage(
-        "Unfortunately we don't ship binaries for your platform yet. " +
-            "You need to manually clone the rust-analyzer repository and " +
+        "Unfortunately we don't ship verus-analyzer server binaries for your platform yet. " +
+            "You need to manually clone the verus-analyzer repository and " +
             "run `cargo xtask install --server` to build the language server from sources. " +
             "If you feel that your platform should be supported, please create an issue " +
-            "about that [here](https://github.com/rust-lang/rust-analyzer/issues) and we " +
+            "about that [here](https://github.com/verus-lang/verus-analyzer/issues) and we " +
             "will consider it.",
     );
     return undefined;
+}
+
+
+export async function getVerus(
+    context: vscode.ExtensionContext,
+    _config: Config,
+): Promise<string|undefined> {
+    // TODO: Add a config flag for setting the Verus binary path
+
+    // const explicitPath = process.env["__RA_LSP_SERVER_DEBUG"] ?? config.serverPath;
+    // if (explicitPath) {
+    //     if (explicitPath.startsWith("~/")) {
+    //         return os.homedir() + explicitPath.slice("~".length);
+    //     }
+    //     return explicitPath;
+    // }
+
+    const target_dir = vscode.Uri.joinPath(context.extensionUri, "verus");
+    const ext = process.platform === "win32" ? ".exe" : "";
+    const target_binary = vscode.Uri.joinPath(target_dir, `verus${ext}`);
+    const target_dir_exists = await vscode.workspace.fs.stat(target_dir).then(
+        () => true,
+        () => false,
+    );
+    if (target_dir_exists) {
+        log.info("Verus is already installed at: ", target_binary.fsPath, ".  No further work needed.")
+        return target_binary.fsPath;
+    } else {
+        vscode.window.showInformationMessage("Attempting to determine the version of Verus's latest release...");
+        const result = await fetch ('https://api.github.com/repos/verus-lang/verus/releases',
+            {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28',
+                }
+            }
+        );
+
+        if (result.status >= 400) {
+            throw new Error("Bad response from server when attempting to fetch the latest Verus release.");
+        }
+          
+        var platform = "";
+        var release_dir = "";
+        if (process.platform === "win32") { 
+            platform = "win" 
+            release_dir = "verus-x86-win";
+        } else if (process.platform === "darwin") { 
+            platform = "macos" 
+            release_dir = "verus-arm64-macos";
+        } else if (process.platform === "linux") { 
+            platform = "linux" 
+            release_dir = "verus-x86-linux";
+        } else {
+            await vscode.window.showErrorMessage(
+                "Unfortunately we don't ship Verus binaries for your platform yet. " +
+                    "You need to manually clone the verus repository and build it from sources. " +
+                    "If you feel that your platform should be supported, please create an issue " +
+                    "about that [here](https://github.com/verus-lang/verus/issues) and we " +
+                    "will consider it.",
+            );
+            return;
+        }
+        log.info("Looking for a release for your platform, which we have identified as:", platform);
+        log.info("We will save the downloaded Verus binaries in:", release_dir);
+
+        const release_data = await result.json();
+        for (const asset of release_data[0].assets) {
+            log.info("Found release asset: ", asset.name);
+            log.info("Index of your platform in the asset's name: ", asset.name.indexOf(platform));
+            if (asset.name.indexOf(platform) >= 0) {
+                vscode.window.showInformationMessage(`Attempting to download Verus's latest release (${asset.name})...`);
+                // Download and store the release
+                const url = asset.browser_download_url;
+                log.info("Retrieving release from this URL:", url);
+                const response = await fetch(url);
+                const downloaded_release = vscode.Uri.joinPath(context.extensionUri, asset.name);
+                await vscode.workspace.fs.writeFile(downloaded_release, new Uint8Array(await response.arrayBuffer()));
+                // Unzip it
+                const decompress = require('decompress');
+                const t = vscode.Uri.joinPath(context.extensionUri, "unzipped"); //context.extensionUri.fsPath
+                await decompress(downloaded_release.fsPath, t.fsPath);
+                // Move it to a well-known location
+                const src_dir = vscode.Uri.joinPath(t, release_dir); //context.extensionUri, release_dir);
+                await vscode.workspace.fs.rename(src_dir, target_dir);
+                vscode.window.showInformationMessage("Verus downloaded completed successfully.");
+                vscode.window.showInformationMessage("Verus will run each time you save your file.");
+
+                return target_binary.fsPath;
+            }
+        }
+        await vscode.window.showErrorMessage(
+            "We failed to find a Verus release asset matching your platform!" +
+            `Consider manually installing it from [here](https://github.com/verus-lang/verus/) into: ${target_dir}`,
+        );
+        return;
+    }
+}
+
+
+export async function findRustup(): Promise<{path: string|undefined}> {
+    try {
+        const resolvedPath = await which("rustup");
+        log.info("Found rustup at: " + resolvedPath);
+        return {path: resolvedPath };
+    } catch(error: unknown) {
+        log.warn("Caught an error while running `which(rustup)`: " + error);
+        return { path: undefined };
+    }
+}
+
+const execFileAsync = promisify(execFile);
+
+export async function validRustToolchain(): Promise<Boolean> {
+    // TODO: Add a config flag for the expected toolchain version
+    const TOOLCHAIN_FULL = 1;
+    const TOOLCHAIN_MAJOR = 79;
+    const TOOLCHAIN_MINOR = 0;
+
+    const { path: rustup_executable } = await findRustup();
+    if (!rustup_executable) {
+        await vscode.window.showErrorMessage(
+            "Failed to find rustup executable!",
+        );
+        return false;
+    }
+    try {
+      const stats = await fs.promises.stat(rustup_executable);
+      if(!stats.isFile()) {
+        await vscode.window.showErrorMessage(
+            rustup_executable + ' is not a valid file.'
+        );
+        return false;
+      }
+      const { stdout } = await execFileAsync(rustup_executable, [ "toolchain", "list" ]);
+      const version_regex = /(\d+)\.(\d+)\.(\d+)-/ig;
+      const toolchainVersions = [ ...stdout.matchAll(version_regex) ]
+        .map(match => {
+            if (match[1] == undefined || match[2] == undefined || match[3] == undefined) {
+                log.warn("Undefined rustup version match groups: ", match)
+                return { full: 0, major: 0, minor: 0 };
+            } else {
+                const full = parseInt(match[1], 10);
+                const major = parseInt(match[2], 10);
+                const minor = parseInt(match[3], 10);
+                log.info(`Found a Rust toolchain version: ${full}.${major}.${minor}`);
+                return { full, major, minor };
+            }
+        });
+      if(toolchainVersions.find(({ full, major, minor }) =>
+            full == TOOLCHAIN_FULL && major == TOOLCHAIN_MAJOR && minor == TOOLCHAIN_MINOR) == undefined) {
+        const toolchain_str = `${TOOLCHAIN_FULL}.${TOOLCHAIN_MAJOR}.${TOOLCHAIN_MINOR}`;
+        const cmd = `rustup toolchain install ${toolchain_str}`;
+        await vscode.window.showErrorMessage(
+            "Failed to find the Rust toolchain needed for Verus.  Try installing it by running: " + cmd
+        );
+        return false;
+      } else {
+        log.info("Found the expected rustup version");
+        return true;
+      }
+    } catch(error: unknown) {
+      const errorMsg = `Error invoking ${rustup_executable} toolchain list: ${error}`;
+      console.error(errorMsg);
+      return false//
+    }
 }
 
 export function isValidExecutable(path: string, extraEnv: Env): boolean {
@@ -93,7 +269,7 @@ async function getNixOsServer(
     server: vscode.Uri,
 ) {
     await vscode.workspace.fs.createDirectory(config.globalStorageUri).then();
-    const dest = vscode.Uri.joinPath(config.globalStorageUri, `rust-analyzer${ext}`);
+    const dest = vscode.Uri.joinPath(config.globalStorageUri, `verus-analyzer${ext}`);
     let exists = await vscode.workspace.fs.stat(dest).then(
         () => true,
         () => false,
@@ -126,13 +302,13 @@ async function patchelf(dest: vscode.Uri): Promise<void> {
     await vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
-            title: "Patching rust-analyzer for NixOS",
+            title: "Patching verus-analyzer for NixOS",
         },
         async (progress, _) => {
             const expression = `
             {srcStr, pkgs ? import <nixpkgs> {}}:
                 pkgs.stdenv.mkDerivation {
-                    name = "rust-analyzer";
+                    name = "verus-analyzer";
                     src = /. + srcStr;
                     phases = [ "installPhase" "fixupPhase" ];
                     installPhase = "cp $src $out";

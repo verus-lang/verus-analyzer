@@ -12,11 +12,11 @@ impl<'a> AssistContext<'a> {
     pub fn type_of_expr_adt(&self, expr: &vst::Expr) -> Option<vst::Adt> {
         let sema: &Semantics<'_, ide_db::RootDatabase> = &self.sema;
         let expr = expr.cst()?;
-        dbg!("call type_of_expr");
+        //dgb!("call type_of_expr");
         let hir_ty: Vec<hir::Type> =
             sema.type_of_expr(&expr)?.adjusted().autoderef(sema.db).collect::<Vec<_>>();
 
-        dbg!("end type_of_expr");
+        //dgb!("end type_of_expr");
         let hir_ty = hir_ty.first()?;
         if let Some(t) = hir_ty.as_adt() {
             let ast_ty: ast::Adt = sema.source(t)?.value;
@@ -81,7 +81,7 @@ impl<'a> AssistContext<'a> {
         let hir_ty: Vec<hir::Type> =
             sema.resolve_type(&ty.cst()?)?.autoderef(sema.db).collect::<Vec<_>>();
         let hir_ty = hir_ty.first()?;
-        dbg!(&hir_ty);
+        //dgb!(&hir_ty);
         if let Some(t) = hir_ty.as_adt() {
             let ast_ty: ast::Adt = sema.source(t)?.value;
             let typename = ast_ty.try_into().ok()?;
@@ -90,9 +90,9 @@ impl<'a> AssistContext<'a> {
             }
         }
 
-        if let Some(t) = hir_ty.as_builtin() {
-            dbg!(t);
-        }
+        // if let Some(t) = hir_ty.as_builtin() {
+        //     //dgb!(t);
+        // }
         None
     }
 
