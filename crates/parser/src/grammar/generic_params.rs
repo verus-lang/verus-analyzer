@@ -223,7 +223,8 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
 
     fn is_where_predicate(p: &mut Parser<'_>) -> bool {
         // verus: We need these, since they're all contextual keywords
-        if p.at_contextual_kw(T![requires])
+        if p.at_contextual_kw(T![recommends])
+        || p.at_contextual_kw(T![requires])
         || p.at_contextual_kw(T![ensures])
         || p.at_contextual_kw(T![decreases])
         || p.at_contextual_kw(T![opens_invariants])
