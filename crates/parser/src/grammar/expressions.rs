@@ -484,6 +484,8 @@ fn postfix_expr(
     mut allow_calls: bool,
 ) -> (CompletedMarker, BlockLike) {
     loop {
+        let l0 = p.current();
+        let la = p.nth(1);
         lhs = match p.current() {
             // test stmt_postfix_expr_ambiguity
             // fn foo() {
@@ -506,7 +508,7 @@ fn postfix_expr(
             T![@] => verus::view_expr(p, lhs),
             T![is] => verus::is_expr(p, lhs),
             T![->] => verus::arrow_expr(p, lhs),
-            T![matches] => verus::matches_expr(p, lhs),
+            T![matches] if la != T![!] => verus::matches_expr(p, lhs),
             T![-] => {
                 if p.nth_at(1, T![>]) {
                     verus::arrow_expr(p, lhs)

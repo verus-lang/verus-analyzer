@@ -1,10 +1,20 @@
 use vstd::prelude::*;
 
-fn normal_assert() {
-    assert!(1 > 0);
+fn normal_code() {
+    //assert!(1 > 0);
+    matches!(x, SizeInfo::Sized { .. })
 }
 
 /*
+verus! {
+
+spec fn walks_upright(l: Life) -> bool
+{
+    l matches Life::Mammal{legs, ..} ==> legs==2
+}
+
+}
+
 fn check(attrs: Vec<u64>) {
     for attr in attrs {
         ()
