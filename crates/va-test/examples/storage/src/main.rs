@@ -1,12 +1,19 @@
 use vstd::prelude::*;
 
+
+fn check(attrs: Vec<u64>) {
+    for attr in attrs {
+        ()
+    }
+}
+
 verus! {
+/*
 
 #[verus::line_count::ignore]
 pub const A: u64 = 0;
 
 
-/*
 trait T { }
 
 spec fn v<K>()

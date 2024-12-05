@@ -499,7 +499,8 @@ fn for_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     patterns::pattern(p);
     p.expect(T![in]);
     // verus allows us to (optionally) name the iterator
-    if p.at(IDENT) {
+    let la = p.nth(1);
+    if p.at(IDENT) && la == T![:] {
         let m = p.start();
         p.bump(IDENT);
         m.complete(p, NAME);
