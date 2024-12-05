@@ -48,9 +48,9 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     // we don't make verus_item in a separate item in ungrammar file
     // "verus!{" and the closing "}" will be thrown away by the parser
     // this is to avoid additional hassel to make this new item to work with the rest of many rust-analyzer features
-    if p.at(T![verus]) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+    if p.at_contextual_kw(T![verus]) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
         let m = p.start();
-        p.bump(T![verus]);
+        p.eat_contextual_kw(T![verus]);
         p.bump(T![!]);
         p.bump(T!['{']);
         m.abandon(p);
@@ -285,6 +285,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     let la = p.nth(1);
+    if p.at_contextual_kw(T![global]) { // verus
+        verus::global_clause(p, m);
+        return Ok(());
+    }
     match p.current() {
         T![extern] if la == T![crate] => extern_crate(p, m),
         T![use] => use_item::use_(p, m),
@@ -295,7 +299,6 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         // verus
         T![tracked] | T![ghost] if p.nth(1) == T![struct] => adt::strukt(p, m),
         T![tracked] | T![ghost] if p.nth(1) == T![enum] => adt::enum_(p, m),
-        // T![global] => verus::global_clause(p, m),
         T![enum] => adt::enum_(p, m),
         IDENT if p.at_contextual_kw(T![union]) && p.nth(1) == IDENT => adt::union(p, m),
 

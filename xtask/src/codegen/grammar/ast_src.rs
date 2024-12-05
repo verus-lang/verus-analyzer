@@ -129,7 +129,6 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "while",
         "yield",
         // verus keywords that currently *need* to be treated as 1st class keywords, based on the parser's current design
-        "verus",
         "ghost",
         "tracked",
         "forall",
@@ -150,6 +149,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "asm",
         "format_args",
         // Most Verus keywords need to be conditional, since we otherwise preclude them from being used as function names, variables, etc.
+        "verus",
         "group",    // verus: Only a key word when it follows 'broadcast'
         "any",      // verus: Only a key word when following 'open_invariants'
         "none",     // verus: Only a key word when following 'open_invariants'
@@ -177,6 +177,11 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "open",
         "closed",
         "opens_invariants",
+        // global-related keywords
+        "size_of",
+        "layout",
+        "size",
+        "align",
     ],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING", "C_STRING"],
     tokens: &["ERROR", "IDENT", "WHITESPACE", "LIFETIME_IDENT", "COMMENT", "SHEBANG"],
