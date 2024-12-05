@@ -1,6 +1,12 @@
 use vstd::prelude::*;
 
 verus! {
+
+#[verus::line_count::ignore]
+pub const A: u64 = 0;
+
+
+/*
 trait T { }
 
 spec fn v<K>()
@@ -13,7 +19,6 @@ spec fn v<K>()
 }
 
 
-/*
 global size_of usize == 4;
 
 global size_of S == 8;

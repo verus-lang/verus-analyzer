@@ -48,9 +48,9 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     // we don't make verus_item in a separate item in ungrammar file
     // "verus!{" and the closing "}" will be thrown away by the parser
     // this is to avoid additional hassel to make this new item to work with the rest of many rust-analyzer features
-    if p.at(T![verus]) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+    if p.at_contextual_kw(T![verus]) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
         let m = p.start();
-        p.bump(T![verus]);
+        p.eat_contextual_kw(T![verus]);
         p.bump(T![!]);
         p.bump(T!['{']);
         m.abandon(p);
