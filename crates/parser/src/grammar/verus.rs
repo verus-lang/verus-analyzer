@@ -212,7 +212,9 @@ pub(crate) fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
         // end of assert_expr
     } else {
         // parse optional 'proof block'
-        expressions::block_expr(p);
+        if p.at(T!['{']) {
+            expressions::block_expr(p);
+        }
     }
 
     m.complete(p, ASSERT_EXPR)
