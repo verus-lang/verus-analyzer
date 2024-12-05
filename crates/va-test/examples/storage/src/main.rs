@@ -1,6 +1,10 @@
 use vstd::prelude::*;
 
+fn normal_assert() {
+    assert!(1 > 0);
+}
 
+/*
 fn check(attrs: Vec<u64>) {
     for attr in attrs {
         ()
@@ -8,7 +12,6 @@ fn check(attrs: Vec<u64>) {
 }
 
 verus! {
-/*
 
 #[verus::line_count::ignore]
 pub const A: u64 = 0;
@@ -78,7 +81,7 @@ spec fn test(a: bool, b:bool) -> bool {
 }
 */
 
-}
+//}
 
 
 fn main() { }

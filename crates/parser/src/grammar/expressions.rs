@@ -27,7 +27,8 @@ pub(super) fn expr_stmt(
 ) -> Option<(CompletedMarker, BlockLike)> {
     // verus
     // entry(1/2) for assert/assume
-    if p.at_contextual_kw(T![assert]) || p.at_contextual_kw(T![assume]) {
+    let la = p.nth(1);
+    if (p.at_contextual_kw(T![assert]) || p.at_contextual_kw(T![assume])) && la != T![!] {
         let m = m.unwrap_or_else(|| {
             let m = p.start();
             attributes::outer_attrs(p);
@@ -42,7 +43,7 @@ pub(super) fn expr_stmt(
             attributes::outer_attrs(p);
             m
         });
-        let pred_expr = verus::verus_closure_expr(p, Some(m), false); //if p.at_contextual_kw(T![assert]) { verus::assert(p, m) } else { verus::assume(p, m) };
+        let pred_expr = verus::verus_closure_expr(p, Some(m), false);
         return Some((pred_expr, BlockLike::NotBlock));
     }
 
@@ -94,7 +95,8 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 
     // verus
     // entry(2/2) for assert/assume
-    if p.at_contextual_kw(T![assert]) || p.at_contextual_kw(T![assume]) {
+    let la = p.nth(1);
+    if (p.at_contextual_kw(T![assert]) || p.at_contextual_kw(T![assume])) && la != T![!] {
         let m1 = p.start();
         if p.at_contextual_kw(T![assert]) {
             verus::assert(p, m1);
