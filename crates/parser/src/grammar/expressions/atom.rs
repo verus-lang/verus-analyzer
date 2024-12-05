@@ -91,6 +91,7 @@ pub(super) fn atom_expr(
         return Some(path_expr(p, r));
     }
     let la = p.nth(1);
+    let lb = p.nth(2);
     let done = match p.current() {
         T!['('] => tuple_expr(p),
         T!['['] => array_expr(p),
@@ -170,7 +171,14 @@ pub(super) fn atom_expr(
             stmt_list(p);
             m.complete(p, BLOCK_EXPR)
         }
-
+        T![|] if la == T![|] && lb == T![|] => { // verus
+            let m = p.start();
+            p.bump(T![|]);
+            p.bump(T![|]);
+            p.bump(T![|]);
+            expr_no_struct(p);
+            m.complete(p, BIN_EXPR) 
+        }
         T![const] | T![static] | T![async] | T![move] | T![|] => closure_expr(p),
         T![forall] | T![exists] | T![choose] => verus::verus_closure_expr(p, None, r.forbid_structs), // verus
         T![for] if la == T![<] => closure_expr(p),
