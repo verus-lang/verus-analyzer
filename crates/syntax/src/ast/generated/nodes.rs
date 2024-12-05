@@ -1866,11 +1866,16 @@ pub struct VerusGlobal {
     pub(crate) syntax: SyntaxNode,
 }
 impl ast::HasAttrs for VerusGlobal {}
-impl ast::HasName for VerusGlobal {}
 impl VerusGlobal {
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    pub fn align_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![align]) }
     pub fn global_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![global]) }
+    pub fn is_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![is]) }
+    pub fn layout_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![layout]) }
+    pub fn size_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![size]) }
+    pub fn size_of_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![size_of]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -5136,7 +5141,6 @@ impl AstNode for AnyHasName {
                 | TYPE_PARAM
                 | UNION
                 | VARIANT
-                | VERUS_GLOBAL
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {

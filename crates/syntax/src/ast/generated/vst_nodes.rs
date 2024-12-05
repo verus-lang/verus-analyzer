@@ -1314,8 +1314,13 @@ pub struct VariantList {
 pub struct VerusGlobal {
     pub attrs: Vec<Attr>,
     pub global_token: bool,
-    pub name: Box<Name>,
+    pub size_of_token: bool,
     pub ty: Option<Box<Type>>,
+    pub layout_token: bool,
+    pub is_token: bool,
+    pub size_token: bool,
+    pub comma_token: bool,
+    pub align_token: bool,
     pub semicolon_token: bool,
     pub cst: Option<super::nodes::VerusGlobal>,
 }
@@ -4753,15 +4758,16 @@ impl TryFrom<super::nodes::VerusGlobal> for VerusGlobal {
                 .map(Attr::try_from)
                 .collect::<Result<Vec<Attr>, String>>()?,
             global_token: item.global_token().is_some(),
-            name: Box::new(
-                item.name()
-                    .ok_or(format!("{}", stringify!(name)))
-                    .map(|it| Name::try_from(it))??,
-            ),
+            size_of_token: item.size_of_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
                 None => None,
             },
+            layout_token: item.layout_token().is_some(),
+            is_token: item.is_token().is_some(),
+            size_token: item.size_token().is_some(),
+            comma_token: item.comma_token().is_some(),
+            align_token: item.align_token().is_some(),
             semicolon_token: item.semicolon_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -8876,10 +8882,44 @@ impl std::fmt::Display for VerusGlobal {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
+        if self.size_of_token {
+            let mut tmp = stringify!(size_of_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if let Some(it) = &self.ty {
             s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.layout_token {
+            let mut tmp = stringify!(layout_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.is_token {
+            let mut tmp = stringify!(is_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.size_token {
+            let mut tmp = stringify!(size_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.align_token {
+            let mut tmp = stringify!(align_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
         if self.semicolon_token {
@@ -11306,12 +11346,17 @@ impl VariantList {
     }
 }
 impl VerusGlobal {
-    pub fn new(name: Name) -> Self {
+    pub fn new() -> Self {
         Self {
             attrs: vec![],
             global_token: true,
-            name: Box::new(name),
+            size_of_token: true,
             ty: None,
+            layout_token: true,
+            is_token: true,
+            size_token: true,
+            comma_token: true,
+            align_token: true,
             semicolon_token: true,
             cst: None,
         }
