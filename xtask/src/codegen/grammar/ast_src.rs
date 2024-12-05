@@ -177,6 +177,11 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "open",
         "closed",
         "opens_invariants",
+        // global-related keywords
+        "size_of",
+        "layout",
+        "size",
+        "align",
     ],
     literals: &["INT_NUMBER", "FLOAT_NUMBER", "CHAR", "BYTE", "STRING", "BYTE_STRING", "C_STRING"],
     tokens: &["ERROR", "IDENT", "WHITESPACE", "LIFETIME_IDENT", "COMMENT", "SHEBANG"],

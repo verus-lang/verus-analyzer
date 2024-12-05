@@ -792,7 +792,7 @@ TriggerAttribute =
 
 VerusGlobal =
   Attr*
-  'global' Name Type op:('==') value:('int_number') ';'
+  'global' (('size_of' Type op:('==') value:('int_number')) | ('layout' Type 'is' 'size' op:('==') value:('int_number') ',' 'align' op:('==') value:('int_number') )) ';'
 
 BroadcastUseList =
   Path (',' Path)* ','?

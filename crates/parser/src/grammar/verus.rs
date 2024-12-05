@@ -1,3 +1,5 @@
+use types::type_no_bounds;
+
 use super::{items::ITEM_RECOVERY_SET, *};
 
 // referenced atom::closure_expr
@@ -526,16 +528,28 @@ pub(crate) fn trigger_attribute(p: &mut Parser<'_>, inner:bool) -> CompletedMark
     m.complete(p, TRIGGER_ATTRIBUTE)
 }
 
-// pub(crate) fn global_clause(p: &mut Parser<'_>, m: Marker) {
-//     println!("global_clause");
-//     //global size_of usize == 8;
-//     p.bump(T![global]);
-//     // name(p);
-//     // name(p);
-//     p.expect(T![==]);
-//     p.expect(INT_NUMBER);
-//     p.expect(T![;]);
-
-//     m.complete(p, VERUS_GLOBAL);
-//     todo!("are we ehre yet?")
-// }
+pub(crate) fn global_clause(p: &mut Parser<'_>, m: Marker) {
+    //global size_of usize == 8;
+    p.eat_contextual_kw(T![global]);
+    if p.at_contextual_kw(T![size_of]) {
+        // global size_of usize == 8;
+        p.eat_contextual_kw(T![size_of]);
+        type_no_bounds(p);
+        p.expect(T![==]);
+        p.expect(INT_NUMBER);
+    } else {
+        // global layout S<u64> is size == 16, align == 8;
+        p.expect_contextual_kw(T![layout]);
+        type_no_bounds(p);
+        p.expect(T![is]);
+        p.expect_contextual_kw(T![size]);
+        p.expect(T![==]);
+        p.expect(INT_NUMBER);
+        p.expect(T![,]);
+        p.expect_contextual_kw(T![align]);
+        p.expect(T![==]);
+        p.expect(INT_NUMBER);
+    }
+    p.expect(T![;]);
+    m.complete(p, VERUS_GLOBAL);
+}
