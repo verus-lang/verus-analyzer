@@ -126,8 +126,11 @@ export async function getVerus(
         if (process.platform === "win32") { 
             platform = "win" 
             release_dir = "verus-x86-win";
-        } else if (process.platform === "darwin") { 
-            platform = "macos" 
+        } else if (process.platform === "darwin" && process.arch === "x64") {
+            platform = "x86-macos";
+            release_dir = "verus-x86-macos";
+        } else if (process.platform === "darwin") {
+            platform = "arm64-macos";
             release_dir = "verus-arm64-macos";
         } else if (process.platform === "linux") { 
             platform = "linux" 
