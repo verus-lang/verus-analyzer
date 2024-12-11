@@ -1,14 +1,10 @@
 name: release
 on:
-  schedule:
-    - cron: "0 0 1 1 *" # midnight UTC (once a year until we repair the workflow)
-
   workflow_dispatch:
 
   push:
     branches:
       - release
-      - trigger-nightly
 
 env:
   CARGO_INCREMENTAL: 0
@@ -101,7 +97,7 @@ jobs:
         working-directory: editors/code
 
       - name: Package Extension (release)
-        if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/infra') && matrix.code-target
+        if: github.ref == 'refs/heads/release' && matrix.code-target
         run: npx vsce package -o "../../dist/verus-analyzer-${{ matrix.code-target }}.vsix" --target ${{ matrix.code-target }}
         working-directory: editors/code
 
@@ -257,7 +253,7 @@ jobs:
         working-directory: ./editors/code
 
       - name: Publish Extension (Code Marketplace, release)
-        if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/infra') && github.repository == 'verus-lang/verus-analyzer'
+        if: github.ref == 'refs/heads/release' && github.repository == 'verus-lang/verus-analyzer'
         working-directory: ./editors/code
         # token from https://dev.azure.com/verus-analyzer/
         run: |
