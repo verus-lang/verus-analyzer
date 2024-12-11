@@ -72,6 +72,9 @@ For example, inside `verus/dependencies/syn/src/items.rs`, refer to `impl parse 
 
 #### Modifying `syntax` and `parser` crates
 Inside the `crates` directory, we need to modify several crates, but most changes will be made on the `parser` and `syntax` crates.
+FWIW, these articles provide some helpful background on the philosophy behind how those crates work.
+- [Introducing Ungrammar](https://rust-analyzer.github.io//blog/2020/10/24/introducing-ungrammar.html)
+- [Simple but Powerful Pratt Parsing](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html)
 
 1. Add a testcase to `crates/syntax/src/lib.rs`.
 2. Update `syntax/rust.ungram` with the new syntax. Also, update `xtask/src/codegen/grammar/ast_src.rs` for newly introduced tokens if there are any. 
