@@ -15,27 +15,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Install latest rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
-          override: true
+      # Install Verus, so we can test proof actions
+      - name: Install Verus' Toolchain Dependencies
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL "https://sh.rustup.rs" | sh -s -- --profile minimal --default-toolchain none -y
+          echo "${CARGO_HOME:-$HOME/.cargo}/bin" >> $GITHUB_PATH
 
-      - name: test syntax
+      - name: Install Rust Toolchain
+        run: |
+          rustup update --no-self-update stable
+          rustup install 1.79.0-x86_64-unknown-linux-gnu
+
+      - name: Get the URL for the latest Verus release
+        id: verus-release-info
+        run: |
+          jq --version
+          echo "VERUS_URL=$(curl -s https://api.github.com/repos/verus-lang/verus/releases | jq -r '.[].assets[].browser_download_url' | grep x86-linux -)" >> $GITHUB_OUTPUT
+
+      - name: Download the latest Verus release
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf ${{ steps.verus-release-info.outputs.VERUS_URL }} -o verus.zip; unzip verus.zip
+
+#      - name: Install latest rust toolchain
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          toolchain: stable
+#          default: true
+#          override: true
+
+      - name: Test Syntax
         run: cargo test --package syntax --lib
-      
-      # TODO: test all proof action
-      # TODO: env variable for verus_fmt, verus
-      # - name: test proof action
-        # run: cargo test --package ide-assists --lib -- handlers::proof_action::wp_move_assertion::tests::wp_lemma_call --exact --nocapture
 
-      #- name: build default
-      #  run: cargo xtask dist
+      - name: Test Proof Actions
+        env:
+          VERUS_BINARY_PATH: ./verus-x86-linux/verus
+        run: cargo test --package ide-assists --lib -- handlers::proof_action
 
-      - name: build proof action version
+      - name: Build Proof-Action Version of the LSP-Server
         run: cargo xtask dist --proof-action
-
-# TODO: more test
-# TODO: auto-merge upstream
-# TODO: add CI to test parsing on example/syntax.rs file from verus repo
