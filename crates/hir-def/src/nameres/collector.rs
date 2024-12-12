@@ -1831,13 +1831,13 @@ impl ModCollector<'_, '_> {
                     );
                 }
                 ModItem::VerusGlobal(_id) => {
-                    print!("ModCollector::Collect -> VerusGlobal not handled");
+                    //print!("ModCollector::Collect -> VerusGlobal not handled");
                 }
                 ModItem::BroadcastUse(_id) => {
-                    print!("ModCollector::Collect -> BroadcastUse not handled");
+                    //print!("ModCollector::Collect -> BroadcastUse not handled");
                 }
                 ModItem::BroadcastGroup(_id) => {
-                    print!("ModCollector::Collect -> BroadcastGroup not handled");
+                    //print!("ModCollector::Collect -> BroadcastGroup not handled");
                 }
             }
         };
