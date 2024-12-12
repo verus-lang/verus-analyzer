@@ -111,6 +111,7 @@ proof fn test_intro_forall_implies1() {
   assert forall|x: int, y: int| x <= y implies twice(x) <= twice(y) by {
         reveal(twice);
     }
+    
 }
 ",
         )

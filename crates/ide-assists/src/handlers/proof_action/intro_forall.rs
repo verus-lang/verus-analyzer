@@ -91,6 +91,7 @@ proof fn test_intro_forall() {
   assert forall|x: int, y: int| twice(x) + twice(y) == x * 2 + y * 2 by {
         reveal(twice);
     }
+    
 }
 ",
         )
