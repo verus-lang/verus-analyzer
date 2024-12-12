@@ -565,6 +565,9 @@ fn verus_walkthrough1() {
             {
                 assert(x + y < 200);
             }
+        fn test(a: u8) {
+            assert(a & 0 == 0) by (bit_vector)
+        }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
     dbg!(&parse.errors);
@@ -847,6 +850,9 @@ fn verus_walkthrough7() {
                 f1(x) < 100 && f1(y) < 100 ==> my_spec_fun(x, y) >= x
             );
         }
+        
+        #[verus::line_count::ignore]
+        pub const A: u64 = 0;
 
         fn test() {
             assert(p % p == 0) by (nonlinear_arith)
@@ -2033,6 +2039,130 @@ fn lemma_mul_by_zero_is_zero()
     assert forall|x: int| #![trigger x * 0] #![trigger 0 * x] x * 0 == 0 && 0 * x == 0 by {
         lemma_mul_basics(x);
     }
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_triple_ops() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+spec fn test(a: bool, b:bool) -> bool {
+    ||| {
+        a
+    }
+    ||| b
+}
+proof fn tester(a: bool, b:bool)
+    requires
+        ({ 
+            let x = a;
+            ||| a == true
+        }),
+{
+}
+proof fn testp(a: bool, b:bool) 
+    requires 
+        ({
+            ||| { a }
+            ||| b
+        }),
+    ensures true,
+{
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_globals() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+global size_of usize == 4;
+
+global size_of S == 8;
+
+global size_of S<u64> == 8;
+
+global size_of S<U> == 8;
+
+global layout S is size == 8, align == 8;
+
+global layout S<u64> is size == 16, align == 8;
+
+global layout S<u32> is size == 8, align == 4;
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_normal_rust() {
+    use ast::HasModuleItem;
+    let source_code = "
+fn check(attrs: Vec<u64>) {
+    assert!(1 > 0);
+    for attr in attrs {
+        ()
+    }
+}
+";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
+fn verus_fn_signatures() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+trait T { }
+
+spec fn v<K>()
+        where 
+            K: T,
+        recommends
+            true,
+{
+    ()
 }
 }";
 
