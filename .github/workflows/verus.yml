@@ -45,6 +45,8 @@ jobs:
 #          override: true
 
       - name: Debug verus location
+        env:
+          VERUS_BINARY_PATH: ./verus-x86-linux/verus
         run: |
           echo working directory
           pwd
@@ -54,6 +56,10 @@ jobs:
           ls -la verus-x86-linux
           echo contents of parent
           ls -la ..
+          echo Verus binary env
+          echo $VERUS_BINARY_PATH
+          echo Verus binary info
+          ls -la $VERUS_BINARY_PATH
 
       - name: Test Syntax
         run: cargo test --package syntax --lib
