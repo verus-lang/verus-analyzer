@@ -120,7 +120,7 @@
       "name": "Attach To Server",
       "type": "lldb",
       "request": "attach",
-      "program": "${workspaceFolder}/target/debug/rust-analyzer",
+      "program": "${workspaceFolder}/target/debug/verus-analyzer",
       "pid": "${command:pickMyProcess}",
       "sourceLanguages": [
         "rust"
