@@ -695,6 +695,10 @@ fn verus_walkthrough3() {
             if exists|i: int| 0 <= i {
                 let x = 1;
             }
+            if exists|i: int| 0 <= start <= i < stop <= s.len() && s[i] == x {
+                let index = choose|i: int| 0 <= start <= i < stop <= s.len() && s[i] == x;
+                assert(s.subrange(start, stop)[index - start] == s[index]);
+            }
         }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
@@ -2010,6 +2014,39 @@ pub fn spawn(f: F)
     }
 }
 
+#[test]
+fn verus_triggers() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn lemma()
+    ensures
+        #[trigger]
+        true,
+{
+}
+
+fn lemma_mul_by_zero_is_zero()
+    ensures
+        #![trigger x]
+        true,
+{
+    assert forall|x: int| #![trigger x * 0] #![trigger 0 * x] x * 0 == 0 && 0 * x == 0 by {
+        lemma_mul_basics(x);
+    }
+}
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
 
 #[test]
 fn cst_to_vst1() {
