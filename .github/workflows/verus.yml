@@ -44,6 +44,17 @@ jobs:
 #          default: true
 #          override: true
 
+      - name: Debug verus location
+        run: |
+          echo working directory
+          pwd
+          echo contents of working directory
+          ls -la
+          echo contents of verus-86-linux
+          ls -la verus-x86-linux
+          echo contents of parent
+          ls -la ..
+
       - name: Test Syntax
         run: cargo test --package syntax --lib
 
