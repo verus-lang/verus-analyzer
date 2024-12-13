@@ -1,9 +1,18 @@
+#![allow(non_snake_case)]
+#![allow(dead_code)]
 //use vstd::prelude::*;
+use storage_macros::Hello;
 
-verus! {
-    pub broadcast group all_the_axioms {
-        axiom_jay_lorch
-    }
+
+//verus! {
+
+#[derive(Hello)]
+struct TestKey {
+    val: u64,
 }
 
-fn main() { }
+//}
+
+fn main() { 
+    say_hello_TestKey();
+}
