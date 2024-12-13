@@ -369,6 +369,19 @@
                 }
             },
             {
+                "title": "verus",
+                "properties": {
+                    "verus-analyzer.verus.verusBinary": {
+                        "type": [
+                            "null",
+                            "string"
+                        ],
+                        "default": null,
+                        "description": "Path to a custom Verus binary"
+                    }
+                }
+            },
+            {
                 "title": "runnables",
                 "properties": {
                     "verus-analyzer.runnables.extraEnv": {

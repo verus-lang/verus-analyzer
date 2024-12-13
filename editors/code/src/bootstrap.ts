@@ -85,16 +85,16 @@ export async function getVerus(
     context: vscode.ExtensionContext,
     _config: Config,
 ): Promise<string|undefined> {
-    // TODO: Add a config flag for setting the Verus binary path
-
-    // const explicitPath = process.env["__RA_LSP_SERVER_DEBUG"] ?? config.serverPath;
-    // if (explicitPath) {
-    //     if (explicitPath.startsWith("~/")) {
-    //         return os.homedir() + explicitPath.slice("~".length);
-    //     }
-    //     return explicitPath;
-    // }
-
+    const explicitPath: string | null | undefined = vscode.workspace.getConfiguration("verus-analyzer.verus").get("verusBinary");
+    log.info("Explicit path to Verus binary: ", explicitPath);
+    if (explicitPath != null) {
+        if (explicitPath.startsWith("~/")) {
+            const absPath = os.homedir() + explicitPath.slice("~".length);
+            log.info("Absolute path to Verus binary:", absPath);
+            return os.homedir() + explicitPath.slice("~".length);
+        }
+        return explicitPath;
+    }
     const target_dir = vscode.Uri.joinPath(context.extensionUri, "verus");
     const ext = process.platform === "win32" ? ".exe" : "";
     const target_binary = vscode.Uri.joinPath(target_dir, `verus${ext}`);
