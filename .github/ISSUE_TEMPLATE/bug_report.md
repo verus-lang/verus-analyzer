@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a bug report for rust-analyzer.
+about: Create a bug report for verus-analyzer.
 title: ''
 labels: 'C-bug'
 assignees: ''
@@ -8,25 +8,20 @@ assignees: ''
 ---
 
 <!--
-Troubleshooting guide: https://rust-analyzer.github.io/manual.html#troubleshooting
-Forum for questions: https://users.rust-lang.org/c/ide/14
-
-Before submitting, please make sure that you're not running into one of these known issues:
-
- 1. on-the-fly diagnostics are mostly unimplemented (`cargo check` diagnostics will be shown when saving a file): #3107
+Forum for questions: https://verus-lang.zulipchat.com/
 
 Otherwise please try to provide information which will help us to fix the issue faster. Minimal reproducible examples with few dependencies are especially lovely <3.
+
+Please keep in mind that this software is experimental: some features are likely broken. At present, it works best on small, self-contained Verus projects. Anything more complex will likely fail. You may file issues, but we do not currently have dedicated engineering support for verus-analyzer, so your issue may not be addressed. Pull requests with fixes are always welcome, although it is unlikely they will be reviewed immediately.
 -->
 
-**rust-analyzer version**: (eg. output of "rust-analyzer: Show RA Version" command, accessible in VSCode via <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
-
-**rustc version**: (eg. output of `rustc -V`)
+**verus-analyzer version**: (eg. output of "verus-analyzer: Show RA Version" command, accessible in VSCode via <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
 
 **editor or extension**: (eg. VSCode, Vim, Emacs, etc. For VSCode users, specify your extension version; for users of other editors, provide the distribution if applicable)
 
 **relevant settings**: (eg. client settings, or environment variables like `CARGO`, `RUSTC`, `RUSTUP_HOME` or `CARGO_HOME`)
 
-**repository link (if public, optional)**: (eg. [rust-analyzer](https://github.com/rust-lang/rust-analyzer))
+**repository link (if public, optional)**: (eg. [verus-analyzer](https://github.com/verus-lang/verus-analyzer))
 
 **code snippet to reproduce**: 
 ```rust
