@@ -3,13 +3,12 @@ import * as os from "os";
 import type { Config } from "./config";
 import { type Env, log } from "./util";
 import type { PersistentState } from "./persistent_state";
-import { exec, spawnSync } from "child_process";
+import { exec, execFile, spawnSync } from "child_process";
 import fetch from "cross-fetch";
 //import * as which from 'which';
 //import which from "which";
 import which = require("which");
 import * as fs from 'fs';
-import { execFile } from 'child_process';
 import { promisify } from 'util';
 
 export async function bootstrap(
@@ -44,6 +43,7 @@ async function getServer(
     state: PersistentState,
 ): Promise<string | undefined> {
     const explicitPath = process.env["__RA_LSP_SERVER_DEBUG"] ?? config.serverPath;
+    log.info("Explicit path to Verus Analyzer server binary: ", explicitPath);
     if (explicitPath) {
         if (explicitPath.startsWith("~/")) {
             return os.homedir() + explicitPath.slice("~".length);
@@ -51,6 +51,7 @@ async function getServer(
         return explicitPath;
     }
     if (config.package.releaseTag === null) {
+        log.info("release tag is null");
         return "verus-analyzer";
     }
 
@@ -60,6 +61,7 @@ async function getServer(
         () => true,
         () => false,
     );
+    log.info("Bundled server exists: ", bundledExists);
     if (bundledExists) {
         let server = bundled;
         if (await isNixOs()) {
@@ -80,6 +82,28 @@ async function getServer(
     return undefined;
 }
 
+export async function getVerusVersion(
+    verusPath: string | undefined,
+): Promise<string> {
+    log.info("Getting Verus version using Verus binary: ", verusPath);
+    if (verusPath == undefined) {
+        return "unknown";
+    }
+    const { stdout } = await execFileAsync(verusPath, [ "--version" ]);
+    const version_regex : RegExp = /Version: (.*)/m;
+    const matches = version_regex.exec(stdout);
+    if (matches != null && matches.length > 1) {
+        log.info("Found Verus version: ", matches[1]);
+        if (matches[1] == undefined) {
+            // TODO: This shouldn't be necessary.  Seems like a limitation of TypeScript's type system.
+            return "unknown";
+        }
+        return matches[1];
+    } else {
+        log.info("Failed to find Verus version in: ", stdout);
+        return "unknown";
+    }
+}
 
 export async function getVerus(
     context: vscode.ExtensionContext,

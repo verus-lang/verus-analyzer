@@ -21,7 +21,7 @@ import {
 } from "./dependencies_provider";
 import { execRevealDependency } from "./commands";
 import { PersistentState } from "./persistent_state";
-import { bootstrap, getVerus, validRustToolchain} from "./bootstrap";
+import { bootstrap, getVerus, getVerusVersion, validRustToolchain} from "./bootstrap";
 import type { RustAnalyzerExtensionApi } from "./main";
 import type { JsonProject } from "./rust_project";
 import { prepareTestExplorer } from "./test_explorer";
@@ -89,6 +89,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
     private _treeView: vscode.TreeView<Dependency | DependencyFile | DependencyId> | undefined;
     private lastStatus: ServerStatusParams | { health: "stopped" } = { health: "stopped" };
     private _serverVersion: string;
+    private _verusVersion: string;
 
     get serverPath(): string | undefined {
         return this._serverPath;
@@ -96,6 +97,10 @@ export class Ctx implements RustAnalyzerExtensionApi {
 
     get serverVersion(): string | undefined {
         return this._serverVersion;
+    }
+
+    get verusVersion(): string {
+        return this._verusVersion;
     }
 
     get client() {
@@ -118,6 +123,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
         extCtx.subscriptions.push(this);
         this.version = extCtx.extension.packageJSON.version ?? "<unknown>";
         this._serverVersion = "<not running>";
+        this._verusVersion = "unknown";
         this.config = new Config(extCtx);
         this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         if (this.config.testExplorer) {
@@ -221,6 +227,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             const verusPath = await getVerus(this.extCtx, this.config);
             log.info("Using verus binary at", verusPath);
             process.env['VERUS_BINARY_PATH'] = verusPath;
+            this._verusVersion = await getVerusVersion(verusPath);
             const newEnv = Object.assign({}, process.env, this.config.serverExtraEnv);
             const run: lc.Executable = {
                 command: this._serverPath,
@@ -510,6 +517,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
         const toggleCheckOnSave = this.config.checkOnSave ? "Disable" : "Enable";
         statusBar.tooltip.appendMarkdown(
             `[Extension Info](command:analyzer.serverVersion "Show version and server binary info"): Version ${this.version}, Server Version ${this._serverVersion}` +
+                `, Verus Version ${this._verusVersion}` +
                 "\n\n---\n\n" +
                 '[$(terminal) Open Logs](command:verus-analyzer.openLogs "Open the server logs")' +
                 "\n\n" +
