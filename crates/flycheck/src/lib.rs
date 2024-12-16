@@ -479,7 +479,10 @@ impl FlycheckActor {
                 }
 
                 options.apply_on_command(&mut cmd);
-                (cmd, options.extra_args.clone())
+                let args = options.extra_args.clone();
+                eprint!("cargo command: {:?}", cmd);
+                eprint!("cargo args: {:?}", args);
+                (cmd, args)
             }
             FlycheckConfig::CustomCommand {
                 command,
@@ -565,6 +568,7 @@ impl FlycheckActor {
                     .canonicalize()
                     .expect("We expect to succeed with canonicalizing the Verus binary path");
                 let mut cmd = Command::new(verus_exec_path);
+                cmd.env("RUSTFLAGS", "--cfg verus_keep_ghost");
 
                 // Try to locate a Cargo.toml file that might contain custom Verus arguments
                 let file = Path::new(&file);
@@ -673,6 +677,7 @@ impl FlycheckActor {
         };
 
         cmd.args(args);
+        eprint!("verus command: {:?}", cmd);
         cmd
     }
 
