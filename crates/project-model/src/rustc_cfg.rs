@@ -65,6 +65,7 @@ fn get_rust_cfgs(
 ) -> anyhow::Result<String> {
     let sysroot = match config {
         RustcCfgConfig::Cargo(sysroot, cargo_toml) => {
+            eprint!("project-model running get_rust_cfgs\n");
             let mut cmd = sysroot.tool(Tool::Cargo);
 
             cmd.envs(extra_env);

@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-storage-macros = { path = "../storage-macros" }
+sm = { path = "../sm" }
 
 [workspace]
 
+[package.metadata.verus.ide]
+extra_args = "--extern=sm=../sm/target/debug/libsm.dylib"

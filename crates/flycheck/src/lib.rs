@@ -450,8 +450,10 @@ impl FlycheckActor {
         package: Option<&str>,
         saved_file: Option<&AbsPath>,
     ) -> Option<Command> {
+        eprint!("check_command\n");
         let (mut cmd, args) = match &self.config {
             FlycheckConfig::CargoCommand { command, options, ansi_color_output } => {
+                eprint!("check_command: CargoCommand\n");
                 let mut cmd = Command::new(Tool::Cargo.path());
                 if let Some(sysroot_root) = &self.sysroot_root {
                     cmd.env("RUSTUP_TOOLCHAIN", AsRef::<std::path::Path>::as_ref(sysroot_root));
@@ -491,6 +493,7 @@ impl FlycheckActor {
                 invocation_strategy,
                 invocation_location,
             } => {
+                eprint!("check_command: CustomCommand\n");
                 let mut cmd = Command::new(command);
                 cmd.envs(extra_env);
 
@@ -536,6 +539,7 @@ impl FlycheckActor {
                 }
             }
             FlycheckConfig::VerusCommand { args: _ } => {
+                eprint!("check_command: VerusCommand\n");
                 return None;
             } // Verus doesn't have a check mode (yet)
         };
@@ -546,6 +550,7 @@ impl FlycheckActor {
 
     // copied from above check_command
     fn run_verus(&self, file: String) -> Command {
+        eprint!("run_verus\n");
         let (mut cmd, args) = match &self.config {
             FlycheckConfig::CargoCommand { .. } => {
                 panic!("verus analyzer does not yet support cargo commands")
@@ -554,6 +559,7 @@ impl FlycheckActor {
                 panic!("verus analyzer does not yet support custom commands")
             }
             FlycheckConfig::VerusCommand { args } => {
+                eprint!("run_verus: VerusCommand");
                 let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
                     Ok(path) => path,
                     Err(_) => {
@@ -581,6 +587,7 @@ impl FlycheckActor {
                         for line in toml.lines() {
                             if found_verus_settings {
                                 if line.contains("extra_args") {
+                                    eprint!("found extra_args in Cargo.toml\n");
                                     let start = "extra_args".len() + 1;
                                     let mut arguments =
                                         line[start..line.len() - 1].trim().to_string();
@@ -605,6 +612,7 @@ impl FlycheckActor {
                             }
                             if line.contains("[package.metadata.verus.ide]") {
                                 found_verus_settings = true;
+                                eprint!("found verus settings header in Cargo.toml\n");
                             }
                         }
                         toml_dir = Some(ans.to_path_buf());
