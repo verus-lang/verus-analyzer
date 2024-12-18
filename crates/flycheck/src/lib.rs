@@ -622,12 +622,12 @@ impl FlycheckActor {
                         // This file appears to be part of a Rust project.
                         // If it's not the root file, then we need to
                         // invoke Verus on the root file and then filter for results in the current file
-                        let root_file = if toml_dir.join("src/main.rs").exists() {
-                            Some(toml_dir.join("src/main.rs"))
-                        } else if toml_dir.join("src/lib.rs").exists() {
+                        let root_file = if toml_dir.join("src").join("main.rs").exists() {
+                            Some(toml_dir.join("src").join("main.rs"))
+                        } else if toml_dir.join("src").join("lib.rs").exists() {
                             args.push("--crate-type".to_string());
                             args.push("lib".to_string());
-                            Some(toml_dir.join("src/lib.rs"))
+                            Some(toml_dir.join("src").join("lib.rs"))
                         } else {
                             None
                         };
@@ -639,7 +639,7 @@ impl FlycheckActor {
                                         .unwrap()
                                         .to_str()
                                         .unwrap()
-                                        .replace("/", "::")
+                                        .replace(std::path::MAIN_SEPARATOR_STR, "::")
                                         .replace(".rs", ""),
                                 );
 
