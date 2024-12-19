@@ -1,10 +1,10 @@
+use vstd::prelude::*;
+
 verus! {
 
-spec fn lemma_div_basics(a:bool, b:bool)
-{
-    a <== b
+spec fn wrapping_add_u8() -> u8 {
+    <u8>::MAX
 }
-
 
 } // verus!
 
