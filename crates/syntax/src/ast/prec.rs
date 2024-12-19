@@ -156,6 +156,7 @@ impl Expr {
                         And => (9, 10),
                         // verus
                         Imply => (0, 0),
+                        Iff => (0, 0),
                     },
                     CmpOp(_) => (11, 11),
                     ArithOp(op) => match op {

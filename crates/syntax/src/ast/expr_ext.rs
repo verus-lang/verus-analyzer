@@ -159,6 +159,7 @@ impl ast::BinExpr {
                 T![||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&] => BinaryOp::LogicOp(LogicOp::And),
                 T![==>]=> BinaryOp::LogicOp(LogicOp::Imply),
+                T![<==>] => BinaryOp::LogicOp(LogicOp::Iff),
 
                 T![==] => BinaryOp::CmpOp(CmpOp::Eq { negated: false }),
                 T![!=] => BinaryOp::CmpOp(CmpOp::Eq { negated: true }),

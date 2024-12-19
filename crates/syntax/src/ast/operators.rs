@@ -36,6 +36,7 @@ pub enum LogicOp {
     Or,
     // verus
     Imply,
+    Iff,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -70,6 +71,7 @@ impl fmt::Display for LogicOp {
             LogicOp::And => "&&",
             LogicOp::Or => "||",
             LogicOp::Imply => "==>",
+            LogicOp::Iff => "<==>",
         };
         f.write_str(res)
     }
