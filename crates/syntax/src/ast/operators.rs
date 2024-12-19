@@ -36,6 +36,7 @@ pub enum LogicOp {
     Or,
     // verus
     Imply,
+    RevImply,
     Iff,
 }
 
@@ -71,6 +72,7 @@ impl fmt::Display for LogicOp {
             LogicOp::And => "&&",
             LogicOp::Or => "||",
             LogicOp::Imply => "==>",
+            LogicOp::RevImply => "<==",
             LogicOp::Iff => "<==>",
         };
         f.write_str(res)

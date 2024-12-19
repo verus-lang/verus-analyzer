@@ -158,10 +158,12 @@ impl ast::BinExpr {
             let bin_op = match c.kind() {
                 T![||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&] => BinaryOp::LogicOp(LogicOp::And),
+                // verus
                 T![|||] => BinaryOp::LogicOp(LogicOp::Or),
                 T![&&&] => BinaryOp::LogicOp(LogicOp::And),
                 T![==>]=> BinaryOp::LogicOp(LogicOp::Imply),
                 T![<==>] => BinaryOp::LogicOp(LogicOp::Iff),
+                T![<==]=> BinaryOp::LogicOp(LogicOp::RevImply),
 
                 T![==] => BinaryOp::CmpOp(CmpOp::Eq { negated: false }),
                 T![!=] => BinaryOp::CmpOp(CmpOp::Eq { negated: true }),

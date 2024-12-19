@@ -1,8 +1,10 @@
 verus! {
 
-spec fn mul_auto(x:bool, y:bool) -> bool {
-    x &&& y
+spec fn lemma_div_basics(a:bool, b:bool)
+{
+    a <== b
 }
+
 
 } // verus!
 

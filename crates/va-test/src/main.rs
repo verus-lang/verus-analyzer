@@ -100,7 +100,7 @@ fn main() {
                         println!("Failed to lift function {:?}: got error: {:?}", foo.name(&db), fn_vst_result);
                         continue;
                     }
-                    let fn_vst: vst::Fn = fn_vst_result.expect("shouldn't have been an Error at this point"); //fn_cst.value.try_into().expect("vst lifting failure");
+                    let _fn_vst: vst::Fn = fn_vst_result.expect("shouldn't have been an Error at this point"); //fn_cst.value.try_into().expect("vst lifting failure");
                     //dbg!(&fn_vst.name);
 
                     // TODO: use the source-level proof rewrite
