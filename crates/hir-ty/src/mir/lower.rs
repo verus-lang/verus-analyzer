@@ -1034,6 +1034,12 @@ impl<'ctx> MirLowerCtx<'ctx> {
                         syntax::ast::LogicOp::Imply => {
                             todo!()
                         }
+                        syntax::ast::LogicOp::RevImply => {
+                            todo!()
+                        }
+                        syntax::ast::LogicOp::Iff => {
+                            todo!()
+                        }
                     };
                     let start_of_then = self.new_basic_block();
                     self.push_assignment(
@@ -1072,6 +1078,8 @@ impl<'ctx> MirLowerCtx<'ctx> {
                                 hir_def::hir::LogicOp::And => BinOp::BitAnd, // FIXME: make these short circuit
                                 hir_def::hir::LogicOp::Or => BinOp::BitOr,
                                 hir_def::hir::LogicOp::Imply => todo!(),
+                                hir_def::hir::LogicOp::RevImply => todo!(),
+                                hir_def::hir::LogicOp::Iff => todo!(),
                             },
                             hir_def::hir::BinaryOp::ArithOp(op) => BinOp::from(op),
                             hir_def::hir::BinaryOp::CmpOp(op) => BinOp::from(op),

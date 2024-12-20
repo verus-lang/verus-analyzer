@@ -53,18 +53,18 @@ fn main() {
     println!("Found {} total modules", all_modules.len());
 
     // Check whether, when parsing each file, we encounter any parse errors
-    for module in all_modules.iter() {
-        let file_id = module.definition_source_file_id(&db).original_file(&db);
-        let crate_name =
-            module.krate().display_name(&db).as_deref().unwrap_or("unknown").to_string();
-        println!("processing crate: {crate_name}, module: {}", vfs.file_path(file_id));
-        let parse = db.parse(file_id);
-        //println!("Got parse: {:?}", parse);
-        println!("Encountered {} parse errors", parse.errors().len());
-        for e in parse.errors() {
-            println!("\tparse error: {:?}", e);
-        }
-    }
+    // for module in all_modules.iter() {
+    //     let file_id = module.definition_source_file_id(&db).original_file(&db);
+    //     let crate_name =
+    //         module.krate().display_name(&db).as_deref().unwrap_or("unknown").to_string();
+    //     println!("processing crate: {crate_name}, module: {}", vfs.file_path(file_id));
+    //     let parse = db.parse(file_id);
+    //     //println!("Got parse: {:?}", parse);
+    //     println!("Encountered {} parse errors", parse.errors().len());
+    //     for e in parse.errors() {
+    //         println!("\tparse error: {:?}", e);
+    //     }
+    // }
 
     let work = all_modules.into_iter().filter(|module| {
         let file_id = module.definition_source_file_id(&db).original_file(&db);
@@ -97,11 +97,11 @@ fn main() {
                     //dbg!(&cst);
                     let fn_vst_result = fn_cst.value.try_into();
                     if fn_vst_result.is_err() {
-                        println!("Failed to lift function: got error: {:?}", fn_vst_result);
+                        println!("Failed to lift function {:?}: got error: {:?}", foo.name(&db), fn_vst_result);
                         continue;
                     }
-                    let fn_vst: vst::Fn = fn_vst_result.expect("shouldn't have been an Error at this point"); //fn_cst.value.try_into().expect("vst lifting failure");
-                    dbg!(&fn_vst.name);
+                    let _fn_vst: vst::Fn = fn_vst_result.expect("shouldn't have been an Error at this point"); //fn_cst.value.try_into().expect("vst lifting failure");
+                    //dbg!(&fn_vst.name);
 
                     // TODO: use the source-level proof rewrite
                     // probably using vst rewriting functions inside proof actions
