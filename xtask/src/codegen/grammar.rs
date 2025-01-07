@@ -737,10 +737,14 @@ fn lower_rule(
             }
             lower_rule(acc, grammar, Some(l), rule, is_vst, inside_opt, inside_alt);
         }
-        Rule::Seq(rules) | Rule::Alt(rules) => {
-            let inside_alt = matches!(rule, Rule::Alt(_));
+        Rule::Seq(rules) => {
             for rule in rules {
                 lower_rule(acc, grammar, label, rule, is_vst, inside_opt, inside_alt);
+            }
+        }
+        Rule::Alt(rules) => {
+            for rule in rules {
+                lower_rule(acc, grammar, label, rule, is_vst, inside_opt, true);
             }
         }
         Rule::Opt(rule) => lower_rule(acc, grammar, label, rule, is_vst, true, inside_alt),
