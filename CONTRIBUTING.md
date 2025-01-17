@@ -34,6 +34,13 @@ considered accepted feel free to just drop a comment and ask!
 Verus runs each time you save a file in your project.  This is primarily implemented in
 `crates/flycheck/lib.rs` in `run_verus`.
 
+## Bumping the expected version of Rust when Verus upgrades to a new version
+
+1. Update the Rust version used in the Verus CI workflow.
+    - Specifically the line `rustup install 1.82.0-x86_64-unknown-linux-gnu` in `.github/workflows/verus.yml`
+2. Update the Rust version the VS Code client looks for during installation
+    - Specifically the line `const TOOLCHAIN_MAJOR = 82;` in `editors/code/src/bootstrap.ts`
+
 ## Adding or Changing Proof Actions
 
 Proof action code primarily lives in `crates/ide-assists/src/`.  In `lib.rs`,
