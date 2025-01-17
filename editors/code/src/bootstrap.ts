@@ -222,7 +222,7 @@ const execFileAsync = promisify(execFile);
 export async function validRustToolchain(): Promise<Boolean> {
     // TODO: Add a config flag for the expected toolchain version
     const TOOLCHAIN_FULL = 1;
-    const TOOLCHAIN_MAJOR = 79;
+    const TOOLCHAIN_MAJOR = 82;
     const TOOLCHAIN_MINOR = 0;
 
     const { path: rustup_executable } = await findRustup();
