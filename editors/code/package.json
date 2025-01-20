@@ -4,8 +4,8 @@
     "description": "Verus language support for Visual Studio Code",
     "private": true,
     "icon": "icon.png",
-    "version": "0.4.225",
-    "releaseTag": "nightly",
+    "version": "0.5.0-dev",
+    "releaseTag": null,
     "publisher": "verus-lang",
     "repository": {
         "url": "https://github.com/verus-lang/verus-analyzer.git",
@@ -29,7 +29,7 @@
     "engines": {
         "vscode": "^1.78.0"
     },
-    
+    "enabledApiProposals": [],
     "scripts": {
         "vscode:prepublish": "npm run build-base -- --minify",
         "package": "vsce package -o verus-analyzer.vsix",
@@ -573,7 +573,7 @@
                 }
             },
             {
-                
+               "title": "$generated-start" 
             },
             {
                 "title": "assist",
@@ -2606,7 +2606,7 @@
                 }
             },
             {
-                
+                "title": "$generated-end"
             }
         ],
         "configurationDefaults": {
