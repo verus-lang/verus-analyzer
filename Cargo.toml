@@ -156,7 +156,7 @@ tracing-subscriber = { version = "0.3.18", default-features = false, features = 
 ] }
 triomphe = { version = "0.1.10", default-features = false, features = ["std"] }
 url = "2.3.1"
-xshell = "0.2.5"
+xshell = "0.2.7"
 
 
 # We need to freeze the version of the crate, as the raw-api feature is considered unstable
