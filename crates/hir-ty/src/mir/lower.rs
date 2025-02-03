@@ -1032,13 +1032,13 @@ impl<'ctx> MirLowerCtx<'ctx> {
                         syntax::ast::LogicOp::And => 0,
                         syntax::ast::LogicOp::Or => 1,
                         syntax::ast::LogicOp::Imply => {
-                            todo!()
+                            not_supported!("not yet implemented")
                         }
                         syntax::ast::LogicOp::RevImply => {
-                            todo!()
+                            not_supported!("not yet implemented")
                         }
                         syntax::ast::LogicOp::Iff => {
-                            todo!()
+                            not_supported!("not yet implemented")
                         }
                     };
                     let start_of_then = self.new_basic_block();
@@ -1077,9 +1077,9 @@ impl<'ctx> MirLowerCtx<'ctx> {
                             hir_def::hir::BinaryOp::LogicOp(op) => match op {
                                 hir_def::hir::LogicOp::And => BinOp::BitAnd, // FIXME: make these short circuit
                                 hir_def::hir::LogicOp::Or => BinOp::BitOr,
-                                hir_def::hir::LogicOp::Imply => todo!(),
-                                hir_def::hir::LogicOp::RevImply => todo!(),
-                                hir_def::hir::LogicOp::Iff => todo!(),
+                                hir_def::hir::LogicOp::Imply => not_supported!("not yet implemented"),
+                                hir_def::hir::LogicOp::RevImply => not_supported!("not yet implemented"),
+                                hir_def::hir::LogicOp::Iff => not_supported!("not yet implemented"),
                             },
                             hir_def::hir::BinaryOp::ArithOp(op) => BinOp::from(op),
                             hir_def::hir::BinaryOp::CmpOp(op) => BinOp::from(op),
