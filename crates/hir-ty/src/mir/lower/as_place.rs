@@ -209,7 +209,7 @@ impl MirLowerCtx<'_> {
                 Ok(Some((r, current)))
             }
             Expr::UnaryOp { .. } => try_rvalue(self),
-            Expr::Field { expr, .. } => {
+            Expr::Field { expr, .. } | Expr::ArrowExpr { expr, .. } => {
                 let Some((mut r, current)) = self.lower_expr_as_place(current, *expr, true)? else {
                     return Ok(None);
                 };
