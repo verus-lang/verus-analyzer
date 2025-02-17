@@ -79,12 +79,10 @@ pub(crate) fn generate_vst(_kinds: KindsSrc<'_>, grammar: &AstSrc) -> String {
                         }
                     }
                 } else {
-                    // As source code can be incomplete, we use Option even if the field is not optional in ungrammar.
-                    // TODO:
-                    // As source code can be incomplete, we use might use `Option` even if the field is not optional in ungrammar.
-                    // instead, however, since proof action might choose to be available when syntax is complete
-                    // therefore, we do not use `Option` for VST.
-                    // we only use `Option` when the syntax item is optional in ungrammar.
+                    // rust-analyzer supports code actions that can be applied to incomplete syntax trees.
+                    // For now, verus-analyzer only supports complete syntax trees,
+                    // so that code actions only encounter Option wrappers around fields that are optional in the ungrammar,
+                    // rather than around every single field.
                     if field.is_one() {
                         quote! {
                             pub #name : Box<#ty>,
