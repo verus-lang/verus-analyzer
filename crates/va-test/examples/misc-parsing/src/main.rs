@@ -64,9 +64,15 @@ proof fn proof_test6(a: u8, b: u8) -> (k: u8)
     return (a + b) as u8; // FAILS
 }
 
-
 pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: bool) 
     where I: core::slice::SliceIndex<[T]>,
+    returns
+        spec_slice_get(slice, i),
+;
+
+pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: Option<
+    &<I as core::slice::SliceIndex<[T]>>::Output,
+>) where I: core::slice::SliceIndex<[T]>
     returns
         spec_slice_get(slice, i),
 ;

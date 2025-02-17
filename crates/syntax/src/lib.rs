@@ -2153,7 +2153,7 @@ fn test2() {
 }
 
 fn test3() -> u8
-    returns 20u8, // FAILS
+    returns 20u8,
 {
     19u8
 }
@@ -2161,7 +2161,7 @@ fn test3() -> u8
 fn test4() -> u8
     returns 20u8,
 {
-    return 19u8; // FAILS
+    return 19u8;
 }
 
 fn test5(a: u8, b: u8) -> (k: u8)
@@ -2169,7 +2169,7 @@ fn test5(a: u8, b: u8) -> (k: u8)
     ensures a + b < 257,
     returns (a + b) as u8,
 {
-    return a; // FAILS
+    return a;
 }
 
 fn test6(a: u8, b: u8) -> (k: u8)
@@ -2177,7 +2177,7 @@ fn test6(a: u8, b: u8) -> (k: u8)
     ensures a + b < 250,
     returns (a + b) as u8,
 {
-    return a + b; // FAILS
+    return a + b;
 }
 
 proof fn proof_test5(a: u8, b: u8) -> (k: u8)
@@ -2185,7 +2185,7 @@ proof fn proof_test5(a: u8, b: u8) -> (k: u8)
     ensures a + b < 257,
     returns (a + b) as u8,
 {
-    return a; // FAILS
+    return a;
 }
 
 proof fn proof_test6(a: u8, b: u8) -> (k: u8)
@@ -2193,12 +2193,18 @@ proof fn proof_test6(a: u8, b: u8) -> (k: u8)
     ensures a + b < 250,
     returns (a + b) as u8,
 {
-    return (a + b) as u8; // FAILS
+    return (a + b) as u8;
 }
-
 
 pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: bool) 
     where I: core::slice::SliceIndex<[T]>,
+    returns
+        spec_slice_get(slice, i),
+;
+
+pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: Option<
+    &<I as core::slice::SliceIndex<[T]>>::Output,
+>) where I: core::slice::SliceIndex<[T]>
     returns
         spec_slice_get(slice, i),
 ;
