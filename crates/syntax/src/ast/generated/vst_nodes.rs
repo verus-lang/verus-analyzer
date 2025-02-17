@@ -107,6 +107,26 @@ pub struct AssumeExpr {
     pub cst: Option<super::nodes::AssumeExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssumeSpecification {
+    pub attrs: Vec<Attr>,
+    pub visibility: Option<Box<Visibility>>,
+    pub assume_specification_token: bool,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub l_brack_token: bool,
+    pub path: Box<Path>,
+    pub r_brack_token: bool,
+    pub param_list: Option<Box<ParamList>>,
+    pub ret_type: Option<Box<RetType>>,
+    pub where_clause: Option<Box<WhereClause>>,
+    pub requires_clause: Option<Box<RequiresClause>>,
+    pub recommends_clause: Option<Box<RecommendsClause>>,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub signature_decreases: Option<Box<SignatureDecreases>>,
+    pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
+    pub no_unwind_clause: Option<Box<NoUnwindClause>>,
+    pub cst: Option<super::nodes::AssumeSpecification>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Attr {
     pub pound_token: bool,
     pub excl_token: bool,
@@ -1472,6 +1492,7 @@ pub enum GenericParam {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item {
+    AssumeSpecification(Box<AssumeSpecification>),
     BroadcastGroup(Box<BroadcastGroup>),
     BroadcastUse(Box<BroadcastUse>),
     Const(Box<Const>),
@@ -1766,6 +1787,71 @@ impl TryFrom<super::nodes::AssumeExpr> for AssumeExpr {
                     .map(|it| Expr::try_from(it))??,
             ),
             r_paren_token: item.r_paren_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AssumeSpecification> for AssumeSpecification {
+    type Error = String;
+    fn try_from(item: super::nodes::AssumeSpecification) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            visibility: match item.visibility() {
+                Some(it) => Some(Box::new(Visibility::try_from(it)?)),
+                None => None,
+            },
+            assume_specification_token: item.assume_specification_token().is_some(),
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+                None => None,
+            },
+            l_brack_token: item.l_brack_token().is_some(),
+            path: Box::new(
+                item.path()
+                    .ok_or(format!("{}", stringify!(path)))
+                    .map(|it| Path::try_from(it))??,
+            ),
+            r_brack_token: item.r_brack_token().is_some(),
+            param_list: match item.param_list() {
+                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
+                None => None,
+            },
+            ret_type: match item.ret_type() {
+                Some(it) => Some(Box::new(RetType::try_from(it)?)),
+                None => None,
+            },
+            where_clause: match item.where_clause() {
+                Some(it) => Some(Box::new(WhereClause::try_from(it)?)),
+                None => None,
+            },
+            requires_clause: match item.requires_clause() {
+                Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
+                None => None,
+            },
+            recommends_clause: match item.recommends_clause() {
+                Some(it) => Some(Box::new(RecommendsClause::try_from(it)?)),
+                None => None,
+            },
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            signature_decreases: match item.signature_decreases() {
+                Some(it) => Some(Box::new(SignatureDecreases::try_from(it)?)),
+                None => None,
+            },
+            opens_invariants_clause: match item.opens_invariants_clause() {
+                Some(it) => Some(Box::new(OpensInvariantsClause::try_from(it)?)),
+                None => None,
+            },
+            no_unwind_clause: match item.no_unwind_clause() {
+                Some(it) => Some(Box::new(NoUnwindClause::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -5068,6 +5154,9 @@ impl TryFrom<super::nodes::Item> for Item {
     type Error = String;
     fn try_from(item: super::nodes::Item) -> Result<Self, Self::Error> {
         match item {
+            super::nodes::Item::AssumeSpecification(it) => {
+                Ok(Self::AssumeSpecification(Box::new(it.try_into()?)))
+            }
             super::nodes::Item::BroadcastGroup(it) => {
                 Ok(Self::BroadcastGroup(Box::new(it.try_into()?)))
             }
@@ -5423,6 +5512,77 @@ impl std::fmt::Display for AssumeExpr {
             let mut tmp = stringify!(r_paren_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AssumeSpecification {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if let Some(it) = &self.visibility {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.assume_specification_token {
+            let mut tmp = stringify!(assume_specification_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.path.to_string());
+        s.push_str(" ");
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.where_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.requires_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.recommends_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.signature_decreases {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.opens_invariants_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.no_unwind_clause {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -9212,6 +9372,7 @@ impl std::fmt::Display for GenericParam {
 impl std::fmt::Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Item::AssumeSpecification(it) => write!(f, "{}", it.to_string()),
             Item::BroadcastGroup(it) => write!(f, "{}", it.to_string()),
             Item::BroadcastUse(it) => write!(f, "{}", it.to_string()),
             Item::Const(it) => write!(f, "{}", it.to_string()),
@@ -9451,6 +9612,9 @@ impl GenericParam {
 impl Item {
     pub fn cst(&self) -> Option<super::nodes::Item> {
         match self {
+            Item::AssumeSpecification(it) => {
+                Some(super::nodes::Item::AssumeSpecification(it.cst.as_ref()?.clone()))
+            }
             Item::BroadcastGroup(it) => {
                 Some(super::nodes::Item::BroadcastGroup(it.cst.as_ref()?.clone()))
             }
@@ -9752,6 +9916,9 @@ impl From<LifetimeParam> for GenericParam {
 }
 impl From<TypeParam> for GenericParam {
     fn from(item: TypeParam) -> Self { GenericParam::TypeParam(Box::new(item)) }
+}
+impl From<AssumeSpecification> for Item {
+    fn from(item: AssumeSpecification) -> Self { Item::AssumeSpecification(Box::new(item)) }
 }
 impl From<BroadcastGroup> for Item {
     fn from(item: BroadcastGroup) -> Self { Item::BroadcastGroup(Box::new(item)) }
@@ -10064,6 +10231,29 @@ impl AssumeExpr {
             l_paren_token: true,
             expr: Box::new(expr.into()),
             r_paren_token: true,
+            cst: None,
+        }
+    }
+}
+impl AssumeSpecification {
+    pub fn new(path: Path) -> Self {
+        Self {
+            attrs: vec![],
+            visibility: None,
+            assume_specification_token: true,
+            generic_param_list: None,
+            l_brack_token: true,
+            path: Box::new(path),
+            r_brack_token: true,
+            param_list: None,
+            ret_type: None,
+            where_clause: None,
+            requires_clause: None,
+            recommends_clause: None,
+            ensures_clause: None,
+            signature_decreases: None,
+            opens_invariants_clause: None,
+            no_unwind_clause: None,
             cst: None,
         }
     }
