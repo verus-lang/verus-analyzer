@@ -16,7 +16,7 @@ use crate::{
     db::DefDatabase,
     generics::{GenericParams, GenericParamsCollector, TypeParamData, TypeParamProvenance},
     item_tree::{
-        AssocItem, AttrOwner, BroadcastGroup, BroadcastUse, Const, Either, Enum, ExternBlock,
+        AssocItem, AssumeSpecification, AttrOwner, BroadcastGroup, BroadcastUse, Const, Either, Enum, ExternBlock,
         ExternCrate, Field, FieldAstId, Fields, FileItemTreeId, FnFlags, Function, GenericArgs,
         GenericModItem, Idx, IdxRange, Impl, ImportAlias, Interned, ItemTree, ItemTreeData,
         ItemTreeNode, Macro2, MacroCall, MacroRules, Mod, ModItem, ModKind, ModPath, Mutability,
@@ -154,6 +154,7 @@ impl<'a> Ctx<'a> {
             ast::Item::VerusGlobal(ast) => self.lower_verus_global(ast).into(),
             ast::Item::BroadcastGroup(ast) => self.lower_broadcast_group(ast)?.into(),
             ast::Item::BroadcastUse(ast) => self.lower_broadcast_use(ast).into(),
+            ast::Item::AssumeSpecification(ast) => self.lower_assume_specification(ast).into(),
         };
         let attrs = RawAttrs::new(self.db.upcast(), item, self.span_map());
         self.add_attrs(mod_item.into(), attrs);
@@ -496,6 +497,15 @@ impl<'a> Ctx<'a> {
         let ast_id = self.source_ast_id_map.ast_id(bu);
         let res = BroadcastUse { ast_id };
         id(self.data().broadcast_uses.alloc(res)).into()
+    }
+
+    fn lower_assume_specification(
+        &mut self,
+        spec: &ast::AssumeSpecification,
+    ) -> FileItemTreeId<AssumeSpecification> {
+        let ast_id = self.source_ast_id_map.ast_id(spec);
+        let res = AssumeSpecification { ast_id };
+        id(self.data().assume_specifications.alloc(res)).into()
     }
 
     fn lower_module(&mut self, module: &ast::Module) -> Option<FileItemTreeId<Mod>> {

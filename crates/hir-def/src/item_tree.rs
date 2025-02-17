@@ -238,6 +238,7 @@ impl ItemTree {
                 verus_globals,
                 broadcast_groups,
                 broadcast_uses,
+                assume_specifications,
             } = &mut **data;
 
             uses.shrink_to_fit();
@@ -263,6 +264,7 @@ impl ItemTree {
             verus_globals.shrink_to_fit();
             broadcast_groups.shrink_to_fit();
             broadcast_uses.shrink_to_fit();
+            assume_specifications.shrink_to_fit();
 
             vis.arena.shrink_to_fit();
         }
@@ -321,6 +323,7 @@ struct ItemTreeData {
     verus_globals: Arena<VerusGlobal>,
     broadcast_groups: Arena<BroadcastGroup>,
     broadcast_uses: Arena<BroadcastUse>,
+    assume_specifications: Arena<AssumeSpecification>,
     vis: ItemVisibilities,
 }
 
@@ -606,6 +609,7 @@ mod_items! {
     VerusGlobal in verus_globals -> ast::VerusGlobal,
     BroadcastGroup in broadcast_groups -> ast::BroadcastGroup,
     BroadcastUse in broadcast_uses -> ast::BroadcastUse,
+    AssumeSpecification in assume_specifications -> ast::AssumeSpecification,
 }
 
 macro_rules! impl_index {
@@ -830,6 +834,12 @@ pub struct BroadcastUse {
     // pub type_ref: Interned<TypeRef>,
     pub ast_id: FileAstId<ast::BroadcastUse>,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct AssumeSpecification {
+    pub ast_id: FileAstId<ast::AssumeSpecification>,
+}
+
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Static {
     pub name: Name,
@@ -1071,7 +1081,8 @@ impl ModItem {
             | ModItem::Mod(_)
             | ModItem::MacroRules(_)
             | ModItem::Macro2(_)
-            | ModItem::BroadcastUse(_) => None,
+            | ModItem::BroadcastUse(_)
+            | ModItem::AssumeSpecification(_) => None,
             &ModItem::MacroCall(call) => Some(AssocItem::MacroCall(call)),
             &ModItem::Const(konst) => Some(AssocItem::Const(konst)),
             &ModItem::TypeAlias(alias) => Some(AssocItem::TypeAlias(alias)),
@@ -1103,6 +1114,7 @@ impl ModItem {
             ModItem::VerusGlobal(it) => tree[it.index()].ast_id().upcast(),
             ModItem::BroadcastGroup(it) => tree[it.index()].ast_id().upcast(),
             ModItem::BroadcastUse(it) => tree[it.index()].ast_id().upcast(),
+            ModItem::AssumeSpecification(it) => tree[it.index()].ast_id().upcast(),
         }
     }
 }
