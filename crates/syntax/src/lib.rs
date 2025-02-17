@@ -2096,6 +2096,43 @@ proof fn testp(a: bool, b:bool)
 }
 
 #[test]
+fn verus_assume_specification() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub assume_specification<T> [core::mem::swap::<T>] (a: &mut T, b: &mut T)
+    ensures
+        *a == *old(b),
+        *b == *old(a),
+    opens_invariants none
+    no_unwind;
+
+pub assume_specification<T>[Vec::<T>::new]() -> (v: Vec<T>)
+    ensures
+        v@ == Seq::<T>::empty();
+
+pub assume_specification<T, A: Allocator>[Vec::<T, A>::clear](vec: &mut Vec<T, A>)
+    ensures
+        vec@ == Seq::<T>::empty();
+
+pub assume_specification [<bool as Clone>::clone](b: &bool) -> (res: bool)
+    ensures res == b;
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+
+
+#[test]
 fn verus_globals() {
     use ast::HasModuleItem;
     let source_code = "verus!{
