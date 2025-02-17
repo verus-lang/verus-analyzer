@@ -156,7 +156,7 @@ UseTreeList =
 Fn =
  Attr* Visibility? Publish?
  'default'? 'const'? 'async'? 'unsafe'? Abi? 'broadcast'? FnMode?
- 'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
+ 'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
  (body:BlockExpr | ';')
 
 Abi =
@@ -749,6 +749,9 @@ RequiresClause =
 EnsuresClause =
   'ensures' (Expr (',' Expr)* ','?)
 
+ReturnsClause =
+  'returns' Expr
+
 LoopClause =
   InvariantExceptBreakClause | InvariantClause | EnsuresClause | DecreasesClause
 
@@ -814,7 +817,7 @@ BroadcastGroup =
   Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
 
 AssumeSpecification =
-  Attr* Visibility? 'assume_specification' GenericParamList? '[' Path ']' ParamList RetType? WhereClause? RequiresClause? RecommendsClause? EnsuresClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
+  Attr* Visibility? 'assume_specification' GenericParamList? '[' Path ']' ParamList RetType? WhereClause? RequiresClause? RecommendsClause? EnsuresClause? ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
 
 IsExpr = 
   Attr* Expr 'is' Type

@@ -161,6 +161,7 @@ impl AssumeSpecification {
     pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
     pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn returns_clause(&self) -> Option<ReturnsClause> { support::child(&self.syntax) }
     pub fn signature_decreases(&self) -> Option<SignatureDecreases> { support::child(&self.syntax) }
     pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
     pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
@@ -551,6 +552,7 @@ impl Fn {
     pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
     pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn returns_clause(&self) -> Option<ReturnsClause> { support::child(&self.syntax) }
     pub fn signature_decreases(&self) -> Option<SignatureDecreases> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
@@ -1514,6 +1516,15 @@ impl ast::HasAttrs for ReturnExpr {}
 impl ReturnExpr {
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn return_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![return]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReturnsClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ReturnsClause {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn returns_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![returns]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3640,6 +3651,17 @@ impl AstNode for RetType {
 }
 impl AstNode for ReturnExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == RETURN_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ReturnsClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == RETURNS_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -5965,6 +5987,11 @@ impl std::fmt::Display for RetType {
     }
 }
 impl std::fmt::Display for ReturnExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ReturnsClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

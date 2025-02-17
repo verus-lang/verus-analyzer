@@ -121,6 +121,7 @@ pub struct AssumeSpecification {
     pub requires_clause: Option<Box<RequiresClause>>,
     pub recommends_clause: Option<Box<RecommendsClause>>,
     pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub returns_clause: Option<Box<ReturnsClause>>,
     pub signature_decreases: Option<Box<SignatureDecreases>>,
     pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
     pub no_unwind_clause: Option<Box<NoUnwindClause>>,
@@ -392,6 +393,7 @@ pub struct Fn {
     pub requires_clause: Option<Box<RequiresClause>>,
     pub recommends_clause: Option<Box<RecommendsClause>>,
     pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub returns_clause: Option<Box<ReturnsClause>>,
     pub signature_decreases: Option<Box<SignatureDecreases>>,
     pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
     pub no_unwind_clause: Option<Box<NoUnwindClause>>,
@@ -1053,6 +1055,12 @@ pub struct ReturnExpr {
     pub return_token: bool,
     pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::ReturnExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReturnsClause {
+    pub returns_token: bool,
+    pub expr: Box<Expr>,
+    pub cst: Option<super::nodes::ReturnsClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
@@ -1840,6 +1848,10 @@ impl TryFrom<super::nodes::AssumeSpecification> for AssumeSpecification {
                 Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
                 None => None,
             },
+            returns_clause: match item.returns_clause() {
+                Some(it) => Some(Box::new(ReturnsClause::try_from(it)?)),
+                None => None,
+            },
             signature_decreases: match item.signature_decreases() {
                 Some(it) => Some(Box::new(SignatureDecreases::try_from(it)?)),
                 None => None,
@@ -2540,6 +2552,10 @@ impl TryFrom<super::nodes::Fn> for Fn {
             },
             ensures_clause: match item.ensures_clause() {
                 Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            returns_clause: match item.returns_clause() {
+                Some(it) => Some(Box::new(ReturnsClause::try_from(it)?)),
                 None => None,
             },
             signature_decreases: match item.signature_decreases() {
@@ -4133,6 +4149,20 @@ impl TryFrom<super::nodes::ReturnExpr> for ReturnExpr {
         })
     }
 }
+impl TryFrom<super::nodes::ReturnsClause> for ReturnsClause {
+    type Error = String;
+    fn try_from(item: super::nodes::ReturnsClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            returns_token: item.returns_token().is_some(),
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
+            cst: Some(item.clone()),
+        })
+    }
+}
 impl TryFrom<super::nodes::SelfParam> for SelfParam {
     type Error = String;
     fn try_from(item: super::nodes::SelfParam) -> Result<Self, Self::Error> {
@@ -5573,6 +5603,10 @@ impl std::fmt::Display for AssumeSpecification {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
+        if let Some(it) = &self.returns_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.signature_decreases {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -6351,6 +6385,10 @@ impl std::fmt::Display for Fn {
             s.push_str(" ");
         }
         if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.returns_clause {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -8202,6 +8240,20 @@ impl std::fmt::Display for ReturnExpr {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ReturnsClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.returns_token {
+            let mut tmp = stringify!(returns_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -10251,6 +10303,7 @@ impl AssumeSpecification {
             requires_clause: None,
             recommends_clause: None,
             ensures_clause: None,
+            returns_clause: None,
             signature_decreases: None,
             opens_invariants_clause: None,
             no_unwind_clause: None,
@@ -10550,6 +10603,7 @@ impl Fn {
             requires_clause: None,
             recommends_clause: None,
             ensures_clause: None,
+            returns_clause: None,
             signature_decreases: None,
             opens_invariants_clause: None,
             no_unwind_clause: None,
@@ -11246,6 +11300,14 @@ impl RetType {
 }
 impl ReturnExpr {
     pub fn new() -> Self { Self { attrs: vec![], return_token: true, expr: None, cst: None } }
+}
+impl ReturnsClause {
+    pub fn new<ET0>(expr: ET0) -> Self
+    where
+        ET0: Into<Expr>,
+    {
+        Self { returns_token: true, expr: Box::new(expr.into()), cst: None }
+    }
 }
 impl SelfParam {
     pub fn new(name: Name) -> Self {
