@@ -545,7 +545,7 @@ fn assume_specification(p: &mut Parser<'_>, m: Marker) {
 
     if p.at(T!['[']) {
         p.bump(T!['[']);
-        paths::use_path(p);     // REVIEW: Is this the right kind of path to expect here?
+        paths::expr_path(p);
         p.expect(T![']']);
     } else {
         p.error("expected path to the wrapped function");
