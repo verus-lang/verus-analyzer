@@ -516,6 +516,9 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
+    if p.at_contextual_kw(T![returns]) {
+        verus::returns(p);
+    }
     if p.at_contextual_kw(T![decreases]) {
         verus::signature_decreases(p);
     }
@@ -574,6 +577,9 @@ fn assume_specification(p: &mut Parser<'_>, m: Marker) {
     }
     if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
+    }
+    if p.at_contextual_kw(T![returns]) {
+        verus::returns(p);
     }
     if p.at_contextual_kw(T![decreases]) {
         verus::signature_decreases(p);

@@ -257,6 +257,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
     while !p.at(EOF)
         && !p.at_contextual_kw(T![recommends])
         && !p.at_contextual_kw(T![ensures])
+        && !p.at_contextual_kw(T![returns])
         && !p.at_contextual_kw(T![decreases])
         && !p.at_contextual_kw(T![opens_invariants])
         && !p.at(T!['{'])
@@ -268,6 +269,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
         if p.at(T![,]) {
             if p.nth_at_contextual_kw(1, T![recommends])
                 || p.nth_at_contextual_kw(1, T![ensures])
+                || p.nth_at_contextual_kw(1, T![returns])
                 || p.nth_at_contextual_kw(1, T![decreases])
                 || p.nth_at_contextual_kw(1, T![opens_invariants])
                 || p.nth_at(1, T!['{'])
@@ -340,6 +342,7 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
         }
         if p.at(T![,]) {
             if p.nth_at_contextual_kw(1, T![recommends])
+                || p.nth_at_contextual_kw(1, T![returns])
                 || p.nth_at_contextual_kw(1, T![decreases])
                 || p.nth_at_contextual_kw(1, T![opens_invariants])
                 || p.nth_at(1, T!['{'])
@@ -360,6 +363,15 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ENSURES_CLAUSE)
 }
 
+pub(crate) fn returns(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect_contextual_kw(T![returns]);
+    expressions::expr_no_struct(p);
+    if p.at(T![,]) {
+        p.expect(T![,]);
+    }
+    m.complete(p, RETURNS_CLAUSE)
+}
 
 pub(crate) fn opens_invariants(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
