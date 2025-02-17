@@ -523,6 +523,11 @@ impl Printer<'_> {
                 // self.print_ast_id(ast_id.erase());
                 wln!(self, "broadcast group ?? TODO!");
             }
+            ModItem::AssumeSpecification(_it) => {
+                // let AssumeSpecification { ast_id } = &self.tree[it];
+                // self.print_ast_id(ast_id.erase());
+                wln!(self, "assume_specification ?? TODO!");
+            }
         }
 
         self.blank();

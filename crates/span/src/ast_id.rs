@@ -96,6 +96,7 @@ register_ast_id_node! {
             MacroCall,
             TypeAlias,
         BroadcastUse,
+        AssumeSpecification,
         ExternBlock,
         ExternCrate,
         Impl,

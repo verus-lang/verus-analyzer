@@ -1839,6 +1839,9 @@ impl ModCollector<'_, '_> {
                 ModItem::BroadcastGroup(_id) => {
                     //print!("ModCollector::Collect -> BroadcastGroup not handled");
                 }
+                ModItem::AssumeSpecification(_id) => {
+                    //print!("ModCollector::Collect -> AssumeSpecification not handled");
+                }
             }
         };
 
