@@ -67,6 +67,28 @@ extra_args = "......"
 ```
 where the quoted string is a list of space-separated Verus arguments, e.g., `extra_args = "--rlimit 20 --log-all"`.
 
+#### Advanced Verus Developments
+Some advanced Verus projects (e.g., those making changes to `vstd`) may need to use `#[cfg(verus_keep_ghost)]`
+in their Verus files.  This will cause various `verus-analyzer` features (like Go To Definition) to stop working,
+since `verus-analyzer` won't recognize that `cfg` setting by default.  To address that, edit your VS Code `settings.json`
+file to add:
+```
+    "verus-analyzer.cargo.cfgs": {
+        "verus_keep_ghost": null,
+        "debug_assertions": null,
+        "miri": null
+    },
+```
+In the future, when we sync up with the latest version of `rust-analyzer`, you will need this setting instead:
+```
+    "verus-analyzer.cargo.cfgs": [
+        "debug_assertions",
+        "miri",
+        "verus_keep_ghost"
+    ],
+```
+since `rust-analyzer` changed the type it expects for this setting.
+
 ---
 ## Limitations
 - This is experimental software and subject to change.
