@@ -247,6 +247,12 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     }
 
     // items
+
+    // This needs to be a special case, since assume_specification is a conditional keyword
+    if p.at_contextual_kw(T![assume_specification]) {
+        assume_specification(p, m);
+        return Ok(());
+    }
     match p.current() {
         T![fn] => fn_(p, m),
 
@@ -510,6 +516,9 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
+    if p.at_contextual_kw(T![returns]) {
+        verus::returns(p);
+    }
     if p.at_contextual_kw(T![decreases]) {
         verus::signature_decreases(p);
     }
@@ -530,6 +539,61 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     }
 
     m.complete(p, FN);
+}
+
+fn assume_specification(p: &mut Parser<'_>, m: Marker) {
+    p.eat_contextual_kw(T![assume_specification]);
+
+    generic_params::opt_generic_param_list(p);
+
+    if p.at(T!['[']) {
+        p.bump(T!['[']);
+        paths::expr_path(p);
+        p.expect(T![']']);
+    } else {
+        p.error("expected path to the wrapped function");
+    }
+
+    if p.at(T!['(']) {
+        params::param_list_fn_def(p);
+    } else {
+        p.error("expected function arguments");
+    }
+    // test function_ret_type
+    // fn foo() {}
+    // fn bar() -> () {}
+    verus::verus_ret_type(p); // previously opt_ret_type(p);
+
+    // test function_where_clause
+    // fn foo<T>() where T: Copy {}
+    generic_params::opt_where_clause(p);
+
+    // Note: requires -> recommends -> ensures -> decreases -> opens_invariants -> no_unwind
+    if p.at_contextual_kw(T![requires]) {
+        verus::requires(p);
+    }
+    if p.at_contextual_kw(T![recommends]) {
+        verus::recommends(p);
+    }
+    if p.at_contextual_kw(T![ensures]) {
+        verus::ensures(p);
+    }
+    if p.at_contextual_kw(T![returns]) {
+        verus::returns(p);
+    }
+    if p.at_contextual_kw(T![decreases]) {
+        verus::signature_decreases(p);
+    }
+    if p.at_contextual_kw(T![opens_invariants]) {
+        verus::opens_invariants(p);
+    }
+    if p.at_contextual_kw(T![no_unwind]) {
+        p.bump_remap(T![no_unwind]);
+        p.eat_contextual_kw(T![when]);
+    }
+    p.expect(T![;]);
+
+    m.complete(p, ASSUME_SPECIFICATION);
 }
 
 fn macro_call(p: &mut Parser<'_>, m: Marker) {

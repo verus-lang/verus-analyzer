@@ -210,7 +210,7 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
             _ => (),
         }
         // verus
-        if p.at_contextual_kw(T![requires]) || p.at_contextual_kw(T![ensures]) || p.at_contextual_kw(T![decreases]) {
+        if p.at_contextual_kw(T![requires]) || p.at_contextual_kw(T![ensures]) || p.at_contextual_kw(T![returns]) || p.at_contextual_kw(T![decreases]) {
             break
         } 
 
@@ -227,6 +227,7 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
         || p.at_contextual_kw(T![requires])
         || p.at_contextual_kw(T![ensures])
         || p.at_contextual_kw(T![decreases])
+        || p.at_contextual_kw(T![returns])
         || p.at_contextual_kw(T![opens_invariants])
         || p.at_contextual_kw(T![no_unwind])
         {

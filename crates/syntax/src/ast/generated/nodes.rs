@@ -144,6 +144,33 @@ impl AssumeExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssumeSpecification {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for AssumeSpecification {}
+impl ast::HasGenericParams for AssumeSpecification {}
+impl ast::HasVisibility for AssumeSpecification {}
+impl AssumeSpecification {
+    pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
+    pub fn no_unwind_clause(&self) -> Option<NoUnwindClause> { support::child(&self.syntax) }
+    pub fn opens_invariants_clause(&self) -> Option<OpensInvariantsClause> {
+        support::child(&self.syntax)
+    }
+    pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
+    pub fn path(&self) -> Option<Path> { support::child(&self.syntax) }
+    pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
+    pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
+    pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn returns_clause(&self) -> Option<ReturnsClause> { support::child(&self.syntax) }
+    pub fn signature_decreases(&self) -> Option<SignatureDecreases> { support::child(&self.syntax) }
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
+    pub fn assume_specification_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![assume_specification])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Attr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -525,6 +552,7 @@ impl Fn {
     pub fn recommends_clause(&self) -> Option<RecommendsClause> { support::child(&self.syntax) }
     pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn returns_clause(&self) -> Option<ReturnsClause> { support::child(&self.syntax) }
     pub fn signature_decreases(&self) -> Option<SignatureDecreases> { support::child(&self.syntax) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
@@ -1491,6 +1519,15 @@ impl ReturnExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReturnsClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ReturnsClause {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn returns_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![returns]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2063,6 +2100,7 @@ impl ast::HasAttrs for GenericParam {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item {
+    AssumeSpecification(AssumeSpecification),
     BroadcastGroup(BroadcastGroup),
     BroadcastUse(BroadcastUse),
     Const(Const),
@@ -2304,6 +2342,17 @@ impl AstNode for AssocTypeArg {
 }
 impl AstNode for AssumeExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == ASSUME_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for AssumeSpecification {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ASSUME_SPECIFICATION }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -3611,6 +3660,17 @@ impl AstNode for ReturnExpr {
     }
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for ReturnsClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == RETURNS_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for SelfParam {
     fn can_cast(kind: SyntaxKind) -> bool { kind == SELF_PARAM }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -4515,6 +4575,9 @@ impl AstNode for GenericParam {
         }
     }
 }
+impl From<AssumeSpecification> for Item {
+    fn from(node: AssumeSpecification) -> Item { Item::AssumeSpecification(node) }
+}
 impl From<BroadcastGroup> for Item {
     fn from(node: BroadcastGroup) -> Item { Item::BroadcastGroup(node) }
 }
@@ -4579,7 +4642,8 @@ impl AstNode for Item {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            BROADCAST_GROUP
+            ASSUME_SPECIFICATION
+                | BROADCAST_GROUP
                 | BROADCAST_USE
                 | CONST
                 | ENUM
@@ -4603,6 +4667,7 @@ impl AstNode for Item {
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
+            ASSUME_SPECIFICATION => Item::AssumeSpecification(AssumeSpecification { syntax }),
             BROADCAST_GROUP => Item::BroadcastGroup(BroadcastGroup { syntax }),
             BROADCAST_USE => Item::BroadcastUse(BroadcastUse { syntax }),
             CONST => Item::Const(Const { syntax }),
@@ -4629,6 +4694,7 @@ impl AstNode for Item {
     }
     fn syntax(&self) -> &SyntaxNode {
         match self {
+            Item::AssumeSpecification(it) => &it.syntax,
             Item::BroadcastGroup(it) => &it.syntax,
             Item::BroadcastUse(it) => &it.syntax,
             Item::Const(it) => &it.syntax,
@@ -4947,6 +5013,7 @@ impl AstNode for AnyHasAttrs {
                 | ASSERT_FORALL_EXPR
                 | ASSOC_ITEM_LIST
                 | ASSUME_EXPR
+                | ASSUME_SPECIFICATION
                 | AWAIT_EXPR
                 | BECOME_EXPR
                 | BIN_EXPR
@@ -5076,7 +5143,18 @@ impl AnyHasGenericParams {
 }
 impl AstNode for AnyHasGenericParams {
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, ENUM | FN | IMPL | STRUCT | TRAIT | TRAIT_ALIAS | TYPE_ALIAS | UNION)
+        matches!(
+            kind,
+            ASSUME_SPECIFICATION
+                | ENUM
+                | FN
+                | IMPL
+                | STRUCT
+                | TRAIT
+                | TRAIT_ALIAS
+                | TYPE_ALIAS
+                | UNION
+        )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         Self::can_cast(syntax.kind()).then_some(AnyHasGenericParams { syntax })
@@ -5176,7 +5254,8 @@ impl AstNode for AnyHasVisibility {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            BROADCAST_GROUP
+            ASSUME_SPECIFICATION
+                | BROADCAST_GROUP
                 | CONST
                 | ENUM
                 | EXTERN_CRATE
@@ -5313,6 +5392,11 @@ impl std::fmt::Display for AssocTypeArg {
     }
 }
 impl std::fmt::Display for AssumeExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AssumeSpecification {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -5903,6 +5987,11 @@ impl std::fmt::Display for RetType {
     }
 }
 impl std::fmt::Display for ReturnExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ReturnsClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

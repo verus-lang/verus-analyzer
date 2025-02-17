@@ -156,6 +156,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "no_unwind",// verus: Only a key word at the end of a function signature
         "requires",
         "ensures",
+        "returns",
         "checked",
         "recommends",
         "decreases",
@@ -174,6 +175,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "trigger",
         "global",
         "broadcast",
+        "assume_specification",
         "open",
         "closed",
         "opens_invariants",
@@ -336,6 +338,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         // verus
         "REQUIRES_CLAUSE",
         "ENSURES_CLAUSE",
+        "RETURNS_CLAUSE",
         "DECREASES_CLAUSE",
         "RECOMMENDS_CLAUSE",
         "OPENS_INVARIANTS_CLAUSE",
@@ -361,6 +364,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "BROADCAST_GROUP_MEMBER",
         "BROADCAST_GROUP_LIST",
         "BROADCAST_GROUP",
+        "ASSUME_SPECIFICATION",
         "IS_EXPR",
         "ARROW_EXPR",
         "MATCHES_EXPR",
