@@ -59,6 +59,14 @@ You can find more documentation of the IDE features by following these links.
 
 Each time you save a file in your project, Verus should run and report proof failures and warnings in the IDE.
 
+#### Extra Arguments
+To pass extra arguments to Verus, add the following table to the `Cargo.toml` file for your Verus project:
+```
+[package.metadata.verus.ide]
+extra_args = "......"
+```
+where the quoted string is a list of space-separated Verus arguments, e.g., `extra_args = "--rlimit 20 --log-all"`.
+
 ---
 ## Limitations
 - This is experimental software and subject to change.
