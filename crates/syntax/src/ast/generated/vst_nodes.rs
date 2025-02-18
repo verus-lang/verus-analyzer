@@ -19,7 +19,7 @@ pub struct ArrayExpr {
     pub attrs: Vec<Attr>,
     pub l_brack_token: bool,
     pub exprs: Vec<Expr>,
-    pub expr: Box<Expr>,
+    pub expr: Option<Box<Expr>>,
     pub semicolon_token: bool,
     pub r_brack_token: bool,
     pub cst: Option<super::nodes::ArrayExpr>,
@@ -91,7 +91,7 @@ pub struct AssocTypeArg {
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
     pub colon_token: bool,
-    pub type_bound_list: Box<TypeBoundList>,
+    pub type_bound_list: Option<Box<TypeBoundList>>,
     pub eq_token: bool,
     pub ty: Option<Box<Type>>,
     pub const_arg: Option<Box<ConstArg>>,
@@ -717,7 +717,7 @@ pub struct MatchesExpr {
 pub struct Meta {
     pub unsafe_token: bool,
     pub l_paren_token: bool,
-    pub path: Box<Path>,
+    pub path: Option<Box<Path>>,
     pub eq_token: bool,
     pub expr: Option<Box<Expr>>,
     pub token_tree: Option<Box<TokenTree>>,
@@ -870,7 +870,7 @@ pub struct PathPat {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PathSegment {
     pub coloncolon_token: bool,
-    pub name_ref: Box<NameRef>,
+    pub name_ref: Option<Box<NameRef>>,
     pub generic_arg_list: Option<Box<GenericArgList>>,
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
@@ -1068,7 +1068,7 @@ pub struct SelfParam {
     pub amp_token: bool,
     pub lifetime: Option<Box<Lifetime>>,
     pub mut_token: bool,
-    pub name: Box<Name>,
+    pub name: Option<Box<Name>>,
     pub colon_token: bool,
     pub ty: Option<Box<Type>>,
     pub cst: Option<super::nodes::SelfParam>,
@@ -1607,11 +1607,10 @@ impl TryFrom<super::nodes::ArrayExpr> for ArrayExpr {
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
-            expr: Box::new(
-                item.expr()
-                    .ok_or(format!("{}", stringify!(expr)))
-                    .map(|it| Expr::try_from(it))??,
-            ),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             semicolon_token: item.semicolon_token().is_some(),
             r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
@@ -1760,11 +1759,10 @@ impl TryFrom<super::nodes::AssocTypeArg> for AssocTypeArg {
                 None => None,
             },
             colon_token: item.colon_token().is_some(),
-            type_bound_list: Box::new(
-                item.type_bound_list()
-                    .ok_or(format!("{}", stringify!(type_bound_list)))
-                    .map(|it| TypeBoundList::try_from(it))??,
-            ),
+            type_bound_list: match item.type_bound_list() {
+                Some(it) => Some(Box::new(TypeBoundList::try_from(it)?)),
+                None => None,
+            },
             eq_token: item.eq_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
@@ -3360,11 +3358,10 @@ impl TryFrom<super::nodes::Meta> for Meta {
         Ok(Self {
             unsafe_token: item.unsafe_token().is_some(),
             l_paren_token: item.l_paren_token().is_some(),
-            path: Box::new(
-                item.path()
-                    .ok_or(format!("{}", stringify!(path)))
-                    .map(|it| Path::try_from(it))??,
-            ),
+            path: match item.path() {
+                Some(it) => Some(Box::new(Path::try_from(it)?)),
+                None => None,
+            },
             eq_token: item.eq_token().is_some(),
             expr: match item.expr() {
                 Some(it) => Some(Box::new(Expr::try_from(it)?)),
@@ -3701,11 +3698,10 @@ impl TryFrom<super::nodes::PathSegment> for PathSegment {
     fn try_from(item: super::nodes::PathSegment) -> Result<Self, Self::Error> {
         Ok(Self {
             coloncolon_token: item.coloncolon_token().is_some(),
-            name_ref: Box::new(
-                item.name_ref()
-                    .ok_or(format!("{}", stringify!(name_ref)))
-                    .map(|it| NameRef::try_from(it))??,
-            ),
+            name_ref: match item.name_ref() {
+                Some(it) => Some(Box::new(NameRef::try_from(it)?)),
+                None => None,
+            },
             generic_arg_list: match item.generic_arg_list() {
                 Some(it) => Some(Box::new(GenericArgList::try_from(it)?)),
                 None => None,
@@ -4178,11 +4174,10 @@ impl TryFrom<super::nodes::SelfParam> for SelfParam {
                 None => None,
             },
             mut_token: item.mut_token().is_some(),
-            name: Box::new(
-                item.name()
-                    .ok_or(format!("{}", stringify!(name)))
-                    .map(|it| Name::try_from(it))??,
-            ),
+            name: match item.name() {
+                Some(it) => Some(Box::new(Name::try_from(it)?)),
+                None => None,
+            },
             colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
@@ -5318,8 +5313,10 @@ impl std::fmt::Display for ArrayExpr {
             s.push_str(" ");
         }
         s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
-        s.push_str(&self.expr.to_string());
-        s.push_str(" ");
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.semicolon_token {
             let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -5501,8 +5498,10 @@ impl std::fmt::Display for AssocTypeArg {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        s.push_str(&self.type_bound_list.to_string());
-        s.push_str(" ");
+        if let Some(it) = &self.type_bound_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.eq_token {
             let mut tmp = stringify!(eq_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7295,8 +7294,10 @@ impl std::fmt::Display for Meta {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        s.push_str(&self.path.to_string());
-        s.push_str(" ");
+        if let Some(it) = &self.path {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.eq_token {
             let mut tmp = stringify!(eq_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -7720,8 +7721,10 @@ impl std::fmt::Display for PathSegment {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        s.push_str(&self.name_ref.to_string());
-        s.push_str(" ");
+        if let Some(it) = &self.name_ref {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.generic_arg_list {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -8277,8 +8280,10 @@ impl std::fmt::Display for SelfParam {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
+        if let Some(it) = &self.name {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -10154,16 +10159,13 @@ impl ArgList {
     }
 }
 impl ArrayExpr {
-    pub fn new<ET0>(expr: ET0) -> Self
-    where
-        ET0: Into<Expr>,
-    {
+    pub fn new() -> Self {
         Self {
             attrs: vec![],
             l_brack_token: true,
             exprs: vec![],
-            expr: Box::new(expr.into()),
-            semicolon_token: true,
+            expr: None,
+            semicolon_token: false,
             r_brack_token: true,
             cst: None,
         }
@@ -10257,15 +10259,15 @@ impl AssocItemList {
     }
 }
 impl AssocTypeArg {
-    pub fn new(name_ref: NameRef, type_bound_list: TypeBoundList) -> Self {
+    pub fn new(name_ref: NameRef) -> Self {
         Self {
             name_ref: Box::new(name_ref),
             generic_arg_list: None,
             param_list: None,
             ret_type: None,
-            colon_token: true,
-            type_bound_list: Box::new(type_bound_list),
-            eq_token: true,
+            colon_token: false,
+            type_bound_list: None,
+            eq_token: false,
             ty: None,
             const_arg: None,
             cst: None,
@@ -10873,13 +10875,13 @@ impl MacroDef {
 impl MacroEagerInput {
     pub fn new() -> Self {
         Self {
-            l_paren_token: true,
+            l_paren_token: false,
             exprs: vec![],
-            r_paren_token: true,
-            l_curly_token: true,
-            r_curly_token: true,
-            l_brack_token: true,
-            r_brack_token: true,
+            r_paren_token: false,
+            l_curly_token: false,
+            r_curly_token: false,
+            l_brack_token: false,
+            r_brack_token: false,
             cst: None,
         }
     }
@@ -10955,15 +10957,15 @@ impl MatchesExpr {
     }
 }
 impl Meta {
-    pub fn new(path: Path) -> Self {
+    pub fn new() -> Self {
         Self {
-            unsafe_token: true,
-            l_paren_token: true,
-            path: Box::new(path),
+            unsafe_token: false,
+            l_paren_token: false,
+            path: None,
             eq_token: false,
             expr: None,
             token_tree: None,
-            r_paren_token: true,
+            r_paren_token: false,
             cst: None,
         }
     }
@@ -11053,9 +11055,9 @@ impl OpensInvariantsClause {
             opens_invariants_token: true,
             none_token: false,
             any_token: false,
-            l_brack_token: true,
+            l_brack_token: false,
             exprs: vec![],
-            r_brack_token: true,
+            r_brack_token: false,
             cst: None,
         }
     }
@@ -11079,12 +11081,12 @@ impl Param {
 impl ParamList {
     pub fn new() -> Self {
         Self {
-            l_paren_token: true,
+            l_paren_token: false,
             self_param: None,
             comma_token: false,
             params: vec![],
-            r_paren_token: true,
-            pipe_token: true,
+            r_paren_token: false,
+            pipe_token: false,
             cst: None,
         }
     }
@@ -11121,18 +11123,18 @@ impl PathPat {
     pub fn new(path: Path) -> Self { Self { path: Box::new(path), cst: None } }
 }
 impl PathSegment {
-    pub fn new(name_ref: NameRef) -> Self {
+    pub fn new() -> Self {
         Self {
             coloncolon_token: false,
-            name_ref: Box::new(name_ref),
+            name_ref: None,
             generic_arg_list: None,
             param_list: None,
             ret_type: None,
-            l_angle_token: true,
+            l_angle_token: false,
             ty: None,
             as_token: false,
             path_type: None,
-            r_angle_token: true,
+            r_angle_token: false,
             cst: None,
         }
     }
@@ -11259,9 +11261,9 @@ impl RefExpr {
         Self {
             attrs: vec![],
             amp_token: true,
-            raw_token: true,
+            raw_token: false,
             const_token: false,
-            mut_token: true,
+            mut_token: false,
             expr: Box::new(expr.into()),
             cst: None,
         }
@@ -11289,11 +11291,11 @@ impl RetType {
         Self {
             thin_arrow_token: true,
             tracked_token: false,
-            l_paren_token: true,
+            l_paren_token: false,
             pat: None,
-            colon_token: true,
+            colon_token: false,
             ty: None,
-            r_paren_token: true,
+            r_paren_token: false,
             cst: None,
         }
     }
@@ -11310,14 +11312,14 @@ impl ReturnsClause {
     }
 }
 impl SelfParam {
-    pub fn new(name: Name) -> Self {
+    pub fn new() -> Self {
         Self {
             attrs: vec![],
             amp_token: false,
             lifetime: None,
             mut_token: false,
-            name: Box::new(name),
-            colon_token: true,
+            name: None,
+            colon_token: false,
             ty: None,
             cst: None,
         }
@@ -11393,12 +11395,12 @@ impl Struct {
 impl TokenTree {
     pub fn new() -> Self {
         Self {
-            l_paren_token: true,
-            r_paren_token: true,
-            l_curly_token: true,
-            r_curly_token: true,
-            l_brack_token: true,
-            r_brack_token: true,
+            l_paren_token: false,
+            r_paren_token: false,
+            l_curly_token: false,
+            r_curly_token: false,
+            l_brack_token: false,
+            r_brack_token: false,
             cst: None,
         }
     }
@@ -11602,13 +11604,13 @@ impl VerusGlobal {
         Self {
             attrs: vec![],
             global_token: true,
-            size_of_token: true,
+            size_of_token: false,
             ty: None,
-            layout_token: true,
-            is_token: true,
-            size_token: true,
-            comma_token: true,
-            align_token: true,
+            layout_token: false,
+            is_token: false,
+            size_token: false,
+            comma_token: false,
+            align_token: false,
             semicolon_token: true,
             cst: None,
         }
