@@ -103,7 +103,10 @@ impl<'a> AssistContext<'a> {
             _ => return None,
         };
         let name_ref = &path.segment.name_ref;
-        Some(*name_ref.clone())
+        match name_ref {
+            None => None,
+            Some(name) => Some(*name.clone()),
+        }
     }
 
     /// Get function definition from the callsite

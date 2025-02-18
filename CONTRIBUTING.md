@@ -113,7 +113,17 @@ These changes are needed for the IDE purposes(e.g. type inference, code
 scanning, etc).  The best approach is to find an existing piece of syntax
 similar to the one you added and mimic it.
 
-
+#### Debugging issues lifting into VST
+The VST (Verus Syntax Tree) representation is used by Verus Analyzer's proof actions.  
+If you run `crates/va_test` on a workspace and see errors along the lines of:
+```
+Failed to lift function Name(Text("ptr_null_mut")): got error: Err("type_bound_list")
+```
+This means our auto-generated lifting code failed to convert the CST provided by
+the parser into a VST representation.  To start debugging such an issue, try
+searching through `crates/syntax/src/ast/generated/vst_nodes.rs` for the term
+`stringify!(PROBLEM)`, where PROBLEM is the type name in the `Err("PROBLEM")` above.
+That may help locate the problematic code.
 
 ## Building a VSIX file
 

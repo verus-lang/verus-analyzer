@@ -250,7 +250,10 @@ pub(crate) fn vst_rewriter_wp_move_assertion(
                         if !func.fn_mode.as_ref()?.proof_token {
                             return None;
                         }
-                        let vst_name_ref: NameRef = *pp.path.segment.name_ref;
+                        let vst_name_ref: NameRef = match pp.path.segment.name_ref {
+                            Some(nr) => *nr,
+                            None => return None,
+                        };
                         // inline every ensures clause
                         let ensures: Option<Vec<Expr>> = func
                             .ensures_clause?

@@ -124,7 +124,10 @@ pub fn vst_preorder_expr(exp: &vst::Expr, cb: &mut dyn FnMut(vst::Expr) -> bool)
             for expr in &e.exprs {
                 vst_preorder_expr(&expr, cb);
             }
-            vst_preorder_expr(&e.expr, cb);
+            match &e.expr {
+                Some(expr) => vst_preorder_expr(&expr, cb),
+                None => (),
+            }
         }
         vst::Expr::BinExpr(e) => {
             vst_preorder_expr(&e.lhs, cb);

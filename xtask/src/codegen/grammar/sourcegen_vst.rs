@@ -79,12 +79,10 @@ pub(crate) fn generate_vst(_kinds: KindsSrc<'_>, grammar: &AstSrc) -> String {
                         }
                     }
                 } else {
-                    // As source code can be incomplete, we use Option even if the field is not optional in ungrammar.
-                    // TODO:
-                    // As source code can be incomplete, we use might use `Option` even if the field is not optional in ungrammar.
-                    // instead, however, since proof action might choose to be available when syntax is complete
-                    // therefore, we do not use `Option` for VST.
-                    // we only use `Option` when the syntax item is optional in ungrammar.
+                    // rust-analyzer supports code actions that can be applied to incomplete syntax trees.
+                    // For now, verus-analyzer only supports complete syntax trees,
+                    // so that code actions only encounter Option wrappers around fields that are optional in the ungrammar,
+                    // rather than around every single field.
                     if field.is_one() {
                         quote! {
                             pub #name : Box<#ty>,
@@ -250,6 +248,12 @@ pub(crate) fn generate_vst(_kinds: KindsSrc<'_>, grammar: &AstSrc) -> String {
 
     // CST -> VST for struct
     // impl From (eventually `TryFrom` to remove all the options around every fields) for each node
+    // The rough approach is to take the output of running `grammar::lower()` on `rust.ungram` and
+    // - For an item with `?`, apply `Option` with an inductive call.
+    // - For an item with `*`, apply `Vec` with an inductive call.
+    // - Special case handling for `ident`, `int number`, and `lifetime_ident`, as these are literals.
+    // - Make `bool` fields for tokens such as semicolon, comma, etc.
+    // - For the rest (with Cardinality::one), just make inductive call.
     let from_node_to_vnode_struct: Vec<_> = grammar
         .nodes
         .iter()

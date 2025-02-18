@@ -94,7 +94,6 @@ fn main() {
             for def in module.declarations(&db) {
                 if let ModuleDef::Function(foo) = def {
                     let fn_cst = foo.source(&db).expect("source not found");
-                    //dbg!(&cst);
                     let fn_vst_result = fn_cst.value.try_into();
                     if fn_vst_result.is_err() {
                         println!("Failed to lift function {:?}: got error: {:?}", foo.name(&db), fn_vst_result);
