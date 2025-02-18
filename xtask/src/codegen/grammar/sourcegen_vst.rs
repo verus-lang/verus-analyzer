@@ -248,6 +248,12 @@ pub(crate) fn generate_vst(_kinds: KindsSrc<'_>, grammar: &AstSrc) -> String {
 
     // CST -> VST for struct
     // impl From (eventually `TryFrom` to remove all the options around every fields) for each node
+    // The rough approach is to take the output of running `grammar::lower()` on `rust.ungram` and
+    // - For an item with `?`, apply `Option` with an inductive call.
+    // - For an item with `*`, apply `Vec` with an inductive call.
+    // - Special case handling for `ident`, `int number`, and `lifetime_ident`, as these are literals.
+    // - Make `bool` fields for tokens such as semicolon, comma, etc.
+    // - For the rest (with Cardinality::one), just make inductive call.
     let from_node_to_vnode_struct: Vec<_> = grammar
         .nodes
         .iter()
