@@ -506,6 +506,10 @@ fn postfix_expr(
             T![@] => verus::view_expr(p, lhs),
             T![is] => verus::is_expr(p, lhs),
             T![has] => verus::has_expr(p, lhs),
+            T![!] if p.nth_at(1, T![is]) => {
+                p.bump(T![!]); 
+                verus::is_expr(p, lhs)
+            }
             T![->] => verus::arrow_expr(p, lhs),
             T![matches] => verus::matches_expr(p, lhs),
             T![-] => {
@@ -730,7 +734,7 @@ fn path_expr(p: &mut Parser<'_>, r: Restrictions) -> (CompletedMarker, BlockLike
             record_expr_field_list(p);
             (m.complete(p, RECORD_EXPR), BlockLike::NotBlock)
         }
-        T![!] if !p.at(T![!=]) => {
+        T![!] if !p.at(T![!=]) && !p.nth_at(1, T![is]) => {
             let block_like = items::macro_call_after_excl(p);
             (m.complete(p, MACRO_CALL).precede(p).complete(p, MACRO_EXPR), block_like)
         }
