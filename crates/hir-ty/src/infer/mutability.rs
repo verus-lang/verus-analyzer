@@ -192,6 +192,10 @@ impl InferenceContext<'_> {
             Expr::IsExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }
+            Expr::HasExpr { expr_collection, expr_elt, .. } => {
+                self.infer_mut_expr(*expr_collection, Mutability::Not);
+                self.infer_mut_expr(*expr_elt, Mutability::Not);
+            }
             Expr::ArrowExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }

@@ -394,6 +394,7 @@ Expr =
 | AssumeExpr
 | AssertForallExpr
 | IsExpr
+| HasExpr
 | ArrowExpr
 | MatchesExpr
 
@@ -821,6 +822,9 @@ AssumeSpecification =
 
 IsExpr = 
   Attr* Expr 'is' Type
+
+HasExpr = 
+  Attr* collection:Expr 'has' elt:Expr
 
 ArrowExpr =
   Attr* Expr '->' (NameRef | value:('int_number'))

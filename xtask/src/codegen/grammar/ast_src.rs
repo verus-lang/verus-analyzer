@@ -134,6 +134,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "forall",
         "exists",
         "is",
+        "has",
         "matches",
     ],
     contextual_keywords: &[
@@ -366,6 +367,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "BROADCAST_GROUP",
         "ASSUME_SPECIFICATION",
         "IS_EXPR",
+        "HAS_EXPR",
         "ARROW_EXPR",
         "MATCHES_EXPR",
     ],

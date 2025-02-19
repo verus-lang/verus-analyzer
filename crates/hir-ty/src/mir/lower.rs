@@ -1236,6 +1236,31 @@ impl<'ctx> MirLowerCtx<'ctx> {
                 );
                 Ok(Some(current))
             }
+            Expr::HasExpr { expr_collection, expr_elt } => {
+                let Some((it, current)) = self.lower_expr_to_some_operand(*expr_collection, current)? else {
+                    return Ok(None);
+                };
+                let source_ty = self.infer[*expr_collection].clone();
+                let target_ty = self.infer[expr_id].clone();
+                self.push_assignment(
+                    current,
+                    place,
+                    Rvalue::Cast(cast_kind(&source_ty, &target_ty)?, it, target_ty),
+                    expr_id.into(),
+                );
+                let Some((it, current)) = self.lower_expr_to_some_operand(*expr_elt, current)? else {
+                    return Ok(None);
+                };
+                let source_ty = self.infer[*expr_elt].clone();
+                let target_ty = self.infer[expr_id].clone();
+                self.push_assignment(
+                    current,
+                    place,
+                    Rvalue::Cast(cast_kind(&source_ty, &target_ty)?, it, target_ty),
+                    expr_id.into(),
+                );
+                Ok(Some(current))
+            }
             Expr::MatchesExpr { expr, pat: _ } => {
                 let Some((it, current)) = self.lower_expr_to_some_operand(*expr, current)? else {
                     return Ok(None);

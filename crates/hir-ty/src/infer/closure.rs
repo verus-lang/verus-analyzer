@@ -718,6 +718,10 @@ impl InferenceContext<'_> {
             Expr::IsExpr { expr, .. } => {
                 self.consume_expr(*expr);
             }
+            Expr::HasExpr { expr_collection, expr_elt, .. } => {
+                self.consume_expr(*expr_collection);
+                self.consume_expr(*expr_elt);
+            }
             Expr::ArrowExpr { expr, .. } => {
                 self.consume_expr(*expr);
             }
