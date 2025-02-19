@@ -930,6 +930,16 @@ impl InferenceContext<'_> {
                 self.infer_expr_coerce(*expr, &Expectation::HasType(ty.clone()));
                 self.result.standard_types.bool_.clone()
             }
+            Expr::HasExpr { expr_collection, expr_elt } => {
+                let ty_collection = self.infer_expr(*expr_collection, &Expectation::none());
+                let ty_elt = self.infer_expr(*expr_elt, &Expectation::none());
+                let ty_collection = self.resolve_ty_shallow(&ty_collection);
+                let ty_elt = self.resolve_ty_shallow(&ty_elt);
+                // TODO: Arrow Expr has a line like this, but IsExpr doesn't...
+                self.write_expr_ty(tgt_expr, ty_collection.clone());
+                self.write_expr_ty(tgt_expr, ty_elt.clone());
+                self.result.standard_types.bool_.clone()
+            }
             Expr::ArrowExpr { expr, .. } => {
                 let ty = self.infer_expr_inner(*expr, &Expectation::none());
                 let ty = self.resolve_ty_shallow(&ty);

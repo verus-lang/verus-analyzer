@@ -177,6 +177,10 @@ pub enum Expr {
         expr: ExprId,
         type_ref: Interned<TypeRef>,
     },
+    HasExpr {
+        expr_collection: ExprId,
+        expr_elt: ExprId,
+    },
     ArrowExpr {
         expr: ExprId,
         name: Name,
@@ -504,6 +508,10 @@ impl Expr {
             }
             Expr::IsExpr { expr, .. } => {
                 f(*expr);
+            }
+            Expr::HasExpr { expr_collection, expr_elt, .. } => {
+                f(*expr_collection);
+                f(*expr_elt);
             }
             Expr::ArrowExpr { expr, .. } => {
                 f(*expr);

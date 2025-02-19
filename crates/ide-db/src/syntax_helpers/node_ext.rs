@@ -316,6 +316,7 @@ pub fn for_each_tail_expr(expr: &ast::Expr, cb: &mut dyn FnMut(&ast::Expr)) {
         | ast::Expr::CallExpr(_)
         | ast::Expr::CastExpr(_)
         | ast::Expr::IsExpr(_) // verus
+        | ast::Expr::HasExpr(_) // verus
         | ast::Expr::MatchesExpr(_) // verus
         | ast::Expr::ClosureExpr(_)
         | ast::Expr::ContinueExpr(_)

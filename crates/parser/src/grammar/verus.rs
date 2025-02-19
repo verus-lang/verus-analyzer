@@ -67,6 +67,14 @@ pub(crate) fn is_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMark
     m.complete(p, IS_EXPR)
 }
 
+pub(crate) fn has_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+    assert!(p.at(T![has]));
+    let m = lhs.precede(p);
+    p.bump(T![has]);
+    expressions::expr(p);
+    m.complete(p, HAS_EXPR)
+}
+
 pub(crate) fn matches_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(T![matches]));
     let m = lhs.precede(p);

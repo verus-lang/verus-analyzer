@@ -476,6 +476,14 @@ pub struct GenericParamList {
     pub cst: Option<super::nodes::GenericParamList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct HasExpr {
+    pub attrs: Vec<Attr>,
+    pub collection: Box<Expr>,
+    pub has_token: bool,
+    pub elt: Box<Expr>,
+    pub cst: Option<super::nodes::HasExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IdentPat {
     pub attrs: Vec<Attr>,
     pub ref_token: bool,
@@ -1447,6 +1455,7 @@ pub enum Expr {
     FieldExpr(Box<FieldExpr>),
     ForExpr(Box<ForExpr>),
     FormatArgsExpr(Box<FormatArgsExpr>),
+    HasExpr(Box<HasExpr>),
     IfExpr(Box<IfExpr>),
     IndexExpr(Box<IndexExpr>),
     IsExpr(Box<IsExpr>),
@@ -2746,6 +2755,28 @@ impl TryFrom<super::nodes::GenericParamList> for GenericParamList {
                 .map(GenericParam::try_from)
                 .collect::<Result<Vec<GenericParam>, String>>()?,
             r_angle_token: item.r_angle_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::HasExpr> for HasExpr {
+    type Error = String;
+    fn try_from(item: super::nodes::HasExpr) -> Result<Self, Self::Error> {
+        Ok(Self {
+            attrs: item
+                .attrs()
+                .into_iter()
+                .map(Attr::try_from)
+                .collect::<Result<Vec<Attr>, String>>()?,
+            collection: Box::new(
+                item.collection()
+                    .ok_or(format!("{}", stringify!(collection)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
+            has_token: item.has_token().is_some(),
+            elt: Box::new(
+                item.elt().ok_or(format!("{}", stringify!(elt))).map(|it| Expr::try_from(it))??,
+            ),
             cst: Some(item.clone()),
         })
     }
@@ -5082,6 +5113,7 @@ impl TryFrom<super::nodes::Expr> for Expr {
             super::nodes::Expr::FormatArgsExpr(it) => {
                 Ok(Self::FormatArgsExpr(Box::new(it.try_into()?)))
             }
+            super::nodes::Expr::HasExpr(it) => Ok(Self::HasExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::IfExpr(it) => Ok(Self::IfExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::IndexExpr(it) => Ok(Self::IndexExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::IsExpr(it) => Ok(Self::IsExpr(Box::new(it.try_into()?))),
@@ -6655,6 +6687,23 @@ impl std::fmt::Display for GenericParamList {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for HasExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        s.push_str(&self.collection.to_string());
+        s.push_str(" ");
+        if self.has_token {
+            let mut tmp = stringify!(has_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.elt.to_string());
+        s.push_str(" ");
         write!(f, "{s}")
     }
 }
@@ -9361,6 +9410,7 @@ impl std::fmt::Display for Expr {
             Expr::FieldExpr(it) => write!(f, "{}", it.to_string()),
             Expr::ForExpr(it) => write!(f, "{}", it.to_string()),
             Expr::FormatArgsExpr(it) => write!(f, "{}", it.to_string()),
+            Expr::HasExpr(it) => write!(f, "{}", it.to_string()),
             Expr::IfExpr(it) => write!(f, "{}", it.to_string()),
             Expr::IndexExpr(it) => write!(f, "{}", it.to_string()),
             Expr::IsExpr(it) => write!(f, "{}", it.to_string()),
@@ -9569,6 +9619,7 @@ impl Expr {
             Expr::FormatArgsExpr(it) => {
                 Some(super::nodes::Expr::FormatArgsExpr(it.cst.as_ref()?.clone()))
             }
+            Expr::HasExpr(it) => Some(super::nodes::Expr::HasExpr(it.cst.as_ref()?.clone())),
             Expr::IfExpr(it) => Some(super::nodes::Expr::IfExpr(it.cst.as_ref()?.clone())),
             Expr::IndexExpr(it) => Some(super::nodes::Expr::IndexExpr(it.cst.as_ref()?.clone())),
             Expr::IsExpr(it) => Some(super::nodes::Expr::IsExpr(it.cst.as_ref()?.clone())),
@@ -9859,6 +9910,9 @@ impl From<ForExpr> for Expr {
 }
 impl From<FormatArgsExpr> for Expr {
     fn from(item: FormatArgsExpr) -> Self { Expr::FormatArgsExpr(Box::new(item)) }
+}
+impl From<HasExpr> for Expr {
+    fn from(item: HasExpr) -> Self { Expr::HasExpr(Box::new(item)) }
 }
 impl From<IfExpr> for Expr {
     fn from(item: IfExpr) -> Self { Expr::IfExpr(Box::new(item)) }
@@ -10707,6 +10761,21 @@ impl GenericArgList {
 impl GenericParamList {
     pub fn new() -> Self {
         Self { l_angle_token: true, generic_params: vec![], r_angle_token: true, cst: None }
+    }
+}
+impl HasExpr {
+    pub fn new<ET0, ET1>(collection: ET0, elt: ET1) -> Self
+    where
+        ET0: Into<Expr>,
+        ET1: Into<Expr>,
+    {
+        Self {
+            attrs: vec![],
+            collection: Box::new(collection.into()),
+            has_token: true,
+            elt: Box::new(elt.into()),
+            cst: None,
+        }
     }
 }
 impl IdentPat {
@@ -11728,6 +11797,9 @@ impl From<ForExpr> for Stmt {
 }
 impl From<FormatArgsExpr> for Stmt {
     fn from(item: FormatArgsExpr) -> Self { Stmt::from(Expr::from(item)) }
+}
+impl From<HasExpr> for Stmt {
+    fn from(item: HasExpr) -> Self { Stmt::from(Expr::from(item)) }
 }
 impl From<IfExpr> for Stmt {
     fn from(item: IfExpr) -> Self { Stmt::from(Expr::from(item)) }

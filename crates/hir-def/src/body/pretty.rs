@@ -499,6 +499,11 @@ impl Printer<'_> {
                 w!(self, " is ");
                 self.print_type_ref(type_ref);
             }
+            Expr::HasExpr { expr_collection, expr_elt } => {
+                self.print_expr(*expr_collection);
+                w!(self, " has ");
+                self.print_expr(*expr_elt);
+            }
             Expr::ArrowExpr { expr, name } => {
                 self.print_expr(*expr);
                 w!(self, "->");

@@ -668,6 +668,11 @@ impl ExprCollector<'_> {
                 let type_ref = Interned::new(TypeRef::from_ast_opt(&self.ctx(), e.ty()));
                 self.alloc_expr(Expr::IsExpr { expr, type_ref }, syntax_ptr)
             }
+            ast::Expr::HasExpr(e) => {
+                let collection = self.collect_expr_opt(e.collection());
+                let elt = self.collect_expr_opt(e.elt());
+                self.alloc_expr(Expr::HasExpr { expr_collection: collection, expr_elt: elt}, syntax_ptr)
+            }
             ast::Expr::ArrowExpr(e) => {
                 let expr = self.collect_expr_opt(e.expr());
                 let name = match e.name_ref() {

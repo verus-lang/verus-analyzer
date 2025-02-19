@@ -2,9 +2,16 @@ use vstd::prelude::*;
 
 verus! {
 
-
-fn ptr_null_mut<T: Pointee<Metadata = ()>>() -> u32 {
-    5
+fn uses_spec_has()
+    requires
+        s has 3,
+        ms has 4,
+{
+    assert(s has 3);
+    assert(s has 3 == true);
+    assert(s has 3 == s has 3);
+    assert(ms has 4);
+    assert(ms has 4 == ms has 4);
 }
 
 /*

@@ -1634,6 +1634,34 @@ spec fn walks_upright(l: Life) -> bool
 }
 
 #[test]
+fn verus_has() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+fn uses_spec_has()
+    requires
+        s has 3,
+        ms has 4,
+{
+    assert(s has 3);
+    assert(s has 3 == true);
+    assert(s has 3 == s has 3);
+    assert(ms has 4);
+    assert(ms has 4 == ms has 4);
+}
+    }";
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
 fn verus_while_loops() {
     use ast::HasModuleItem;
     let source_code = "verus!{

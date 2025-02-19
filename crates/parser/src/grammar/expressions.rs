@@ -505,6 +505,7 @@ fn postfix_expr(
             T![?] => try_expr(p, lhs),
             T![@] => verus::view_expr(p, lhs),
             T![is] => verus::is_expr(p, lhs),
+            T![has] => verus::has_expr(p, lhs),
             T![->] => verus::arrow_expr(p, lhs),
             T![matches] => verus::matches_expr(p, lhs),
             T![-] => {
