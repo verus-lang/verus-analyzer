@@ -1589,16 +1589,17 @@ fn verus_struct_syntax() {
 proof fn sufficiently_creamy() -> bool
     requires 
         bev is Coffee,
+        bev !is Tea,
 {
    bev->creamers
 }
 
 spec fn is_insect(l: Life) -> bool {
-    l is Arthropod && l->Arthropod_legs == 6
+    l !is Primate && l is Arthropod && l->Arthropod_legs == 6
 }
 
 spec fn rect_height(s: Shape) -> int
-    recommends s is Rect
+    recommends s is Rect && s !is Circle 
 {
     s->1
 }
@@ -1641,12 +1642,19 @@ fn uses_spec_has()
     requires
         s has 3,
         ms has 4,
+        s !has 5,
+        ms !has 6,
 {
     assert(s has 3);
     assert(s has 3 == true);
     assert(s has 3 == s has 3);
     assert(ms has 4);
     assert(ms has 4 == ms has 4);
+    assert(s !has 3);
+    assert(s !has 3 == true);
+    assert(s !has 3 == s !has 3);
+    assert(ms !has 4);
+    assert(ms !has 4 == ms !has 4);
 }
     }";
     let parse = SourceFile::parse(source_code, Edition::Edition2024);
