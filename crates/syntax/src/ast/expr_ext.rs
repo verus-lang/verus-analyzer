@@ -167,6 +167,7 @@ impl ast::BinExpr {
 
                 T![==] => BinaryOp::CmpOp(CmpOp::Eq { negated: false }),
                 T![=~=] | T![=~~=] | T![===] => BinaryOp::CmpOp(CmpOp::Eq { negated: false }),   // verus: TODO: Do we need a separate operator for extensional equality?
+                T![!==] => BinaryOp::CmpOp(CmpOp::Eq { negated: true }),   // verus: TODO: Do we need a separate operator for extensional equality?
                 T![!=] => BinaryOp::CmpOp(CmpOp::Eq { negated: true }),
                 T![<=] => BinaryOp::CmpOp(CmpOp::Ord { ordering: Ordering::Less,    strict: false }),
                 T![>=] => BinaryOp::CmpOp(CmpOp::Ord { ordering: Ordering::Greater, strict: false }),
