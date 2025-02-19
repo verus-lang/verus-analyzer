@@ -47,7 +47,7 @@ impl Stitched {
     pub(crate) fn public_deps(&self) -> impl Iterator<Item = (CrateName, SysrootCrate, bool)> + '_ {
         // core is added as a dependency before std in order to
         // mimic rustcs dependency order
-        [("core", true), ("alloc", false), ("std", true), ("test", false)].into_iter().filter_map(
+        [("core", true), ("alloc", false), ("std", true), ("vstd", true), ("test", false)].into_iter().filter_map(  // Verus: vstd
             move |(name, prelude)| {
                 Some((CrateName::new(name).unwrap(), self.by_name(name)?, prelude))
             },
@@ -320,12 +320,14 @@ impl Sysroot {
                         Some(_) => {
                             tracing::warn!("unknown rustc-std-workspace-* crate: {}", package.name)
                         }
-                        None => match &*package.name {
+                        None => {
+                            eprintln!("{}", &*package.name);
+                            match &*package.name {
                             "core" => real_core = Some(package.id.clone()),
                             "alloc" => real_alloc = Some(package.id.clone()),
                             "std" => real_std = Some(package.id.clone()),
                             _ => (),
-                        },
+                        }},
                     }
                 });
 
@@ -502,6 +504,7 @@ fn get_rust_src(sysroot_path: &AbsPath) -> Option<AbsPathBuf> {
     }
 }
 
+// Verus: added vstd
 const SYSROOT_CRATES: &str = "
 alloc
 backtrace
@@ -511,6 +514,7 @@ panic_unwind
 proc_macro
 profiler_builtins
 std
+vstd
 stdarch/crates/std_detect
 test
 unwind";

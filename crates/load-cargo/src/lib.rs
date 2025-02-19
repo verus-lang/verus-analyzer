@@ -166,6 +166,8 @@ impl ProjectFolders {
             .sorted_by(|a, b| a.include.cmp(&b.include))
             .collect();
 
+        eprintln!("roots: {:#?}", roots);
+
         // map that tracks indices of overlapping roots
         let mut overlap_map = FxHashMap::<_, Vec<_>>::default();
         let mut done = false;
@@ -223,7 +225,7 @@ impl ProjectFolders {
                         dirs.exclude.push(excl.clone());
                     }
                 }
-
+                eprintln!("dirs: {:#?}", dirs);
                 vfs::loader::Entry::Directories(dirs)
             };
 

@@ -285,10 +285,12 @@ impl GlobalState {
                             state = Progress::Report;
 
                             message = match &report.crates_currently_indexing[..] {
-                                [crate_name] => Some(format!(
+                                [crate_name] => {
+                                    eprintln!("Indexing {}", crate_name);
+                                    Some(format!(
                                     "{}/{} ({crate_name})",
                                     report.crates_done, report.crates_total
-                                )),
+                                ))},
                                 [crate_name, rest @ ..] => Some(format!(
                                     "{}/{} ({} + {} more)",
                                     report.crates_done,

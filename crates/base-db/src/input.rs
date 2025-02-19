@@ -146,7 +146,7 @@ pub enum CrateOrigin {
     Local { repo: Option<String>, name: Option<String> },
     /// Crates that are non member libraries.
     Library { repo: Option<String>, name: String },
-    /// Crates that are provided by the language, like std, core, proc-macro, ...
+    /// Crates that are provided by the language, like std, core, proc-macro, (Verus: vstd), ...
     Lang(LangCrateOrigin),
 }
 
@@ -170,6 +170,7 @@ pub enum LangCrateOrigin {
     Core,
     ProcMacro,
     Std,
+    Vstd,   // Verus
     Test,
     Other,
 }
@@ -181,6 +182,7 @@ impl From<&str> for LangCrateOrigin {
             "core" => LangCrateOrigin::Core,
             "proc-macro" | "proc_macro" => LangCrateOrigin::ProcMacro,
             "std" => LangCrateOrigin::Std,
+            "vstd" => LangCrateOrigin::Vstd,
             "test" => LangCrateOrigin::Test,
             _ => LangCrateOrigin::Other,
         }
@@ -194,6 +196,7 @@ impl fmt::Display for LangCrateOrigin {
             LangCrateOrigin::Core => "core",
             LangCrateOrigin::ProcMacro => "proc_macro",
             LangCrateOrigin::Std => "std",
+            LangCrateOrigin::Vstd => "vstd",
             LangCrateOrigin::Test => "test",
             LangCrateOrigin::Other => "other",
         };

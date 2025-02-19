@@ -10,7 +10,7 @@ use base_db::{
     LangCrateOrigin, ProcMacroPaths, TargetLayoutLoadResult,
 };
 use cfg::{CfgAtom, CfgDiff, CfgOptions};
-use paths::{AbsPath, AbsPathBuf};
+use paths::{AbsPath, AbsPathBuf, Utf8Path};
 use rustc_hash::{FxHashMap, FxHashSet};
 use semver::Version;
 use span::Edition;
@@ -574,6 +574,16 @@ impl ProjectWorkspace {
             r.push(PackageRoot {
                 is_local: false,
                 include: self.sysroot.src_root().map(|it| it.to_path_buf()).into_iter().collect(),
+                exclude: Vec::new(),
+            });
+            eprintln!("Trying to add a PackageRoot for vstd");
+            //let utf8_path_buf = Utf8PathBuf::new("/Users/parno/git/verus/source/vstd");
+            let utf8_path = Utf8Path::new("/Users/parno/git/verus/source/vstd");
+            //let path_buf = PathBuf::from("/Users/parno/git/verus/source/vstd");
+            let abs_path = AbsPath::assert(utf8_path);
+            r.push(PackageRoot {
+                is_local: false,
+                include: vec![abs_path.normalize()], //AbsPath::try_from(path_buf)],  //utf8_path_buf.into()], //self.  sysroot.root().map(|it| it.to_path_buf()).into_iter().collect(),
                 exclude: Vec::new(),
             });
             r
@@ -1414,7 +1424,8 @@ fn sysroot_to_crate_graph(
                         LangCrateOrigin::Test
                         | LangCrateOrigin::Alloc
                         | LangCrateOrigin::Core
-                        | LangCrateOrigin::Std => pub_deps.push((
+                        | LangCrateOrigin::Std
+                        | LangCrateOrigin::Vstd => pub_deps.push((
                             CrateName::normalize_dashes(&lang_crate.to_string()),
                             cid,
                             !matches!(lang_crate, LangCrateOrigin::Test | LangCrateOrigin::Alloc),
@@ -1424,6 +1435,7 @@ fn sysroot_to_crate_graph(
                     }
                 }
             }
+            dbg!(&pub_deps);
 
             let mut marker_set = vec![];
             for &(_, cid, _) in pub_deps.iter() {
@@ -1448,6 +1460,7 @@ fn sysroot_to_crate_graph(
                 *libproc_macro = mapping
                     [&removed_mapping[libproc_macro.into_raw().into_u32() as usize].unwrap()];
             }
+            dbg!(&pub_deps);
 
             (SysrootPublicDeps { deps: pub_deps }, libproc_macro)
         }

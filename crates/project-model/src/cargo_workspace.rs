@@ -103,6 +103,8 @@ pub struct CargoConfig {
     pub invocation_location: InvocationLocation,
     /// Optional path to use instead of `target` when building
     pub target_dir: Option<Utf8PathBuf>,
+    /// Verus: Optional path to the source code for vstd
+    pub vstd_src: Option<Utf8PathBuf>,
 }
 
 pub type Package = Idx<PackageData>;

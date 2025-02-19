@@ -1879,6 +1879,7 @@ impl Config {
             extra_args: self.cargo_extraArgs().clone(),
             extra_env: self.cargo_extraEnv().clone(),
             target_dir: self.target_dir_from_config(),
+            vstd_src: self.get_vstd_src_path(),
         }
     }
 
@@ -1952,6 +1953,16 @@ impl Config {
             TargetDirectory::Directory(dir) if dir.is_relative() => Some(dir.clone()),
             TargetDirectory::Directory(_) => None,
         })
+    }
+
+    fn get_vstd_src_path(&self) -> Option<Utf8PathBuf> {
+        match std::env::var("VSTD_SRC_PATH") {
+            Ok(path) => Some(Utf8PathBuf::from(path)),
+            Err(_) => {
+                tracing::warn!("VSTD_SRC_PATH was not set!");
+                None
+            }
+        }
     }
 
     pub fn check_on_save(&self) -> bool {
