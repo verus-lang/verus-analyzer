@@ -664,6 +664,17 @@ impl GenericParamList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct HasExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for HasExpr {}
+impl HasExpr {
+    pub fn collection(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn elt(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn has_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![has]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IdentPat {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2039,6 +2050,7 @@ pub enum Expr {
     FieldExpr(FieldExpr),
     ForExpr(ForExpr),
     FormatArgsExpr(FormatArgsExpr),
+    HasExpr(HasExpr),
     IfExpr(IfExpr),
     IndexExpr(IndexExpr),
     IsExpr(IsExpr),
@@ -2793,6 +2805,17 @@ impl AstNode for GenericArgList {
 }
 impl AstNode for GenericParamList {
     fn can_cast(kind: SyntaxKind) -> bool { kind == GENERIC_PARAM_LIST }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for HasExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == HAS_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4233,6 +4256,9 @@ impl From<ForExpr> for Expr {
 impl From<FormatArgsExpr> for Expr {
     fn from(node: FormatArgsExpr) -> Expr { Expr::FormatArgsExpr(node) }
 }
+impl From<HasExpr> for Expr {
+    fn from(node: HasExpr) -> Expr { Expr::HasExpr(node) }
+}
 impl From<IfExpr> for Expr {
     fn from(node: IfExpr) -> Expr { Expr::IfExpr(node) }
 }
@@ -4330,6 +4356,7 @@ impl AstNode for Expr {
                 | FIELD_EXPR
                 | FOR_EXPR
                 | FORMAT_ARGS_EXPR
+                | HAS_EXPR
                 | IF_EXPR
                 | INDEX_EXPR
                 | IS_EXPR
@@ -4377,6 +4404,7 @@ impl AstNode for Expr {
             FIELD_EXPR => Expr::FieldExpr(FieldExpr { syntax }),
             FOR_EXPR => Expr::ForExpr(ForExpr { syntax }),
             FORMAT_ARGS_EXPR => Expr::FormatArgsExpr(FormatArgsExpr { syntax }),
+            HAS_EXPR => Expr::HasExpr(HasExpr { syntax }),
             IF_EXPR => Expr::IfExpr(IfExpr { syntax }),
             INDEX_EXPR => Expr::IndexExpr(IndexExpr { syntax }),
             IS_EXPR => Expr::IsExpr(IsExpr { syntax }),
@@ -4426,6 +4454,7 @@ impl AstNode for Expr {
             Expr::FieldExpr(it) => &it.syntax,
             Expr::ForExpr(it) => &it.syntax,
             Expr::FormatArgsExpr(it) => &it.syntax,
+            Expr::HasExpr(it) => &it.syntax,
             Expr::IfExpr(it) => &it.syntax,
             Expr::IndexExpr(it) => &it.syntax,
             Expr::IsExpr(it) => &it.syntax,
@@ -5036,6 +5065,7 @@ impl AstNode for AnyHasAttrs {
                 | FN
                 | FOR_EXPR
                 | FORMAT_ARGS_EXPR
+                | HAS_EXPR
                 | IDENT_PAT
                 | IF_EXPR
                 | IMPL
@@ -5597,6 +5627,11 @@ impl std::fmt::Display for GenericArgList {
     }
 }
 impl std::fmt::Display for GenericParamList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for HasExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
