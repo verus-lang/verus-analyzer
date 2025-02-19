@@ -761,10 +761,10 @@ impl<'a> AssocItemCollector<'a> {
                 }
             }
             AssocItem::VerusGlobal(_id) => {
-                todo!()
+                // not yet implemented
             }
             AssocItem::BroadcastGroup(_id) => {
-                todo!()
+                // not yet implemented
             }
         }
     }
