@@ -578,7 +578,7 @@ impl ProjectWorkspace {
             });
             eprintln!("Trying to add a PackageRoot for vstd");
             //let utf8_path_buf = Utf8PathBuf::new("/Users/parno/git/verus/source/vstd");
-            let utf8_path = Utf8Path::new("/Users/parno/git/verus/source/vstd");
+            let utf8_path = Utf8Path::new("/Users/parno/tmp/verus-source");
             //let path_buf = PathBuf::from("/Users/parno/git/verus/source/vstd");
             let abs_path = AbsPath::assert(utf8_path);
             r.push(PackageRoot {

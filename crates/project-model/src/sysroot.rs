@@ -536,4 +536,5 @@ const PROC_MACRO_DEPS: &str = "
 std
 core";
 
-const RELEVANT_SYSROOT_CRATES: &[&str] = &["core", "alloc", "std", "test", "proc_macro"];
+// Verus: added vstd
+const RELEVANT_SYSROOT_CRATES: &[&str] = &["core", "alloc", "std", "test", "proc_macro", "vstd"];

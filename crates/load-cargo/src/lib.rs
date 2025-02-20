@@ -413,6 +413,7 @@ fn load_crate_graph(
         }
     }
     let source_roots = source_root_config.partition(vfs);
+    eprintln!("source_roots: {:#?}", source_roots);
     analysis_change.set_roots(source_roots);
 
     let num_crates = crate_graph.len();
