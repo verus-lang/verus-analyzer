@@ -217,7 +217,7 @@ pub(super) fn expr_block_contents(p: &mut Parser<'_>) {
         attributes::inner_attrs(p);
         // With Verus's triple-operators, we know the next item should be an expression,
         // whereas Rust expects a block to contain statements.
-        expr_no_struct(p);
+        expr(p);
         mm.abandon(p);
         return;
     }
