@@ -105,8 +105,11 @@ pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
     } else if p.at_contextual_kw(T![closed]) {
         p.bump_remap(T![closed]);
         m.complete(p, PUBLISH)
+    } else if p.at_contextual_kw(T![uninterp]) {
+        p.bump_remap(T![uninterp]);
+        m.complete(p, PUBLISH)
     } else {
-        p.error("TODO: expected open or closed or publish.");
+        p.error("TODO: expected open, closed, or uninterp.");
         m.complete(p, ERROR)
     }
 }

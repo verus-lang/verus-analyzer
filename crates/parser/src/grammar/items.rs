@@ -140,7 +140,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         (body:BlockExpr | ';')
     */
     // verus--publish : after visibility, before const
-    if p.at_contextual_kw(T![open]) || p.at_contextual_kw(T![closed]) {
+    if p.at_contextual_kw(T![open]) || p.at_contextual_kw(T![closed]) || p.at_contextual_kw(T![uninterp]) {
         verus::publish(p);
     }
 

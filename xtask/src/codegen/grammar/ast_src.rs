@@ -180,6 +180,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "assume_specification",
         "open",
         "closed",
+        "uninterp",
         "opens_invariants",
         // global-related keywords
         "size_of",

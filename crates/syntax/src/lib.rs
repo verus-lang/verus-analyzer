@@ -2335,6 +2335,26 @@ pub axiom fn foo(x: u8) requires x == 5;
 }
 
 #[test]
+fn verus_uninterp() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+pub uninterp spec fn bar() -> bool;
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+
+#[test]
 fn verus_fn_signatures() {
     use ast::HasModuleItem;
     let source_code = "verus!{
