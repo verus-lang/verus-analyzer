@@ -736,7 +736,7 @@ Publish =
   ('closed' | 'open' )
 
 FnMode =
-  ('spec' | 'proof' | 'exec' | ModeSpecChecked )
+  ('spec' | 'proof' | 'exec' | 'axiom' | ModeSpecChecked )
 
 DataMode =
   ('ghost' | 'tracked')

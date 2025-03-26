@@ -170,6 +170,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "exec",
         "spec",
         "proof",
+        "axiom",
         "by",
         "via",
         "when",

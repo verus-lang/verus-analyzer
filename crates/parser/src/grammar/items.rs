@@ -185,7 +185,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         (body:BlockExpr | ';')
     */
     // verus--fnmode : spec proof exec
-    if p.at_contextual_kw(T![spec]) || p.at_contextual_kw(T![proof]) || p.at_contextual_kw(T![exec]) {
+    if p.at_contextual_kw(T![spec]) || p.at_contextual_kw(T![proof]) || p.at_contextual_kw(T![exec]) || p.at_contextual_kw(T![axiom]) {
         verus::fn_mode(p);
     }
 
