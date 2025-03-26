@@ -921,6 +921,7 @@ pub struct PtrType {
 pub struct Publish {
     pub closed_token: bool,
     pub open_token: bool,
+    pub uninterp_token: bool,
     pub cst: Option<super::nodes::Publish>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3830,6 +3831,7 @@ impl TryFrom<super::nodes::Publish> for Publish {
         Ok(Self {
             closed_token: item.closed_token().is_some(),
             open_token: item.open_token().is_some(),
+            uninterp_token: item.uninterp_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -7909,6 +7911,12 @@ impl std::fmt::Display for Publish {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.uninterp_token {
+            let mut tmp = stringify!(uninterp_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -11245,7 +11253,9 @@ impl PtrType {
     }
 }
 impl Publish {
-    pub fn new() -> Self { Self { closed_token: false, open_token: false, cst: None } }
+    pub fn new() -> Self {
+        Self { closed_token: false, open_token: false, uninterp_token: false, cst: None }
+    }
 }
 impl RangeExpr {
     pub fn new() -> Self { Self { attrs: vec![], cst: None } }

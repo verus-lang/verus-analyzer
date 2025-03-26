@@ -1322,6 +1322,9 @@ pub struct Publish {
 impl Publish {
     pub fn closed_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![closed]) }
     pub fn open_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![open]) }
+    pub fn uninterp_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![uninterp])
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
