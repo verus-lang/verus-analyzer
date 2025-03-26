@@ -406,6 +406,7 @@ pub struct FnMode {
     pub spec_token: bool,
     pub proof_token: bool,
     pub exec_token: bool,
+    pub axiom_token: bool,
     pub mode_spec_checked: Option<Box<ModeSpecChecked>>,
     pub cst: Option<super::nodes::FnMode>,
 }
@@ -2593,6 +2594,7 @@ impl TryFrom<super::nodes::FnMode> for FnMode {
             spec_token: item.spec_token().is_some(),
             proof_token: item.proof_token().is_some(),
             exec_token: item.exec_token().is_some(),
+            axiom_token: item.axiom_token().is_some(),
             mode_spec_checked: match item.mode_spec_checked() {
                 Some(it) => Some(Box::new(ModeSpecChecked::try_from(it)?)),
                 None => None,
@@ -6465,6 +6467,12 @@ impl std::fmt::Display for FnMode {
         }
         if self.exec_token {
             let mut tmp = stringify!(exec_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.axiom_token {
+            let mut tmp = stringify!(axiom_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -10675,6 +10683,7 @@ impl FnMode {
             spec_token: false,
             proof_token: false,
             exec_token: false,
+            axiom_token: false,
             mode_spec_checked: None,
             cst: None,
         }
