@@ -170,6 +170,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "exec",
         "spec",
         "proof",
+        "axiom",
         "by",
         "via",
         "when",
@@ -179,6 +180,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "assume_specification",
         "open",
         "closed",
+        "uninterp",
         "opens_invariants",
         // global-related keywords
         "size_of",

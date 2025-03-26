@@ -733,10 +733,10 @@ ConstBlockPat =
 //************************//
 
 Publish =
-  ('closed' | 'open' )
+  ('closed' | 'open' | 'uninterp' )
 
 FnMode =
-  ('spec' | 'proof' | 'exec' | ModeSpecChecked )
+  ('spec' | 'proof' | 'exec' | 'axiom' | ModeSpecChecked )
 
 DataMode =
   ('ghost' | 'tracked')

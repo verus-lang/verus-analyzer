@@ -571,6 +571,7 @@ pub struct FnMode {
 }
 impl FnMode {
     pub fn mode_spec_checked(&self) -> Option<ModeSpecChecked> { support::child(&self.syntax) }
+    pub fn axiom_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![axiom]) }
     pub fn exec_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![exec]) }
     pub fn proof_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![proof]) }
     pub fn spec_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![spec]) }
@@ -1321,6 +1322,9 @@ pub struct Publish {
 impl Publish {
     pub fn closed_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![closed]) }
     pub fn open_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![open]) }
+    pub fn uninterp_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![uninterp])
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

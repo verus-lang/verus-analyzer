@@ -140,7 +140,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         (body:BlockExpr | ';')
     */
     // verus--publish : after visibility, before const
-    if p.at_contextual_kw(T![open]) || p.at_contextual_kw(T![closed]) {
+    if p.at_contextual_kw(T![open]) || p.at_contextual_kw(T![closed]) || p.at_contextual_kw(T![uninterp]) {
         verus::publish(p);
     }
 
@@ -185,7 +185,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         (body:BlockExpr | ';')
     */
     // verus--fnmode : spec proof exec
-    if p.at_contextual_kw(T![spec]) || p.at_contextual_kw(T![proof]) || p.at_contextual_kw(T![exec]) {
+    if p.at_contextual_kw(T![spec]) || p.at_contextual_kw(T![proof]) || p.at_contextual_kw(T![exec]) || p.at_contextual_kw(T![axiom]) {
         verus::fn_mode(p);
     }
 
