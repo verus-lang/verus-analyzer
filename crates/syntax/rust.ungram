@@ -504,9 +504,21 @@ MethodCallExpr =
 FieldExpr =
   Attr* Expr '.' NameRef
 
+// verus
+ProofFnCharacteristics =
+  '[' fields:(Path (',' Path)* ','?) ']'
+
+// verus
+ProofFnWithCharacteristics =
+  'proof_fn' ProofFnCharacteristics?
+
+// verus
+ProofFnType =
+  'proof_fn' ProofFnCharacteristics? GenericParamList? ParamList? RetType?
+
 // verus: forall, exists
 ClosureExpr =
-  Attr* ('for' GenericParamList)? 'const'? 'static'? 'async'? 'move'? 'forall'? 'exists'? ParamList RetType? Attr*
+  Attr* ('for' GenericParamList)? 'const'? 'static'? 'async'? 'move'? ProofFnWithCharacteristics? 'forall'? 'exists'? ParamList RetType? RequiresClause? EnsuresClause? Attr*
   body:Expr
 
 IfExpr =
@@ -582,6 +594,7 @@ Type =
   ArrayType
 | DynTraitType
 | FnPtrType
+| ProofFnType
 | ForType
 | ImplTraitType
 | InferType

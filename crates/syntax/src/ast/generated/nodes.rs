@@ -345,6 +345,9 @@ impl ClosureExpr {
     pub fn body(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn generic_param_list(&self) -> Option<GenericParamList> { support::child(&self.syntax) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
+    pub fn proof_fn_with_characteristics(&self) -> Option<ProofFnWithCharacteristics> {
+        support::child(&self.syntax)
+    }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
@@ -1294,6 +1297,45 @@ impl PrefixExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnCharacteristics {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ProofFnCharacteristics {
+    pub fn fields(&self) -> AstChildren<PathSegment> { support::children(&self.syntax) }
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ProofFnType {
+    pub fn generic_param_list(&self) -> Option<GenericParamList> { support::child(&self.syntax) }
+    pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
+    pub fn proof_fn_characteristics(&self) -> Option<ProofFnCharacteristics> {
+        support::child(&self.syntax)
+    }
+    pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    pub fn proof_fn_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![proof_fn])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnWithCharacteristics {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ProofFnWithCharacteristics {
+    pub fn proof_fn_characteristics(&self) -> Option<ProofFnCharacteristics> {
+        support::child(&self.syntax)
+    }
+    pub fn proof_fn_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![proof_fn])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Prover {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2187,6 +2229,7 @@ pub enum Type {
     NeverType(NeverType),
     ParenType(ParenType),
     PathType(PathType),
+    ProofFnType(ProofFnType),
     PtrType(PtrType),
     RefType(RefType),
     SliceType(SliceType),
@@ -3436,6 +3479,39 @@ impl AstNode for PathType {
 }
 impl AstNode for PrefixExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == PREFIX_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ProofFnCharacteristics {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PROOF_FN_CHARACTERISTICS }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ProofFnType {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PROOF_FN_TYPE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ProofFnWithCharacteristics {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PROOF_FN_WITH_CHARACTERISTICS }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4945,6 +5021,9 @@ impl From<ParenType> for Type {
 impl From<PathType> for Type {
     fn from(node: PathType) -> Type { Type::PathType(node) }
 }
+impl From<ProofFnType> for Type {
+    fn from(node: ProofFnType) -> Type { Type::ProofFnType(node) }
+}
 impl From<PtrType> for Type {
     fn from(node: PtrType) -> Type { Type::PtrType(node) }
 }
@@ -4971,6 +5050,7 @@ impl AstNode for Type {
                 | NEVER_TYPE
                 | PAREN_TYPE
                 | PATH_TYPE
+                | PROOF_FN_TYPE
                 | PTR_TYPE
                 | REF_TYPE
                 | SLICE_TYPE
@@ -4989,6 +5069,7 @@ impl AstNode for Type {
             NEVER_TYPE => Type::NeverType(NeverType { syntax }),
             PAREN_TYPE => Type::ParenType(ParenType { syntax }),
             PATH_TYPE => Type::PathType(PathType { syntax }),
+            PROOF_FN_TYPE => Type::ProofFnType(ProofFnType { syntax }),
             PTR_TYPE => Type::PtrType(PtrType { syntax }),
             REF_TYPE => Type::RefType(RefType { syntax }),
             SLICE_TYPE => Type::SliceType(SliceType { syntax }),
@@ -5009,6 +5090,7 @@ impl AstNode for Type {
             Type::NeverType(it) => &it.syntax,
             Type::ParenType(it) => &it.syntax,
             Type::PathType(it) => &it.syntax,
+            Type::ProofFnType(it) => &it.syntax,
             Type::PtrType(it) => &it.syntax,
             Type::RefType(it) => &it.syntax,
             Type::SliceType(it) => &it.syntax,
@@ -5916,6 +5998,21 @@ impl std::fmt::Display for PathType {
     }
 }
 impl std::fmt::Display for PrefixExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ProofFnCharacteristics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ProofFnType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ProofFnWithCharacteristics {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

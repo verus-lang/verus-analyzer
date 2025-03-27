@@ -26,7 +26,7 @@ pub(crate) fn verus_closure_expr(p: &mut Parser<'_>, m: Option<Marker>, forbid_s
     m.complete(p, CLOSURE_EXPR)
 }
 
-pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> () {
+pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> bool {
     if p.at(T![->]) {
         let m = p.start();
         p.bump(T![->]);
@@ -49,7 +49,24 @@ pub(crate) fn verus_ret_type(p: &mut Parser<'_>) -> () {
             types::type_no_bounds(p);
         }
         m.complete(p, RET_TYPE);
+        true
+    } else {
+        false
     }
+}
+
+pub(crate) fn proof_fn_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.eat_contextual_kw(T![proof_fn]);
+    proof_fn_characteristics(p);
+    generic_params::opt_generic_param_list(p);
+    if p.at(T!['(']) {
+        params::param_list_fn_ptr(p);
+    } else {
+        p.error("expected parameters");
+    }
+    verus_ret_type(p);
+    m.complete(p, PROOF_FN_TYPE)
 }
 
 pub(crate) fn view_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
@@ -112,6 +129,34 @@ pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("TODO: expected open, closed, or uninterp.");
         m.complete(p, ERROR)
     }
+}
+
+pub(crate) fn proof_fn_characteristics(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(T!['[']) {
+        let m = p.start();
+        p.expect(T!['[']);
+        while !p.at(EOF) && !p.at(T![']']) {
+            paths::type_path(p);
+
+            if p.at(T![']']) {
+                break;
+            }
+            if p.at(T![,]) {
+                p.bump(T![,]);
+            }
+        }
+        p.expect(T![']']);
+        Some(m.complete(p, PROOF_FN_CHARACTERISTICS))
+    } else {
+        None
+    }
+}
+
+pub(crate) fn proof_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.expect_contextual_kw(T![proof_fn]);
+    proof_fn_characteristics(p);
+    m.complete(p, PROOF_FN_WITH_CHARACTERISTICS)
 }
 
 pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
