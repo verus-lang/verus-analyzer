@@ -243,6 +243,7 @@ pub struct ClosureExpr {
     pub static_token: bool,
     pub async_token: bool,
     pub move_token: bool,
+    pub proof_fn_with_characteristics: Option<Box<ProofFnWithCharacteristics>>,
     pub forall_token: bool,
     pub exists_token: bool,
     pub param_list: Option<Box<ParamList>>,
@@ -900,6 +901,28 @@ pub struct PrefixExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
     pub cst: Option<super::nodes::PrefixExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnCharacteristics {
+    pub l_brack_token: bool,
+    pub fields: Vec<PathSegment>,
+    pub r_brack_token: bool,
+    pub cst: Option<super::nodes::ProofFnCharacteristics>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnType {
+    pub proof_fn_token: bool,
+    pub proof_fn_characteristics: Option<Box<ProofFnCharacteristics>>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub param_list: Option<Box<ParamList>>,
+    pub ret_type: Option<Box<RetType>>,
+    pub cst: Option<super::nodes::ProofFnType>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnWithCharacteristics {
+    pub proof_fn_token: bool,
+    pub proof_fn_characteristics: Option<Box<ProofFnCharacteristics>>,
+    pub cst: Option<super::nodes::ProofFnWithCharacteristics>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Prover {
@@ -1577,6 +1600,7 @@ pub enum Type {
     NeverType(Box<NeverType>),
     ParenType(Box<ParenType>),
     PathType(Box<PathType>),
+    ProofFnType(Box<ProofFnType>),
     PtrType(Box<PtrType>),
     RefType(Box<RefType>),
     SliceType(Box<SliceType>),
@@ -2166,6 +2190,10 @@ impl TryFrom<super::nodes::ClosureExpr> for ClosureExpr {
             static_token: item.static_token().is_some(),
             async_token: item.async_token().is_some(),
             move_token: item.move_token().is_some(),
+            proof_fn_with_characteristics: match item.proof_fn_with_characteristics() {
+                Some(it) => Some(Box::new(ProofFnWithCharacteristics::try_from(it)?)),
+                None => None,
+            },
             forall_token: item.forall_token().is_some(),
             exists_token: item.exists_token().is_some(),
             param_list: match item.param_list() {
@@ -3794,6 +3822,59 @@ impl TryFrom<super::nodes::PrefixExpr> for PrefixExpr {
         })
     }
 }
+impl TryFrom<super::nodes::ProofFnCharacteristics> for ProofFnCharacteristics {
+    type Error = String;
+    fn try_from(item: super::nodes::ProofFnCharacteristics) -> Result<Self, Self::Error> {
+        Ok(Self {
+            l_brack_token: item.l_brack_token().is_some(),
+            fields: item
+                .fields()
+                .into_iter()
+                .map(PathSegment::try_from)
+                .collect::<Result<Vec<PathSegment>, String>>()?,
+            r_brack_token: item.r_brack_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::ProofFnType> for ProofFnType {
+    type Error = String;
+    fn try_from(item: super::nodes::ProofFnType) -> Result<Self, Self::Error> {
+        Ok(Self {
+            proof_fn_token: item.proof_fn_token().is_some(),
+            proof_fn_characteristics: match item.proof_fn_characteristics() {
+                Some(it) => Some(Box::new(ProofFnCharacteristics::try_from(it)?)),
+                None => None,
+            },
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+                None => None,
+            },
+            param_list: match item.param_list() {
+                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
+                None => None,
+            },
+            ret_type: match item.ret_type() {
+                Some(it) => Some(Box::new(RetType::try_from(it)?)),
+                None => None,
+            },
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::ProofFnWithCharacteristics> for ProofFnWithCharacteristics {
+    type Error = String;
+    fn try_from(item: super::nodes::ProofFnWithCharacteristics) -> Result<Self, Self::Error> {
+        Ok(Self {
+            proof_fn_token: item.proof_fn_token().is_some(),
+            proof_fn_characteristics: match item.proof_fn_characteristics() {
+                Some(it) => Some(Box::new(ProofFnCharacteristics::try_from(it)?)),
+                None => None,
+            },
+            cst: Some(item.clone()),
+        })
+    }
+}
 impl TryFrom<super::nodes::Prover> for Prover {
     type Error = String;
     fn try_from(item: super::nodes::Prover) -> Result<Self, Self::Error> {
@@ -5319,6 +5400,7 @@ impl TryFrom<super::nodes::Type> for Type {
             super::nodes::Type::NeverType(it) => Ok(Self::NeverType(Box::new(it.try_into()?))),
             super::nodes::Type::ParenType(it) => Ok(Self::ParenType(Box::new(it.try_into()?))),
             super::nodes::Type::PathType(it) => Ok(Self::PathType(Box::new(it.try_into()?))),
+            super::nodes::Type::ProofFnType(it) => Ok(Self::ProofFnType(Box::new(it.try_into()?))),
             super::nodes::Type::PtrType(it) => Ok(Self::PtrType(Box::new(it.try_into()?))),
             super::nodes::Type::RefType(it) => Ok(Self::RefType(Box::new(it.try_into()?))),
             super::nodes::Type::SliceType(it) => Ok(Self::SliceType(Box::new(it.try_into()?))),
@@ -5977,6 +6059,10 @@ impl std::fmt::Display for ClosureExpr {
             let mut tmp = stringify!(move_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.proof_fn_with_characteristics {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.forall_token {
@@ -7842,6 +7928,69 @@ impl std::fmt::Display for PrefixExpr {
         write!(f, "{s}")
     }
 }
+impl std::fmt::Display for ProofFnCharacteristics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ProofFnType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.proof_fn_token {
+            let mut tmp = stringify!(proof_fn_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.proof_fn_characteristics {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ProofFnWithCharacteristics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.proof_fn_token {
+            let mut tmp = stringify!(proof_fn_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.proof_fn_characteristics {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
 impl std::fmt::Display for Prover {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
@@ -9573,6 +9722,7 @@ impl std::fmt::Display for Type {
             Type::NeverType(it) => write!(f, "{}", it.to_string()),
             Type::ParenType(it) => write!(f, "{}", it.to_string()),
             Type::PathType(it) => write!(f, "{}", it.to_string()),
+            Type::ProofFnType(it) => write!(f, "{}", it.to_string()),
             Type::PtrType(it) => write!(f, "{}", it.to_string()),
             Type::RefType(it) => write!(f, "{}", it.to_string()),
             Type::SliceType(it) => write!(f, "{}", it.to_string()),
@@ -9842,6 +9992,9 @@ impl Type {
             Type::NeverType(it) => Some(super::nodes::Type::NeverType(it.cst.as_ref()?.clone())),
             Type::ParenType(it) => Some(super::nodes::Type::ParenType(it.cst.as_ref()?.clone())),
             Type::PathType(it) => Some(super::nodes::Type::PathType(it.cst.as_ref()?.clone())),
+            Type::ProofFnType(it) => {
+                Some(super::nodes::Type::ProofFnType(it.cst.as_ref()?.clone()))
+            }
             Type::PtrType(it) => Some(super::nodes::Type::PtrType(it.cst.as_ref()?.clone())),
             Type::RefType(it) => Some(super::nodes::Type::RefType(it.cst.as_ref()?.clone())),
             Type::SliceType(it) => Some(super::nodes::Type::SliceType(it.cst.as_ref()?.clone())),
@@ -10208,6 +10361,9 @@ impl From<ParenType> for Type {
 impl From<PathType> for Type {
     fn from(item: PathType) -> Self { Type::PathType(Box::new(item)) }
 }
+impl From<ProofFnType> for Type {
+    fn from(item: ProofFnType) -> Self { Type::ProofFnType(Box::new(item)) }
+}
 impl From<PtrType> for Type {
     fn from(item: PtrType) -> Self { Type::PtrType(Box::new(item)) }
 }
@@ -10516,6 +10672,7 @@ impl ClosureExpr {
             static_token: false,
             async_token: false,
             move_token: false,
+            proof_fn_with_characteristics: None,
             forall_token: false,
             exists_token: false,
             param_list: None,
@@ -11234,6 +11391,28 @@ impl PrefixExpr {
         ET0: Into<Expr>,
     {
         Self { attrs: vec![], expr: Box::new(expr.into()), cst: None }
+    }
+}
+impl ProofFnCharacteristics {
+    pub fn new() -> Self {
+        Self { l_brack_token: true, fields: vec![], r_brack_token: true, cst: None }
+    }
+}
+impl ProofFnType {
+    pub fn new() -> Self {
+        Self {
+            proof_fn_token: true,
+            proof_fn_characteristics: None,
+            generic_param_list: None,
+            param_list: None,
+            ret_type: None,
+            cst: None,
+        }
+    }
+}
+impl ProofFnWithCharacteristics {
+    pub fn new() -> Self {
+        Self { proof_fn_token: true, proof_fn_characteristics: None, cst: None }
     }
 }
 impl Prover {
