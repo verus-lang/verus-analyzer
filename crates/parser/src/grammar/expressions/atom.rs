@@ -87,6 +87,9 @@ pub(super) fn atom_expr(
         let pred_expr = verus::verus_closure_expr(p, None, r.forbid_structs);
         return Some((pred_expr, BlockLike::NotBlock));
     }
+    if p.at_contextual_kw(T![proof_fn]) {
+        return Some((closure_expr(p), BlockLike::NotBlock));
+    }
     if paths::is_path_start(p) {
         return Some(path_expr(p, r));
     }
@@ -356,7 +359,7 @@ fn array_expr(p: &mut Parser<'_>) -> CompletedMarker {
 //     for<'a> move || {};
 // }
 pub(crate) fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(match p.current() {
+    assert!(p.at_contextual_kw(T![proof_fn]) || match p.current() {
         T![const] | T![static] | T![async] | T![move] | T![|] => true,
         T![for] => p.nth(1) == T![<],
         _ => false,
@@ -373,19 +376,26 @@ pub(crate) fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(T![static]);
     p.eat(T![async]);
     p.eat(T![move]);
+    if p.at_contextual_kw(T![proof_fn]) {
+        verus::proof_fn(p);
+    }
 
     if !p.at(T![|]) {
         p.error("expected `|`");
         return m.complete(p, CLOSURE_EXPR);
     }
     params::param_list_closure(p);
-    if opt_ret_type(p) {
+    if verus::verus_ret_type(p) {
         // test lambda_ret_block
         // fn main() { || -> i32 { 92 }(); }
+        if p.at_contextual_kw(T![requires]) { verus::requires(p); }
+        if p.at_contextual_kw(T![ensures]) { verus::ensures(p); }
         block_expr(p);
     } else if p.at_ts(EXPR_FIRST) {
         // test closure_body_underscore_assignment
         // fn main() { || _ = 0; }
+        if p.at_contextual_kw(T![requires]) { verus::requires(p); }
+        if p.at_contextual_kw(T![ensures]) { verus::ensures(p); }
         expr(p);
     } else {
         p.error("expected expression");

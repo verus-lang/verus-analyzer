@@ -242,6 +242,36 @@ impl TypeRef {
                 params.push((None, ret_ty));
                 TypeRef::Fn(params, is_varargs, inner.unsafe_token().is_some(), abi)
             }
+            ast::Type::ProofFnType(inner) => {
+                let ret_ty = inner
+                    .ret_type()
+                    .and_then(|rt| rt.ty())
+                    .map(|it| TypeRef::from_ast(ctx, it))
+                    .unwrap_or_else(|| TypeRef::Tuple(Vec::new()));
+                let mut is_varargs = false;
+                let mut params = if let Some(pl) = inner.param_list() {
+                    if let Some(param) = pl.params().last() {
+                        is_varargs = param.dotdotdot_token().is_some();
+                    }
+
+                    pl.params()
+                        .map(|it| {
+                            let type_ref = TypeRef::from_ast_opt(ctx, it.ty());
+                            let name = match it.pat() {
+                                Some(ast::Pat::IdentPat(it)) => Some(
+                                    it.name().map(|nr| nr.as_name()).unwrap_or_else(Name::missing),
+                                ),
+                                _ => None,
+                            };
+                            (name, type_ref)
+                        })
+                        .collect()
+                } else {
+                    Vec::new()
+                };
+                params.push((None, ret_ty));
+                TypeRef::Fn(params, is_varargs, false, None)
+            }
             // for types are close enough for our purposes to the inner type for now...
             ast::Type::ForType(inner) => TypeRef::from_ast_opt(ctx, inner.ty()),
             ast::Type::ImplTraitType(inner) => {

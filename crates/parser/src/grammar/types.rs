@@ -37,6 +37,10 @@ pub(super) fn type_no_bounds(p: &mut Parser<'_>) {
 }
 
 fn type_with_bounds_cond(p: &mut Parser<'_>, allow_bounds: bool) {
+    if p.at_contextual_kw(T![proof_fn]) {
+        verus::proof_fn_type(p);
+        return;
+    }
     match p.current() {
         T!['('] => paren_or_tuple_type(p),
         T![!] => never_type(p),

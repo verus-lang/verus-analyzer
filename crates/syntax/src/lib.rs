@@ -2335,6 +2335,58 @@ pub axiom fn foo(x: u8) requires x == 5;
 }
 
 #[test]
+fn verus_proof_fn() {
+    use ast::HasModuleItem;
+    let source_code = "verus!{
+    proof fn testfn() {
+        let tracked f = proof_fn |y: u64| -> (z: u64)
+            requires
+                y == 2,
+            ensures
+                z == 2,
+            { y };
+        assert(f.requires((2,)));
+        assert(!f.ensures((2,), 3));
+        let t = f(2);
+        assert(t == 2);
+    }
+    proof fn helper(tracked f: proof_fn(y: u64) -> u64)
+        requires
+            f.requires((2,)),
+            forall|z: u64| f.ensures((2,), z) ==> z == 2,
+    {
+        let t = f(2);
+        assert(t == 2);
+    }
+    proof fn testfn() {
+        let tracked f = proof_fn |y: u64| -> (z: u64)
+            requires
+                y == 2,
+            ensures
+                z == 2,
+            { y };
+        helper(f);
+    }
+    proof fn test() {
+        let tracked f = proof_fn[Mut, Copy, Send, ReqEns<foo>, Sync] |y: u64| -> (z: u64) { y };
+    }
+    proof fn foo(x: proof_fn(a: u32) -> u64, y: proof_fn[Send](a: u32) -> u64) {
+    }
+}";
+
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    dbg!(&file);
+    for item in file.items() {
+        dbg!(&item);
+        // let v_item: vst_nodes::Item = item.try_into().unwrap();
+        // dbg!(v_item);
+    }
+}
+
+#[test]
 fn verus_uninterp() {
     use ast::HasModuleItem;
     let source_code = "verus!{
