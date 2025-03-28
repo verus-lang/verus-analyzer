@@ -60,7 +60,7 @@ pub fn filter_pre_failuires(verus_errors: &Vec<VerusError>) -> Vec<PreFailure> {
 
 /// From a vector of VerusErrors,
 /// filter only postcondition failures
-pub fn filter_post_failuires(verus_errors: &Vec<VerusError>) -> Vec<PostFailure> {
+pub fn filter_post_failures(verus_errors: &Vec<VerusError>) -> Vec<PostFailure> {
     let mut post_errs = vec![];
     for verr in verus_errors {
         if let VerusError::Post(p) = verr {
