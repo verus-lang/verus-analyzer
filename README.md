@@ -152,7 +152,7 @@ and below you can see the version after the proof action executes.
 We encourage you to enhance the proof actions above and to develop your own proof actions.
 Pull requests are quite welcome.  Here are some steps to get started.
 
-1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./verus-analyzer/crates/ide-assists/src/handlers).
+1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./crates/ide-assists/src/handlers).
 2. Find the existing proof action most similar to your idea and copy it into a new file in that directory.  Update the names and code appropriately.  Note that each proof action is called on just about every single UI event, so it's important that your proof action exits quickly and cleanly when it doesn't apply.
 3. Add your new proof action to the long list in the `all()` function in the [ide-assists' crate's `lib.rs` file](crates/ide-assists/src/lib.rs).
 4. Follow the steps in [CONTRIBUTING.md](./CONTRIBUTING.md) to build and test your new proof action.
