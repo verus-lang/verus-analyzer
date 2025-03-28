@@ -31,7 +31,7 @@ jobs:
         id: verus-release-info
         run: |
           jq --version
-          echo "VERUS_URL=$(curl -s https://api.github.com/repos/verus-lang/verus/releases | jq -r '.[].assets[].browser_download_url' | grep x86-linux -)" >> $GITHUB_OUTPUT
+          echo "VERUS_URL=$(curl -s https://api.github.com/repos/verus-lang/verus/releases | jq -r '.assets[].browser_download_url' | grep x86-linux -)" >> $GITHUB_OUTPUT
 
       - name: Download the latest Verus release
         run: |
