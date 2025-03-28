@@ -107,15 +107,15 @@ vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in
 ```
 
 ---
-
 ## Proof Actions
-
-TODO: More details + light bulb icon
-
 
 [Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) 
 are an **experimental** feature to assist developers when debugging proof failures.
-They show up as light bulb icons in the IDE when you hover over a failed proof.
+They show up as light bulb (💡) icons in the IDE when you hover over a failed proof.
+They are designed to automate many of the tedious, error-prone debugging steps that 
+developers previously did manually.  See below for some examples.  The framework
+is also designed to make it easy to write your own proof actions.  Indeed, the
+examples below only require ~30-180 lines of Rust code.
 
 ### Proof Action Demo
 [Source code](https://github.com/chanheec/proof-action-example)
@@ -125,7 +125,7 @@ They show up as light bulb icons in the IDE when you hover over a failed proof.
 ### Currently Enabled Proof Actions
 
 The "Hover over" column indicates where you should place your mouse cursor 
-so that a "light bulb" will appear and allow you to perform the corresponding
+so that a "light bulb" 💡 will appear and allow you to perform the corresponding
 proof action.  In the examples linked to below, the `$0` characters indicate
 where the user has positioned their mouse in the "before" version of the code,
 and below you can see the version after the proof action executes.
@@ -147,10 +147,12 @@ and below you can see the version after the proof action executes.
 | sequence expression inside an `assert ... by` | Adds a clause saying that the sequence index is in bounds | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/seq_index_inbound.rs#L99) |
 
 
-### Developing Your Own Proof Action
+### Developing Your Own Proof Actions
 
-[][(crates/ide-assists/src/lib.rs)
+We encourage you to enhance the proof actions above and to develop your own proof actions.
+Pull requests are quite welcome.  Here are some steps to get started.
 
-# TODO
-
-Point to CONTRIBUTING for more details
+1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./verus-analyzer/crates/ide-assists/src/handlers).
+2. Find the existing proof action most similar to your idea and copy it into a new file in that directory.  Update the names and code appropriately.  Note that each proof action is called on just about every single UI event, so it's important that your proof action exits quickly and cleanly when it doesn't apply.
+3. Add your new proof action to the long list in the `all()` function in the [ide-assists' crate's `lib.rs` file](crates/ide-assists/src/lib.rs).
+4. Follow the steps in [CONTRIBUTING.md](./CONTRIBUTING.md) to build and test your new proof action.
