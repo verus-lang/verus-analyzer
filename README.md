@@ -124,9 +124,9 @@ They show up as light bulb icons in the IDE when you hover over a failed proof.
 
 ### Currently Enabled Proof Actions
 
-The "Hover over" column indicates where you should place your mouse cursor in
+The "Hover over" column indicates where you should place your mouse cursor 
 so that a "light bulb" will appear and allow you to perform the corresponding
-proof action.  In the examples linked to below, the `$0$` characters indicate
+proof action.  In the examples linked to below, the `$0` characters indicate
 where the user has positioned their mouse in the "before" version of the code,
 and below you can see the version after the proof action executes.
 
@@ -138,18 +138,18 @@ and below you can see the version after the proof action executes.
 | `assert` keyword | Take an assertion containing a `forall` quantifier and introduce a `by` clause where the quantified variables are in scope. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_forall.rs#L71) |
 | `assert` keyword | Add a `by` block to an existing assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_assert_by_block.rs#L64) |
 | `assert` keyword | Add a `by` block containing `assume(false)`. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_assume_false.rs#L66) |
-| `ensures` keyword | Introduce a failing ensures clause at the end of the current function | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_postcondition.rs#L92) |
+| `ensures` keyword | Introduce an ensures clause as an `assert` statement at the end of the current function | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_postcondition.rs#L92) |
 | `ensures` keyword | Take an ensures clause `A ==> B`, and move `A` to the requires clause, leaving `B` in the ensures clause. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_imply_ensures.rs#L75) |
-| function call | Introduce a failing precondition in the caller's context. |[code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_precondition.rs#L64) |
-| function call inside an assertion | Add a reveal statement for this function above the current assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_above.rs#L78) |
+| function call | Introduce the function's precondition as an assumption in the caller's context. |[code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_precondition.rs#L64) |
 | function call inside an assertion | Convert the assertion into an `assert ... by` expression and reveal the selected function's definition inside the `by` block | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_in_by_block.rs#L76) |
+| function call inside an assertion | Add a reveal statement for this function above the current assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_above.rs#L78) |
 | `<=` | Split an assertion of `A <= B` into two assertions: `A < B` and `A <= B` | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_smaller_or_equal_to.rs#L118) |
 | sequence expression inside an `assert ... by` | Adds a clause saying that the sequence index is in bounds | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/seq_index_inbound.rs#L99) |
 
 
 ### Developing Your Own Proof Action
 
-(crates/ide-assists/src/lib.rs)
+[][(crates/ide-assists/src/lib.rs)
 
 # TODO
 
