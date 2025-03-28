@@ -84,6 +84,14 @@ FWIW, these articles provide some helpful background on the philosophy behind ho
 - [Simple but Powerful Pratt Parsing](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html)
 
 1. Add a testcase to `crates/syntax/src/lib.rs`.
+
+1. It can be a nuisance to initially develop syntax changes using `crates/syntax/src/lib.rs`,
+   since the parser reports issues in terms of tokens from the start of the "file", which can 
+   be hard to use in your favorite editor.  Hence, I often copy the relevant test(s) into
+   `crates/va-test/examples/misc-parsing/src/main.rs`.  Then in `crates/va-test/examples/misc-parsing/`,
+   running `cargo run -- misc-parsing` will attempt to parse the new code and then lift it to VST.
+   This can be an easier and faster way to test changes.
+
 2. Update `syntax/rust.ungram` with the new syntax. Also, update `xtask/src/codegen/grammar/ast_src.rs` for newly introduced tokens if there are any. 
   - In particular, you will need to update the `keywords` list for new keywords to be available
 
