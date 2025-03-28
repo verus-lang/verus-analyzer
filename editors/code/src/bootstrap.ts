@@ -131,7 +131,7 @@ export async function getVerus(
         return target_binary.fsPath;
     } else {
         vscode.window.showInformationMessage("Attempting to determine the version of Verus's latest release...");
-        const result = await fetch ('https://api.github.com/repos/verus-lang/verus/releases',
+        const result = await fetch ('https://api.github.com/repos/verus-lang/verus/releases/latest',
             {
                 method: 'get',
                 headers: {
@@ -173,7 +173,7 @@ export async function getVerus(
         log.info("We will save the downloaded Verus binaries in:", release_dir);
 
         const release_data = await result.json();
-        for (const asset of release_data[0].assets) {
+        for (const asset of release_data.assets) {
             log.info("Found release asset: ", asset.name);
             log.info("Index of your platform in the asset's name: ", asset.name.indexOf(platform));
             if (asset.name.indexOf(platform) >= 0) {
