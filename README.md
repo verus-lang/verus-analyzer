@@ -138,7 +138,7 @@ and below you can see the version after the proof action executes.
 | `assert` keyword | Take an assertion containing a `forall` quantifier and introduce a `by` clause where the quantified variables are in scope. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_forall.rs#L71) |
 | `assert` keyword | Add a `by` block to an existing assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_assert_by_block.rs#L64) |
 | `assert` keyword | Add a `by` block containing `assume(false)`. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_assume_false.rs#L66) |
-| `ensures` keyword | Introduce an ensures clause as an `assert` statement at the end of the current function | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_postcondition.rs#L92) |
+| `ensures` keyword | Introduce a failing ensures clause as an `assert` statement at the end of the current function | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_postcondition.rs#L92) |
 | `ensures` keyword | Take an ensures clause `A ==> B`, and move `A` to the requires clause, leaving `B` in the ensures clause. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_imply_ensures.rs#L75) |
 | function call | Introduce the function's precondition as an assumption in the caller's context. |[code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_precondition.rs#L64) |
 | function call inside an assertion | Convert the assertion into an `assert ... by` expression and reveal the selected function's definition inside the `by` block | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_in_by_block.rs#L76) |
@@ -152,7 +152,7 @@ and below you can see the version after the proof action executes.
 We encourage you to enhance the proof actions above and to develop your own proof actions.
 Pull requests are quite welcome.  Here are some steps to get started.
 
-1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./crates/ide-assists/src/handlers).
+1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./crates/ide-assists/src/handlers/proof_action).
 2. Find the existing proof action most similar to your idea and copy it into a new file in that directory.  Update the names and code appropriately.  Note that each proof action is called on just about every single UI event, so it's important that your proof action exits quickly and cleanly when it doesn't apply.
 3. Add your new proof action to the long list in the `all()` function in the [ide-assists' crate's `lib.rs` file](crates/ide-assists/src/lib.rs).
 4. Follow the steps in [CONTRIBUTING.md](./CONTRIBUTING.md) to build and test your new proof action.
