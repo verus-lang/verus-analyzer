@@ -37,9 +37,9 @@ pub(crate) fn diagnostic_to_verus_err(diagnostic: &flycheck::Diagnostic) -> Opti
             );
             let verr;
             if diagnostic.spans[0].is_primary {
-                verr = VerusError::Post(PostFailure { failing_post: range1, func_body: range0 });
+                verr = VerusError::Post(PostFailure { failing_post: range0, func_name: range1 });
             } else {
-                verr = VerusError::Post(PostFailure { failing_post: range0, func_body: range1 });
+                verr = VerusError::Post(PostFailure { failing_post: range1, func_name: range0 });
             }
             Some(verr)
         } else {
