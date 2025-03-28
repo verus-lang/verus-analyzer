@@ -110,6 +110,9 @@ vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in
 
 ## Proof Actions
 
+TODO: More details + light bulb icon
+
+
 [Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) 
 are an **experimental** feature to assist developers when debugging proof failures.
 They show up as light bulb icons in the IDE when you hover over a failed proof.
@@ -149,3 +152,5 @@ and below you can see the version after the proof action executes.
 (crates/ide-assists/src/lib.rs)
 
 # TODO
+
+Point to CONTRIBUTING for more details
