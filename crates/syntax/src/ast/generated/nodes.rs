@@ -1320,7 +1320,11 @@ pub struct Publish {
     pub(crate) syntax: SyntaxNode,
 }
 impl Publish {
+    pub fn path(&self) -> Option<Path> { support::child(&self.syntax) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
     pub fn closed_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![closed]) }
+    pub fn in_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![in]) }
     pub fn open_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![open]) }
     pub fn uninterp_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![uninterp])
