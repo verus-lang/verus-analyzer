@@ -101,6 +101,11 @@ pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     if p.at_contextual_kw(T![open]) {
         p.bump_remap(T![open]);
+        if p.eat(T!['(']) {
+            p.eat(T![in]);
+            paths::use_path(p);
+            p.expect(T![')']);
+        }
         m.complete(p, PUBLISH)
     } else if p.at_contextual_kw(T![closed]) {
         p.bump_remap(T![closed]);
