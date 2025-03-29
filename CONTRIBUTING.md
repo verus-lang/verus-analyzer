@@ -129,9 +129,10 @@ Failed to lift function Name(Text("ptr_null_mut")): got error: Err("type_bound_l
 ```
 This means our auto-generated lifting code failed to convert the CST provided by
 the parser into a VST representation.  To start debugging such an issue, try
-searching through `crates/syntax/src/ast/generated/vst_nodes.rs` for the term
-`stringify!(PROBLEM)`, where PROBLEM is the type name in the `Err("PROBLEM")` above.
-That may help locate the problematic code.
+searching through `crates/syntax/src/ast/generated/vst_nodes.rs` and
+`crates/syntax/src/ast/vst.rs` for the term `stringify!(PROBLEM)`, where
+PROBLEM is the type name in the `Err("PROBLEM")` above.  That may help locate
+the problematic code.
 
 ## Building a VSIX file
 
