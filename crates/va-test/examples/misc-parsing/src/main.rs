@@ -2,10 +2,29 @@ use vstd::prelude::*;
 
 verus! {
 
-pub open (crate) spec fn test1() {}
-pub open (in foo) spec fn test2() {}
-pub open (in crate::m) spec fn test3() { }
-pub open (super) spec fn test4() {}
+//spec fn test(a: bool, b:bool) -> bool {
+//    ||| {
+//        a
+//    }
+//    ||| b
+//}
+proof fn tester()
+    requires
+        ({ 
+            let x = a;
+            &&& a
+        }),
+{
+}
+//proof fn testp(a: bool, b:bool) 
+//    requires 
+//        ({
+//            ||| { a }
+//            ||| b
+//        }),
+//    ensures true,
+//{
+//}
 
 } // verus!
 

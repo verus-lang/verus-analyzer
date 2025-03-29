@@ -68,7 +68,6 @@ pub use rowan::{
 pub use rustc_lexer::unescape;
 pub use smol_str::{format_smolstr, SmolStr};
 
-#[cfg(test)]
 use ast::generated::vst_nodes;
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of
@@ -524,7 +523,7 @@ fn verus_core(source_code: &str) {
     //dbg!(&file);
     for item in file.items() {
         //dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
+        let _v_item: vst_nodes::Item = item.try_into().unwrap();
         //dbg!(v_item);
     }
 }
