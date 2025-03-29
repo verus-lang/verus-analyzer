@@ -137,7 +137,10 @@ pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    let group_name_m = p.start();
     p.expect(IDENT); // group name
+    group_name_m.complete(p, BROADCAST_GROUP_IDENTIFIER);
+    let group_list_m = p.start();
     p.expect(T!['{']);
     while !p.at(EOF) && !p.at(T!['}']) {
         attributes::inner_attrs(p);
@@ -151,6 +154,7 @@ pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker 
         }
     }
     p.expect(T!['}']);
+    group_list_m.complete(p, BROADCAST_GROUP_LIST);
     m.complete(p, BROADCAST_GROUP)
 }
 
