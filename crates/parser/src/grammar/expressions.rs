@@ -400,7 +400,13 @@ const LHS_FIRST: TokenSet =
 
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
-    let kind = match p.current() {
+    let kind =
+    if p.at(T![|||]) || p.at(T![&&&]) {
+        m = p.start();
+        p.bump_any();
+        PREFIX_EXPR
+    } else {
+        match p.current() {
         // test ref_expr
         // fn foo() {
         //     // reference operator
@@ -467,7 +473,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
                 postfix_expr(p, lhs, blocklike, !(r.prefer_stmt && blocklike.is_block()));
             return Some((cm, block_like));
         }
-    };
+    }};
     // parse the interior of the unary expression
     expr_bp(p, None, r, 255);
     let cm = m.complete(p, kind);

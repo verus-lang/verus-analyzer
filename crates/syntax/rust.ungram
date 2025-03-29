@@ -446,7 +446,7 @@ BlockExpr =
 
 // verus: &&&, |||
 PrefixExpr =
-  Attr* op:('-' | '!' | '*') Expr
+  Attr* op:('-' | '!' | '*' | '&&&' | '|||') Expr
 
 // verus: ==>, !==
 BinExpr =
