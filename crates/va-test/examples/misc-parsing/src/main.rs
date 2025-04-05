@@ -2,39 +2,50 @@ use vstd::prelude::*;
 
 verus! {
 
-proof fn testfn() {
-    let tracked f = proof_fn |y: u64| -> (z: u64)
+trait T1 {
+    proof fn my_function_decl(&self, i: int, j: int) -> (r: int)
         requires
-            y == 2,
+            0 <= i < 10,
+            0 <= j < 10,
         ensures
-            z == 2,
-        { y };
-    assert(f.requires((2,)));
-    assert(!f.ensures((2,), 3));
-    let t = f(2);
-    assert(t == 2);
-}
-proof fn helper(tracked f: proof_fn(y: u64) -> u64)
-    requires
-        f.requires((2,)),
-        forall|z: u64| f.ensures((2,), z) ==> z == 2,
-{
-    let t = f(2);
-    assert(t == 2);
-}
-proof fn testfn() {
-    let tracked f = proof_fn |y: u64| -> (z: u64)
+            i <= r,
+            j <= r,
+    ;
+
+    /// A trait function may have a default (provided) implementation,
+    /// and this defaults may have additional ensures specified with default_ensures
+    fn my_function_with_a_default(&self, i: u32, j: u32) -> (r: u32)
         requires
-            y == 2,
+            0 <= i < 10,
+            0 <= j < 10,
         ensures
-            z == 2,
-        { y };
-    helper(f);
+            i <= r,
+            j <= r,
+        default_ensures
+            i == r || j == r,
+        {
+            if i >= j { i } else { j }
+        }
 }
-proof fn test() {
-    let tracked f = proof_fn[Mut, Copy, Send, ReqEns<foo>, Sync] |y: u64| -> (z: u64) { y };
+
+trait T2 {
+    fn f(i: u32) -> (r: u32)
+        requires
+            (builtin::default_ensures)(true),
+        default_ensures
+            r <= i,
+    {
+        i / 2
+    }
 }
-proof fn foo(x: proof_fn(a: u32) -> u64, y: proof_fn[Send](a: u32) -> u64) {
+
+trait T3 {
+    fn f(i: u32) -> (r: u32)
+        default_ensures
+            r <= i,
+    {
+        i / 2
+    }
 }
 
 } // verus!
