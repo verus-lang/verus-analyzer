@@ -558,115 +558,20 @@ impl FlycheckActor {
                         "verus".to_string() // Hope that it's in the PATH
                     }
                 };
+// TODO: UPDATE ME
                 dbg!(&verus_binary_str);
                 tracing::info!("Using Verus binary: {}", &verus_binary_str);
-
                 let verus_exec_path = Path::new(&verus_binary_str)
                     .canonicalize()
                     .expect("We expect to succeed with canonicalizing the Verus binary path");
-                let mut cmd = Command::new(verus_exec_path);
-
-                // Try to locate a Cargo.toml file that might contain custom Verus arguments
-                let file = Path::new(&file);
-                let mut toml_dir: Option<std::path::PathBuf> = None;
-                let mut extra_args_from_toml = Vec::new();
-                for ans in file.ancestors() {
-                    if ans.join("Cargo.toml").exists() {
-                        let toml = std::fs::read_to_string(ans.join("Cargo.toml")).unwrap();
-                        let mut found_verus_settings = false;
-                        for line in toml.lines() {
-                            if found_verus_settings {
-                                if line.contains("extra_args") {
-                                    let start = "extra_args".len() + 1;
-                                    let mut arguments =
-                                        line[start..line.len() - 1].trim().to_string();
-                                    if arguments.starts_with("=") {
-                                        arguments.remove(0);
-                                        arguments = arguments.trim().to_string();
-                                    }
-                                    if arguments.starts_with("\"") {
-                                        arguments.remove(0);
-                                    }
-                                    if arguments.ends_with("\"") {
-                                        arguments.remove(arguments.len() - 1);
-                                    }
-
-                                    let arguments_vec = arguments
-                                        .split(" ")
-                                        .map(|it| it.to_string())
-                                        .collect::<Vec<_>>();
-                                    extra_args_from_toml.extend(arguments_vec);
-                                }
-                                break;
-                            }
-                            if line.contains("[package.metadata.verus.ide]") {
-                                found_verus_settings = true;
-                            }
-                        }
-                        toml_dir = Some(ans.to_path_buf());
-                        break;
-                    }
-                }
-
-                // We may need to add additional arguments
+                let verus_exec_dir = verus_exec_path.parent().unwrap();
+                let cargo_verus_exec = verus_exec_dir.join("cargo-verus");
+                dbg!(&cargo_verus_exec);
+                let mut cmd = Command::new(cargo_verus_exec);
                 let mut args = args.to_vec();
-                match toml_dir {
-                    None => {
-                        // This file doesn't appear to be part of a larger project
-                        // Try to invoke Verus on it directly, but try to avoid
-                        // complaints about missing `fn main()`
-                        args.push("--crate-type".to_string());
-                        args.push("lib".to_string());
-                    }
-                    Some(toml_dir) => {
-                        // This file appears to be part of a Rust project.
-                        // If it's not the root file, then we need to
-                        // invoke Verus on the root file and then filter for results in the current file
-                        let root_file = if toml_dir.join("src").join("main.rs").exists() {
-                            Some(toml_dir.join("src").join("main.rs"))
-                        } else if toml_dir.join("src").join("lib.rs").exists() {
-                            args.push("--crate-type".to_string());
-                            args.push("lib".to_string());
-                            Some(toml_dir.join("src").join("lib.rs"))
-                        } else {
-                            None
-                        };
-
-                        match root_file {
-                            Some(root_file) => {
-                                let file_as_module = Some(
-                                    file.strip_prefix(toml_dir.join("src"))
-                                        .unwrap()
-                                        .to_str()
-                                        .unwrap()
-                                        .replace(std::path::MAIN_SEPARATOR_STR, "::")
-                                        .replace(".rs", ""),
-                                );
-
-                                args.insert(0, root_file.to_str().unwrap().to_string());
-                                if file == root_file {
-                                    tracing::info!("file == root_file");
-                                } else {
-                                    tracing::info!(?root_file, "root_file");
-                                    args.insert(1, "--verify-module".to_string());
-                                    args.insert(2, file_as_module.unwrap().to_string());
-                                }
-                            }
-                            None => {
-                                // Puzzling -- we found a Cargo.toml but no root file.
-                                // Do our best by trying to run directly on the file supplied
-                                args.insert(0, file.to_str().unwrap().to_string());
-                                args.push("--crate-type".to_string());
-                                args.push("lib".to_string());
-                            }
-                        }
-                    }
-                }
-
-                args.append(&mut extra_args_from_toml);
-                args.push("--".to_string());
-                args.push("--error-format=json".to_string());
-
+                args.push("verify".to_string());
+                //args.push("--".to_string());
+                //args.push("--error-format=json".to_string());
                 cmd.current_dir(&self.root);
                 (cmd, args)
             }
