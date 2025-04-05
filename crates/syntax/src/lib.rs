@@ -1558,7 +1558,6 @@ pub fn write(in_v: V) where V: Copy
 
 #[test]
 fn verus_default_ensures() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 trait T1 {
     proof fn my_function_decl(&self, i: int, j: int) -> (r: int)
@@ -1606,17 +1605,7 @@ trait T3 {
     }
 }
 }";
-
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 
@@ -1909,7 +1898,6 @@ pub axiom fn foo(x: u8) requires x == 5;
 
 #[test]
 fn verus_proof_fn() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     proof fn testfn() {
         let tracked f = proof_fn |y: u64| -> (z: u64)
@@ -1947,16 +1935,7 @@ fn verus_proof_fn() {
     }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
