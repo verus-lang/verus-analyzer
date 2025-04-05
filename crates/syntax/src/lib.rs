@@ -68,7 +68,6 @@ pub use rowan::{
 pub use rustc_lexer::unescape;
 pub use smol_str::{format_smolstr, SmolStr};
 
-#[cfg(test)]
 use ast::generated::vst_nodes;
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of
@@ -514,10 +513,25 @@ fn api_walkthrough() {
 // Verus tests
 // Do "cargo test --package syntax --lib -- tests"
 
-#[test]
-fn verus_walkthrough0() {
+fn verus_core(source_code: &str) {
     use ast::HasModuleItem;
 
+    let parse = SourceFile::parse(source_code, Edition::Edition2024);
+    dbg!(&parse.errors);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    //dbg!(&file);
+    for item in file.items() {
+        //dbg!(&item);
+        let _v_item: vst_nodes::Item = item.try_into().unwrap();
+        //dbg!(v_item);
+    }
+}
+
+
+
+#[test]
+fn verus_walkthrough0() {
     let source_code = "verus!{
         proof fn my_proof_fun(x: int, y: int)
             {
@@ -538,23 +552,11 @@ fn verus_walkthrough0() {
             ensures(b);
         }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough1() {
-    use ast::HasModuleItem;
-
     let source_code = "verus!{
         proof fn my_proof_fun(x: int, y: int)
             requires
@@ -569,23 +571,11 @@ fn verus_walkthrough1() {
             assert(a & 0 == 0) by (bit_vector)
         }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough1_1() {
-    use ast::HasModuleItem;
-
     let source_code = "
 verus! {
     spec fn identity(x: u32) -> u32 {
@@ -603,28 +593,11 @@ verus! {
     }
 }
 ";
-
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // match item {
-        //     ast::Item::Fn(f) => func = Some(f),
-        //     _ => unreachable!(),
-        // }
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough2() {
-    use ast::HasModuleItem;
-
     let source_code = "verus!{
         proof fn my_proof_fun(x: int, y: int) -> (sum: int)
             requires
@@ -654,23 +627,16 @@ fn verus_walkthrough2() {
             // function visible to crate, body visible to module
             x / 2 + y / 2
         }
+        pub open (crate) spec fn test1() {}
+        pub open (in foo) spec fn test2() {}
+        pub open (in crate::m) spec fn test3() { }
+        pub open (super) spec fn test4() {}
     }";
-
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    // dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough3() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
         proof fn test5_bound_checking(x: u32, y: u32, z: u32)
             requires
@@ -704,20 +670,11 @@ fn verus_walkthrough3() {
             }
         }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough4() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
         fn test_assert_forall_by() {
             assert forall|x: int, y: int| f1(x) + f1(y) == x + y + 2 by {
@@ -751,21 +708,11 @@ fn verus_walkthrough4() {
             choose|x: int| f1(x)
         }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    // dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough5() {
-    use ast::HasModuleItem;
     let source_code =
     "verus!{
         fn test_single_trigger1() {
@@ -776,21 +723,11 @@ fn verus_walkthrough5() {
             if x>0 {1} else {-1}
         }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough6() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
         proof fn my_proof_fun(x: int, y: int) -> (sum: int)
             requires
@@ -820,21 +757,11 @@ fn verus_walkthrough6() {
                 a.valid(),
         ;
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough7() {
-    use ast::HasModuleItem;
     let source_code =
     "verus!{
         fn test_single_trigger2() {
@@ -861,21 +788,11 @@ fn verus_walkthrough7() {
             ;
         }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough8() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     fn test_my_funs2(
         a: u32, // exec variable
@@ -892,21 +809,11 @@ fn verus_walkthrough8() {
         }
     }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough9_0() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     fn test_is_variant_1(v: Vehicle2<u64>) {
         match v {
@@ -915,21 +822,11 @@ fn verus_walkthrough9_0() {
         };
     }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough9() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     proof fn test_tracked(
         tracked w: int,
@@ -940,21 +837,11 @@ fn verus_walkthrough9() {
 
     }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough10_0() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     pub(crate) proof fn binary_ops<A>(a: A, x: int) {
         assert(2 + 2 !== 3);
@@ -964,21 +851,11 @@ fn verus_walkthrough10_0() {
     }
 
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough10_1() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     spec fn ccc(x: int, y: int) -> bool {
         &&& if false {
@@ -990,20 +867,11 @@ fn verus_walkthrough10_1() {
         &&& true
     }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough10_2() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     spec fn complex_conjuncts(x: int, y: int) -> bool {
         let b = x < y;
@@ -1019,21 +887,11 @@ fn verus_walkthrough10_2() {
     }
 
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough10() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     fn test_views() {
         let mut v: Vec<u8> = Vec::new();
@@ -1046,21 +904,11 @@ fn verus_walkthrough10() {
         }
     }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough11() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn binary_search(v: &Vec<u64>, k: u64) -> (r: usize)
     requires
@@ -1090,21 +938,11 @@ fn binary_search(v: &Vec<u64>, k: u64) -> (r: usize)
     i1
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough12() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn pop_test(t: Vec<u64>)
 requires
@@ -1117,21 +955,11 @@ assert(uninterp_fn(x));
 assert(forall|i: int| #![auto] 0 <= i < t.len() ==> uninterp_fn(t[i]));
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough13() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
     proof fn arith_sum_int_nonneg(i: nat)
         ensures
@@ -1150,21 +978,11 @@ fn verus_walkthrough13() {
     if i <= 0 { 0 } else { i + arith_sum_int(i - 1) }
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough14() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn exec_with_decreases(n: u64) -> u64
     decreases 100 - n,
@@ -1176,21 +994,11 @@ fn exec_with_decreases(n: u64) -> u64
     }
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough15() {
-    use ast::HasModuleItem;
     let source_code =
     "verus!{
 spec(checked) fn my_spec_fun2(x: int, y: int) -> int
@@ -1202,21 +1010,11 @@ spec(checked) fn my_spec_fun2(x: int, y: int) -> int
     my_spec_fun(x, y)
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough16() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 proof fn test_even_f()
     ensures
@@ -1230,21 +1028,11 @@ proof fn test_even_f()
     }
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough17() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/wiki/Doc%3A-Deprecated-and-recommended-syntax%2C-and-upcoming-changes
     let source_code = "verus!{
 proof fn lemma1(i: int, tracked t: S) {
@@ -1272,21 +1060,11 @@ fn g(Tracked(t): Tracked<S>) -> u32 {
     f(5, Ghost(6), Tracked(t))
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough18() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1319,21 +1097,11 @@ proof fn dec0_decreases(a: int) {
     // proof
 }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough19() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1342,21 +1110,11 @@ tracked struct TrackedAndGhost<T, G>(
     ghost G,
 );
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough20() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1367,21 +1125,11 @@ proof fn lemma_mul_upper_bound(x: int, x_bound: int, y: int, y_bound: int)
 {
 }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough21() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1398,21 +1146,11 @@ proof fn add0_recommends(a: nat, b: nat) {
 }
 
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough22() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1445,16 +1183,7 @@ proof fn dec0_decreases(a: int) {
     // proof
 }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 // verus trigger attribute is custom syntax
@@ -1470,7 +1199,6 @@ proof fn dec0_decreases(a: int) {
 // therefore, we just special-case `#[trigger]`
 #[test]
 fn verus_walkthrough23() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1482,21 +1210,11 @@ verus!{
         );
     }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough24() {
-    use ast::HasModuleItem;
     //from: https://github.com/verus-lang/verus/blob/main/source/rust_verify/example/syntax.rs
     let source_code = "
 verus!{
@@ -1512,21 +1230,11 @@ spec fn test_rec2(x: int, y: int) -> int
     }
 }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_walkthrough25() {
-    use ast::HasModuleItem;
     // https://github.com/verus-lang/verus/blob/ed95a417a236707fbb50efd96c91cb217ed2b22a/source/rust_verify/example/vectors.rs
     let source_code = "
 verus!{
@@ -1548,43 +1256,22 @@ verus!{
         v
     }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(&v_item);
-        // println!("{}", &v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_anonymous_return_types() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn foo() -> (u32, u32)
 {
     (1, 2)
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_struct_syntax() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 proof fn sufficiently_creamy() -> bool
     requires 
@@ -1622,21 +1309,11 @@ spec fn walks_upright(l: Life) -> bool
     l matches Life::Mammal{legs, ..} ==> legs==2
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_has() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn uses_spec_has()
     requires
@@ -1657,21 +1334,11 @@ fn uses_spec_has()
     assert(ms !has 4 == ms !has 4);
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_while_loops() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 pub fn clone_vec_u8() {
     let i = 0;
@@ -1691,21 +1358,11 @@ pub fn clone_vec_u8() {
     }
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_loops() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn test() {
     loop
@@ -1727,21 +1384,11 @@ fn test() {
     }
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_for_loops() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn reverse(v: &mut Vec<u64>)
     ensures
@@ -1793,21 +1440,11 @@ fn test() {
     }
 }
     }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_broadcast() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 mod ring {
     use builtin::*;
@@ -1882,37 +1519,19 @@ mod m4 {
 }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_broadcast_regression() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn f() { let group = Group::new(Delimiter::Bracket, bracketed.build()); let mut group = crate::Group::_new_fallback(group); group.set_span(span); trees.push_token_from_parser(TokenTree::Group(group)); }
 }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_where_clauses() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 pub fn spawn<F, Ret>(f: F) -> (handle: JoinHandle<Ret>) where
     F: FnOnce() -> Ret,
@@ -1934,16 +1553,7 @@ pub fn write(in_v: V) where V: Copy
 }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
@@ -2012,7 +1622,6 @@ trait T3 {
 
 #[test]
 fn verus_opens_invariants() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn inv1()
     opens_invariants none
@@ -2058,21 +1667,11 @@ fn kw_test() {
 }
 
 }";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_tracked() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn is_nonnull(tracked &self)
 {
@@ -2082,22 +1681,11 @@ fn into_raw() -> (tracked points_to_raw: PointsToRaw)
 {
 }
 }";
-
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_higher_order_functions() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 pub fn spawn(f: F) 
     requires
@@ -2108,21 +1696,11 @@ pub fn spawn(f: F)
 }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_triggers() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn lemma()
     ensures
@@ -2142,21 +1720,11 @@ fn lemma_mul_by_zero_is_zero()
 }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_triple_ops() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 spec fn test(a: bool, b:bool) -> bool {
     ||| {
@@ -2183,21 +1751,11 @@ proof fn testp(a: bool, b:bool)
 }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_assume_specification() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 pub assume_specification<T> [core::mem::swap::<T>] (a: &mut T, b: &mut T)
     ensures
@@ -2218,21 +1776,11 @@ pub assume_specification [<bool as Clone>::clone](b: &bool) -> (res: bool)
     ensures res == b;
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_returns() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 fn test() -> u8
     returns 20u8,
@@ -2311,22 +1859,12 @@ pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: Opti
 
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 
 #[test]
 fn verus_globals() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 global size_of usize == 4;
 
@@ -2343,21 +1881,11 @@ global layout S<u64> is size == 16, align == 8;
 global layout S<u32> is size == 8, align == 4;
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_normal_rust() {
-    use ast::HasModuleItem;
     let source_code = "
 fn check(attrs: Vec<u64>) {
     assert!(1 > 0);
@@ -2367,35 +1895,16 @@ fn check(attrs: Vec<u64>) {
 }
 ";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn verus_axioms() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 pub axiom fn foo(x: u8) requires x == 5; 
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
@@ -2452,27 +1961,16 @@ fn verus_proof_fn() {
 
 #[test]
 fn verus_uninterp() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 pub uninterp spec fn bar() -> bool;
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 
 #[test]
 fn verus_fn_signatures() {
-    use ast::HasModuleItem;
     let source_code = "verus!{
 trait T { }
 
@@ -2486,21 +1984,11 @@ spec fn v<K>()
 }
 }";
 
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        // let v_item: vst_nodes::Item = item.try_into().unwrap();
-        // dbg!(v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn cst_to_vst1() {
-    use ast::HasModuleItem;
     let source_code = "
 verus!{
 spec fn sum(x: int, y: int) -> int
@@ -2508,22 +1996,11 @@ spec fn sum(x: int, y: int) -> int
     x + y
 }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(&v_item);
-        println!("{}", &v_item);
-    }
+    verus_core(source_code);
 }
 
 #[test]
 fn cst_to_vst2() {
-    use ast::HasModuleItem;
     let source_code = "
 verus!{
 spec fn test_rec2(x: int, y: int) -> int
@@ -2536,17 +2013,7 @@ spec fn test_rec2(x: int, y: int) -> int
     }
 }
 } // verus!";
-    let parse = SourceFile::parse(source_code, Edition::Edition2024);
-    dbg!(&parse.errors);
-    assert!(parse.errors().is_empty());
-    let file: SourceFile = parse.tree();
-    dbg!(&file);
-    for item in file.items() {
-        dbg!(&item);
-        let v_item: vst_nodes::Item = item.try_into().unwrap();
-        dbg!(&v_item);
-        println!("{}", &v_item);
-    }
+    verus_core(source_code);
 }
 
 /*

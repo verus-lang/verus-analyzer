@@ -107,14 +107,52 @@ vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in
 ```
 
 ---
-
 ## Proof Actions
 
 [Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) 
 are an **experimental** feature to assist developers when debugging proof failures.
-They show up as light bulb icons in the IDE when you hover over a failed proof.
+They show up as light bulb (💡) icons in the IDE when you hover over a failed proof.
+They are designed to automate many of the tedious, error-prone debugging steps that 
+developers previously did manually.  See below for some examples.  The framework
+is also designed to make it easy to write your own proof actions.  Indeed, the
+examples below only require ~30-180 lines of Rust code.
 
 ### Proof Action Demo
 [Source code](https://github.com/chanheec/proof-action-example)
 
 ![](demo.gif)
+
+### Currently Enabled Proof Actions
+
+The "Hover over" column indicates where you should place your mouse cursor 
+so that a "light bulb" 💡 will appear and allow you to perform the corresponding
+proof action.  In the examples linked to below, the `$0` characters indicate
+where the user has positioned their mouse in the "before" version of the code,
+and below you can see the version after the proof action executes.
+
+| Hover over | Proof action | Examples |
+|------------|--------------|----------|
+| `assert` keyword | Move the current expression "up" one statement in the current function, adjusting it appropriately based on the statement it "moves past" (technically it applies one weakest-precondition step).  Currently only handles a subset of available Verus statements. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/weakest_pre_step.rs#L303) |
+| `assert` keyword | Convert `assert(A ==> B)` into `if A { assert(B); }` | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/convert_imply_to_if.rs#L71) |
+| `assert` keyword | Take an assertion containing a `forall` quantifier and an implication and introduce a [`forall ... implies ... by` statement](https://verus-lang.github.io/verus/guide/quantproofs.html#proving-forall-with-assert-by) where the quantified variables are in scope and the proof already assumes the left-hand side of the implication. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_forall_implies.rs#L98) |
+| `assert` keyword | Take an assertion containing a `forall` quantifier and introduce a `by` clause where the quantified variables are in scope. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_forall.rs#L71) |
+| `assert` keyword | Add a `by` block to an existing assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_assert_by_block.rs#L64) |
+| `assert` keyword | Add a `by` block containing `assume(false)`. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_assume_false.rs#L66) |
+| `ensures` keyword | Introduce a failing ensures clause as an `assert` statement at the end of the current function | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_postcondition.rs#L92) |
+| `ensures` keyword | Take an ensures clause `A ==> B`, and move `A` to the requires clause, leaving `B` in the ensures clause. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_imply_ensures.rs#L75) |
+| function call | Introduce the function's precondition as an assumption in the caller's context. |[code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_precondition.rs#L64) |
+| function call inside an assertion | Convert the assertion into an `assert ... by` expression and reveal the selected function's definition inside the `by` block | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_in_by_block.rs#L76) |
+| function call inside an assertion | Add a reveal statement for this function above the current assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_above.rs#L78) |
+| `<=` | Split an assertion of `A <= B` into two assertions: `A < B` and `A <= B` | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_smaller_or_equal_to.rs#L118) |
+| sequence expression inside an `assert ... by` | Adds a clause saying that the sequence index is in bounds | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/seq_index_inbound.rs#L99) |
+
+
+### Developing Your Own Proof Actions
+
+We encourage you to enhance the proof actions above and to develop your own proof actions.
+Pull requests are quite welcome.  Here are some steps to get started.
+
+1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./crates/ide-assists/src/handlers/proof_action).
+2. Find the existing proof action most similar to your idea and copy it into a new file in that directory.  Update the names and code appropriately.  Note that each proof action is called on just about every single UI event, so it's important that your proof action exits quickly and cleanly when it doesn't apply.
+3. Add your new proof action to the long list in the `all()` function in the [ide-assists' crate's `lib.rs` file](crates/ide-assists/src/lib.rs).
+4. Follow the steps in [CONTRIBUTING.md](./CONTRIBUTING.md) to build and test your new proof action.

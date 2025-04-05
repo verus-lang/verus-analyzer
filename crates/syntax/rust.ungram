@@ -446,7 +446,7 @@ BlockExpr =
 
 // verus: &&&, |||
 PrefixExpr =
-  Attr* op:('-' | '!' | '*') Expr
+  Attr* op:('-' | '!' | '*' | '&&&' | '|||') Expr
 
 // verus: ==>, !==
 BinExpr =
@@ -746,7 +746,7 @@ ConstBlockPat =
 //************************//
 
 Publish =
-  ('closed' | 'open' | 'uninterp' )
+  ('closed' | 'open' ('(' 'in'? Path ')')? | 'uninterp' )
 
 FnMode =
   ('spec' | 'proof' | 'exec' | 'axiom' | ModeSpecChecked )

@@ -118,6 +118,11 @@ pub(crate) fn publish(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     if p.at_contextual_kw(T![open]) {
         p.bump_remap(T![open]);
+        if p.eat(T!['(']) {
+            p.eat(T![in]);
+            paths::use_path(p);
+            p.expect(T![')']);
+        }
         m.complete(p, PUBLISH)
     } else if p.at_contextual_kw(T![closed]) {
         p.bump_remap(T![closed]);
@@ -177,7 +182,10 @@ pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    let group_name_m = p.start();
     p.expect(IDENT); // group name
+    group_name_m.complete(p, BROADCAST_GROUP_IDENTIFIER);
+    let group_list_m = p.start();
     p.expect(T!['{']);
     while !p.at(EOF) && !p.at(T!['}']) {
         attributes::inner_attrs(p);
@@ -191,6 +199,7 @@ pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker 
         }
     }
     p.expect(T!['}']);
+    group_list_m.complete(p, BROADCAST_GROUP_LIST);
     m.complete(p, BROADCAST_GROUP)
 }
 

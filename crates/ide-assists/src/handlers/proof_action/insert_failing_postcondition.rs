@@ -40,7 +40,7 @@ pub(crate) fn vst_rewriter_intro_failing_ensures(
     mut blk: BlockExpr,
 ) -> Option<BlockExpr> {
     let this_fn = ctx.vst_find_node_at_offset::<Fn, ast::Fn>()?;
-    let post_fails = filter_post_failuires(&ctx.verus_errors_inside_fn(&this_fn)?);
+    let post_fails = filter_post_failures(&ctx.verus_errors_inside_fn(&this_fn)?);
     let failed_exprs: Option<Vec<Expr>> =
         post_fails.into_iter().map(|p| ctx.expr_from_post_failure(p)).collect();
     let asserts_failed_exprs =

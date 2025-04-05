@@ -953,6 +953,10 @@ pub struct PtrType {
 pub struct Publish {
     pub closed_token: bool,
     pub open_token: bool,
+    pub l_paren_token: bool,
+    pub in_token: bool,
+    pub path: Option<Box<Path>>,
+    pub r_paren_token: bool,
     pub uninterp_token: bool,
     pub cst: Option<super::nodes::Publish>,
 }
@@ -3947,6 +3951,13 @@ impl TryFrom<super::nodes::Publish> for Publish {
         Ok(Self {
             closed_token: item.closed_token().is_some(),
             open_token: item.open_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            in_token: item.in_token().is_some(),
+            path: match item.path() {
+                Some(it) => Some(Box::new(Path::try_from(it)?)),
+                None => None,
+            },
+            r_paren_token: item.r_paren_token().is_some(),
             uninterp_token: item.uninterp_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -8120,6 +8131,28 @@ impl std::fmt::Display for Publish {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.in_token {
+            let mut tmp = stringify!(in_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.path {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         if self.uninterp_token {
             let mut tmp = stringify!(uninterp_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -11499,7 +11532,16 @@ impl PtrType {
 }
 impl Publish {
     pub fn new() -> Self {
-        Self { closed_token: false, open_token: false, uninterp_token: false, cst: None }
+        Self {
+            closed_token: false,
+            open_token: false,
+            l_paren_token: false,
+            in_token: false,
+            path: None,
+            r_paren_token: false,
+            uninterp_token: false,
+            cst: None,
+        }
     }
 }
 impl RangeExpr {

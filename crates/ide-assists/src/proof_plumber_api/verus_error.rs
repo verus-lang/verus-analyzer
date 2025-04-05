@@ -27,11 +27,11 @@ pub struct PreFailure {
 
 /// Postcondition failure contains
 /// (1) the exact postcondition that is failing
-/// (2) the error span from Verus
+/// (2) the error span for the function name and mode from Verus
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct PostFailure {
     pub failing_post: TextRange,
-    pub func_body: TextRange,
+    pub func_name: TextRange,
 }
 
 /// Assertion failure contains
@@ -60,7 +60,7 @@ pub fn filter_pre_failuires(verus_errors: &Vec<VerusError>) -> Vec<PreFailure> {
 
 /// From a vector of VerusErrors,
 /// filter only postcondition failures
-pub fn filter_post_failuires(verus_errors: &Vec<VerusError>) -> Vec<PostFailure> {
+pub fn filter_post_failures(verus_errors: &Vec<VerusError>) -> Vec<PostFailure> {
     let mut post_errs = vec![];
     for verr in verus_errors {
         if let VerusError::Post(p) = verr {
@@ -83,11 +83,11 @@ pub fn mk_pre_failure(pre_start: u32, pre_end: u32, call_start: u32, call_end: u
 pub fn mk_post_failure(
     post_start: u32,
     post_end: u32,
-    body_start: u32,
-    body_end: u32,
+    name_start: u32,
+    name_end: u32,
 ) -> VerusError {
     VerusError::Post(PostFailure {
         failing_post: TextRange::new(post_start.into(), post_end.into()),
-        func_body: TextRange::new(body_start.into(), body_end.into()),
+        func_name: TextRange::new(name_start.into(), name_end.into()),
     })
 }
