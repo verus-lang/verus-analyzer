@@ -248,6 +248,8 @@ pub struct ClosureExpr {
     pub exists_token: bool,
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
+    pub requires_clause: Option<Box<RequiresClause>>,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
     pub body: Box<Expr>,
     pub cst: Option<super::nodes::ClosureExpr>,
 }
@@ -306,6 +308,12 @@ pub struct DecreasesClause {
     pub decreases_token: bool,
     pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::DecreasesClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DefaultEnsuresClause {
+    pub default_ensures_token: bool,
+    pub exprs: Vec<Expr>,
+    pub cst: Option<super::nodes::DefaultEnsuresClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynTraitType {
@@ -394,6 +402,7 @@ pub struct Fn {
     pub requires_clause: Option<Box<RequiresClause>>,
     pub recommends_clause: Option<Box<RecommendsClause>>,
     pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub default_ensures_clause: Option<Box<DefaultEnsuresClause>>,
     pub returns_clause: Option<Box<ReturnsClause>>,
     pub signature_decreases: Option<Box<SignatureDecreases>>,
     pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
@@ -905,7 +914,7 @@ pub struct PrefixExpr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ProofFnCharacteristics {
     pub l_brack_token: bool,
-    pub fields: Vec<PathSegment>,
+    pub fields: Vec<Path>,
     pub r_brack_token: bool,
     pub cst: Option<super::nodes::ProofFnCharacteristics>,
 }
@@ -2204,6 +2213,14 @@ impl TryFrom<super::nodes::ClosureExpr> for ClosureExpr {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
                 None => None,
             },
+            requires_clause: match item.requires_clause() {
+                Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
+                None => None,
+            },
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
             body: Box::new(
                 item.body()
                     .ok_or(format!("{}", stringify!(body)))
@@ -2337,6 +2354,20 @@ impl TryFrom<super::nodes::DecreasesClause> for DecreasesClause {
     fn try_from(item: super::nodes::DecreasesClause) -> Result<Self, Self::Error> {
         Ok(Self {
             decreases_token: item.decreases_token().is_some(),
+            exprs: item
+                .exprs()
+                .into_iter()
+                .map(Expr::try_from)
+                .collect::<Result<Vec<Expr>, String>>()?,
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::DefaultEnsuresClause> for DefaultEnsuresClause {
+    type Error = String;
+    fn try_from(item: super::nodes::DefaultEnsuresClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            default_ensures_token: item.default_ensures_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
@@ -2589,6 +2620,10 @@ impl TryFrom<super::nodes::Fn> for Fn {
             },
             ensures_clause: match item.ensures_clause() {
                 Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            default_ensures_clause: match item.default_ensures_clause() {
+                Some(it) => Some(Box::new(DefaultEnsuresClause::try_from(it)?)),
                 None => None,
             },
             returns_clause: match item.returns_clause() {
@@ -3830,8 +3865,8 @@ impl TryFrom<super::nodes::ProofFnCharacteristics> for ProofFnCharacteristics {
             fields: item
                 .fields()
                 .into_iter()
-                .map(PathSegment::try_from)
-                .collect::<Result<Vec<PathSegment>, String>>()?,
+                .map(Path::try_from)
+                .collect::<Result<Vec<Path>, String>>()?,
             r_brack_token: item.r_brack_token().is_some(),
             cst: Some(item.clone()),
         })
@@ -6085,6 +6120,14 @@ impl std::fmt::Display for ClosureExpr {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
+        if let Some(it) = &self.requires_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         s.push_str(&self.body.to_string());
         s.push_str(" ");
         write!(f, "{s}")
@@ -6246,6 +6289,19 @@ impl std::fmt::Display for DecreasesClause {
         let mut s = String::new();
         if self.decreases_token {
             let mut tmp = stringify!(decreases_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for DefaultEnsuresClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.default_ensures_token {
+            let mut tmp = stringify!(default_ensures_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6506,6 +6562,10 @@ impl std::fmt::Display for Fn {
             s.push_str(" ");
         }
         if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.default_ensures_clause {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -10677,6 +10737,8 @@ impl ClosureExpr {
             exists_token: false,
             param_list: None,
             ret_type: None,
+            requires_clause: None,
+            ensures_clause: None,
             body: Box::new(body.into()),
             cst: None,
         }
@@ -10735,6 +10797,9 @@ impl DataMode {
 }
 impl DecreasesClause {
     pub fn new() -> Self { Self { decreases_token: true, exprs: vec![], cst: None } }
+}
+impl DefaultEnsuresClause {
+    pub fn new() -> Self { Self { default_ensures_token: true, exprs: vec![], cst: None } }
 }
 impl DynTraitType {
     pub fn new(type_bound_list: TypeBoundList) -> Self {
@@ -10832,6 +10897,7 @@ impl Fn {
             requires_clause: None,
             recommends_clause: None,
             ensures_clause: None,
+            default_ensures_clause: None,
             returns_clause: None,
             signature_decreases: None,
             opens_invariants_clause: None,

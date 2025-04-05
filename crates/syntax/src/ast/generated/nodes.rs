@@ -343,11 +343,13 @@ pub struct ClosureExpr {
 impl ast::HasAttrs for ClosureExpr {}
 impl ClosureExpr {
     pub fn body(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     pub fn generic_param_list(&self) -> Option<GenericParamList> { support::child(&self.syntax) }
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     pub fn proof_fn_with_characteristics(&self) -> Option<ProofFnWithCharacteristics> {
         support::child(&self.syntax)
     }
+    pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
@@ -437,6 +439,17 @@ impl DecreasesClause {
     pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
     pub fn decreases_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![decreases])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DefaultEnsuresClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DefaultEnsuresClause {
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+    pub fn default_ensures_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![default_ensures])
     }
 }
 
@@ -543,6 +556,9 @@ impl ast::HasVisibility for Fn {}
 impl Fn {
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
+    pub fn default_ensures_clause(&self) -> Option<DefaultEnsuresClause> {
+        support::child(&self.syntax)
+    }
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
     pub fn no_unwind_clause(&self) -> Option<NoUnwindClause> { support::child(&self.syntax) }
@@ -1301,7 +1317,7 @@ pub struct ProofFnCharacteristics {
     pub(crate) syntax: SyntaxNode,
 }
 impl ProofFnCharacteristics {
-    pub fn fields(&self) -> AstChildren<PathSegment> { support::children(&self.syntax) }
+    pub fn fields(&self) -> AstChildren<Path> { support::children(&self.syntax) }
     pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
     pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
 }
@@ -2665,6 +2681,17 @@ impl AstNode for DataMode {
 }
 impl AstNode for DecreasesClause {
     fn can_cast(kind: SyntaxKind) -> bool { kind == DECREASES_CLAUSE }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for DefaultEnsuresClause {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DEFAULT_ENSURES_CLAUSE }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -5628,6 +5655,11 @@ impl std::fmt::Display for DataMode {
     }
 }
 impl std::fmt::Display for DecreasesClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for DefaultEnsuresClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
