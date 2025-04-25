@@ -513,6 +513,7 @@ fn api_walkthrough() {
 // Verus tests
 // Do "cargo test --package syntax --lib -- tests"
 
+#[allow(dead_code)]
 fn verus_core(source_code: &str) {
     use ast::HasModuleItem;
 
