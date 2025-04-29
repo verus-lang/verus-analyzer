@@ -498,7 +498,11 @@ pub(crate) fn opens_invariants(p: &mut Parser<'_>) -> CompletedMarker {
         if p.at(T![']']) {
             p.bump(T![']']);
         }
+    } else {
+        // Try to parse a single set expression
+        expressions::expr_no_struct(p);
     }
+    
     m.complete(p, OPENS_INVARIANTS_CLAUSE)
 }
 

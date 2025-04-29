@@ -785,7 +785,7 @@ DecreasesClause =
   'decreases' (Expr (',' Expr)* ','?)
 
 OpensInvariantsClause =
-  'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']')
+  'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']' | Expr)
 
 NoUnwindClause =
   'no_unwind' ('when' Expr)?
