@@ -821,6 +821,7 @@ pub struct OpensInvariantsClause {
     pub l_brack_token: bool,
     pub exprs: Vec<Expr>,
     pub r_brack_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::OpensInvariantsClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3639,6 +3640,10 @@ impl TryFrom<super::nodes::OpensInvariantsClause> for OpensInvariantsClause {
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
             r_brack_token: item.r_brack_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -7801,6 +7806,10 @@ impl std::fmt::Display for OpensInvariantsClause {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -11418,6 +11427,7 @@ impl OpensInvariantsClause {
             l_brack_token: false,
             exprs: vec![],
             r_brack_token: false,
+            expr: None,
             cst: None,
         }
     }

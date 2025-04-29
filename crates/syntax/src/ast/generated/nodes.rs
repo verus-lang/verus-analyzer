@@ -1178,6 +1178,7 @@ pub struct OpensInvariantsClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl OpensInvariantsClause {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
     pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
     pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
