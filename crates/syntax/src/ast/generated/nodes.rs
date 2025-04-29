@@ -313,6 +313,8 @@ pub struct BroadcastUseList {
 }
 impl BroadcastUseList {
     pub fn paths(&self) -> AstChildren<Path> { support::children(&self.syntax) }
+    pub fn l_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['{']) }
+    pub fn r_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['}']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
