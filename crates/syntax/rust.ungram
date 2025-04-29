@@ -816,8 +816,7 @@ VerusGlobal =
   'global' (('size_of' Type op:('==') value:('int_number')) | ('layout' Type 'is' 'size' op:('==') value:('int_number') ',' 'align' op:('==') value:('int_number') )) ';'
 
 BroadcastUseList =
-  (     Path (',' Path)* ','? 
-   | '{' Path (',' Path)* ','? '}')
+   (Path (',' Path)* ','?) | ('{' (Path (',' Path)* ','?) '}')
   
 BroadcastUse =
   Attr* 'broadcast' 'use' BroadcastUseList ';'
