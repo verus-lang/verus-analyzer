@@ -205,7 +205,8 @@ pub(crate) fn broadcast_group(p: &mut Parser<'_>, m: Marker) -> CompletedMarker 
 
 pub(crate) fn broadcast_use_list(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     p.expect(T![use]);
-    while !p.at(EOF) && !p.at(T![;]) {
+    let curly = p.eat(T!['{']);     // Consume the (currently optional) curly brace
+    while !p.at(EOF) && !p.at(T![;]) && !p.at(T!['}']) {
         paths::use_path(p);
 
         if p.at(T![;]) {
@@ -214,6 +215,9 @@ pub(crate) fn broadcast_use_list(p: &mut Parser<'_>, m: Marker) -> CompletedMark
         if p.at(T![,]) {
             p.bump(T![,]);
         }
+    }
+    if curly {
+        p.expect(T!['}']);     // Consume the (currently optional) curly brace
     }
     p.expect(T![;]);
     m.complete(p, BROADCAST_USE_LIST)
@@ -494,7 +498,11 @@ pub(crate) fn opens_invariants(p: &mut Parser<'_>) -> CompletedMarker {
         if p.at(T![']']) {
             p.bump(T![']']);
         }
+    } else {
+        // Try to parse a single set expression
+        expressions::expr_no_struct(p);
     }
+    
     m.complete(p, OPENS_INVARIANTS_CLAUSE)
 }
 

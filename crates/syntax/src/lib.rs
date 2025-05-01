@@ -1518,6 +1518,33 @@ mod m4 {
                     Ring::spec_succ_ensures,
             Ring::spec_prev_ensures;
 }
+
+mod m5 {
+broadcast use
+    super::raw_ptr::group_raw_ptr_axioms,
+    super::set_lib::group_set_lib_axioms,
+    super::set::group_set_axioms,
+;
+broadcast use
+    super::raw_ptr::group_raw_ptr_axioms,
+    super::set_lib::group_set_lib_axioms,
+    super::set::group_set_axioms;
+broadcast use super::raw_ptr::group_raw_ptr_axioms;
+broadcast use super::set_lib::group_set_lib_axioms;
+broadcast use super::set::group_set_axioms;
+broadcast use {
+    super::raw_ptr::group_raw_ptr_axioms,
+    super::set_lib::group_set_lib_axioms,
+    super::set::group_set_axioms};
+broadcast use {
+    super::raw_ptr::group_raw_ptr_axioms,
+    super::set_lib::group_set_lib_axioms,
+    super::set::group_set_axioms,};
+broadcast use {super::set::group_set_axioms};
+broadcast use {super::set::group_set_axioms,};
+
+}
+
 }";
 
     verus_core(source_code);
@@ -1655,6 +1682,13 @@ fn put()
 fn kw_test() {
     let any = 5;
 }
+
+proof fn foo1() opens_invariants bar();
+proof fn foo2() opens_invariants baz;
+proof fn foo3() opens_invariants bar() {}
+proof fn foo4() opens_invariants baz {}
+proof fn foo5() opens_invariants Set::<int>::empty() {}
+proof fn foo6() opens_invariants { let a = Set::<int>::empty(); let b = a.insert(c); b } {}
 
 }";
     verus_core(source_code);

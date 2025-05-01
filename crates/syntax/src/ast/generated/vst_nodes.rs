@@ -217,6 +217,8 @@ pub struct BroadcastUse {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BroadcastUseList {
     pub paths: Vec<Path>,
+    pub l_curly_token: bool,
+    pub r_curly_token: bool,
     pub cst: Option<super::nodes::BroadcastUseList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -819,6 +821,7 @@ pub struct OpensInvariantsClause {
     pub l_brack_token: bool,
     pub exprs: Vec<Expr>,
     pub r_brack_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::OpensInvariantsClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2135,6 +2138,8 @@ impl TryFrom<super::nodes::BroadcastUseList> for BroadcastUseList {
                 .into_iter()
                 .map(Path::try_from)
                 .collect::<Result<Vec<Path>, String>>()?,
+            l_curly_token: item.l_curly_token().is_some(),
+            r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -3635,6 +3640,10 @@ impl TryFrom<super::nodes::OpensInvariantsClause> for OpensInvariantsClause {
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
             r_brack_token: item.r_brack_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -6036,6 +6045,18 @@ impl std::fmt::Display for BroadcastUseList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.paths.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.r_curly_token {
+            let mut tmp = stringify!(r_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -7783,6 +7804,10 @@ impl std::fmt::Display for OpensInvariantsClause {
             let mut tmp = stringify!(r_brack_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -10734,7 +10759,9 @@ impl BroadcastUse {
     }
 }
 impl BroadcastUseList {
-    pub fn new() -> Self { Self { paths: vec![], cst: None } }
+    pub fn new() -> Self {
+        Self { paths: vec![], l_curly_token: false, r_curly_token: false, cst: None }
+    }
 }
 impl CallExpr {
     pub fn new<ET0>(expr: ET0, arg_list: ArgList) -> Self
@@ -11400,6 +11427,7 @@ impl OpensInvariantsClause {
             l_brack_token: false,
             exprs: vec![],
             r_brack_token: false,
+            expr: None,
             cst: None,
         }
     }
