@@ -217,6 +217,8 @@ pub struct BroadcastUse {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct BroadcastUseList {
     pub paths: Vec<Path>,
+    pub l_curly_token: bool,
+    pub r_curly_token: bool,
     pub cst: Option<super::nodes::BroadcastUseList>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -243,10 +245,13 @@ pub struct ClosureExpr {
     pub static_token: bool,
     pub async_token: bool,
     pub move_token: bool,
+    pub proof_fn_with_characteristics: Option<Box<ProofFnWithCharacteristics>>,
     pub forall_token: bool,
     pub exists_token: bool,
     pub param_list: Option<Box<ParamList>>,
     pub ret_type: Option<Box<RetType>>,
+    pub requires_clause: Option<Box<RequiresClause>>,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
     pub body: Box<Expr>,
     pub cst: Option<super::nodes::ClosureExpr>,
 }
@@ -305,6 +310,12 @@ pub struct DecreasesClause {
     pub decreases_token: bool,
     pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::DecreasesClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DefaultEnsuresClause {
+    pub default_ensures_token: bool,
+    pub exprs: Vec<Expr>,
+    pub cst: Option<super::nodes::DefaultEnsuresClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynTraitType {
@@ -393,6 +404,7 @@ pub struct Fn {
     pub requires_clause: Option<Box<RequiresClause>>,
     pub recommends_clause: Option<Box<RecommendsClause>>,
     pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub default_ensures_clause: Option<Box<DefaultEnsuresClause>>,
     pub returns_clause: Option<Box<ReturnsClause>>,
     pub signature_decreases: Option<Box<SignatureDecreases>>,
     pub opens_invariants_clause: Option<Box<OpensInvariantsClause>>,
@@ -809,6 +821,7 @@ pub struct OpensInvariantsClause {
     pub l_brack_token: bool,
     pub exprs: Vec<Expr>,
     pub r_brack_token: bool,
+    pub expr: Option<Box<Expr>>,
     pub cst: Option<super::nodes::OpensInvariantsClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -900,6 +913,28 @@ pub struct PrefixExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
     pub cst: Option<super::nodes::PrefixExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnCharacteristics {
+    pub l_brack_token: bool,
+    pub fields: Vec<Path>,
+    pub r_brack_token: bool,
+    pub cst: Option<super::nodes::ProofFnCharacteristics>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnType {
+    pub proof_fn_token: bool,
+    pub proof_fn_characteristics: Option<Box<ProofFnCharacteristics>>,
+    pub generic_param_list: Option<Box<GenericParamList>>,
+    pub param_list: Option<Box<ParamList>>,
+    pub ret_type: Option<Box<RetType>>,
+    pub cst: Option<super::nodes::ProofFnType>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ProofFnWithCharacteristics {
+    pub proof_fn_token: bool,
+    pub proof_fn_characteristics: Option<Box<ProofFnCharacteristics>>,
+    pub cst: Option<super::nodes::ProofFnWithCharacteristics>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Prover {
@@ -1581,6 +1616,7 @@ pub enum Type {
     NeverType(Box<NeverType>),
     ParenType(Box<ParenType>),
     PathType(Box<PathType>),
+    ProofFnType(Box<ProofFnType>),
     PtrType(Box<PtrType>),
     RefType(Box<RefType>),
     SliceType(Box<SliceType>),
@@ -2102,6 +2138,8 @@ impl TryFrom<super::nodes::BroadcastUseList> for BroadcastUseList {
                 .into_iter()
                 .map(Path::try_from)
                 .collect::<Result<Vec<Path>, String>>()?,
+            l_curly_token: item.l_curly_token().is_some(),
+            r_curly_token: item.r_curly_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -2170,6 +2208,10 @@ impl TryFrom<super::nodes::ClosureExpr> for ClosureExpr {
             static_token: item.static_token().is_some(),
             async_token: item.async_token().is_some(),
             move_token: item.move_token().is_some(),
+            proof_fn_with_characteristics: match item.proof_fn_with_characteristics() {
+                Some(it) => Some(Box::new(ProofFnWithCharacteristics::try_from(it)?)),
+                None => None,
+            },
             forall_token: item.forall_token().is_some(),
             exists_token: item.exists_token().is_some(),
             param_list: match item.param_list() {
@@ -2178,6 +2220,14 @@ impl TryFrom<super::nodes::ClosureExpr> for ClosureExpr {
             },
             ret_type: match item.ret_type() {
                 Some(it) => Some(Box::new(RetType::try_from(it)?)),
+                None => None,
+            },
+            requires_clause: match item.requires_clause() {
+                Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
+                None => None,
+            },
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
                 None => None,
             },
             body: Box::new(
@@ -2313,6 +2363,20 @@ impl TryFrom<super::nodes::DecreasesClause> for DecreasesClause {
     fn try_from(item: super::nodes::DecreasesClause) -> Result<Self, Self::Error> {
         Ok(Self {
             decreases_token: item.decreases_token().is_some(),
+            exprs: item
+                .exprs()
+                .into_iter()
+                .map(Expr::try_from)
+                .collect::<Result<Vec<Expr>, String>>()?,
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::DefaultEnsuresClause> for DefaultEnsuresClause {
+    type Error = String;
+    fn try_from(item: super::nodes::DefaultEnsuresClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            default_ensures_token: item.default_ensures_token().is_some(),
             exprs: item
                 .exprs()
                 .into_iter()
@@ -2565,6 +2629,10 @@ impl TryFrom<super::nodes::Fn> for Fn {
             },
             ensures_clause: match item.ensures_clause() {
                 Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            default_ensures_clause: match item.default_ensures_clause() {
+                Some(it) => Some(Box::new(DefaultEnsuresClause::try_from(it)?)),
                 None => None,
             },
             returns_clause: match item.returns_clause() {
@@ -3572,6 +3640,10 @@ impl TryFrom<super::nodes::OpensInvariantsClause> for OpensInvariantsClause {
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
             r_brack_token: item.r_brack_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -3794,6 +3866,59 @@ impl TryFrom<super::nodes::PrefixExpr> for PrefixExpr {
                     .ok_or(format!("{}", stringify!(expr)))
                     .map(|it| Expr::try_from(it))??,
             ),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::ProofFnCharacteristics> for ProofFnCharacteristics {
+    type Error = String;
+    fn try_from(item: super::nodes::ProofFnCharacteristics) -> Result<Self, Self::Error> {
+        Ok(Self {
+            l_brack_token: item.l_brack_token().is_some(),
+            fields: item
+                .fields()
+                .into_iter()
+                .map(Path::try_from)
+                .collect::<Result<Vec<Path>, String>>()?,
+            r_brack_token: item.r_brack_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::ProofFnType> for ProofFnType {
+    type Error = String;
+    fn try_from(item: super::nodes::ProofFnType) -> Result<Self, Self::Error> {
+        Ok(Self {
+            proof_fn_token: item.proof_fn_token().is_some(),
+            proof_fn_characteristics: match item.proof_fn_characteristics() {
+                Some(it) => Some(Box::new(ProofFnCharacteristics::try_from(it)?)),
+                None => None,
+            },
+            generic_param_list: match item.generic_param_list() {
+                Some(it) => Some(Box::new(GenericParamList::try_from(it)?)),
+                None => None,
+            },
+            param_list: match item.param_list() {
+                Some(it) => Some(Box::new(ParamList::try_from(it)?)),
+                None => None,
+            },
+            ret_type: match item.ret_type() {
+                Some(it) => Some(Box::new(RetType::try_from(it)?)),
+                None => None,
+            },
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::ProofFnWithCharacteristics> for ProofFnWithCharacteristics {
+    type Error = String;
+    fn try_from(item: super::nodes::ProofFnWithCharacteristics) -> Result<Self, Self::Error> {
+        Ok(Self {
+            proof_fn_token: item.proof_fn_token().is_some(),
+            proof_fn_characteristics: match item.proof_fn_characteristics() {
+                Some(it) => Some(Box::new(ProofFnCharacteristics::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -5330,6 +5455,7 @@ impl TryFrom<super::nodes::Type> for Type {
             super::nodes::Type::NeverType(it) => Ok(Self::NeverType(Box::new(it.try_into()?))),
             super::nodes::Type::ParenType(it) => Ok(Self::ParenType(Box::new(it.try_into()?))),
             super::nodes::Type::PathType(it) => Ok(Self::PathType(Box::new(it.try_into()?))),
+            super::nodes::Type::ProofFnType(it) => Ok(Self::ProofFnType(Box::new(it.try_into()?))),
             super::nodes::Type::PtrType(it) => Ok(Self::PtrType(Box::new(it.try_into()?))),
             super::nodes::Type::RefType(it) => Ok(Self::RefType(Box::new(it.try_into()?))),
             super::nodes::Type::SliceType(it) => Ok(Self::SliceType(Box::new(it.try_into()?))),
@@ -5919,6 +6045,18 @@ impl std::fmt::Display for BroadcastUseList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         s.push_str(&self.paths.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.r_curly_token {
+            let mut tmp = stringify!(r_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -5990,6 +6128,10 @@ impl std::fmt::Display for ClosureExpr {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.proof_fn_with_characteristics {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.forall_token {
             let mut tmp = stringify!(forall_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -6007,6 +6149,14 @@ impl std::fmt::Display for ClosureExpr {
             s.push_str(" ");
         }
         if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.requires_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -6171,6 +6321,19 @@ impl std::fmt::Display for DecreasesClause {
         let mut s = String::new();
         if self.decreases_token {
             let mut tmp = stringify!(decreases_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for DefaultEnsuresClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.default_ensures_token {
+            let mut tmp = stringify!(default_ensures_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
@@ -6431,6 +6594,10 @@ impl std::fmt::Display for Fn {
             s.push_str(" ");
         }
         if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.default_ensures_clause {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -7639,6 +7806,10 @@ impl std::fmt::Display for OpensInvariantsClause {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -7850,6 +8021,69 @@ impl std::fmt::Display for PrefixExpr {
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         s.push_str(&self.expr.to_string());
         s.push_str(" ");
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ProofFnCharacteristics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ProofFnType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.proof_fn_token {
+            let mut tmp = stringify!(proof_fn_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.proof_fn_characteristics {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.generic_param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.param_list {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ret_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for ProofFnWithCharacteristics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.proof_fn_token {
+            let mut tmp = stringify!(proof_fn_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.proof_fn_characteristics {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -9606,6 +9840,7 @@ impl std::fmt::Display for Type {
             Type::NeverType(it) => write!(f, "{}", it.to_string()),
             Type::ParenType(it) => write!(f, "{}", it.to_string()),
             Type::PathType(it) => write!(f, "{}", it.to_string()),
+            Type::ProofFnType(it) => write!(f, "{}", it.to_string()),
             Type::PtrType(it) => write!(f, "{}", it.to_string()),
             Type::RefType(it) => write!(f, "{}", it.to_string()),
             Type::SliceType(it) => write!(f, "{}", it.to_string()),
@@ -9875,6 +10110,9 @@ impl Type {
             Type::NeverType(it) => Some(super::nodes::Type::NeverType(it.cst.as_ref()?.clone())),
             Type::ParenType(it) => Some(super::nodes::Type::ParenType(it.cst.as_ref()?.clone())),
             Type::PathType(it) => Some(super::nodes::Type::PathType(it.cst.as_ref()?.clone())),
+            Type::ProofFnType(it) => {
+                Some(super::nodes::Type::ProofFnType(it.cst.as_ref()?.clone()))
+            }
             Type::PtrType(it) => Some(super::nodes::Type::PtrType(it.cst.as_ref()?.clone())),
             Type::RefType(it) => Some(super::nodes::Type::RefType(it.cst.as_ref()?.clone())),
             Type::SliceType(it) => Some(super::nodes::Type::SliceType(it.cst.as_ref()?.clone())),
@@ -10241,6 +10479,9 @@ impl From<ParenType> for Type {
 impl From<PathType> for Type {
     fn from(item: PathType) -> Self { Type::PathType(Box::new(item)) }
 }
+impl From<ProofFnType> for Type {
+    fn from(item: ProofFnType) -> Self { Type::ProofFnType(Box::new(item)) }
+}
 impl From<PtrType> for Type {
     fn from(item: PtrType) -> Self { Type::PtrType(Box::new(item)) }
 }
@@ -10518,7 +10759,9 @@ impl BroadcastUse {
     }
 }
 impl BroadcastUseList {
-    pub fn new() -> Self { Self { paths: vec![], cst: None } }
+    pub fn new() -> Self {
+        Self { paths: vec![], l_curly_token: false, r_curly_token: false, cst: None }
+    }
 }
 impl CallExpr {
     pub fn new<ET0>(expr: ET0, arg_list: ArgList) -> Self
@@ -10549,10 +10792,13 @@ impl ClosureExpr {
             static_token: false,
             async_token: false,
             move_token: false,
+            proof_fn_with_characteristics: None,
             forall_token: false,
             exists_token: false,
             param_list: None,
             ret_type: None,
+            requires_clause: None,
+            ensures_clause: None,
             body: Box::new(body.into()),
             cst: None,
         }
@@ -10611,6 +10857,9 @@ impl DataMode {
 }
 impl DecreasesClause {
     pub fn new() -> Self { Self { decreases_token: true, exprs: vec![], cst: None } }
+}
+impl DefaultEnsuresClause {
+    pub fn new() -> Self { Self { default_ensures_token: true, exprs: vec![], cst: None } }
 }
 impl DynTraitType {
     pub fn new(type_bound_list: TypeBoundList) -> Self {
@@ -10708,6 +10957,7 @@ impl Fn {
             requires_clause: None,
             recommends_clause: None,
             ensures_clause: None,
+            default_ensures_clause: None,
             returns_clause: None,
             signature_decreases: None,
             opens_invariants_clause: None,
@@ -11177,6 +11427,7 @@ impl OpensInvariantsClause {
             l_brack_token: false,
             exprs: vec![],
             r_brack_token: false,
+            expr: None,
             cst: None,
         }
     }
@@ -11267,6 +11518,28 @@ impl PrefixExpr {
         ET0: Into<Expr>,
     {
         Self { attrs: vec![], expr: Box::new(expr.into()), cst: None }
+    }
+}
+impl ProofFnCharacteristics {
+    pub fn new() -> Self {
+        Self { l_brack_token: true, fields: vec![], r_brack_token: true, cst: None }
+    }
+}
+impl ProofFnType {
+    pub fn new() -> Self {
+        Self {
+            proof_fn_token: true,
+            proof_fn_characteristics: None,
+            generic_param_list: None,
+            param_list: None,
+            ret_type: None,
+            cst: None,
+        }
+    }
+}
+impl ProofFnWithCharacteristics {
+    pub fn new() -> Self {
+        Self { proof_fn_token: true, proof_fn_characteristics: None, cst: None }
     }
 }
 impl Prover {

@@ -157,6 +157,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "no_unwind",// verus: Only a key word at the end of a function signature
         "requires",
         "ensures",
+        "default_ensures",
         "returns",
         "checked",
         "recommends",
@@ -171,6 +172,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "spec",
         "proof",
         "axiom",
+        "proof_fn",
         "by",
         "via",
         "when",
@@ -340,6 +342,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "MACRO_EAGER_INPUT",
         // verus
         "REQUIRES_CLAUSE",
+        "DEFAULT_ENSURES_CLAUSE",
         "ENSURES_CLAUSE",
         "RETURNS_CLAUSE",
         "DECREASES_CLAUSE",
@@ -357,6 +360,9 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "FN_MODE",
         "DATA_MODE",
         "MODE_SPEC_CHECKED",
+        "PROOF_FN_TYPE",
+        "PROOF_FN_CHARACTERISTICS",
+        "PROOF_FN_WITH_CHARACTERISTICS",
         "PROVER",
         "SIGNATURE_DECREASES",
         "TRIGGER_ATTRIBUTE",

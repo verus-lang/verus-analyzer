@@ -516,6 +516,9 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     if p.at_contextual_kw(T![ensures]) {
         verus::ensures(p);
     }
+    if p.at_contextual_kw(T![default_ensures]) {
+        verus::default_ensures(p);
+    }
     if p.at_contextual_kw(T![returns]) {
         verus::returns(p);
     }

@@ -156,7 +156,7 @@ UseTreeList =
 Fn =
  Attr* Visibility? Publish?
  'default'? 'const'? 'async'? 'unsafe'? Abi? 'broadcast'? FnMode?
- 'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
+ 'fn' Name GenericParamList? ParamList RetType? WhereClause? Prover? RequiresClause? RecommendsClause? EnsuresClause? DefaultEnsuresClause? ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
  (body:BlockExpr | ';')
 
 Abi =
@@ -504,9 +504,21 @@ MethodCallExpr =
 FieldExpr =
   Attr* Expr '.' NameRef
 
+// verus
+ProofFnCharacteristics =
+  '[' fields:(Path (',' Path)* ','?) ']'
+
+// verus
+ProofFnWithCharacteristics =
+  'proof_fn' ProofFnCharacteristics?
+
+// verus
+ProofFnType =
+  'proof_fn' ProofFnCharacteristics? GenericParamList? ParamList? RetType?
+
 // verus: forall, exists
 ClosureExpr =
-  Attr* ('for' GenericParamList)? 'const'? 'static'? 'async'? 'move'? 'forall'? 'exists'? ParamList RetType? Attr*
+  Attr* ('for' GenericParamList)? 'const'? 'static'? 'async'? 'move'? ProofFnWithCharacteristics? 'forall'? 'exists'? ParamList RetType? RequiresClause? EnsuresClause? Attr*
   body:Expr
 
 IfExpr =
@@ -582,6 +594,7 @@ Type =
   ArrayType
 | DynTraitType
 | FnPtrType
+| ProofFnType
 | ForType
 | ImplTraitType
 | InferType
@@ -750,6 +763,9 @@ RequiresClause =
 EnsuresClause =
   'ensures' (Expr (',' Expr)* ','?)
 
+DefaultEnsuresClause =
+  'default_ensures' (Expr (',' Expr)* ','?)
+
 ReturnsClause =
   'returns' Expr
 
@@ -769,7 +785,7 @@ DecreasesClause =
   'decreases' (Expr (',' Expr)* ','?)
 
 OpensInvariantsClause =
-  'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']')
+  'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']' | Expr)
 
 NoUnwindClause =
   'no_unwind' ('when' Expr)?
@@ -800,7 +816,7 @@ VerusGlobal =
   'global' (('size_of' Type op:('==') value:('int_number')) | ('layout' Type 'is' 'size' op:('==') value:('int_number') ',' 'align' op:('==') value:('int_number') )) ';'
 
 BroadcastUseList =
-  Path (',' Path)* ','?
+   (Path (',' Path)* ','?) | ('{' (Path (',' Path)* ','?) '}')
   
 BroadcastUse =
   Attr* 'broadcast' 'use' BroadcastUseList ';'
