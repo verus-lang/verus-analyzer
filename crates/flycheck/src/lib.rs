@@ -569,9 +569,9 @@ impl FlycheckActor {
                 dbg!(&cargo_verus_exec);
                 let mut cmd = Command::new(cargo_verus_exec);
                 let mut args = args.to_vec();
+// TODO: Need to restore the use of `--verify-module`
                 args.push("verify".to_string());
-                //args.push("--".to_string());
-                //args.push("--error-format=json".to_string());
+                args.push("--message-format=json".to_string());
                 cmd.current_dir(&self.root);
                 (cmd, args)
             }
