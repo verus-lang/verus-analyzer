@@ -551,6 +551,8 @@ impl FlycheckActor {
                 panic!("verus analyzer does not yet support custom commands")
             }
             FlycheckConfig::VerusCommand { args } => {
+
+                // Find the `cargo-verus` binary
                 let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
                     Ok(path) => path,
                     Err(_) => {
@@ -558,7 +560,6 @@ impl FlycheckActor {
                         "verus".to_string() // Hope that it's in the PATH
                     }
                 };
-// TODO: UPDATE ME
                 dbg!(&verus_binary_str);
                 tracing::info!("Using Verus binary: {}", &verus_binary_str);
                 let verus_exec_path = Path::new(&verus_binary_str)
@@ -569,10 +570,69 @@ impl FlycheckActor {
                 dbg!(&cargo_verus_exec);
                 let mut cmd = Command::new(cargo_verus_exec);
                 let mut args = args.to_vec();
-// TODO: Need to restore the use of `--verify-module`
+
+                // Find the toml file to check for additional arguments
+                let mut extra_args_from_toml = Vec::new();
+                if std::fs::metadata(self.root.join("Cargo.toml")).is_ok_and(|f| f.is_file()) {
+                    let toml = std::fs::read_to_string(self.root.join("Cargo.toml")).unwrap();
+                    let mut found_verus_settings = false;
+                    for line in toml.lines() {
+                        if found_verus_settings {
+                            if line.contains("extra_args") {
+                                let start = "extra_args".len() + 1;
+                                let mut arguments =
+                                    line[start..line.len() - 1].trim().to_string();
+                                if arguments.starts_with("=") {
+                                    arguments.remove(0);
+                                    arguments = arguments.trim().to_string();
+                                }
+                                if arguments.starts_with("\"") {
+                                    arguments.remove(0);
+                                }
+                                if arguments.ends_with("\"") {
+                                    arguments.remove(arguments.len() - 1);
+                                }
+                    
+                                let arguments_vec = arguments
+                                    .split(" ")
+                                    .map(|it| it.to_string())
+                                    .collect::<Vec<_>>();
+                                extra_args_from_toml.extend(arguments_vec);
+                            }
+                            break;
+                        }
+                        if line.contains("[package.metadata.verus.ide]") {
+                            found_verus_settings = true;
+                        }
+                    }
+                }
+
+                // Convert the file name into a module name, so we only receive errors for the file the developer is working on
+                let mut module_args = Vec::new();
+                let file = std::path::absolute(Path::new(&file)).unwrap();
+                if file != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("lib.rs")) &&
+                   file != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("main.rs")) {
+                     let file_as_module = Some(
+                        file.strip_prefix(self.root.join("src"))
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .replace(std::path::MAIN_SEPARATOR_STR, "::")
+                            .replace(".rs", ""),
+                    );
+                    module_args.push("--verify-module".to_string());
+                    module_args.push(file_as_module.unwrap().to_string());
+                }
+
                 args.push("verify".to_string());
                 args.push("--message-format=json".to_string());
+                args.push("--".to_string());
+                args.append(&mut extra_args_from_toml);
+                args.append(&mut module_args);
+
                 cmd.current_dir(&self.root);
+                dbg!(&self.root);
+                dbg!(&args);
                 (cmd, args)
             }
         };
