@@ -622,6 +622,8 @@ impl FlycheckActor {
                     );
                     module_args.push("--verify-module".to_string());
                     module_args.push(file_as_module.unwrap().to_string());
+                } else {
+                    module_args.push("--verify-root".to_string());
                 }
 
                 args.push("verify".to_string());
