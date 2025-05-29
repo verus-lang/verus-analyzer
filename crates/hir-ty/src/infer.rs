@@ -973,7 +973,7 @@ impl<'a> InferenceContext<'a> {
         let mut collector =
             OpaqueTyCollector { table: &mut self.table, opaque_tys: FxHashMap::default() };
         for ty in tys {
-            ty.visit_with(collector.as_dyn(), DebruijnIndex::INNERMOST);
+            _ = ty.visit_with(collector.as_dyn(), DebruijnIndex::INNERMOST);
         }
         let atpit_coercion_table: FxHashMap<_, _> = collector
             .opaque_tys
