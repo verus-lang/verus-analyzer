@@ -1636,7 +1636,6 @@ trait T3 {
     verus_core(source_code);
 }
 
-
 #[test]
 fn verus_opens_invariants() {
     let source_code = "verus!{
@@ -1690,6 +1689,48 @@ proof fn foo4() opens_invariants baz {}
 proof fn foo5() opens_invariants Set::<int>::empty() {}
 proof fn foo6() opens_invariants { let a = Set::<int>::empty(); let b = a.insert(c); b } {}
 
+}";
+    verus_core(source_code);
+}
+
+#[test]
+fn verus_no_wind() {
+    let source_code = "verus!{
+fn put1()
+    requires
+        self.id() === old(perm)@.pptr,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+    no_unwind when true
+{
+}
+
+fn put2()
+    requires
+        self.id() === old(perm)@.pptr,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+    opens_invariants none
+    no_unwind when true
+{
+}
+
+fn put3()
+    requires
+        self.id() === old(perm)@.pptr,
+    no_unwind when true
+{
+}
+
+fn put4()
+    no_unwind when true
+{
+}
+
+fn put5()
+    no_unwind when x + y > z
+{
+}
 }";
     verus_core(source_code);
 }

@@ -330,6 +330,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
         && !p.at_contextual_kw(T![returns])
         && !p.at_contextual_kw(T![decreases])
         && !p.at_contextual_kw(T![opens_invariants])
+        && !p.at_contextual_kw(T![no_unwind])
         && !p.at(T!['{'])
         && !p.at(T![;])
     {
@@ -343,6 +344,7 @@ pub(crate) fn requires(p: &mut Parser<'_>) -> CompletedMarker {
                 || p.nth_at_contextual_kw(1, T![returns])
                 || p.nth_at_contextual_kw(1, T![decreases])
                 || p.nth_at_contextual_kw(1, T![opens_invariants])
+                || p.nth_at_contextual_kw(1, T![no_unwind])
                 || p.nth_at(1, T!['{'])
                 || p.nth_at(1, T![;])
             {
@@ -409,7 +411,7 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect_contextual_kw(T![ensures]);
     expressions::expr_no_struct(p);
 
-    while !p.at(EOF) && !p.at_contextual_kw(T![decreases]) && !p.at_contextual_kw(T![default_ensures]) && !p.at_contextual_kw(T![opens_invariants]) && !p.at(T!['{']) && !p.at(T![;]) {
+    while !p.at(EOF) && !p.at_contextual_kw(T![decreases]) && !p.at_contextual_kw(T![default_ensures]) && !p.at_contextual_kw(T![opens_invariants]) && !p.at_contextual_kw(T![no_unwind]) && !p.at(T!['{']) && !p.at(T![;]) {
         if p.at_contextual_kw(T![recommends]) || p.at(T!['{']) {
             break;
         }
@@ -419,6 +421,7 @@ pub(crate) fn ensures(p: &mut Parser<'_>) -> CompletedMarker {
                 || p.nth_at_contextual_kw(1, T![returns])
                 || p.nth_at_contextual_kw(1, T![decreases])
                 || p.nth_at_contextual_kw(1, T![opens_invariants])
+                || p.nth_at_contextual_kw(1, T![no_unwind])
                 || p.nth_at(1, T!['{'])
                 || p.nth_at(1, T![;])
             {
@@ -442,7 +445,7 @@ pub(crate) fn default_ensures(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect_contextual_kw(T![default_ensures]);
     expressions::expr_no_struct(p);
 
-    while !p.at(EOF) && !p.at_contextual_kw(T![decreases]) && !p.at_contextual_kw(T![opens_invariants]) && !p.at(T!['{']) && !p.at(T![;]) {
+    while !p.at(EOF) && !p.at_contextual_kw(T![decreases]) && !p.at_contextual_kw(T![opens_invariants]) && !p.at_contextual_kw(T![no_unwind]) && !p.at(T!['{']) && !p.at(T![;]) {
         if p.at_contextual_kw(T![recommends]) || p.at(T!['{']) {
             break;
         }
@@ -451,6 +454,7 @@ pub(crate) fn default_ensures(p: &mut Parser<'_>) -> CompletedMarker {
                 || p.nth_at_contextual_kw(1, T![returns])
                 || p.nth_at_contextual_kw(1, T![decreases])
                 || p.nth_at_contextual_kw(1, T![opens_invariants])
+                || p.nth_at_contextual_kw(1, T![no_unwind])
                 || p.nth_at(1, T!['{'])
                 || p.nth_at(1, T![;])
             {
