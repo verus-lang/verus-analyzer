@@ -634,14 +634,18 @@ impl FlycheckActor {
 
                         match root_file {
                             Some(root_file) => {
-                                let file_as_module = Some(
-                                    file.strip_prefix(toml_dir.join("src"))
-                                        .unwrap()
-                                        .to_str()
-                                        .unwrap()
-                                        .replace(std::path::MAIN_SEPARATOR_STR, "::")
-                                        .replace(".rs", ""),
-                                );
+                                let file_as_module = file
+                                    .strip_prefix(toml_dir.join("src"))
+                                    .unwrap()
+                                    .to_str()
+                                    .unwrap()
+                                    .replace(std::path::MAIN_SEPARATOR_STR, "::")
+                                    .replace(".rs", "")
+                                    // Trimming `::mod` instead of trimming `mod` and conditionally
+                                    // checking for a `::` before it. This works because a `mod.rs`
+                                    // file at the source root can define a module called `mod`. 
+                                    .trim_end_matches("::mod").to_string()
+                                ;
 
                                 args.insert(0, root_file.to_str().unwrap().to_string());
                                 if file == root_file {
@@ -649,7 +653,7 @@ impl FlycheckActor {
                                 } else {
                                     tracing::info!(?root_file, "root_file");
                                     args.insert(1, "--verify-module".to_string());
-                                    args.insert(2, file_as_module.unwrap().to_string());
+                                    args.insert(2, file_as_module);
                                 }
                             }
                             None => {
