@@ -530,7 +530,9 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     }
     if p.at_contextual_kw(T![no_unwind]) {
         p.bump_remap(T![no_unwind]);
-        p.eat_contextual_kw(T![when]);
+        if p.eat_contextual_kw(T![when]) {
+            expressions::expr_no_struct(p);
+        }
     }
 
     if p.at(T![;]) {
@@ -592,7 +594,9 @@ fn assume_specification(p: &mut Parser<'_>, m: Marker) {
     }
     if p.at_contextual_kw(T![no_unwind]) {
         p.bump_remap(T![no_unwind]);
-        p.eat_contextual_kw(T![when]);
+        if p.eat_contextual_kw(T![when]) {
+            expressions::expr_no_struct(p);
+        }
     }
     p.expect(T![;]);
 
