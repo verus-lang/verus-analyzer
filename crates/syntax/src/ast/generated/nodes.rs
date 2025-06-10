@@ -1674,7 +1674,9 @@ impl ast::HasDocComments for Static {}
 impl ast::HasName for Static {}
 impl ast::HasVisibility for Static {}
 impl Static {
+    pub fn block_expr(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     pub fn body(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
     pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }

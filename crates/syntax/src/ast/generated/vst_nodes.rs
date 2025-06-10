@@ -1159,12 +1159,14 @@ pub struct Static {
     pub visibility: Option<Box<Visibility>>,
     pub static_token: bool,
     pub mut_token: bool,
-    pub name: Box<Name>,
+    pub name: Option<Box<Name>>,
     pub colon_token: bool,
     pub ty: Option<Box<Type>>,
     pub eq_token: bool,
     pub body: Option<Box<Expr>>,
     pub semicolon_token: bool,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub block_expr: Option<Box<BlockExpr>>,
     pub cst: Option<super::nodes::Static>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -4450,11 +4452,10 @@ impl TryFrom<super::nodes::Static> for Static {
             },
             static_token: item.static_token().is_some(),
             mut_token: item.mut_token().is_some(),
-            name: Box::new(
-                item.name()
-                    .ok_or(format!("{}", stringify!(name)))
-                    .map(|it| Name::try_from(it))??,
-            ),
+            name: match item.name() {
+                Some(it) => Some(Box::new(Name::try_from(it)?)),
+                None => None,
+            },
             colon_token: item.colon_token().is_some(),
             ty: match item.ty() {
                 Some(it) => Some(Box::new(Type::try_from(it)?)),
@@ -4466,6 +4467,14 @@ impl TryFrom<super::nodes::Static> for Static {
                 None => None,
             },
             semicolon_token: item.semicolon_token().is_some(),
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            block_expr: match item.block_expr() {
+                Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -8746,8 +8755,10 @@ impl std::fmt::Display for Static {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
-        s.push_str(&self.name.to_string());
-        s.push_str(" ");
+        if let Some(it) = &self.name {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.colon_token {
             let mut tmp = stringify!(colon_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -8772,6 +8783,14 @@ impl std::fmt::Display for Static {
             let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.block_expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -11771,18 +11790,20 @@ impl SourceFile {
     pub fn new() -> Self { Self { shebang_token: false, attrs: vec![], items: vec![], cst: None } }
 }
 impl Static {
-    pub fn new(name: Name) -> Self {
+    pub fn new() -> Self {
         Self {
             attrs: vec![],
             visibility: None,
-            static_token: true,
+            static_token: false,
             mut_token: false,
-            name: Box::new(name),
-            colon_token: true,
+            name: None,
+            colon_token: false,
             ty: None,
             eq_token: false,
             body: None,
-            semicolon_token: true,
+            semicolon_token: false,
+            ensures_clause: None,
+            block_expr: None,
             cst: None,
         }
     }
