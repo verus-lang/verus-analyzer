@@ -248,7 +248,7 @@ Const =
   Attr* Visibility?
   'default'?
   'const' (Name | '_') ':' Type
-  ('=' body:Expr)? ';'
+  (('=' body:Expr)? ';') | (EnsuresClause BlockExpr)
 
 Static =
   Attr* Visibility?
