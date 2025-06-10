@@ -268,6 +268,8 @@ pub struct Const {
     pub eq_token: bool,
     pub body: Option<Box<Expr>>,
     pub semicolon_token: bool,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub block_expr: Option<Box<BlockExpr>>,
     pub cst: Option<super::nodes::Const>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2270,6 +2272,14 @@ impl TryFrom<super::nodes::Const> for Const {
                 None => None,
             },
             semicolon_token: item.semicolon_token().is_some(),
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            block_expr: match item.block_expr() {
+                Some(it) => Some(Box::new(BlockExpr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -6219,6 +6229,14 @@ impl std::fmt::Display for Const {
             let mut tmp = stringify!(semicolon_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.block_expr {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         write!(f, "{s}")
@@ -10810,14 +10828,16 @@ impl Const {
             attrs: vec![],
             visibility: None,
             default_token: false,
-            const_token: true,
+            const_token: false,
             name: None,
             underscore_token: false,
-            colon_token: true,
+            colon_token: false,
             ty: None,
             eq_token: false,
             body: None,
-            semicolon_token: true,
+            semicolon_token: false,
+            ensures_clause: None,
+            block_expr: None,
             cst: None,
         }
     }
