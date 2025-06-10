@@ -166,7 +166,7 @@ pub(crate) fn proof_fn(p: &mut Parser<'_>) -> CompletedMarker {
 
 pub(crate) fn fn_mode(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
-    if p.eat_contextual_kw(T![exec]) || p.eat_contextual_kw(T![proof]) || p.eat_contextual_kw(T![axiom]){
+    if p.eat_contextual_kw(T![exec]) || p.eat_contextual_kw(T![proof]) || p.eat_contextual_kw(T![axiom]) {
         m.complete(p, FN_MODE)
     } else if p.eat_contextual_kw(T![spec]) {
         if p.at(T!['(']) {

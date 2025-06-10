@@ -2042,14 +2042,14 @@ spec const SPEC_E: u64 = 7;
 exec const E: u64 ensures E == SPEC_E { 7 }
 
 
-//exec static E: u64 ensures false {
-//    proof { let x = F; }
-//    0
-//}
-//exec static F: u64 ensures false {
-//    proof { let x = E; }
-//    0
-//}
+exec static E: u64 ensures false {
+    proof { let x = F; }
+    0
+}
+exec static F: u64 ensures false {
+    proof { let x = E; }
+    0
+}
 
 }";
 

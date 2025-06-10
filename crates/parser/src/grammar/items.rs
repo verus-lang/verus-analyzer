@@ -257,6 +257,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         T![fn] => fn_(p, m),
 
         T![const] if p.nth(1) != T!['{'] => consts::konst(p, m),
+        T![static] => consts::static_(p, m),
 
         T![trait] => traits::trait_(p, m),
         T![impl] => traits::impl_(p, m),

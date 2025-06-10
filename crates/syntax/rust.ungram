@@ -253,7 +253,7 @@ Const =
 Static =
   Attr* Visibility?
   'static' 'mut'? Name ':' Type
-  ('=' body:Expr)? ';'
+  (('=' body:Expr)? ';') | (EnsuresClause BlockExpr)
 
 Trait =
   Attr* Visibility?

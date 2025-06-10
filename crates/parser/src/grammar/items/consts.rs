@@ -1,5 +1,3 @@
-use crate::grammar::expressions::expr_no_struct;
-
 use super::*;
 
 // test const_item
@@ -36,9 +34,7 @@ fn const_or_static(p: &mut Parser<'_>, m: Marker, is_const: bool) {
         p.expect(T![;]);
     } else if p.at_contextual_kw(T![ensures]) { // verus
         verus::ensures(p);
-        p.expect(T!['{']);
-        expr_no_struct(p);
-        p.expect(T!['}']);
+        expressions::block_expr(p);
     } else {
         p.expect(T![;]);
     }
