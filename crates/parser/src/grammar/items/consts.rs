@@ -31,7 +31,12 @@ fn const_or_static(p: &mut Parser<'_>, m: Marker, is_const: bool) {
     }
     if p.eat(T![=]) {
         expressions::expr(p);
+        p.expect(T![;]);
+    } else if p.at_contextual_kw(T![ensures]) { // verus
+        verus::ensures(p);
+        expressions::block_expr(p);
+    } else {
+        p.expect(T![;]);
     }
-    p.expect(T![;]);
     m.complete(p, if is_const { CONST } else { STATIC });
 }
