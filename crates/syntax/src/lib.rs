@@ -1636,7 +1636,6 @@ trait T3 {
     verus_core(source_code);
 }
 
-
 #[test]
 fn verus_opens_invariants() {
     let source_code = "verus!{
@@ -1690,6 +1689,48 @@ proof fn foo4() opens_invariants baz {}
 proof fn foo5() opens_invariants Set::<int>::empty() {}
 proof fn foo6() opens_invariants { let a = Set::<int>::empty(); let b = a.insert(c); b } {}
 
+}";
+    verus_core(source_code);
+}
+
+#[test]
+fn verus_no_wind() {
+    let source_code = "verus!{
+fn put1()
+    requires
+        self.id() === old(perm)@.pptr,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+    no_unwind when true
+{
+}
+
+fn put2()
+    requires
+        self.id() === old(perm)@.pptr,
+    ensures
+        perm@.pptr === old(perm)@.pptr,
+    opens_invariants none
+    no_unwind when true
+{
+}
+
+fn put3()
+    requires
+        self.id() === old(perm)@.pptr,
+    no_unwind when true
+{
+}
+
+fn put4()
+    no_unwind when true
+{
+}
+
+fn put5()
+    no_unwind when x + y > z
+{
+}
 }";
     verus_core(source_code);
 }
@@ -1977,6 +2018,39 @@ fn verus_proof_fn() {
 fn verus_uninterp() {
     let source_code = "verus!{
 pub uninterp spec fn bar() -> bool;
+}";
+
+    verus_core(source_code);
+}
+
+#[test]
+fn verus_constants() {
+    let source_code = "verus!{
+pub exec const BDF_DEVICE_MASK: u16
+    ensures BDF_DEVICE_MASK == 31
+{
+    31
+}
+
+const fn e() -> (u: u64) ensures u == 1 { 1 }
+exec const E: u64 ensures E == 2 { 1 + e() }
+
+exec const F: u64 ensures true { 1 }
+
+spec const SPEC_E: u64 = 7;
+#[verifier::when_used_as_spec(SPEC_E)]
+exec const E: u64 ensures E == SPEC_E { 7 }
+
+
+exec static E: u64 ensures false {
+    proof { let x = F; }
+    0
+}
+exec static F: u64 ensures false {
+    proof { let x = E; }
+    0
+}
+
 }";
 
     verus_core(source_code);

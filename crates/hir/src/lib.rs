@@ -4671,7 +4671,7 @@ impl Type {
             .generic_def()
             .map_or_else(|| TraitEnvironment::empty(krate.id), |d| db.trait_environment(d));
 
-        method_resolution::iterate_method_candidates_dyn(
+        _ = method_resolution::iterate_method_candidates_dyn(
             &canonical,
             db,
             environment,
@@ -4730,7 +4730,7 @@ impl Type {
             .generic_def()
             .map_or_else(|| TraitEnvironment::empty(krate.id), |d| db.trait_environment(d));
 
-        method_resolution::iterate_path_candidates(
+        _ = method_resolution::iterate_path_candidates(
             &canonical,
             db,
             environment,
