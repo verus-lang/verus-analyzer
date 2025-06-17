@@ -612,16 +612,21 @@ impl FlycheckActor {
                 let file = std::path::absolute(Path::new(&file)).unwrap();
                 if file != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("lib.rs")) &&
                    file != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("main.rs")) {
-                     let file_as_module = Some(
+                     let file_as_module = 
                         file.strip_prefix(self.root.join("src"))
                             .unwrap()
                             .to_str()
                             .unwrap()
                             .replace(std::path::MAIN_SEPARATOR_STR, "::")
-                            .replace(".rs", ""),
-                    );
+                            .replace(".rs", "")
+                            .replace(".rs", "")
+                            // Trimming `::mod` instead of trimming `mod` and conditionally
+                            // checking for a `::` before it. This works because a `mod.rs`
+                            // file at the source root can define a module called `mod`. 
+                            .trim_end_matches("::mod").to_string()
+                    ;
                     module_args.push("--verify-module".to_string());
-                    module_args.push(file_as_module.unwrap().to_string());
+                    module_args.push(file_as_module);
                 } else {
                     module_args.push("--verify-root".to_string());
                 }
