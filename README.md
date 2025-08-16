@@ -34,6 +34,18 @@ manage multiple crates.
 
 Please install the `verus-analyzer` extension via the Visual Studio Code extension marketplace.
 
+### Updating Verus
+
+When you install `verus-analyzer`, it automatically downloads the latest Verus release.
+The same thing happens when you install an updated version of `verus-analyzer`.  If you
+want to install a new version of Verus in between `verus-analyzer` updates, there are 
+two options.
+1. You can remove the `verus-analyzer` extension and then re-install it.
+2. You can manually download the latest [Verus release](https://github.com/verus-lang/verus/releases)
+   and use it to overwrite the version that `verus-analyzer` downloads.  This will be in your
+   VS Code extensions directory.  E.g., on MacOS, it will be something like 
+   `~/.vscode/extensions/verus-lang.verus-analyzer-0.3.246-darwin-arm64/verus`.
+
 ---
 ## Features and Details
 
