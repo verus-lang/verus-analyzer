@@ -676,6 +676,7 @@ impl FlycheckActor {
             }
         };
 
+        dbg!(&args);
         cmd.args(args);
         cmd
     }
