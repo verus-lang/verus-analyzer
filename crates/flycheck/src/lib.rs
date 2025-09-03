@@ -542,7 +542,7 @@ impl FlycheckActor {
     }
 
     // copied from above check_command
-    fn run_verus(&self, file: String) -> Command {
+    fn run_cargo_verus(&self, file: String) -> Command {
         let (mut cmd, args) = match &self.config {
             FlycheckConfig::CargoCommand { .. } => {
                 panic!("verus analyzer does not yet support cargo commands")
@@ -646,6 +646,154 @@ impl FlycheckActor {
 
         cmd.args(args);
         cmd
+    }
+
+    // copied from above check_command
+    fn run_verus_direct(&self, file: String) -> Command {
+        let (mut cmd, args) = match &self.config {
+            FlycheckConfig::CargoCommand { .. } => {
+                panic!("verus analyzer does not yet support cargo commands")
+            }
+            FlycheckConfig::CustomCommand { .. } => {
+                panic!("verus analyzer does not yet support custom commands")
+            }
+            FlycheckConfig::VerusCommand { args } => {
+                let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
+                    Ok(path) => path,
+                    Err(_) => {
+                        tracing::warn!("VERUS_BINARY_PATH was not set!");
+                        "verus".to_string() // Hope that it's in the PATH
+                    }
+                };
+                dbg!(&verus_binary_str);
+                tracing::info!("Using Verus binary: {}", &verus_binary_str);
+
+                let verus_exec_path = Path::new(&verus_binary_str)
+                    .canonicalize()
+                    .expect("We expect to succeed with canonicalizing the Verus binary path");
+                let mut cmd = Command::new(verus_exec_path);
+
+                // Try to locate a Cargo.toml file that might contain custom Verus arguments
+                let file = Path::new(&file);
+                let mut toml_dir: Option<std::path::PathBuf> = None;
+                let mut extra_args_from_toml = Vec::new();
+                for ans in file.ancestors() {
+                    if ans.join("Cargo.toml").exists() {
+                        let toml = std::fs::read_to_string(ans.join("Cargo.toml")).unwrap();
+                        let mut found_verus_settings = false;
+                        for line in toml.lines() {
+                            if found_verus_settings {
+                                if line.contains("extra_args") {
+                                    let start = "extra_args".len() + 1;
+                                    let mut arguments =
+                                        line[start..line.len() - 1].trim().to_string();
+                                    if arguments.starts_with("=") {
+                                        arguments.remove(0);
+                                        arguments = arguments.trim().to_string();
+                                    }
+                                    if arguments.starts_with("\"") {
+                                        arguments.remove(0);
+                                    }
+                                    if arguments.ends_with("\"") {
+                                        arguments.remove(arguments.len() - 1);
+                                    }
+
+                                    let arguments_vec = arguments
+                                        .split(" ")
+                                        .map(|it| it.to_string())
+                                        .collect::<Vec<_>>();
+                                    extra_args_from_toml.extend(arguments_vec);
+                                }
+                                break;
+                            }
+                            if line.contains("[package.metadata.verus.ide]") {
+                                found_verus_settings = true;
+                            }
+                        }
+                        toml_dir = Some(ans.to_path_buf());
+                        break;
+                    }
+                }
+
+                // We may need to add additional arguments
+                let mut args = args.to_vec();
+                match toml_dir {
+                    None => {
+                        // This file doesn't appear to be part of a larger project
+                        // Try to invoke Verus on it directly, but try to avoid
+                        // complaints about missing `fn main()`
+                        args.push("--crate-type".to_string());
+                        args.push("lib".to_string());
+                    }
+                    Some(toml_dir) => {
+                        // This file appears to be part of a Rust project.
+                        // If it's not the root file, then we need to
+                        // invoke Verus on the root file and then filter for results in the current file
+                        let root_file = if toml_dir.join("src").join("main.rs").exists() {
+                            Some(toml_dir.join("src").join("main.rs"))
+                        } else if toml_dir.join("src").join("lib.rs").exists() {
+                            args.push("--crate-type".to_string());
+                            args.push("lib".to_string());
+                            Some(toml_dir.join("src").join("lib.rs"))
+                        } else {
+                            None
+                        };
+
+                        match root_file {
+                            Some(root_file) => {
+                                let file_as_module = file
+                                    .strip_prefix(toml_dir.join("src"))
+                                    .unwrap()
+                                    .to_str()
+                                    .unwrap()
+                                    .replace(std::path::MAIN_SEPARATOR_STR, "::")
+                                    .replace(".rs", "")
+                                    // Trimming `::mod` instead of trimming `mod` and conditionally
+                                    // checking for a `::` before it. This works because a `mod.rs`
+                                    // file at the source root can define a module called `mod`. 
+                                    .trim_end_matches("::mod").to_string()
+                                ;
+
+                                args.insert(0, root_file.to_str().unwrap().to_string());
+                                if file == root_file {
+                                    tracing::info!("file == root_file");
+                                } else {
+                                    tracing::info!(?root_file, "root_file");
+                                    args.insert(1, "--verify-module".to_string());
+                                    args.insert(2, file_as_module);
+                                }
+                            }
+                            None => {
+                                // Puzzling -- we found a Cargo.toml but no root file.
+                                // Do our best by trying to run directly on the file supplied
+                                args.insert(0, file.to_str().unwrap().to_string());
+                                args.push("--crate-type".to_string());
+                                args.push("lib".to_string());
+                            }
+                        }
+                    }
+                }
+
+                args.append(&mut extra_args_from_toml);
+                args.push("--".to_string());
+                args.push("--error-format=json".to_string());
+
+                cmd.current_dir(&self.root);
+                (cmd, args)
+            }
+        };
+
+        dbg!(&args);
+        cmd.args(args);
+        cmd
+    }
+
+    fn run_verus(&self, file: String) -> Command {
+        if self.config == CargoVerus {
+            self.run_cargo_verus(file)
+        } else {
+            self.run_verus_direct(file)
+        }
     }
 
     fn send(&self, check_task: Message) {
