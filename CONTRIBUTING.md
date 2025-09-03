@@ -21,10 +21,18 @@ If you want to find something to fix or work on keep a look out for the `C-bug` 
 labels.
 
 ## Adding a new configuration option
-There are two parts.  In `crates/rust-analyzer/src/config.rs` defines the server-side configuration of rust-analyzer.  
-Portions of that file are automatically copied into `editors/code/package.json`, which also contains
-editor-specific (for VS Code) configuration options.  Look for the `"title": "$generated-start"` entry
-in the JSON file to see where the automatically copied portion appears.
+There are two parts to the configuration information.  In
+`crates/rust-analyzer/src/config.rs` defines the server-side configuration of
+rust-analyzer.  Portions of that file are automatically copied into
+`editors/code/package.json`, which also contains editor-specific (for VS Code)
+configuration options.  Look for the `"title": "$generated-start"` entry in the
+JSON file to see where the automatically copied portion appears.
+
+If you update the config! settings in `crates/rust-analyzer/src/config.rs`, you
+need to run:
+`cargo test -p rust-analyzer generate_package_json_config generate_config_documentation`
+to update the `package.json` file and the documentation (which we don't currently publish).
+
 
 ## Implementing a new feature
 
