@@ -573,7 +573,7 @@
                 }
             },
             {
-               "title": "$generated-start" 
+                "title": "$generated-start"
             },
             {
                 "title": "assist",
@@ -891,6 +891,16 @@
                                 "type": "string"
                             }
                         ]
+                    }
+                }
+            },
+            {
+                "title": "cargo",
+                "properties": {
+                    "verus-analyzer.cargo.verusEnable": {
+                        "markdownDescription": "Run `cargo verus` instead of running the `verus` binary directly.",
+                        "default": false,
+                        "type": "boolean"
                     }
                 }
             },
@@ -1681,7 +1691,7 @@
                 "title": "imports",
                 "properties": {
                     "verus-analyzer.imports.group.enable": {
-                        "markdownDescription": "Group inserted imports by the [following order](https://verus-analyzer.github.io/manual.html#auto-import). Groups are separated by newlines.",
+                        "markdownDescription": "Group inserted imports by the [following order](https://rust-analyzer.github.io/manual.html#auto-import). Groups are separated by newlines.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -2289,7 +2299,7 @@
                 "properties": {
                     "verus-analyzer.procMacro.attributes.enable": {
                         "markdownDescription": "Expand attribute macros. Requires `#verus-analyzer.procMacro.enable#` to be set.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -2299,7 +2309,7 @@
                 "properties": {
                     "verus-analyzer.procMacro.enable": {
                         "markdownDescription": "Enable support for procedural macros, implies `#verus-analyzer.cargo.buildScripts.enable#`.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
