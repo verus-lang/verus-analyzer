@@ -45,9 +45,9 @@ Run build scripts (`build.rs`) for more precise code analysis.
 --
 Specifies the working directory for running build scripts.
 - "workspace": run build scripts for a workspace in the workspace's root directory.
-  This is incompatible with `#rust-analyzer.cargo.buildScripts.invocationStrategy#` set to `once`.
+  This is incompatible with `#verus-analyzer.cargo.buildScripts.invocationStrategy#` set to `once`.
 - "root": run build scripts in the project's root directory.
-This config only has an effect when `#rust-analyzer.cargo.buildScripts.overrideCommand#`
+This config only has an effect when `#verus-analyzer.cargo.buildScripts.overrideCommand#`
 is set.
 --
 [[rust-analyzer.cargo.buildScripts.invocationStrategy]]rust-analyzer.cargo.buildScripts.invocationStrategy (default: `"per_workspace"`)::
@@ -56,13 +56,13 @@ is set.
 Specifies the invocation strategy to use when running the build scripts command.
 If `per_workspace` is set, the command will be executed for each workspace.
 If `once` is set, the command will be executed once.
-This config only has an effect when `#rust-analyzer.cargo.buildScripts.overrideCommand#`
+This config only has an effect when `#verus-analyzer.cargo.buildScripts.overrideCommand#`
 is set.
 --
 [[rust-analyzer.cargo.buildScripts.overrideCommand]]rust-analyzer.cargo.buildScripts.overrideCommand (default: `null`)::
 +
 --
-Override the command rust-analyzer uses to run build scripts and
+Override the command verus-analyzer uses to run build scripts and
 build procedural macros. The command is required to output json
 and should therefore include `--message-format=json` or a similar
 option.
@@ -70,8 +70,8 @@ option.
 If there are multiple linked projects/workspaces, this command is invoked for
 each of them, with the working directory being the workspace root
 (i.e., the folder containing the `Cargo.toml`). This can be overwritten
-by changing `#rust-analyzer.cargo.buildScripts.invocationStrategy#` and
-`#rust-analyzer.cargo.buildScripts.invocationLocation#`.
+by changing `#verus-analyzer.cargo.buildScripts.invocationStrategy#` and
+`#verus-analyzer.cargo.buildScripts.invocationLocation#`.
 
 By default, a cargo invocation will be constructed for the configured
 targets and features, with the following base command line:
@@ -90,7 +90,7 @@ or build-script sources change and are saved.
 [[rust-analyzer.cargo.buildScripts.useRustcWrapper]]rust-analyzer.cargo.buildScripts.useRustcWrapper (default: `true`)::
 +
 --
-Use `RUSTC_WRAPPER=rust-analyzer` when running build scripts to
+Use `RUSTC_WRAPPER=verus-analyzer` when running build scripts to
 avoid checking unnecessary things.
 --
 [[rust-analyzer.cargo.cfgs]]rust-analyzer.cargo.cfgs::
@@ -137,15 +137,15 @@ Relative path to the sysroot, or "discover" to try to automatically find it via
 
 Unsetting this disables sysroot loading.
 
-This option does not take effect until rust-analyzer is restarted.
+This option does not take effect until verus-analyzer is restarted.
 --
 [[rust-analyzer.cargo.sysrootQueryMetadata]]rust-analyzer.cargo.sysrootQueryMetadata (default: `false`)::
 +
 --
-Whether to run cargo metadata on the sysroot library allowing rust-analyzer to analyze
+Whether to run cargo metadata on the sysroot library allowing verus-analyzer to analyze
 third-party dependencies of the standard libraries.
 
-This will cause `cargo` to create a lockfile in your sysroot directory. rust-analyzer
+This will cause `cargo` to create a lockfile in your sysroot directory. verus-analyzer
 will attempt to clean up afterwards, but nevertheless requires the location to be
 writable to.
 --
@@ -155,7 +155,7 @@ writable to.
 Relative path to the sysroot library sources. If left unset, this will default to
 `{cargo.sysroot}/lib/rustlib/src/rust/library`.
 
-This option does not take effect until rust-analyzer is restarted.
+This option does not take effect until verus-analyzer is restarted.
 --
 [[rust-analyzer.cargo.target]]rust-analyzer.cargo.target (default: `null`)::
 +
@@ -165,12 +165,17 @@ Compilation target override (target triple).
 [[rust-analyzer.cargo.targetDir]]rust-analyzer.cargo.targetDir (default: `null`)::
 +
 --
-Optional path to a rust-analyzer specific target directory.
-This prevents rust-analyzer's `cargo check` and initial build-script and proc-macro
+Optional path to a verus-analyzer specific target directory.
+This prevents verus-analyzer's `cargo check` and initial build-script and proc-macro
 building from locking the `Cargo.lock` at the expense of duplicating build artifacts.
 
 Set to `true` to use a subdirectory of the existing target directory or
 set to a path relative to the workspace to use that path.
+--
+[[rust-analyzer.cargo.verusEnable]]rust-analyzer.cargo.verusEnable (default: `false`)::
++
+--
+Run `cargo verus` instead of running the `verus` binary directly.
 --
 [[rust-analyzer.checkOnSave]]rust-analyzer.checkOnSave (default: `true`)::
 +
@@ -181,7 +186,7 @@ Run the check command for diagnostics on save.
 +
 --
 Check all targets and tests (`--all-targets`). Defaults to
-`#rust-analyzer.cargo.allTargets#`.
+`#verus-analyzer.cargo.allTargets#`.
 --
 [[rust-analyzer.check.command]]rust-analyzer.check.command (default: `"check"`)::
 +
@@ -197,13 +202,13 @@ Extra arguments for `cargo check`.
 +
 --
 Extra environment variables that will be set when running `cargo check`.
-Extends `#rust-analyzer.cargo.extraEnv#`.
+Extends `#verus-analyzer.cargo.extraEnv#`.
 --
 [[rust-analyzer.check.features]]rust-analyzer.check.features (default: `null`)::
 +
 --
 List of features to activate. Defaults to
-`#rust-analyzer.cargo.features#`.
+`#verus-analyzer.cargo.features#`.
 
 Set to `"all"` to pass `--all-features` to Cargo.
 --
@@ -219,9 +224,9 @@ For example for `cargo check`: `dead_code`, `unused_imports`, `unused_variables`
 --
 Specifies the working directory for running checks.
 - "workspace": run checks for workspaces in the corresponding workspaces' root directories.
-  This falls back to "root" if `#rust-analyzer.check.invocationStrategy#` is set to `once`.
+  This falls back to "root" if `#verus-analyzer.check.invocationStrategy#` is set to `once`.
 - "root": run checks in the project's root directory.
-This config only has an effect when `#rust-analyzer.check.overrideCommand#`
+This config only has an effect when `#verus-analyzer.check.overrideCommand#`
 is set.
 --
 [[rust-analyzer.check.invocationStrategy]]rust-analyzer.check.invocationStrategy (default: `"per_workspace"`)::
@@ -230,19 +235,19 @@ is set.
 Specifies the invocation strategy to use when running the check command.
 If `per_workspace` is set, the command will be executed for each workspace.
 If `once` is set, the command will be executed once.
-This config only has an effect when `#rust-analyzer.check.overrideCommand#`
+This config only has an effect when `#verus-analyzer.check.overrideCommand#`
 is set.
 --
 [[rust-analyzer.check.noDefaultFeatures]]rust-analyzer.check.noDefaultFeatures (default: `null`)::
 +
 --
 Whether to pass `--no-default-features` to Cargo. Defaults to
-`#rust-analyzer.cargo.noDefaultFeatures#`.
+`#verus-analyzer.cargo.noDefaultFeatures#`.
 --
 [[rust-analyzer.check.overrideCommand]]rust-analyzer.check.overrideCommand (default: `null`)::
 +
 --
-Override the command rust-analyzer uses instead of `cargo check` for
+Override the command verus-analyzer uses instead of `cargo check` for
 diagnostics on save. The command is required to output json and
 should therefore include `--message-format=json` or a similar option
 (if your client supports the `colorDiagnosticOutput` experimental
@@ -250,15 +255,15 @@ capability, you can use `--message-format=json-diagnostic-rendered-ansi`).
 
 If you're changing this because you're using some tool wrapping
 Cargo, you might also want to change
-`#rust-analyzer.cargo.buildScripts.overrideCommand#`.
+`#verus-analyzer.cargo.buildScripts.overrideCommand#`.
 
 If there are multiple linked projects/workspaces, this command is invoked for
 each of them, with the working directory being the workspace root
 (i.e., the folder containing the `Cargo.toml`). This can be overwritten
-by changing `#rust-analyzer.check.invocationStrategy#` and
-`#rust-analyzer.check.invocationLocation#`.
+by changing `#verus-analyzer.check.invocationStrategy#` and
+`#verus-analyzer.check.invocationLocation#`.
 
-If `$saved_file` is part of the command, rust-analyzer will pass
+If `$saved_file` is part of the command, verus-analyzer will pass
 the absolute path of the saved file to the provided command. This is
 intended to be used with non-Cargo build systems.
 Note that `$saved_file` is experimental and may be removed in the future.
@@ -273,7 +278,7 @@ cargo check --workspace --message-format=json --all-targets
 [[rust-analyzer.check.targets]]rust-analyzer.check.targets (default: `null`)::
 +
 --
-Check for specific targets. Defaults to `#rust-analyzer.cargo.target#` if empty.
+Check for specific targets. Defaults to `#verus-analyzer.cargo.target#` if empty.
 
 Can be a single target, e.g. `"x86_64-unknown-linux-gnu"` or a list of targets, e.g.
 `["aarch64-apple-darwin", "x86_64-apple-darwin"]`.
@@ -386,17 +391,17 @@ Term search fuel in "units of work" for autocompletion (Defaults to 1000).
 [[rust-analyzer.diagnostics.disabled]]rust-analyzer.diagnostics.disabled (default: `[]`)::
 +
 --
-List of rust-analyzer diagnostics to disable.
+List of verus-analyzer diagnostics to disable.
 --
 [[rust-analyzer.diagnostics.enable]]rust-analyzer.diagnostics.enable (default: `true`)::
 +
 --
-Whether to show native rust-analyzer diagnostics.
+Whether to show native verus-analyzer diagnostics.
 --
 [[rust-analyzer.diagnostics.experimental.enable]]rust-analyzer.diagnostics.experimental.enable (default: `false`)::
 +
 --
-Whether to show experimental rust-analyzer diagnostics that might
+Whether to show experimental verus-analyzer diagnostics that might
 have more false positives than usual.
 --
 [[rust-analyzer.diagnostics.remapPrefix]]rust-analyzer.diagnostics.remapPrefix (default: `{}`)::
@@ -429,7 +434,7 @@ and a blue icon in the `Problems Panel`.
 [[rust-analyzer.files.excludeDirs]]rust-analyzer.files.excludeDirs (default: `[]`)::
 +
 --
-These directories will be ignored by rust-analyzer. They are
+These directories will be ignored by verus-analyzer. They are
 relative to the workspace root, and globs are not supported. You may
 also need to add the folders to Code's `files.watcherExclude`.
 --
@@ -467,7 +472,7 @@ Enables highlighting of all break points for a loop or block context while the c
 +
 --
 Whether to show `Debug` action. Only applies when
-`#rust-analyzer.hover.actions.enable#` is set.
+`#verus-analyzer.hover.actions.enable#` is set.
 --
 [[rust-analyzer.hover.actions.enable]]rust-analyzer.hover.actions.enable (default: `true`)::
 +
@@ -478,25 +483,25 @@ Whether to show HoverActions in Rust files.
 +
 --
 Whether to show `Go to Type Definition` action. Only applies when
-`#rust-analyzer.hover.actions.enable#` is set.
+`#verus-analyzer.hover.actions.enable#` is set.
 --
 [[rust-analyzer.hover.actions.implementations.enable]]rust-analyzer.hover.actions.implementations.enable (default: `true`)::
 +
 --
 Whether to show `Implementations` action. Only applies when
-`#rust-analyzer.hover.actions.enable#` is set.
+`#verus-analyzer.hover.actions.enable#` is set.
 --
 [[rust-analyzer.hover.actions.references.enable]]rust-analyzer.hover.actions.references.enable (default: `false`)::
 +
 --
 Whether to show `References` action. Only applies when
-`#rust-analyzer.hover.actions.enable#` is set.
+`#verus-analyzer.hover.actions.enable#` is set.
 --
 [[rust-analyzer.hover.actions.run.enable]]rust-analyzer.hover.actions.run.enable (default: `true`)::
 +
 --
 Whether to show `Run` action. Only applies when
-`#rust-analyzer.hover.actions.enable#` is set.
+`#verus-analyzer.hover.actions.enable#` is set.
 --
 [[rust-analyzer.hover.documentation.enable]]rust-analyzer.hover.documentation.enable (default: `true`)::
 +
@@ -507,7 +512,7 @@ Whether to show documentation on hover.
 +
 --
 Whether to show keyword hover popups. Only applies when
-`#rust-analyzer.hover.documentation.enable#` is set.
+`#verus-analyzer.hover.documentation.enable#` is set.
 --
 [[rust-analyzer.hover.links.enable]]rust-analyzer.hover.links.enable (default: `true`)::
 +
@@ -557,7 +562,7 @@ How many associated items of a trait to display when hovering a trait.
 [[rust-analyzer.imports.granularity.enforce]]rust-analyzer.imports.granularity.enforce (default: `false`)::
 +
 --
-Whether to enforce the import granularity setting for all files. If set to false rust-analyzer will try to keep import styles consistent per file.
+Whether to enforce the import granularity setting for all files. If set to false verus-analyzer will try to keep import styles consistent per file.
 --
 [[rust-analyzer.imports.granularity.group]]rust-analyzer.imports.granularity.group (default: `"crate"`)::
 +
@@ -680,7 +685,7 @@ Whether to show exclusive range inlay hints.
 +
 --
 Whether to show inlay hints for compiler inserted reborrows.
-This setting is deprecated in favor of #rust-analyzer.inlayHints.expressionAdjustmentHints.enable#.
+This setting is deprecated in favor of #verus-analyzer.inlayHints.expressionAdjustmentHints.enable#.
 --
 [[rust-analyzer.inlayHints.renderColons]]rust-analyzer.inlayHints.renderColons (default: `true`)::
 +
@@ -696,7 +701,7 @@ Whether to show inlay type hints for variables.
 +
 --
 Whether to hide inlay type hints for `let` statements that initialize to a closure.
-Only applies to closures with blocks, same as `#rust-analyzer.inlayHints.closureReturnTypeHints.enable#`.
+Only applies to closures with blocks, same as `#verus-analyzer.inlayHints.closureReturnTypeHints.enable#`.
 --
 [[rust-analyzer.inlayHints.typeHints.hideNamedConstructor]]rust-analyzer.inlayHints.typeHints.hideNamedConstructor (default: `false`)::
 +
@@ -732,7 +737,7 @@ Join lines unwraps trivial blocks.
 +
 --
 Whether to show `Debug` lens. Only applies when
-`#rust-analyzer.lens.enable#` is set.
+`#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.lens.enable]]rust-analyzer.lens.enable (default: `true`)::
 +
@@ -749,7 +754,7 @@ client doesn't set the corresponding capability.
 +
 --
 Whether to show `Implementations` lens. Only applies when
-`#rust-analyzer.lens.enable#` is set.
+`#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.lens.location]]rust-analyzer.lens.location (default: `"above_name"`)::
 +
@@ -760,31 +765,31 @@ Where to render annotations.
 +
 --
 Whether to show `References` lens for Struct, Enum, and Union.
-Only applies when `#rust-analyzer.lens.enable#` is set.
+Only applies when `#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.lens.references.enumVariant.enable]]rust-analyzer.lens.references.enumVariant.enable (default: `false`)::
 +
 --
 Whether to show `References` lens for Enum Variants.
-Only applies when `#rust-analyzer.lens.enable#` is set.
+Only applies when `#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.lens.references.method.enable]]rust-analyzer.lens.references.method.enable (default: `false`)::
 +
 --
 Whether to show `Method References` lens. Only applies when
-`#rust-analyzer.lens.enable#` is set.
+`#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.lens.references.trait.enable]]rust-analyzer.lens.references.trait.enable (default: `false`)::
 +
 --
 Whether to show `References` lens for Trait.
-Only applies when `#rust-analyzer.lens.enable#` is set.
+Only applies when `#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.lens.run.enable]]rust-analyzer.lens.run.enable (default: `true`)::
 +
 --
 Whether to show `Run` lens. Only applies when
-`#rust-analyzer.lens.enable#` is set.
+`#verus-analyzer.lens.enable#` is set.
 --
 [[rust-analyzer.linkedProjects]]rust-analyzer.linkedProjects (default: `[]`)::
 +
@@ -799,7 +804,7 @@ objects in `rust-project.json` format.
 [[rust-analyzer.lru.capacity]]rust-analyzer.lru.capacity (default: `null`)::
 +
 --
-Number of syntax trees rust-analyzer keeps in memory. Defaults to 128.
+Number of syntax trees verus-analyzer keeps in memory. Defaults to 128.
 --
 [[rust-analyzer.lru.query.capacities]]rust-analyzer.lru.query.capacities (default: `{}`)::
 +
@@ -824,12 +829,12 @@ How many worker threads in the main loop. The default `null` means to pick autom
 [[rust-analyzer.procMacro.attributes.enable]]rust-analyzer.procMacro.attributes.enable (default: `true`)::
 +
 --
-Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.
+Expand attribute macros. Requires `#verus-analyzer.procMacro.enable#` to be set.
 --
 [[rust-analyzer.procMacro.enable]]rust-analyzer.procMacro.enable (default: `true`)::
 +
 --
-Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.
+Enable support for procedural macros, implies `#verus-analyzer.cargo.buildScripts.enable#`.
 --
 [[rust-analyzer.procMacro.ignored]]rust-analyzer.procMacro.ignored (default: `{}`)::
 +
@@ -889,10 +894,10 @@ Path to the Cargo.toml of the rust compiler workspace, for usage in rustc_privat
 projects, or "discover" to try to automatically find it if the `rustc-dev` component
 is installed.
 
-Any project which uses rust-analyzer with the rustcPrivate
-crates must set `[package.metadata.rust-analyzer] rustc_private=true` to use it.
+Any project which uses verus-analyzer with the rustcPrivate
+crates must set `[package.metadata.verus-analyzer] rustc_private=true` to use it.
 
-This option does not take effect until rust-analyzer is restarted.
+This option does not take effect until verus-analyzer is restarted.
 --
 [[rust-analyzer.rustfmt.extraArgs]]rust-analyzer.rustfmt.extraArgs (default: `[]`)::
 +
@@ -902,7 +907,7 @@ Additional arguments to `rustfmt`.
 [[rust-analyzer.rustfmt.overrideCommand]]rust-analyzer.rustfmt.overrideCommand (default: `null`)::
 +
 --
-Advanced option, fully override the command rust-analyzer uses for
+Advanced option, fully override the command verus-analyzer uses for
 formatting. This should be the equivalent of `rustfmt` here, and
 not that of `cargo fmt`. The file contents will be passed on the
 standard input and the formatted result will be read from the
@@ -920,7 +925,7 @@ available on a nightly build.
 --
 Inject additional highlighting into doc comments.
 
-When enabled, rust-analyzer will highlight rust source in doc comments as well as intra
+When enabled, verus-analyzer will highlight rust source in doc comments as well as intra
 doc links.
 --
 [[rust-analyzer.semanticHighlighting.nonStandardTokens]]rust-analyzer.semanticHighlighting.nonStandardTokens (default: `true`)::
@@ -933,7 +938,7 @@ Whether the server is allowed to emit non-standard tokens and modifiers.
 --
 Use semantic tokens for operators.
 
-When disabled, rust-analyzer will emit semantic tokens only for operator tokens when
+When disabled, verus-analyzer will emit semantic tokens only for operator tokens when
 they are tagged with modifiers.
 --
 [[rust-analyzer.semanticHighlighting.operator.specialization.enable]]rust-analyzer.semanticHighlighting.operator.specialization.enable (default: `false`)::
@@ -941,7 +946,7 @@ they are tagged with modifiers.
 --
 Use specialized semantic tokens for operators.
 
-When enabled, rust-analyzer will emit special token types for operator tokens instead
+When enabled, verus-analyzer will emit special token types for operator tokens instead
 of the generic `operator` token type.
 --
 [[rust-analyzer.semanticHighlighting.punctuation.enable]]rust-analyzer.semanticHighlighting.punctuation.enable (default: `false`)::
@@ -949,13 +954,13 @@ of the generic `operator` token type.
 --
 Use semantic tokens for punctuation.
 
-When disabled, rust-analyzer will emit semantic tokens only for punctuation tokens when
+When disabled, verus-analyzer will emit semantic tokens only for punctuation tokens when
 they are tagged with modifiers or have a special role.
 --
 [[rust-analyzer.semanticHighlighting.punctuation.separate.macro.bang]]rust-analyzer.semanticHighlighting.punctuation.separate.macro.bang (default: `false`)::
 +
 --
-When enabled, rust-analyzer will emit a punctuation semantic token for the `!` of macro
+When enabled, verus-analyzer will emit a punctuation semantic token for the `!` of macro
 calls.
 --
 [[rust-analyzer.semanticHighlighting.punctuation.specialization.enable]]rust-analyzer.semanticHighlighting.punctuation.specialization.enable (default: `false`)::
@@ -963,7 +968,7 @@ calls.
 --
 Use specialized semantic tokens for punctuation.
 
-When enabled, rust-analyzer will emit special token types for punctuation tokens instead
+When enabled, verus-analyzer will emit special token types for punctuation tokens instead
 of the generic `punctuation` token type.
 --
 [[rust-analyzer.semanticHighlighting.strings.enable]]rust-analyzer.semanticHighlighting.strings.enable (default: `true`)::
