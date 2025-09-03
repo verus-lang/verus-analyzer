@@ -331,6 +331,9 @@ config_data! {
         /// `textDocument/rangeFormatting` request. The rustfmt option is unstable and only
         /// available on a nightly build.
         rustfmt_rangeFormatting_enable: bool = false,
+
+        /// Run `cargo verus` instead of running the `verus` binary directly
+        cargo_verus_enable: bool = false,
     }
 }
 
@@ -1939,7 +1942,7 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args() },
+            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args(), cargo_verus_enable: *self.cargo_verus_enable() },
         }
     }
 

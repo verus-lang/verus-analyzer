@@ -20,6 +20,12 @@ afterwards or linked for context.
 If you want to find something to fix or work on keep a look out for the `C-bug` and `C-enhancement`
 labels.
 
+## Adding a new configuration option
+There are two parts.  In `crates/rust-analyzer/src/config.rs` defines the server-side configuration of rust-analyzer.  
+Portions of that file are automatically copied into `editors/code/package.json`, which also contains
+editor-specific (for VS Code) configuration options.  Look for the `"title": "$generated-start"` entry
+in the JSON file to see where the automatically copied portion appears.
+
 ## Implementing a new feature
 
 It's advised to first open an issue for any kind of new feature so the team can tell upfront whether
