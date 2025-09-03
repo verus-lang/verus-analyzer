@@ -108,7 +108,7 @@ impl fmt::Display for FlycheckConfig {
             }
             FlycheckConfig::VerusCommand { args, cargo_verus_enable } => {
                 write!(f, "verus {} (cargo_verus: {})", args.join(" "), cargo_verus_enable)
-            },
+            }
         }
     }
 }
@@ -535,7 +535,7 @@ impl FlycheckActor {
                     (cmd, args.clone())
                 }
             }
-            FlycheckConfig::VerusCommand { args: _ , cargo_verus_enable: _ } => {
+            FlycheckConfig::VerusCommand { args: _, cargo_verus_enable: _ } => {
                 return None;
             } // Verus doesn't have a check mode (yet)
         };
@@ -546,95 +546,97 @@ impl FlycheckActor {
 
     // copied from above check_command
     fn run_cargo_verus(&self, file: String, args: &Vec<String>) -> (Command, Vec<String>) {
-                // Find the `cargo-verus` binary
-                let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
-                    Ok(path) => path,
-                    Err(_) => {
-                        tracing::warn!("VERUS_BINARY_PATH was not set!");
-                        "verus".to_string() // Hope that it's in the PATH
-                    }
-                };
-                dbg!(&verus_binary_str);
-                tracing::info!("Using Verus binary: {}", &verus_binary_str);
-                let verus_exec_path = Path::new(&verus_binary_str)
-                    .canonicalize()
-                    .expect("We expect to succeed with canonicalizing the Verus binary path");
-                let verus_exec_dir = verus_exec_path.parent().unwrap();
-                let cargo_verus_exec = verus_exec_dir.join("cargo-verus");
-                dbg!(&cargo_verus_exec);
-                let mut cmd = Command::new(cargo_verus_exec);
-                let mut args = args.to_vec();
+        // Find the `cargo-verus` binary
+        let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
+            Ok(path) => path,
+            Err(_) => {
+                tracing::warn!("VERUS_BINARY_PATH was not set!");
+                "verus".to_string() // Hope that it's in the PATH
+            }
+        };
+        dbg!(&verus_binary_str);
+        tracing::info!("Using Verus binary: {}", &verus_binary_str);
+        let verus_exec_path = Path::new(&verus_binary_str)
+            .canonicalize()
+            .expect("We expect to succeed with canonicalizing the Verus binary path");
+        let verus_exec_dir = verus_exec_path.parent().unwrap();
+        let cargo_verus_exec = verus_exec_dir.join("cargo-verus");
+        dbg!(&cargo_verus_exec);
+        let mut cmd = Command::new(cargo_verus_exec);
+        let mut args = args.to_vec();
 
-                // Find the toml file to check for additional arguments
-                let mut extra_args_from_toml = Vec::new();
-                if std::fs::metadata(self.root.join("Cargo.toml")).is_ok_and(|f| f.is_file()) {
-                    let toml = std::fs::read_to_string(self.root.join("Cargo.toml")).unwrap();
-                    let mut found_verus_settings = false;
-                    for line in toml.lines() {
-                        if found_verus_settings {
-                            if line.contains("extra_args") {
-                                let start = "extra_args".len() + 1;
-                                let mut arguments =
-                                    line[start..line.len() - 1].trim().to_string();
-                                if arguments.starts_with("=") {
-                                    arguments.remove(0);
-                                    arguments = arguments.trim().to_string();
-                                }
-                                if arguments.starts_with("\"") {
-                                    arguments.remove(0);
-                                }
-                                if arguments.ends_with("\"") {
-                                    arguments.remove(arguments.len() - 1);
-                                }
-                    
-                                let arguments_vec = arguments
-                                    .split(" ")
-                                    .map(|it| it.to_string())
-                                    .collect::<Vec<_>>();
-                                extra_args_from_toml.extend(arguments_vec);
-                            }
-                            break;
+        // Find the toml file to check for additional arguments
+        let mut extra_args_from_toml = Vec::new();
+        if std::fs::metadata(self.root.join("Cargo.toml")).is_ok_and(|f| f.is_file()) {
+            let toml = std::fs::read_to_string(self.root.join("Cargo.toml")).unwrap();
+            let mut found_verus_settings = false;
+            for line in toml.lines() {
+                if found_verus_settings {
+                    if line.contains("extra_args") {
+                        let start = "extra_args".len() + 1;
+                        let mut arguments = line[start..line.len() - 1].trim().to_string();
+                        if arguments.starts_with("=") {
+                            arguments.remove(0);
+                            arguments = arguments.trim().to_string();
                         }
-                        if line.contains("[package.metadata.verus.ide]") {
-                            found_verus_settings = true;
+                        if arguments.starts_with("\"") {
+                            arguments.remove(0);
                         }
+                        if arguments.ends_with("\"") {
+                            arguments.remove(arguments.len() - 1);
+                        }
+
+                        let arguments_vec =
+                            arguments.split(" ").map(|it| it.to_string()).collect::<Vec<_>>();
+                        extra_args_from_toml.extend(arguments_vec);
                     }
+                    break;
                 }
-
-                // Convert the file name into a module name, so we only receive errors for the file the developer is working on
-                let mut module_args = Vec::new();
-                let file = std::path::absolute(Path::new(&file)).unwrap();
-                if file != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("lib.rs")) &&
-                   file != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("main.rs")) {
-                     let file_as_module = 
-                        file.strip_prefix(self.root.join("src"))
-                            .unwrap()
-                            .to_str()
-                            .unwrap()
-                            .replace(std::path::MAIN_SEPARATOR_STR, "::")
-                            .replace(".rs", "")
-                            .replace(".rs", "")
-                            // Trimming `::mod` instead of trimming `mod` and conditionally
-                            // checking for a `::` before it. This works because a `mod.rs`
-                            // file at the source root can define a module called `mod`. 
-                            .trim_end_matches("::mod").to_string()
-                    ;
-                    module_args.push("--verify-module".to_string());
-                    module_args.push(file_as_module);
-                } else {
-                    module_args.push("--verify-root".to_string());
+                if line.contains("[package.metadata.verus.ide]") {
+                    found_verus_settings = true;
                 }
+            }
+        }
 
-                args.push("verify".to_string());
-                args.push("--message-format=json".to_string());
-                args.push("--".to_string());
-                args.append(&mut extra_args_from_toml);
-                args.append(&mut module_args);
+        // Convert the file name into a module name, so we only receive errors for the file the developer is working on
+        let mut module_args = Vec::new();
+        let file = std::path::absolute(Path::new(&file)).unwrap();
+        if file
+            != <AbsPathBuf as Into<std::path::PathBuf>>::into(self.root.join("src").join("lib.rs"))
+            && file
+                != <AbsPathBuf as Into<std::path::PathBuf>>::into(
+                    self.root.join("src").join("main.rs"),
+                )
+        {
+            let file_as_module = file
+                .strip_prefix(self.root.join("src"))
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .replace(std::path::MAIN_SEPARATOR_STR, "::")
+                .replace(".rs", "")
+                .replace(".rs", "")
+                // Trimming `::mod` instead of trimming `mod` and conditionally
+                // checking for a `::` before it. This works because a `mod.rs`
+                // file at the source root can define a module called `mod`.
+                .trim_end_matches("::mod")
+                .to_string();
+            module_args.push("--verify-module".to_string());
+            module_args.push(file_as_module);
+        } else {
+            module_args.push("--verify-root".to_string());
+        }
 
-                cmd.current_dir(&self.root);
-                dbg!(&self.root);
-                dbg!(&args);
-                (cmd, args)
+        args.push("verify".to_string());
+        args.push("--message-format=json".to_string());
+        args.push("--".to_string());
+        args.append(&mut extra_args_from_toml);
+        args.append(&mut module_args);
+
+        cmd.current_dir(&self.root);
+        dbg!(&self.root);
+        dbg!(&args);
+        (cmd, args)
     }
 
     // copied from above check_command
@@ -666,8 +668,7 @@ impl FlycheckActor {
                     if found_verus_settings {
                         if line.contains("extra_args") {
                             let start = "extra_args".len() + 1;
-                            let mut arguments =
-                                line[start..line.len() - 1].trim().to_string();
+                            let mut arguments = line[start..line.len() - 1].trim().to_string();
                             if arguments.starts_with("=") {
                                 arguments.remove(0);
                                 arguments = arguments.trim().to_string();
@@ -679,10 +680,8 @@ impl FlycheckActor {
                                 arguments.remove(arguments.len() - 1);
                             }
 
-                            let arguments_vec = arguments
-                                .split(" ")
-                                .map(|it| it.to_string())
-                                .collect::<Vec<_>>();
+                            let arguments_vec =
+                                arguments.split(" ").map(|it| it.to_string()).collect::<Vec<_>>();
                             extra_args_from_toml.extend(arguments_vec);
                         }
                         break;
@@ -731,9 +730,9 @@ impl FlycheckActor {
                             .replace(".rs", "")
                             // Trimming `::mod` instead of trimming `mod` and conditionally
                             // checking for a `::` before it. This works because a `mod.rs`
-                            // file at the source root can define a module called `mod`. 
-                            .trim_end_matches("::mod").to_string()
-                        ;
+                            // file at the source root can define a module called `mod`.
+                            .trim_end_matches("::mod")
+                            .to_string();
 
                         args.insert(0, root_file.to_str().unwrap().to_string());
                         if file == root_file {
@@ -761,24 +760,24 @@ impl FlycheckActor {
 
         cmd.current_dir(&self.root);
         (cmd, args)
-}
+    }
 
-fn run_verus(&self, file: String) -> Command {
-    let (mut cmd, args) = match &self.config {
-        FlycheckConfig::CargoCommand { .. } => {
-            panic!("verus analyzer does not yet support cargo commands")
-        }
-        FlycheckConfig::CustomCommand { .. } => {
-            panic!("verus analyzer does not yet support custom commands")
-        }
-        FlycheckConfig::VerusCommand { args, cargo_verus_enable } => {
-            if *cargo_verus_enable {
-                self.run_cargo_verus(file, args)
-            } else {
-                self.run_verus_direct(file, args)
+    fn run_verus(&self, file: String) -> Command {
+        let (mut cmd, args) = match &self.config {
+            FlycheckConfig::CargoCommand { .. } => {
+                panic!("verus analyzer does not yet support cargo commands")
             }
-        }
-    };
+            FlycheckConfig::CustomCommand { .. } => {
+                panic!("verus analyzer does not yet support custom commands")
+            }
+            FlycheckConfig::VerusCommand { args, cargo_verus_enable } => {
+                if *cargo_verus_enable {
+                    self.run_cargo_verus(file, args)
+                } else {
+                    self.run_verus_direct(file, args)
+                }
+            }
+        };
         dbg!(&args);
         cmd.args(args);
         cmd
