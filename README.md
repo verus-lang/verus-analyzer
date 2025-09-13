@@ -85,6 +85,11 @@ extra_args = "......"
 ```
 where the quoted string is a list of space-separated Verus arguments, e.g., `extra_args = "--rlimit 20 --log-all"`.
 
+#### Using `cargo verus`
+
+By default, `verus-analyzer` direclyt invokes the Verus executable on the root of your crate. If you would
+instead prefer to have it invoke `cargo verus`, toggle the setting: "Verus-analyzer › Cargo: Verus Enable".
+
 #### Advanced Verus Developments
 Some advanced Verus projects (e.g., those making changes to `vstd`) may need to use `#[cfg(verus_keep_ghost)]`
 in their Verus files.  This will cause various `verus-analyzer` features (like Go To Definition) to stop working,
