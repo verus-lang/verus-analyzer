@@ -834,7 +834,7 @@ BroadcastGroup =
   Attr* Visibility? 'broadcast' 'group' BroadcastGroupIdentifier BroadcastGroupList
 
 AssumeSpecification =
-  Attr* Visibility? 'assume_specification' GenericParamList? '[' Path ']' ParamList RetType? WhereClause? RequiresClause? RecommendsClause? EnsuresClause? ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
+  Attr* Visibility? 'assume_specification' GenericParamList? '[' Path ']' ParamList? RetType? WhereClause? RequiresClause? RecommendsClause? EnsuresClause? ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
 
 IsExpr = 
   Attr* Expr 'is' Type

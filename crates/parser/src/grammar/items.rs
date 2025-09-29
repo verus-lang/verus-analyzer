@@ -562,9 +562,7 @@ fn assume_specification(p: &mut Parser<'_>, m: Marker) {
 
     if p.at(T!['(']) {
         params::param_list_fn_def(p);
-    } else {
-        p.error("expected function arguments");
-    }
+    } 
     // test function_ret_type
     // fn foo() {}
     // fn bar() -> () {}
