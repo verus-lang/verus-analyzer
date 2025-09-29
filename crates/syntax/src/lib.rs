@@ -1839,6 +1839,15 @@ pub assume_specification<T, A: Allocator>[Vec::<T, A>::clear](vec: &mut Vec<T, A
 
 pub assume_specification [<bool as Clone>::clone](b: &bool) -> (res: bool)
     ensures res == b;
+
+assume_specification[char::REPLACEMENT_CHARACTER] -> (c: char)
+    ensures
+        c != '7',
+;
+assume_specification[C] -> u8
+    returns
+        7u8,
+;
 }";
 
     verus_core(source_code);
