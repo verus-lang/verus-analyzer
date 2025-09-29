@@ -23,7 +23,7 @@ impl flags::Scip {
         eprintln!("Generating SCIP start...");
         let now = Instant::now();
 
-        let no_progress = &|s| (eprintln!("rust-analyzer: Loading {s}"));
+        let no_progress = &|s| eprintln!("rust-analyzer: Loading {s}");
         let load_cargo_config = LoadCargoConfig {
             load_out_dirs_from_check: true,
             with_proc_macro_server: ProcMacroServerChoice::Sysroot,
