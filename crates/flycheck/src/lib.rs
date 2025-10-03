@@ -94,8 +94,9 @@ pub enum FlycheckConfig {
         invocation_location: InvocationLocation,
     },
     VerusCommand {
-        args: Vec<String>,
+        verus_args: Vec<String>,
         cargo_verus_enable: bool,
+        cargo_options: CargoOptions,
     },
 }
 
@@ -106,8 +107,8 @@ impl fmt::Display for FlycheckConfig {
             FlycheckConfig::CustomCommand { command, args, .. } => {
                 write!(f, "{command} {}", args.join(" "))
             }
-            FlycheckConfig::VerusCommand { args, cargo_verus_enable } => {
-                write!(f, "verus {} (cargo_verus: {})", args.join(" "), cargo_verus_enable)
+            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options } => {
+                write!(f, "verus {} (cargo_verus enabled: {}, cargo_verus options {:?})", verus_args.join(" "), cargo_verus_enable, cargo_options)
             }
         }
     }
@@ -535,7 +536,7 @@ impl FlycheckActor {
                     (cmd, args.clone())
                 }
             }
-            FlycheckConfig::VerusCommand { args: _, cargo_verus_enable: _ } => {
+            FlycheckConfig::VerusCommand { .. } => {
                 return None;
             } // Verus doesn't have a check mode (yet)
         };
@@ -545,7 +546,7 @@ impl FlycheckActor {
     }
 
     // copied from above check_command
-    fn run_cargo_verus(&self, file: String, args: &Vec<String>) -> (Command, Vec<String>) {
+    fn run_cargo_verus(&self, file: String, verus_args: &Vec<String>, cargo_options: &CargoOptions) -> Command {
         // Find the `cargo-verus` binary
         let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
             Ok(path) => path,
@@ -563,7 +564,6 @@ impl FlycheckActor {
         let cargo_verus_exec = verus_exec_dir.join("cargo-verus");
         dbg!(&cargo_verus_exec);
         let mut cmd = Command::new(cargo_verus_exec);
-        let mut args = args.to_vec();
 
         // Find the toml file to check for additional arguments
         let mut extra_args_from_toml = Vec::new();
@@ -627,20 +627,21 @@ impl FlycheckActor {
             module_args.push("--verify-root".to_string());
         }
 
-        args.push("verify".to_string());
-        args.push("--message-format=json".to_string());
-        args.push("--".to_string());
-        args.append(&mut extra_args_from_toml);
-        args.append(&mut module_args);
+        cmd.arg("verify".to_string());
+        cmd.arg("--message-format=json".to_string());
+        cargo_options.apply_on_command(&mut cmd);
+        cmd.arg("--".to_string());
+        cmd.args(verus_args);
+        cmd.args(extra_args_from_toml);
+        cmd.args(module_args);
 
         cmd.current_dir(&self.root);
         dbg!(&self.root);
-        dbg!(&args);
-        (cmd, args)
+        cmd
     }
 
     // copied from above check_command
-    fn run_verus_direct(&self, file: String, args: &Vec<String>) -> (Command, Vec<String>) {
+    fn run_verus_direct(&self, file: String, verus_args: &Vec<String>) -> Command {
         let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
             Ok(path) => path,
             Err(_) => {
@@ -696,7 +697,7 @@ impl FlycheckActor {
         }
 
         // We may need to add additional arguments
-        let mut args = args.to_vec();
+        let mut args = verus_args.to_vec();
         match toml_dir {
             None => {
                 // This file doesn't appear to be part of a larger project
@@ -759,27 +760,28 @@ impl FlycheckActor {
         args.push("--error-format=json".to_string());
 
         cmd.current_dir(&self.root);
-        (cmd, args)
+        cmd.args(args);
+        cmd
     }
 
     fn run_verus(&self, file: String) -> Command {
-        let (mut cmd, args) = match &self.config {
+        let cmd = match &self.config {
             FlycheckConfig::CargoCommand { .. } => {
                 panic!("verus analyzer does not yet support cargo commands")
             }
             FlycheckConfig::CustomCommand { .. } => {
                 panic!("verus analyzer does not yet support custom commands")
             }
-            FlycheckConfig::VerusCommand { args, cargo_verus_enable } => {
+            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options } => {
                 if *cargo_verus_enable {
-                    self.run_cargo_verus(file, args)
+                    self.run_cargo_verus(file, verus_args, cargo_options)
                 } else {
-                    self.run_verus_direct(file, args)
+                    self.run_verus_direct(file, verus_args)
                 }
             }
         };
-        dbg!(&args);
-        cmd.args(args);
+        let args: Vec<&std::ffi::OsStr> = cmd.get_args().collect();
+        dbg!(args);
         cmd
     }
 
@@ -818,6 +820,7 @@ impl ParseFromLine for CargoCheckMessage {
             // forward verification result if present
             // TODO: We should ask Verus for json output and then parse it properly here
             if line.contains("verification results::") {
+                tracing::info!("Found results: {:?}", line);
                 Some(CargoCheckMessage::VerusResult(line.to_string()));
             } else {
                 tracing::error!("deserialize error: {:?}", line);
