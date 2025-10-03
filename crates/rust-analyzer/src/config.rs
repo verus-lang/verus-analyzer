@@ -1941,7 +1941,7 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::VerusCommand { args: self.check_extra_args(), cargo_verus_enable: *self.cargo_verusEnable() },
+            Some(_) | None => FlycheckConfig::VerusCommand { verus_args: self.check_extra_args(), cargo_verus_enable: *self.cargo_verusEnable(), cargo_options: self.cargo_test_options() },
         }
     }
 
