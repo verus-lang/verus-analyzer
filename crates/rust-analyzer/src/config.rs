@@ -171,6 +171,8 @@ config_data! {
         cargo_targetDir | rust_analyzerTargetDir: Option<TargetDirectory> = None,
         /// Run `cargo verus` instead of running the `verus` binary directly.
         cargo_verusEnable: bool = false,
+        /// Extra Verus arguments passed to each invocation of `verus` performed either via Cargo or directly.
+        verus_extraArgs: Vec<String> = vec![],
 
         /// Run the check command for diagnostics on save.
         checkOnSave | checkOnSave_enable: bool                         = true,
@@ -1941,7 +1943,7 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::VerusCommand { verus_args: self.check_extra_args(), cargo_verus_enable: *self.cargo_verusEnable(), cargo_options: self.cargo_test_options() },
+            Some(_) | None => FlycheckConfig::VerusCommand { verus_args: self.verus_extraArgs().clone(), cargo_verus_enable: *self.cargo_verusEnable(), cargo_options: self.cargo_test_options() },
         }
     }
 

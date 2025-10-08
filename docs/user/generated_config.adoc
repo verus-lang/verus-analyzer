@@ -995,6 +995,11 @@ Show documentation.
 --
 Whether to insert closing angle brackets when typing an opening angle bracket of a generic argument list.
 --
+[[rust-analyzer.verus.extraArgs]]rust-analyzer.verus.extraArgs (default: `[]`)::
++
+--
+Extra Verus arguments passed to each invocation of `verus` performed either via Cargo or directly.
+--
 [[rust-analyzer.workspace.symbol.search.kind]]rust-analyzer.workspace.symbol.search.kind (default: `"only_types"`)::
 +
 --

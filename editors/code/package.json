@@ -2569,6 +2569,19 @@
                 }
             },
             {
+                "title": "verus",
+                "properties": {
+                    "verus-analyzer.verus.extraArgs": {
+                        "markdownDescription": "Extra Verus arguments passed to each invocation of `verus` performed either via Cargo or directly.",
+                        "default": [],
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            {
                 "title": "workspace",
                 "properties": {
                     "verus-analyzer.workspace.symbol.search.kind": {

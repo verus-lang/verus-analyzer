@@ -30,7 +30,10 @@ JSON file to see where the automatically copied portion appears.
 
 If you update the config! settings in `crates/rust-analyzer/src/config.rs`, you
 need to run:
-`cargo test -p rust-analyzer generate_package_json_config generate_config_documentation`
+```
+cargo test -p rust-analyzer generate_package_json_config
+cargo test -p rust-analyzer generate_config_documentation
+```
 to update the `package.json` file and the documentation (which we don't currently publish).
 
 
