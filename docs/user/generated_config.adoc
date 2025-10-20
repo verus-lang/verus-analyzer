@@ -1000,6 +1000,11 @@ Whether to insert closing angle brackets when typing an opening angle bracket of
 --
 Extra Verus arguments passed to each invocation of `verus` performed either via Cargo or directly.
 --
+[[rust-analyzer.verus.reportAllErrorsEnable]]rust-analyzer.verus.reportAllErrorsEnable (default: `false`)::
++
+--
+Setting this to true causes verus-analyzer to report errors in all files, not just the one you are editing.
+--
 [[rust-analyzer.workspace.symbol.search.kind]]rust-analyzer.workspace.symbol.search.kind (default: `"only_types"`)::
 +
 --

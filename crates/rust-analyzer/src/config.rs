@@ -173,6 +173,8 @@ config_data! {
         cargo_verusEnable: bool = false,
         /// Extra Verus arguments passed to each invocation of `verus` performed either via Cargo or directly.
         verus_extraArgs: Vec<String> = vec![],
+        /// Setting this to true causes verus-analyzer to report errors in all files, not just the one you are editing.
+        verus_reportAllErrorsEnable: bool = false,
 
         /// Run the check command for diagnostics on save.
         checkOnSave | checkOnSave_enable: bool                         = true,
@@ -1943,7 +1945,12 @@ impl Config {
                     },
                 }
             }
-            Some(_) | None => FlycheckConfig::VerusCommand { verus_args: self.verus_extraArgs().clone(), cargo_verus_enable: *self.cargo_verusEnable(), cargo_options: self.cargo_test_options() },
+            Some(_) | None => FlycheckConfig::VerusCommand {
+                verus_args: self.verus_extraArgs().clone(),
+                cargo_verus_enable: *self.cargo_verusEnable(),
+                cargo_options: self.cargo_test_options(),
+                report_all_errors: *self.check_reportAllErrors(),
+            },
         }
     }
 

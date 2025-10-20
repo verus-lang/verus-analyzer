@@ -2582,6 +2582,16 @@
                 }
             },
             {
+                "title": "verus",
+                "properties": {
+                    "verus-analyzer.verus.reportAllErrorsEnable": {
+                        "markdownDescription": "Setting this to true causes verus-analyzer to report errors in all files, not just the one you are editing.",
+                        "default": false,
+                        "type": "boolean"
+                    }
+                }
+            },
+            {
                 "title": "workspace",
                 "properties": {
                     "verus-analyzer.workspace.symbol.search.kind": {

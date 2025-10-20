@@ -97,6 +97,7 @@ pub enum FlycheckConfig {
         verus_args: Vec<String>,
         cargo_verus_enable: bool,
         cargo_options: CargoOptions,
+        report_all_errors: bool,
     },
 }
 
@@ -107,8 +108,8 @@ impl fmt::Display for FlycheckConfig {
             FlycheckConfig::CustomCommand { command, args, .. } => {
                 write!(f, "{command} {}", args.join(" "))
             }
-            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options } => {
-                write!(f, "verus {} (cargo_verus enabled: {}, cargo_verus options {:?})", verus_args.join(" "), cargo_verus_enable, cargo_options)
+            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options, report_all_errors } => {
+                write!(f, "verus {} (cargo_verus enabled: {}, cargo_verus options {:?}, report all errors: {})", verus_args.join(" "), cargo_verus_enable, cargo_options, report_all_errors)
             }
         }
     }
@@ -546,7 +547,7 @@ impl FlycheckActor {
     }
 
     // copied from above check_command
-    fn run_cargo_verus(&self, file: String, verus_args: &Vec<String>, cargo_options: &CargoOptions) -> Command {
+    fn run_cargo_verus(&self, file: String, verus_args: &Vec<String>, cargo_options: &CargoOptions, report_all_errors: bool) -> Command {
         // Find the `cargo-verus` binary
         let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
             Ok(path) => path,
@@ -637,7 +638,9 @@ impl FlycheckActor {
         cmd.arg("--".to_string());
         cmd.args(verus_args);
         cmd.args(extra_args_from_toml);
-        cmd.args(module_args);
+        if report_all_errors {
+            cmd.args(module_args);
+        }
 
         cmd.current_dir(&self.root);
         dbg!(&self.root);
@@ -645,7 +648,7 @@ impl FlycheckActor {
     }
 
     // copied from above check_command
-    fn run_verus_direct(&self, file: String, verus_args: &Vec<String>) -> Command {
+    fn run_verus_direct(&self, file: String, verus_args: &Vec<String>, report_all_errors: bool) -> Command {
         let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
             Ok(path) => path,
             Err(_) => {
@@ -701,7 +704,8 @@ impl FlycheckActor {
         }
 
         // We may need to add additional configuration arguments
-        let mut config_args = vec![];
+        let mut config_args = vec![];   // File name and crate type
+        let mut module_args = vec![];   // Arguments to restrict verification to the file currently being edited
         match toml_dir {
             None => {
                 // This file doesn't appear to be part of a larger project
@@ -744,8 +748,8 @@ impl FlycheckActor {
                             tracing::info!("file == root_file");
                         } else {
                             tracing::info!(?root_file, "root_file");
-                            config_args.insert(1, "--verify-module".to_string());
-                            config_args.insert(2, file_as_module);
+                            module_args.insert(1, "--verify-module".to_string());
+                            module_args.insert(2, file_as_module);
                         }
                     }
                     None => {
@@ -763,6 +767,9 @@ impl FlycheckActor {
         cmd.args(verus_args);
         cmd.args(config_args);
         cmd.args(extra_args_from_toml);
+        if report_all_errors {
+            cmd.args(module_args);
+        }
 
         // Apply arguments that go to rustc instead of Verus
         cmd.arg("--".to_string());
@@ -780,11 +787,11 @@ impl FlycheckActor {
             FlycheckConfig::CustomCommand { .. } => {
                 panic!("verus analyzer does not yet support custom commands")
             }
-            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options } => {
+            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options, report_all_errors } => {
                 if *cargo_verus_enable {
-                    self.run_cargo_verus(file, verus_args, cargo_options)
+                    self.run_cargo_verus(file, verus_args, cargo_options, report_all_errors)
                 } else {
-                    self.run_verus_direct(file, verus_args)
+                    self.run_verus_direct(file, verus_args, report_all_errors)
                 }
             }
         };
