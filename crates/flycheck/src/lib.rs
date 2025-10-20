@@ -638,7 +638,7 @@ impl FlycheckActor {
         cmd.arg("--".to_string());
         cmd.args(verus_args);
         cmd.args(extra_args_from_toml);
-        if report_all_errors {
+        if !report_all_errors {
             cmd.args(module_args);
         }
 
@@ -748,8 +748,8 @@ impl FlycheckActor {
                             tracing::info!("file == root_file");
                         } else {
                             tracing::info!(?root_file, "root_file");
-                            module_args.insert(1, "--verify-module".to_string());
-                            module_args.insert(2, file_as_module);
+                            module_args.push("--verify-module".to_string());
+                            module_args.push(file_as_module);
                         }
                     }
                     None => {
@@ -767,7 +767,7 @@ impl FlycheckActor {
         cmd.args(verus_args);
         cmd.args(config_args);
         cmd.args(extra_args_from_toml);
-        if report_all_errors {
+        if !report_all_errors {
             cmd.args(module_args);
         }
 
