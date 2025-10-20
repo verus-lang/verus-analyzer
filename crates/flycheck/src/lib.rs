@@ -789,9 +789,9 @@ impl FlycheckActor {
             }
             FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options, report_all_errors } => {
                 if *cargo_verus_enable {
-                    self.run_cargo_verus(file, verus_args, cargo_options, report_all_errors)
+                    self.run_cargo_verus(file, verus_args, cargo_options, *report_all_errors)
                 } else {
-                    self.run_verus_direct(file, verus_args, report_all_errors)
+                    self.run_verus_direct(file, verus_args, *report_all_errors)
                 }
             }
         };

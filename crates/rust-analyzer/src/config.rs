@@ -1949,7 +1949,7 @@ impl Config {
                 verus_args: self.verus_extraArgs().clone(),
                 cargo_verus_enable: *self.cargo_verusEnable(),
                 cargo_options: self.cargo_test_options(),
-                report_all_errors: *self.check_reportAllErrors(),
+                report_all_errors: *self.verus_reportAllErrorsEnable(),
             },
         }
     }
