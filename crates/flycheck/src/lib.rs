@@ -97,6 +97,7 @@ pub enum FlycheckConfig {
         verus_args: Vec<String>,
         cargo_verus_enable: bool,
         cargo_options: CargoOptions,
+        report_all_errors: bool,
     },
 }
 
@@ -107,8 +108,8 @@ impl fmt::Display for FlycheckConfig {
             FlycheckConfig::CustomCommand { command, args, .. } => {
                 write!(f, "{command} {}", args.join(" "))
             }
-            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options } => {
-                write!(f, "verus {} (cargo_verus enabled: {}, cargo_verus options {:?})", verus_args.join(" "), cargo_verus_enable, cargo_options)
+            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options, report_all_errors } => {
+                write!(f, "verus {} (cargo_verus enabled: {}, cargo_verus options {:?}, report all errors: {})", verus_args.join(" "), cargo_verus_enable, cargo_options, report_all_errors)
             }
         }
     }
@@ -546,7 +547,7 @@ impl FlycheckActor {
     }
 
     // copied from above check_command
-    fn run_cargo_verus(&self, file: String, verus_args: &Vec<String>, cargo_options: &CargoOptions) -> Command {
+    fn run_cargo_verus(&self, file: String, verus_args: &Vec<String>, cargo_options: &CargoOptions, report_all_errors: bool) -> Command {
         // Find the `cargo-verus` binary
         let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
             Ok(path) => path,
@@ -627,13 +628,19 @@ impl FlycheckActor {
             module_args.push("--verify-root".to_string());
         }
 
+        // Cargo command
         cmd.arg("verify".to_string());
+        // Provide the cargo arguments
         cmd.arg("--message-format=json".to_string());
         cargo_options.apply_on_command(&mut cmd);
+        cmd.args(&cargo_options.extra_args);
+        // Provide the Verus arguments
         cmd.arg("--".to_string());
         cmd.args(verus_args);
         cmd.args(extra_args_from_toml);
-        cmd.args(module_args);
+        if !report_all_errors {
+            cmd.args(module_args);
+        }
 
         cmd.current_dir(&self.root);
         dbg!(&self.root);
@@ -641,7 +648,7 @@ impl FlycheckActor {
     }
 
     // copied from above check_command
-    fn run_verus_direct(&self, file: String, verus_args: &Vec<String>) -> Command {
+    fn run_verus_direct(&self, file: String, verus_args: &Vec<String>, report_all_errors: bool) -> Command {
         let verus_binary_str = match std::env::var("VERUS_BINARY_PATH") {
             Ok(path) => path,
             Err(_) => {
@@ -696,15 +703,16 @@ impl FlycheckActor {
             }
         }
 
-        // We may need to add additional arguments
-        let mut args = verus_args.to_vec();
+        // We may need to add additional configuration arguments
+        let mut config_args = vec![];   // File name and crate type
+        let mut module_args = vec![];   // Arguments to restrict verification to the file currently being edited
         match toml_dir {
             None => {
                 // This file doesn't appear to be part of a larger project
                 // Try to invoke Verus on it directly, but try to avoid
                 // complaints about missing `fn main()`
-                args.push("--crate-type".to_string());
-                args.push("lib".to_string());
+                config_args.push("--crate-type".to_string());
+                config_args.push("lib".to_string());
             }
             Some(toml_dir) => {
                 // This file appears to be part of a Rust project.
@@ -713,8 +721,8 @@ impl FlycheckActor {
                 let root_file = if toml_dir.join("src").join("main.rs").exists() {
                     Some(toml_dir.join("src").join("main.rs"))
                 } else if toml_dir.join("src").join("lib.rs").exists() {
-                    args.push("--crate-type".to_string());
-                    args.push("lib".to_string());
+                    config_args.push("--crate-type".to_string());
+                    config_args.push("lib".to_string());
                     Some(toml_dir.join("src").join("lib.rs"))
                 } else {
                     None
@@ -735,32 +743,39 @@ impl FlycheckActor {
                             .trim_end_matches("::mod")
                             .to_string();
 
-                        args.insert(0, root_file.to_str().unwrap().to_string());
+                        config_args.insert(0, root_file.to_str().unwrap().to_string());
                         if file == root_file {
                             tracing::info!("file == root_file");
                         } else {
                             tracing::info!(?root_file, "root_file");
-                            args.insert(1, "--verify-module".to_string());
-                            args.insert(2, file_as_module);
+                            module_args.push("--verify-module".to_string());
+                            module_args.push(file_as_module);
                         }
                     }
                     None => {
                         // Puzzling -- we found a Cargo.toml but no root file.
                         // Do our best by trying to run directly on the file supplied
-                        args.insert(0, file.to_str().unwrap().to_string());
-                        args.push("--crate-type".to_string());
-                        args.push("lib".to_string());
+                        config_args.insert(0, file.to_str().unwrap().to_string());
+                        config_args.push("--crate-type".to_string());
+                        config_args.push("lib".to_string());
                     }
                 }
             }
         }
+        
+        // Apply all of the argument collections
+        cmd.args(verus_args);
+        cmd.args(config_args);
+        cmd.args(extra_args_from_toml);
+        if !report_all_errors {
+            cmd.args(module_args);
+        }
 
-        args.append(&mut extra_args_from_toml);
-        args.push("--".to_string());
-        args.push("--error-format=json".to_string());
+        // Apply arguments that go to rustc instead of Verus
+        cmd.arg("--".to_string());
+        cmd.arg("--error-format=json".to_string());
 
         cmd.current_dir(&self.root);
-        cmd.args(args);
         cmd
     }
 
@@ -772,11 +787,11 @@ impl FlycheckActor {
             FlycheckConfig::CustomCommand { .. } => {
                 panic!("verus analyzer does not yet support custom commands")
             }
-            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options } => {
+            FlycheckConfig::VerusCommand { verus_args, cargo_verus_enable, cargo_options, report_all_errors } => {
                 if *cargo_verus_enable {
-                    self.run_cargo_verus(file, verus_args, cargo_options)
+                    self.run_cargo_verus(file, verus_args, cargo_options, *report_all_errors)
                 } else {
-                    self.run_verus_direct(file, verus_args)
+                    self.run_verus_direct(file, verus_args, *report_all_errors)
                 }
             }
         };

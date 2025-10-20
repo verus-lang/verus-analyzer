@@ -87,7 +87,7 @@ where the quoted string is a list of space-separated Verus arguments, e.g., `ext
 
 #### Using `cargo verus`
 
-By default, `verus-analyzer` direclyt invokes the Verus executable on the root of your crate. If you would
+By default, `verus-analyzer` directly invokes the Verus executable on the root of your crate. If you would
 instead prefer to have it invoke `cargo verus`, toggle the setting: "Verus-analyzer › Cargo: Verus Enable".
 
 #### Advanced Verus Developments
