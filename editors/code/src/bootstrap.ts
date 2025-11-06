@@ -213,6 +213,25 @@ export async function findRustup(): Promise<{path: string|undefined}> {
         return {path: resolvedPath };
     } catch(error: unknown) {
         log.warn("Caught an error while running `which(rustup)`: " + error);
+        log.info("Attempting to find rustup in standard Cargo installation location...");
+
+        // Try standard Cargo installation locations
+        const ext = process.platform === "win32" ? ".exe" : "";
+        const cargoHome = process.env.CARGO_HOME || (process.platform === "win32"
+            ? `${process.env.USERPROFILE}\\.cargo`
+            : `${os.homedir()}/.cargo`);
+        const rustupPath = `${cargoHome}/bin/rustup${ext}`;
+
+        try {
+            const stats = await fs.promises.stat(rustupPath);
+            if (stats.isFile()) {
+                log.info("Found rustup at standard location: " + rustupPath);
+                return { path: rustupPath };
+            }
+        } catch(statError: unknown) {
+            log.warn(`Failed to find rustup at ${rustupPath}: ${statError}`);
+        }
+
         return { path: undefined };
     }
 }
