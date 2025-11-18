@@ -221,7 +221,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             );
             const haveValidRustToolchain:Boolean = await validRustToolchain();
             if (!haveValidRustToolchain) {
-                log.info("Failed to find rustup");
+                log.info("Rust toolchain validation failed");
                 return;
             }
             const verusPath = await getVerus(this.extCtx, this.config);
