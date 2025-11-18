@@ -53,7 +53,7 @@ Verus runs each time you save a file in your project.  This is primarily impleme
 
 ## Bumping the expected version of Rust when Verus upgrades to a new version
 
-1. Update the Rust version used in the Verus CI workflow.
+1. Update the Rust version used in the Verus CI workflow (`.github/workflows/verus.yml`).
     - Specifically the line `rustup install 1.82.0-x86_64-unknown-linux-gnu` in `.github/workflows/verus.yml`
 2. Update the Rust version the VS Code client looks for during installation
     - Specifically the line `const TOOLCHAIN_MAJOR = 82;` in `editors/code/src/bootstrap.ts`
