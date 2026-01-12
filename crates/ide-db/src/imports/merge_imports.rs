@@ -275,6 +275,7 @@ pub fn try_normalize_use_tree_mut(
 }
 
 /// Recursively normalizes a use tree and its subtrees (if any).
+#[allow(unused_assignments)]
 fn recursive_normalize(use_tree: &ast::UseTree, style: NormalizationStyle) -> Option<()> {
     let use_tree_list = use_tree.use_tree_list()?;
     let merge_subtree_into_parent_tree = |single_subtree: &ast::UseTree| {
