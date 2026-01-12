@@ -129,6 +129,30 @@ since `rust-analyzer` changed the type it expects for this setting.
 vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in the same directory
 ```
 
+## Proc Macros
+
+You may run into an error like the following:
+```
+Failed spawning proc-macro server for workspace /home/user/Documents/verus/verus_test/Cargo.toml: Failed to run proc-macro server from path /home/user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/libexec/rust-analyzer-proc-macro-srv, error: Custom { kind: Other, error: "proc-macro server's api version (6) is newer than rust-analyzer's (4)" }
+```
+
+The problem is that the protocol that `rust-analyzer` uses to talk to the
+proc-macro server changes as Rust versions change. However, `verus-analyzer`
+evolves more slowly and hence can't talk to the proc-macro server in the latest
+versions of Rust.
+
+If your code doesn't use proc macros, then the simplest solution is to look in
+the settings for the extension and make sure they are disabled (e.g.,
+`"verus-analyzer.procMacro.enable": false,`).
+
+If your code does use proc macros, then you'll need to install an older Rust toolchain; specifically 1.79, e.g., `rustup toolchain install 1.79.0-aarch64-apple-darwin`. Then you'll need to add these settings to your VS Code `settings.json` file:
+```
+"verus-analyzer.server.extraEnv": { "RUSTUP_TOOLCHAIN": "1.79.0-aarch64-apple-darwin" },
+"verus-analyzer.procMacro.server": "/Users/username/.rustup/toolchains/1.79.0-aarch64-apple-darwin/libexec/rust-analyzer-proc-macro-srv",
+```
+(with appropriate edits to your toolchain and paths).
+
+
 ---
 ## Proof Actions
 
