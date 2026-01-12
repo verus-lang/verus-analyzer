@@ -172,6 +172,8 @@ unused_extern_crates = "warn"
 unused_lifetimes = "warn"
 unreachable_pub = "warn"
 
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(ignore_fragment)'] }
+
 [workspace.lints.clippy]
 # FIXME Remove the tidy test once the lint table is stable
 
