@@ -272,7 +272,7 @@ pub(crate) fn def_to_moniker(
             AssocItemContainer::Impl(impl_) => {
                 // Because a struct can implement multiple traits, for implementations
                 // we add both the struct name and the trait name to the path
-                if let Some(adt) = impl_.self_ty(db).as_adt() {
+                if let Some(adt) = impl_.self_ty(db).strip_references().as_adt() {
                     description.push(MonikerDescriptor {
                         name: adt.name(db).display(db).to_string(),
                         desc: def_to_kind(db, adt.into()).into(),
