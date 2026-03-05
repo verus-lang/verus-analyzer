@@ -91,9 +91,11 @@ pub(super) fn atom_expr(
     if p.at_contextual_kw(T![proof_fn]) {
         return Some((closure_expr(p), BlockLike::NotBlock));
     }
-    // Special-case `matches!` as a macro call.
-    // `matches` is a first-class keyword for the Verus postfix operator (`x matches Pattern`),
-    // but `matches!` is a standard Rust macro. When followed by `!`, treat it as a macro call.
+    // Special-case `matches!` as a macro call. This is necessary
+    // because `matches` is a first-class keyword for the Verus
+    // postfix operator (`x matches Pattern`), but `matches!` is a
+    // standard Rust macro. When followed by `!`, treat it as a macro
+    // call.
     if p.at(T![matches]) && p.nth_at(1, T![!]) {
         let m = p.start();
         let macro_call = p.start();
