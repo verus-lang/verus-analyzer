@@ -69,6 +69,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![forall],
         T![exists],
         T![choose],
+        T![matches],
     ]));
 
 pub(super) const EXPR_RECOVERY_SET: TokenSet = TokenSet::new(&[T![')'], T![']']]);
@@ -89,6 +90,25 @@ pub(super) fn atom_expr(
     }
     if p.at_contextual_kw(T![proof_fn]) {
         return Some((closure_expr(p), BlockLike::NotBlock));
+    }
+    // Special-case `matches!` as a macro call. This is necessary
+    // because `matches` is a first-class keyword for the Verus
+    // postfix operator (`x matches Pattern`), but `matches!` is a
+    // standard Rust macro. When followed by `!`, treat it as a macro
+    // call.
+    if p.at(T![matches]) && p.nth_at(1, T![!]) {
+        let m = p.start();
+        let macro_call = p.start();
+        let path = p.start();
+        let path_segment = p.start();
+        let name_ref = p.start();
+        p.bump_remap(IDENT);
+        name_ref.complete(p, NAME_REF);
+        path_segment.complete(p, PATH_SEGMENT);
+        path.complete(p, PATH);
+        let block_like = items::macro_call_after_excl(p);
+        macro_call.complete(p, MACRO_CALL);
+        return Some((m.complete(p, MACRO_EXPR), block_like));
     }
     if paths::is_path_start(p) {
         return Some(path_expr(p, r));

@@ -305,6 +305,59 @@ fn expr() {
     );
 }
 
+#[test]
+fn matches_macro() {
+    check(
+        TopEntryPoint::SourceFile,
+        "fn foo() { let _ = matches!(x, Some(42)); }",
+        expect![[r#"
+            SOURCE_FILE
+              FN
+                FN_KW "fn"
+                WHITESPACE " "
+                NAME
+                  IDENT "foo"
+                PARAM_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+                WHITESPACE " "
+                BLOCK_EXPR
+                  STMT_LIST
+                    L_CURLY "{"
+                    WHITESPACE " "
+                    LET_STMT
+                      LET_KW "let"
+                      WHITESPACE " "
+                      WILDCARD_PAT
+                        UNDERSCORE "_"
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      MACRO_EXPR
+                        MACRO_CALL
+                          PATH
+                            PATH_SEGMENT
+                              NAME_REF
+                                IDENT "matches"
+                          BANG "!"
+                          TOKEN_TREE
+                            L_PAREN "("
+                            IDENT "x"
+                            COMMA ","
+                            WHITESPACE " "
+                            IDENT "Some"
+                            TOKEN_TREE
+                              L_PAREN "("
+                              INT_NUMBER "42"
+                              R_PAREN ")"
+                            R_PAREN ")"
+                      SEMICOLON ";"
+                    WHITESPACE " "
+                    R_CURLY "}"
+        "#]],
+    );
+}
+
 #[track_caller]
 fn check(entry: TopEntryPoint, input: &str, expect: expect_test::Expect) {
     let (parsed, _errors) = super::parse(entry, input);
