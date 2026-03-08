@@ -778,6 +778,7 @@ pub(crate) fn folding_range(
         | FoldKind::ReturnType
         | FoldKind::Array
         | FoldKind::MatchArm => None,
+        FoldKind::ProofBlock => Some(lsp_types::FoldingRangeKind::Region),
     };
 
     let range = range(line_index, fold.range);
