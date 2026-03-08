@@ -1502,3 +1502,73 @@ export function toggleLSPLogs(ctx: Ctx): Cmd {
         }
     };
 }
+
+export function foldProofBlocks(ctx: Ctx): Cmd {
+    return async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const ranges = (await ctx.client.sendRequest(
+            "textDocument/foldingRange",
+            {
+                textDocument: ctx.client.code2ProtocolConverter.asTextDocumentIdentifier(
+                    editor.document,
+                ),
+            },
+        )) as Array<vscode.FoldingRange & { kind?: string; collapsedText?: string }>;
+
+        if (!ranges) return;
+
+        const proofRanges = ranges.filter(
+            (r) => r.kind === "proof_block" || (r.kind === "region" && r.collapsedText === "proof_block"),
+        );
+        if (proofRanges.length === 0) return;
+
+        // Keep only multiline ranges and deduplicate by start line.
+        // We fold inner blocks first, then outer blocks.
+        const sortedLines = [...new Set(
+            proofRanges
+                .filter((r) => r.endLine > r.startLine)
+                .sort((a, b) => (a.endLine - a.startLine) - (b.endLine - b.startLine))
+                .map((r) => r.startLine),
+        )];
+
+        if (sortedLines.length === 0) return;
+
+        // Reset proof-block folding state before folding so repeated command runs stay
+        // idempotent and do not climb to parent fn/impl blocks.
+        await vscode.commands.executeCommand("editor.unfold", { selectionLines: sortedLines });
+
+        for (const line of sortedLines) {
+            await vscode.commands.executeCommand("editor.fold", {
+                selectionLines: [line],
+            });
+        }
+    };
+}
+
+export function unfoldProofBlocks(ctx: Ctx): Cmd {
+    return async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const ranges = (await ctx.client.sendRequest(
+            "textDocument/foldingRange",
+            {
+                textDocument: ctx.client.code2ProtocolConverter.asTextDocumentIdentifier(
+                    editor.document,
+                ),
+            },
+        )) as Array<vscode.FoldingRange & { kind?: string; collapsedText?: string }>;
+
+        if (!ranges) return;
+
+        const proofRanges = ranges.filter(
+            (r) => r.kind === "proof_block" || (r.kind === "region" && r.collapsedText === "proof_block"),
+        );
+        if (proofRanges.length === 0) return;
+
+        const lines = [...new Set(proofRanges.map((r) => r.startLine))];
+        await vscode.commands.executeCommand("editor.unfold", { selectionLines: lines });
+    };
+}

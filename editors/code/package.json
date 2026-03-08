@@ -109,6 +109,16 @@
         ],
         "commands": [
             {
+                "command": "verus-analyzer.foldProofBlocks",
+                "title": "Fold Proof Blocks",
+                "category": "verus-analyzer"
+            },
+            {
+                "command": "verus-analyzer.unfoldProofBlocks",
+                "title": "Unfold Proof Blocks",
+                "category": "verus-analyzer"
+            },
+            {
                 "command": "verus-analyzer.syntaxTree",
                 "title": "Show Syntax Tree",
                 "category": "verus-analyzer (debug command)"
