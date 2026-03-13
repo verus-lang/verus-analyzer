@@ -1520,7 +1520,7 @@ export function foldProofBlocks(ctx: Ctx): Cmd {
         if (!ranges) return;
 
         const proofRanges = ranges.filter(
-            (r) => r.kind === "proof_block" || (r.kind === "region" && r.collapsedText === "proof_block"),
+            (r) => r.kind === "region" && r.collapsedText === "proof_block",
         );
         if (proofRanges.length === 0) return;
 
@@ -1564,7 +1564,7 @@ export function unfoldProofBlocks(ctx: Ctx): Cmd {
         if (!ranges) return;
 
         const proofRanges = ranges.filter(
-            (r) => r.kind === "proof_block" || (r.kind === "region" && r.collapsedText === "proof_block"),
+            (r) => r.kind === "region" && r.collapsedText === "proof_block",
         );
         if (proofRanges.length === 0) return;
 
