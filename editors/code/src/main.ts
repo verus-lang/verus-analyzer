@@ -190,6 +190,8 @@ function createCommands(): Record<string, CommandFactory> {
         triggerParameterHints: { enabled: commands.triggerParameterHints },
         openLogs: { enabled: commands.openLogs },
         revealDependency: { enabled: commands.revealDependency },
+        foldProofBlocks: { enabled: commands.foldProofBlocks },
+        unfoldProofBlocks: { enabled: commands.unfoldProofBlocks },
     };
 }
 

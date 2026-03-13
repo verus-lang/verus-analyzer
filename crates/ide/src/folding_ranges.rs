@@ -25,6 +25,7 @@ pub enum FoldKind {
     WhereClause,
     ReturnType,
     MatchArm,
+    ProofBlock,
 }
 
 #[derive(Debug)]
@@ -50,13 +51,34 @@ pub(crate) fn folding_ranges(file: &SourceFile) -> Vec<Fold> {
 
     for element in file.syntax().descendants_with_tokens() {
         // Fold items that span multiple lines
-        if let Some(kind) = fold_kind(element.kind()) {
+        if let Some(mut kind) = fold_kind(element.kind()) {
             let is_multiline = match &element {
-                NodeOrToken::Node(node) => node.text().contains_char('\n'),
+                NodeOrToken::Node(node) => {
+                    if kind == FoldKind::Block && is_proof_block(node) {
+                        kind = FoldKind::ProofBlock;
+                    }
+                    node.text().contains_char('\n')
+                }
                 NodeOrToken::Token(token) => token.text().contains('\n'),
             };
             if is_multiline {
-                res.push(Fold { range: element.text_range(), kind });
+                let range = if kind == FoldKind::ProofBlock {
+                    let l_curly = element
+                        .as_node()
+                        .and_then(|n| n.children().find(|it| it.kind() == STMT_LIST))
+                        .and_then(|stmt_list| {
+                            stmt_list.children_with_tokens().find(|it| it.kind() == L_CURLY)
+                        });
+
+                    if let Some(NodeOrToken::Token(l_curly)) = l_curly {
+                        TextRange::new(l_curly.text_range().start(), element.text_range().end())
+                    } else {
+                        element.text_range()
+                    }
+                } else {
+                    element.text_range()
+                };
+                res.push(Fold { range, kind });
                 continue;
             }
         }
@@ -258,6 +280,78 @@ fn contiguous_range_for_comment(
     }
 }
 
+fn is_proof_block(node: &syntax::SyntaxNode) -> bool {
+    match node.kind() {
+        BLOCK_EXPR => {
+            // proof { ... } — FN_MODE is a direct child of BLOCK_EXPR
+            if node.children().any(|child| {
+                child.kind() == FN_MODE
+                    && child.children_with_tokens().any(|it| it.kind() == PROOF_KW)
+            }) {
+                return true;
+            }
+            if let Some(parent) = node.parent() {
+                // proof! { ... } — parent is PREFIX_EXPR containing FN_MODE(PROOF_KW) and BANG
+                if parent.kind() == PREFIX_EXPR {
+                    let has_proof_mode = parent.children().any(|child| {
+                        child.kind() == FN_MODE
+                            && child.children_with_tokens().any(|it| it.kind() == PROOF_KW)
+                    });
+                    let has_bang = parent.children_with_tokens().any(|it| it.kind() == BANG);
+                    return has_proof_mode && has_bang;
+                }
+                // assert(...) by { ... } — parent is ASSERT_EXPR with a BY_KW sibling
+                if parent.kind() == ASSERT_EXPR {
+                    return parent
+                        .children_with_tokens()
+                        .any(|it| it.kind() == BY_KW);
+                }
+                // proof fn foo() { ... } — parent is FN with FN_MODE(PROOF_KW)
+                if parent.kind() == FN {
+                    return parent.children().any(|child| {
+                        child.kind() == FN_MODE
+                            && child.children_with_tokens().any(|it| it.kind() == PROOF_KW)
+                    });
+                }
+            }
+            false
+        }
+        TOKEN_TREE => {
+            if let Some(parent) = node.parent() {
+                // proof_decl! { ... } — parent MACRO_CALL whose path text is "proof_decl"
+                if parent.kind() == MACRO_CALL {
+                    return parent.children().any(|child| {
+                        child.kind() == PATH && child.text().to_string().trim() == "proof_decl"
+                    });
+                }
+                // ghost name => { ... } inside atomic_with_ghost!:
+                // TOKEN_TREE starting with L_CURLY whose preceding siblings in a TOKEN_TREE
+                // contain a GHOST_KW (pattern: ghost <ident> => { ... })
+                if parent.kind() == TOKEN_TREE {
+                    let starts_with_curly = node
+                        .children_with_tokens()
+                        .next()
+                        .map_or(false, |it| it.kind() == L_CURLY);
+                    if starts_with_curly {
+                        let mut found_ghost = false;
+                        let mut sib = node.prev_sibling_or_token();
+                        while let Some(s) = sib {
+                            if s.kind() == GHOST_KW {
+                                found_ghost = true;
+                                break;
+                            }
+                            sib = s.prev_sibling_or_token();
+                        }
+                        return found_ghost;
+                    }
+                }
+            }
+            false
+        }
+        _ => false,
+    }
+}
+
 fn fold_range_for_where_clause(where_clause: ast::WhereClause) -> Option<TextRange> {
     let first_where_pred = where_clause.predicates().next();
     let last_where_pred = where_clause.predicates().last();
@@ -316,9 +410,94 @@ mod tests {
                 FoldKind::WhereClause => "whereclause",
                 FoldKind::ReturnType => "returntype",
                 FoldKind::MatchArm => "matcharm",
+                FoldKind::ProofBlock => "proof_block",
             };
             assert_eq!(kind, &attr.unwrap());
         }
+    }
+
+    #[test]
+    fn fold_proof_block() {
+        check(
+            r#"
+fn main() <fold block>{
+    proof <fold proof_block>{
+        assert(true);
+    }</fold>
+}</fold>
+"#,
+        );
+    }
+
+    #[test]
+    fn fold_proof_bang_block() {
+        check(
+            r#"
+fn main() <fold block>{
+    proof! <fold proof_block>{
+        assert(true);
+    }</fold>
+}</fold>
+"#,
+        );
+    }
+
+    #[test]
+    fn fold_proof_decl_block() {
+        check(
+            r#"
+fn main() <fold block>{
+    proof_decl! <fold proof_block>{
+        let tracked mut g = 0u32;
+    }</fold>
+}</fold>
+"#,
+        );
+    }
+
+    #[test]
+    fn fold_atomic_with_ghost_block() {
+        check(
+            r#"
+fn main() <fold block>{
+    let value = AtomicBool::new(0);
+    atomic_with_ghost! <fold block>(
+        value => compare_exchange(false, true);
+        returning res;
+        ghost g => <fold proof_block>{
+            assert(true);
+        }</fold>
+    )</fold>;
+}</fold>
+"#,
+        );
+    }
+
+    #[test]
+    fn fold_assert_by_block() {
+        check(
+            r#"
+fn main() <fold block>{
+    assert(1 > 0) by <fold proof_block>{
+        assert(true);
+    }</fold>;
+}</fold>
+"#,
+        );
+    }
+
+    #[test]
+    fn fold_proof_fn_body() {
+        check(
+            r#"
+proof fn helper() 
+    requires false, 
+    ensures true,
+    <fold proof_block>{
+    assert(true);
+}</fold>
+"#,
+        );
     }
 
     #[test]

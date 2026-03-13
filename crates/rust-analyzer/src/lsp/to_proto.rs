@@ -778,6 +778,11 @@ pub(crate) fn folding_range(
         | FoldKind::ReturnType
         | FoldKind::Array
         | FoldKind::MatchArm => None,
+        FoldKind::ProofBlock => Some(lsp_types::FoldingRangeKind::Region),
+    };
+    let collapsed_text = match fold.kind {
+        FoldKind::ProofBlock => Some("proof_block".to_owned()),
+        _ => None,
     };
 
     let range = range(line_index, fold.range);
@@ -804,7 +809,7 @@ pub(crate) fn folding_range(
             end_line,
             end_character: None,
             kind,
-            collapsed_text: None,
+            collapsed_text,
         }
     } else {
         lsp_types::FoldingRange {
@@ -813,7 +818,7 @@ pub(crate) fn folding_range(
             end_line: range.end.line,
             end_character: Some(range.end.character),
             kind,
-            collapsed_text: None,
+            collapsed_text,
         }
     }
 }
