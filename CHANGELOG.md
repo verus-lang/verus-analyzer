@@ -1,6 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## Unreleased
+
+## 2026-03-13
+
+### Added
+- Add "Fold Proof Block" command (#73)
+
 
 ## 2026-03-06
 
