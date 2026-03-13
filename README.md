@@ -113,6 +113,10 @@ In the future, when we sync up with the latest version of `rust-analyzer`, you w
 since `rust-analyzer` changed the type it expects for this setting.
 
 ---
+## Release Notes
+
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
+
 ## Limitations
 - This is experimental software and subject to change.
 - It is intended to be used only for Verus code. 
