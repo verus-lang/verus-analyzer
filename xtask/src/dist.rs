@@ -72,6 +72,8 @@ fn dist_client(
         sh.copy_file(symbols_path, &bundle_path)?;
     }
 
+    sh.copy_file("CHANGELOG.md", "editors/code/CHANGELOG.md")?;
+
     let _d = sh.push_dir("./editors/code");
 
     let mut patch = Patch::new(sh, "./package.json")?;
