@@ -1936,6 +1936,38 @@ pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: Opti
     verus_core(source_code);
 }
 
+#[test]
+fn verus_final_expr() {
+    let source_code = "verus!{
+
+pub fn vec_index_mut<T, A: Allocator>(vec: &mut Vec<T, A>, i: usize) -> (element: &mut T)
+    requires i < vec.view().len(),
+    ensures
+        *element == old(vec)@.index(i as int),
+        final(vec)@ == old(vec)@.update(i as int, *final(element)),
+        *final(element) == final(vec).view().index(i as int),
+    no_unwind
+;
+
+}";
+
+    verus_core(source_code);
+}
+
+#[test]
+fn verus_final_expr_simple() {
+    let source_code = "verus!{
+
+fn test(x: &mut u64)
+    ensures *x == 5, *final(x) == 10,
+{
+    *x = 10;
+}
+
+}";
+
+    verus_core(source_code);
+}
 
 #[test]
 fn verus_globals() {

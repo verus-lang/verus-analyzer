@@ -392,6 +392,7 @@ Expr =
 | ViewExpr
 | AssertExpr
 | AssumeExpr
+| FinalExpr
 | AssertForallExpr
 | IsExpr
 | HasExpr
@@ -801,6 +802,9 @@ AssertExpr =
 
 AssumeExpr =
   Attr* 'assume' '(' Expr ')'
+
+FinalExpr =
+  'final' '(' Expr ')'
 
 AssertForallExpr =
   Attr* 'assert' ClosureExpr ('implies' Expr)? 'by' BlockExpr

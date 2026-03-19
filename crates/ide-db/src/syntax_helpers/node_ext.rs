@@ -347,6 +347,7 @@ pub fn for_each_tail_expr(expr: &ast::Expr, cb: &mut dyn FnMut(&ast::Expr)) {
         ast::Expr::ViewExpr(_) => cb(expr),
         ast::Expr::AssertExpr(_) => cb(expr),
         ast::Expr::AssumeExpr(_) => cb(expr),
+        ast::Expr::FinalExpr(_) => cb(expr),
         ast::Expr::AssertForallExpr(_) => cb(expr),
     }
 }

@@ -355,6 +355,7 @@ pub(crate) const KINDS_SRC: KindsSrc<'_> = KindsSrc {
         "ASSERT_EXPR",
         "ASSERT_FORALL_EXPR",
         "ASSUME_EXPR",
+        "FINAL_EXPR",
         "VIEW_EXPR",
         "PUBLISH",
         "FN_MODE",
