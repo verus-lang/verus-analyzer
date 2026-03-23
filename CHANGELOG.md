@@ -48,7 +48,7 @@
 - Setting for enabling/disabling the feature that tries to only report errors in the file that's currently being edited.
 
 ### Fixed
-- Various bugs related to `cargo verus` arugments
+- Various bugs related to `cargo verus` arguments
 
 
 ## 2025-10-03

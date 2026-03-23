@@ -957,6 +957,9 @@ impl InferenceContext<'_> {
                 self.infer_expr_coerce(*condition, &Expectation::HasType(bool_ty.clone()));
                 bool_ty
             }
+            Expr::Final { expr } => {
+                self.infer_expr(*expr, &Expectation::none())
+            }
         };
         // use a new type variable if we got unknown here
         let ty = self.insert_type_vars_shallow(ty);

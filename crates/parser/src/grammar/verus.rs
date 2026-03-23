@@ -245,6 +245,15 @@ pub(crate) fn assume(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     m.complete(p, ASSUME_EXPR)
 }
 
+// FinalExpr = 'final' '(' Expr ')'
+pub(crate) fn final_(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    p.expect(T![final]);
+    p.expect(T!['(']);
+    expressions::expr(p);
+    p.expect(T![')']);
+    m.complete(p, FINAL_EXPR)
+}
+
 // AssertExpr =
 //   'assert' '(' Expr ')' 'by'? ( '(' Name ')' )?  RequiresClause? BlockExpr?
 pub(crate) fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {

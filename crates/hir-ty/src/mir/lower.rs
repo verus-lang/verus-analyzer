@@ -395,7 +395,7 @@ impl<'ctx> MirLowerCtx<'ctx> {
             }
             Expr::Missing
             // verus
-            | Expr::Assert {..} | Expr::Assume{..} | Expr::View{..}
+            | Expr::Assert {..} | Expr::Assume{..} | Expr::Final{..} | Expr::View{..}
              => {
                 if let DefWithBodyId::FunctionId(f) = self.owner {
                     let assoc = f.lookup(self.db.upcast());

@@ -170,6 +170,9 @@ pub enum Expr {
     Assume {
         condition: ExprId,
     },
+    Final {
+        expr: ExprId,
+    },
     View {
         condition: ExprId,
     },
@@ -502,6 +505,9 @@ impl Expr {
             }
             Expr::Assume { condition } => {
                 f(*condition);
+            }
+            Expr::Final { expr } => {
+                f(*expr);
             }
             Expr::View { condition } => {
                 f(*condition);
