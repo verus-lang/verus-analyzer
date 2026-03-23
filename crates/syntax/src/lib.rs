@@ -2145,6 +2145,26 @@ spec fn test_rec2(x: int, y: int) -> int
     verus_core(source_code);
 }
 
+#[test]
+fn verus_real_literals() {
+    let source_code = "verus!{
+fn test_real_literals() {
+    // Integer-style with real suffix
+    assert(0real <= 1real);
+    assert(0xFFreal >= 0real);
+    assert(0b1010real == 10real);
+    assert(0o77real == 63real);
+    // Decimal-style with real suffix
+    assert(0.5real < 1.0real);
+    assert(0.0real <= 1.5real);
+    // Exponential-style with real suffix
+    assert(1e2real == 100real);
+    assert(2e-1real == 0.2real);
+}
+}";
+    verus_core(source_code);
+}
+
 /*
 TODO: cst_to_vst, "op_details"
 failures:
