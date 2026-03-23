@@ -385,6 +385,14 @@ pub struct FieldExpr {
     pub cst: Option<super::nodes::FieldExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FinalExpr {
+    pub final_token: bool,
+    pub l_paren_token: bool,
+    pub expr: Box<Expr>,
+    pub r_paren_token: bool,
+    pub cst: Option<super::nodes::FinalExpr>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Fn {
     pub attrs: Vec<Attr>,
     pub visibility: Option<Box<Visibility>>,
@@ -1498,6 +1506,7 @@ pub enum Expr {
     ClosureExpr(Box<ClosureExpr>),
     ContinueExpr(Box<ContinueExpr>),
     FieldExpr(Box<FieldExpr>),
+    FinalExpr(Box<FinalExpr>),
     ForExpr(Box<ForExpr>),
     FormatArgsExpr(Box<FormatArgsExpr>),
     HasExpr(Box<HasExpr>),
@@ -2571,6 +2580,22 @@ impl TryFrom<super::nodes::FieldExpr> for FieldExpr {
                     .ok_or(format!("{}", stringify!(name_ref)))
                     .map(|it| NameRef::try_from(it))??,
             ),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::FinalExpr> for FinalExpr {
+    type Error = String;
+    fn try_from(item: super::nodes::FinalExpr) -> Result<Self, Self::Error> {
+        Ok(Self {
+            final_token: item.final_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            expr: Box::new(
+                item.expr()
+                    .ok_or(format!("{}", stringify!(expr)))
+                    .map(|it| Expr::try_from(it))??,
+            ),
+            r_paren_token: item.r_paren_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -5268,6 +5293,7 @@ impl TryFrom<super::nodes::Expr> for Expr {
                 Ok(Self::ContinueExpr(Box::new(it.try_into()?)))
             }
             super::nodes::Expr::FieldExpr(it) => Ok(Self::FieldExpr(Box::new(it.try_into()?))),
+            super::nodes::Expr::FinalExpr(it) => Ok(Self::FinalExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::ForExpr(it) => Ok(Self::ForExpr(Box::new(it.try_into()?))),
             super::nodes::Expr::FormatArgsExpr(it) => {
                 Ok(Self::FormatArgsExpr(Box::new(it.try_into()?)))
@@ -6531,6 +6557,32 @@ impl std::fmt::Display for FieldExpr {
         }
         s.push_str(&self.name_ref.to_string());
         s.push_str(" ");
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for FinalExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.final_token {
+            let mut tmp = stringify!(final_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.expr.to_string());
+        s.push_str(" ");
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -9728,6 +9780,7 @@ impl std::fmt::Display for Expr {
             Expr::ClosureExpr(it) => write!(f, "{}", it.to_string()),
             Expr::ContinueExpr(it) => write!(f, "{}", it.to_string()),
             Expr::FieldExpr(it) => write!(f, "{}", it.to_string()),
+            Expr::FinalExpr(it) => write!(f, "{}", it.to_string()),
             Expr::ForExpr(it) => write!(f, "{}", it.to_string()),
             Expr::FormatArgsExpr(it) => write!(f, "{}", it.to_string()),
             Expr::HasExpr(it) => write!(f, "{}", it.to_string()),
@@ -9936,6 +9989,7 @@ impl Expr {
                 Some(super::nodes::Expr::ContinueExpr(it.cst.as_ref()?.clone()))
             }
             Expr::FieldExpr(it) => Some(super::nodes::Expr::FieldExpr(it.cst.as_ref()?.clone())),
+            Expr::FinalExpr(it) => Some(super::nodes::Expr::FinalExpr(it.cst.as_ref()?.clone())),
             Expr::ForExpr(it) => Some(super::nodes::Expr::ForExpr(it.cst.as_ref()?.clone())),
             Expr::FormatArgsExpr(it) => {
                 Some(super::nodes::Expr::FormatArgsExpr(it.cst.as_ref()?.clone()))
@@ -10228,6 +10282,9 @@ impl From<ContinueExpr> for Expr {
 }
 impl From<FieldExpr> for Expr {
     fn from(item: FieldExpr) -> Self { Expr::FieldExpr(Box::new(item)) }
+}
+impl From<FinalExpr> for Expr {
+    fn from(item: FinalExpr) -> Self { Expr::FinalExpr(Box::new(item)) }
 }
 impl From<ForExpr> for Expr {
     fn from(item: ForExpr) -> Self { Expr::ForExpr(Box::new(item)) }
@@ -10969,6 +11026,20 @@ impl FieldExpr {
             expr: Box::new(expr.into()),
             dot_token: true,
             name_ref: Box::new(name_ref),
+            cst: None,
+        }
+    }
+}
+impl FinalExpr {
+    pub fn new<ET0>(expr: ET0) -> Self
+    where
+        ET0: Into<Expr>,
+    {
+        Self {
+            final_token: true,
+            l_paren_token: true,
+            expr: Box::new(expr.into()),
+            r_paren_token: true,
             cst: None,
         }
     }
@@ -12166,6 +12237,9 @@ impl From<ContinueExpr> for Stmt {
 }
 impl From<FieldExpr> for Stmt {
     fn from(item: FieldExpr) -> Self { Stmt::from(Expr::from(item)) }
+}
+impl From<FinalExpr> for Stmt {
+    fn from(item: FinalExpr) -> Self { Stmt::from(Expr::from(item)) }
 }
 impl From<ForExpr> for Stmt {
     fn from(item: ForExpr) -> Self { Stmt::from(Expr::from(item)) }

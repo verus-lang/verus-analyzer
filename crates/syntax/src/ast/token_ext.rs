@@ -528,6 +528,11 @@ mod tests {
         check_float_suffix("123.0ef32", "f32");
         check_float_suffix("123.0E4f32", "f32");
         check_float_suffix("1_2_3.0_f32", "f32");
+        // Verus real suffix on float literals
+        check_float_suffix("0.5real", "real");
+        check_float_suffix("1.0real", "real");
+        check_float_suffix("1e2real", "real");
+        check_float_suffix("2E-3real", "real");
     }
 
     #[test]
@@ -541,6 +546,12 @@ mod tests {
         check_int_suffix("0b11u32", "u32");
         check_int_suffix("0o11u32", "u32");
         check_int_suffix("0xffu32", "u32");
+        // Verus real suffix on integer literals
+        check_int_suffix("0real", "real");
+        check_int_suffix("123real", "real");
+        check_int_suffix("0xFFreal", "real");
+        check_int_suffix("0o77real", "real");
+        check_int_suffix("0b1010real", "real");
     }
 
     fn check_string_value<'a>(lit: &str, expected: impl Into<Option<&'a str>>) {

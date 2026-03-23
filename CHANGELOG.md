@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+
+## 2026-03-23
+
+### Added
+- Support for the new Verus `final` keyword
+
+### Changed
+- Updated to Rust version to 1.94.0
+
+
 ## 2026-03-13
 
 ### Added
@@ -15,6 +25,7 @@
 
 ### Changed
 - Updated to Rust version to 1.93.1
+
 
 ## 2026-02-03
 
@@ -48,7 +59,7 @@
 - Setting for enabling/disabling the feature that tries to only report errors in the file that's currently being edited.
 
 ### Fixed
-- Various bugs related to `cargo verus` arugments
+- Various bugs related to `cargo verus` arguments
 
 
 ## 2025-10-03

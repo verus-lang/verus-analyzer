@@ -69,6 +69,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![forall],
         T![exists],
         T![choose],
+        T![final],
         T![matches],
     ]));
 
@@ -86,6 +87,11 @@ pub(super) fn atom_expr(
     }
     if p.at_contextual_kw(T![choose]) {
         let pred_expr = verus::verus_closure_expr(p, None, r.forbid_structs);
+        return Some((pred_expr, BlockLike::NotBlock));
+    }
+    if p.at(T![final]) {
+        let m = p.start();
+        let pred_expr = verus::final_(p, m);
         return Some((pred_expr, BlockLike::NotBlock));
     }
     if p.at_contextual_kw(T![proof_fn]) {

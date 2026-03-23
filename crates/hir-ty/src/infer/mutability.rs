@@ -202,7 +202,7 @@ impl InferenceContext<'_> {
             Expr::MatchesExpr { expr, .. } => {
                 self.infer_mut_expr(*expr, Mutability::Not);
             }
-            Expr::Assert { .. } | Expr::Assume { .. } | Expr::View { .. } => (),
+            Expr::Assert { .. } | Expr::Assume { .. } | Expr::Final { .. } | Expr::View { .. } => (),
         }
     }
 

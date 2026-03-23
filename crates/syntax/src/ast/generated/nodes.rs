@@ -549,6 +549,17 @@ impl FieldExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FinalExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FinalExpr {
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    pub fn final_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![final]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Fn {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2121,6 +2132,7 @@ pub enum Expr {
     ClosureExpr(ClosureExpr),
     ContinueExpr(ContinueExpr),
     FieldExpr(FieldExpr),
+    FinalExpr(FinalExpr),
     ForExpr(ForExpr),
     FormatArgsExpr(FormatArgsExpr),
     HasExpr(HasExpr),
@@ -2791,6 +2803,17 @@ impl AstNode for ExternItemList {
 }
 impl AstNode for FieldExpr {
     fn can_cast(kind: SyntaxKind) -> bool { kind == FIELD_EXPR }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for FinalExpr {
+    fn can_cast(kind: SyntaxKind) -> bool { kind == FINAL_EXPR }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
             Some(Self { syntax })
@@ -4368,6 +4391,9 @@ impl From<ContinueExpr> for Expr {
 impl From<FieldExpr> for Expr {
     fn from(node: FieldExpr) -> Expr { Expr::FieldExpr(node) }
 }
+impl From<FinalExpr> for Expr {
+    fn from(node: FinalExpr) -> Expr { Expr::FinalExpr(node) }
+}
 impl From<ForExpr> for Expr {
     fn from(node: ForExpr) -> Expr { Expr::ForExpr(node) }
 }
@@ -4472,6 +4498,7 @@ impl AstNode for Expr {
                 | CLOSURE_EXPR
                 | CONTINUE_EXPR
                 | FIELD_EXPR
+                | FINAL_EXPR
                 | FOR_EXPR
                 | FORMAT_ARGS_EXPR
                 | HAS_EXPR
@@ -4520,6 +4547,7 @@ impl AstNode for Expr {
             CLOSURE_EXPR => Expr::ClosureExpr(ClosureExpr { syntax }),
             CONTINUE_EXPR => Expr::ContinueExpr(ContinueExpr { syntax }),
             FIELD_EXPR => Expr::FieldExpr(FieldExpr { syntax }),
+            FINAL_EXPR => Expr::FinalExpr(FinalExpr { syntax }),
             FOR_EXPR => Expr::ForExpr(ForExpr { syntax }),
             FORMAT_ARGS_EXPR => Expr::FormatArgsExpr(FormatArgsExpr { syntax }),
             HAS_EXPR => Expr::HasExpr(HasExpr { syntax }),
@@ -4570,6 +4598,7 @@ impl AstNode for Expr {
             Expr::ClosureExpr(it) => &it.syntax,
             Expr::ContinueExpr(it) => &it.syntax,
             Expr::FieldExpr(it) => &it.syntax,
+            Expr::FinalExpr(it) => &it.syntax,
             Expr::ForExpr(it) => &it.syntax,
             Expr::FormatArgsExpr(it) => &it.syntax,
             Expr::HasExpr(it) => &it.syntax,
@@ -5711,6 +5740,11 @@ impl std::fmt::Display for ExternItemList {
     }
 }
 impl std::fmt::Display for FieldExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for FinalExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

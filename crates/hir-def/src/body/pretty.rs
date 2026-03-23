@@ -490,6 +490,11 @@ impl Printer<'_> {
                 w!(self, "assume ");
                 self.print_expr(*condition);
             }
+            Expr::Final { expr } => {
+                w!(self, "final(");
+                self.print_expr(*expr);
+                w!(self, ")");
+            }
             Expr::View { condition } => {
                 w!(self, "view ");
                 self.print_expr(*condition);

@@ -1936,6 +1936,38 @@ pub assume_specification<T, I>[ <[T]>::get::<I> ](slice: &[T], i: I) -> (b: Opti
     verus_core(source_code);
 }
 
+#[test]
+fn verus_final_expr() {
+    let source_code = "verus!{
+
+pub fn vec_index_mut<T, A: Allocator>(vec: &mut Vec<T, A>, i: usize) -> (element: &mut T)
+    requires i < vec.view().len(),
+    ensures
+        *element == old(vec)@.index(i as int),
+        final(vec)@ == old(vec)@.update(i as int, *final(element)),
+        *final(element) == final(vec).view().index(i as int),
+    no_unwind
+;
+
+}";
+
+    verus_core(source_code);
+}
+
+#[test]
+fn verus_final_expr_simple() {
+    let source_code = "verus!{
+
+fn test(x: &mut u64)
+    ensures *x == 5, *final(x) == 10,
+{
+    *x = 10;
+}
+
+}";
+
+    verus_core(source_code);
+}
 
 #[test]
 fn verus_globals() {
@@ -2110,6 +2142,26 @@ spec fn test_rec2(x: int, y: int) -> int
     }
 }
 } // verus!";
+    verus_core(source_code);
+}
+
+#[test]
+fn verus_real_literals() {
+    let source_code = "verus!{
+fn test_real_literals() {
+    // Integer-style with real suffix
+    assert(0real <= 1real);
+    assert(0xFFreal >= 0real);
+    assert(0b1010real == 10real);
+    assert(0o77real == 63real);
+    // Decimal-style with real suffix
+    assert(0.5real < 1.0real);
+    assert(0.0real <= 1.5real);
+    // Exponential-style with real suffix
+    assert(1e2real == 100real);
+    assert(2e-1real == 0.2real);
+}
+}";
     verus_core(source_code);
 }
 
