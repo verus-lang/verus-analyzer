@@ -95,6 +95,7 @@ impl<'a> AssistContext<'a> {
 
         let now = Instant::now();
         let output = Command::new(verus_exec_path)
+            .current_dir(tmp_dir.path())
             .arg(file_path)
             .arg("--multiple-errors")
             .arg("10") // we want many errors as proof-action reads this. By default, Verus gives a couple of errors as a human reads those.

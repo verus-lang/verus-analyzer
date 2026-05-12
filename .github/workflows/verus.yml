@@ -50,7 +50,7 @@ jobs:
       - name: Test Proof Actions
         env:
           VERUS_BINARY_PATH: /home/runner/work/verus-analyzer/verus-analyzer/verus-x86-linux/verus
-        run: cargo test --package ide-assists --lib -- handlers::proof_action --test-threads=1
+        run: cargo test --package ide-assists --lib -- handlers::proof_action
 
       - name: Build Proof-Action Version of the LSP-Server
         run: cargo xtask dist --proof-action
