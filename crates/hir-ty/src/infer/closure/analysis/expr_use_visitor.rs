@@ -503,6 +503,41 @@ impl<'a, 'db, D: Delegate<'db>> ExprUseVisitor<'a, 'db, D> {
         self.walk_adjustment(expr)?;
 
         match self.cx.store[expr] {
+            Expr::Assert { condition, body } => {
+                self.consume_expr(condition)?;
+                if let Some(body) = body {
+                    self.consume_expr(body)?;
+                }
+            }
+
+            Expr::AssertForall { closure, body } => {
+                self.consume_expr(closure)?;
+                self.consume_expr(body)?;
+            }
+
+            Expr::Assume { condition } => {
+                self.consume_expr(condition)?;
+            }
+
+            Expr::Final { expr }
+            | Expr::View { expr }
+            | Expr::Is { expr, .. }
+            | Expr::Arrow { expr, .. } => {
+                self.consume_expr(expr)?;
+            }
+
+            Expr::Has { collection, element } => {
+                self.consume_expr(collection)?;
+                self.consume_expr(element)?;
+            }
+
+            Expr::Matches { expr: discr, pat } => {
+                let discr_place = self.cat_expr(discr)?;
+                self.fake_read_scrutinee(discr_place.clone(), true);
+                self.walk_expr(discr)?;
+                self.walk_pat(discr_place, pat, false)?;
+            }
+
             Expr::Path(_) => {}
 
             Expr::UnaryOp { op: UnaryOp::Deref, expr: base } => {

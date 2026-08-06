@@ -663,6 +663,30 @@ impl ExpressionStore {
         // Do not use `..` patterns or field accesses here, only destructuring, to ensure we cover all cases
         // (we've had multiple bugs with this in the past).
         match &self[expr_id] {
+            Expr::Assert { condition, body } => {
+                visitor.on_expr(*condition);
+                visitor.on_expr_opt(*body);
+            }
+            Expr::AssertForall { closure, body } => {
+                visitor.on_expr(*closure);
+                visitor.on_expr(*body);
+            }
+            Expr::Assume { condition }
+            | Expr::Final { expr: condition }
+            | Expr::View { expr: condition }
+            | Expr::Arrow { expr: condition, name: _ } => visitor.on_expr(*condition),
+            Expr::Is { expr, type_ref } => {
+                visitor.on_expr(*expr);
+                visitor.on_type(*type_ref);
+            }
+            Expr::Has { collection, element } => {
+                visitor.on_expr(*collection);
+                visitor.on_expr(*element);
+            }
+            Expr::Matches { expr, pat } => {
+                visitor.on_expr(*expr);
+                visitor.on_pat(*pat);
+            }
             Expr::OffsetOf(OffsetOf { container, fields: _ }) => visitor.on_type(*container),
             Expr::Path(path) => visitor.on_path(path),
             Expr::Continue { label: _ } | Expr::Missing | Expr::Literal(_) | Expr::Underscore => {}

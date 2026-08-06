@@ -1450,6 +1450,13 @@ fn coerce_pointee_expand(
                     .chain(ty.ret_type().and_then(|it| it.ty())),
                 |ty| substitute_type_in_bound(editor, ty, param_name, replacement),
             ),
+            ast::Type::ProofFnType(ty) => any_long(
+                ty.param_list()
+                    .into_iter()
+                    .flat_map(|params| params.params().filter_map(|param| param.ty()))
+                    .chain(ty.ret_type().and_then(|it| it.ty())),
+                |ty| substitute_type_in_bound(editor, ty, param_name, replacement),
+            ),
             ast::Type::ForType(ty) => ty
                 .ty()
                 .is_some_and(|ty| substitute_type_in_bound(editor, ty, param_name, replacement)),

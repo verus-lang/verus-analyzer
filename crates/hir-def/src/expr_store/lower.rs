@@ -771,6 +771,44 @@ impl<'db> ExprCollector<'db> {
                     binder,
                 }))
             }
+            ast::Type::ProofFnType(inner) => {
+                let ret_ty = inner
+                    .ret_type()
+                    .and_then(|rt| rt.ty())
+                    .map(|it| self.lower_type_ref(it, impl_trait_lower_fn))
+                    .unwrap_or_else(|| self.alloc_type_ref_desugared(TypeRef::unit()));
+                let mut params = inner
+                    .param_list()
+                    .map(|params| {
+                        params
+                            .params()
+                            .filter(|it| it.dotdotdot_token().is_none())
+                            .map(|it| {
+                                let type_ref =
+                                    self.lower_type_ref_opt(it.ty(), impl_trait_lower_fn);
+                                let name = match it.pat() {
+                                    Some(ast::Pat::IdentPat(it)) => Some(
+                                        it.name()
+                                            .map(|name| name.as_name())
+                                            .unwrap_or_else(Name::missing),
+                                    ),
+                                    _ => None,
+                                };
+                                (name, type_ref)
+                            })
+                            .collect::<Vec<_>>()
+                    })
+                    .unwrap_or_default();
+                params.push((None, ret_ty));
+
+                TypeRef::Fn(Box::new(FnType {
+                    is_varargs: false,
+                    is_unsafe: false,
+                    abi: ExternAbi::Rust,
+                    params: params.into_boxed_slice(),
+                    binder: self.for_type_binder.take().map(Into::into),
+                }))
+            }
             // for types are close enough for our purposes to the inner type for now...
             ast::Type::ForType(inner) => {
                 let binder = self.lower_for_binder_opt(inner.for_binder());
@@ -1844,7 +1882,50 @@ impl<'db> ExprCollector<'db> {
                 self.alloc_expr(Expr::OffsetOf(OffsetOf { container, fields }), syntax_ptr)
             }
             ast::Expr::FormatArgsExpr(f) => self.collect_format_args(f, syntax_ptr),
-            ast::Expr::IncludeBytesExpr(_) => self.alloc_expr(Expr::IncludeBytes, syntax_ptr)
+            ast::Expr::IncludeBytesExpr(_) => self.alloc_expr(Expr::IncludeBytes, syntax_ptr),
+            ast::Expr::AssertExpr(e) => {
+                let condition = self.collect_expr_opt(e.expr());
+                let body = e.block_expr().map(|block| self.collect_block(block));
+                self.alloc_expr(Expr::Assert { condition, body }, syntax_ptr)
+            }
+            ast::Expr::AssertForallExpr(e) => {
+                let closure = self.collect_expr_opt(e.closure_expr().map(ast::Expr::ClosureExpr));
+                let body = self.collect_block_opt(e.block_expr());
+                self.alloc_expr(Expr::AssertForall { closure, body }, syntax_ptr)
+            }
+            ast::Expr::AssumeExpr(e) => {
+                let condition = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::Assume { condition }, syntax_ptr)
+            }
+            ast::Expr::FinalExpr(e) => {
+                let expr = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::Final { expr }, syntax_ptr)
+            }
+            ast::Expr::ViewExpr(e) => {
+                let expr = self.collect_expr_opt(e.expr());
+                self.alloc_expr(Expr::View { expr }, syntax_ptr)
+            }
+            ast::Expr::IsExpr(e) => {
+                let expr = self.collect_expr_opt(e.expr());
+                let type_ref = self.lower_type_ref_opt_disallow_impl_trait(e.ty());
+                self.alloc_expr(Expr::Is { expr, type_ref }, syntax_ptr)
+            }
+            ast::Expr::HasExpr(e) => {
+                let collection = self.collect_expr_opt(e.collection());
+                let element = self.collect_expr_opt(e.element());
+                self.alloc_expr(Expr::Has { collection, element }, syntax_ptr)
+            }
+            ast::Expr::ArrowExpr(e) => {
+                let expr = self.collect_expr_opt(e.expr());
+                let name =
+                    e.name_ref().map(|name| name.as_name()).unwrap_or_else(Name::missing);
+                self.alloc_expr(Expr::Arrow { expr, name }, syntax_ptr)
+            }
+            ast::Expr::MatchesExpr(e) => {
+                let expr = self.collect_expr_opt(e.expr());
+                let pat = self.collect_pat_top(e.pat());
+                self.alloc_expr(Expr::Matches { expr, pat }, syntax_ptr)
+            }
         })
     }
 

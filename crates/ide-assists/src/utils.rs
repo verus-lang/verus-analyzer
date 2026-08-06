@@ -206,6 +206,7 @@ pub fn filter_assoc_items(
                 (default_methods, def.ty()),
                 (DefaultMethods::Only, Some(_)) | (DefaultMethods::No, None)
             ),
+            ast::AssocItem::BroadcastGroup(_) => false,
             ast::AssocItem::MacroCall(_) => unreachable!(),
         })
         .collect();
@@ -215,6 +216,7 @@ pub fn filter_assoc_items(
             ast::AssocItem::Fn(def) => def.name(),
             ast::AssocItem::TypeAlias(def) => def.name(),
             ast::AssocItem::Const(def) => def.name(),
+            ast::AssocItem::BroadcastGroup(_) => None,
             ast::AssocItem::MacroCall(_) => None,
         }
         .is_some()

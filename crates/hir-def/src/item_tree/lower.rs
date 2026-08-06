@@ -142,7 +142,11 @@ impl<'db> Ctx<'db> {
             ast::Item::MacroDef(ast) => self.lower_macro_def(ast)?,
             ast::Item::ExternBlock(ast) => self.lower_extern_block(ast),
             // FIXME: Handle `global_asm!()`.
-            ast::Item::AsmExpr(_) => return None,
+            ast::Item::AsmExpr(_)
+            | ast::Item::AssumeSpecification(_)
+            | ast::Item::BroadcastGroup(_)
+            | ast::Item::BroadcastUse(_)
+            | ast::Item::VerusGlobal(_) => return None,
         };
         let attrs = self.lower_attrs(item);
         self.add_attrs(mod_item, attrs);

@@ -470,6 +470,7 @@ pub struct BroadcastGroup {
     pub(crate) syntax: SyntaxNode,
 }
 impl ast::HasAttrs for BroadcastGroup {}
+impl ast::HasDocComments for BroadcastGroup {}
 impl ast::HasName for BroadcastGroup {}
 impl ast::HasVisibility for BroadcastGroup {}
 impl BroadcastGroup {
@@ -2780,6 +2781,7 @@ pub enum AssocItem {
     TypeAlias(TypeAlias),
 }
 impl ast::HasAttrs for AssocItem {}
+impl ast::HasDocComments for AssocItem {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CfgPredicate {
@@ -11338,7 +11340,8 @@ impl AstNode for AnyHasDocComments {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            CONST
+            BROADCAST_GROUP
+                | CONST
                 | ENUM
                 | EXTERN_BLOCK
                 | EXTERN_CRATE
@@ -11381,6 +11384,10 @@ impl fmt::Debug for AnyHasDocComments {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("AnyHasDocComments").field("syntax", &self.syntax).finish()
     }
+}
+impl From<BroadcastGroup> for AnyHasDocComments {
+    #[inline]
+    fn from(node: BroadcastGroup) -> AnyHasDocComments { AnyHasDocComments { syntax: node.syntax } }
 }
 impl From<Const> for AnyHasDocComments {
     #[inline]

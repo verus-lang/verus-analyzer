@@ -242,7 +242,7 @@ impl<'db> InferenceContext<'db> {
             }
             Expr::Underscore => true,
             Expr::UnaryOp { op: UnaryOp::Deref, .. } => true,
-            Expr::Field { .. } | Expr::Index { .. } => true,
+            Expr::Field { .. } | Expr::Arrow { .. } | Expr::Index { .. } => true,
             Expr::Call { .. }
             | Expr::MethodCall { .. }
             | Expr::Tuple { .. }
@@ -272,6 +272,14 @@ impl<'db> InferenceContext<'db> {
             | Expr::Range { .. }
             | Expr::RecordLit { .. }
             | Expr::Yeet { .. }
+            | Expr::Assert { .. }
+            | Expr::AssertForall { .. }
+            | Expr::Assume { .. }
+            | Expr::Final { .. }
+            | Expr::View { .. }
+            | Expr::Is { .. }
+            | Expr::Has { .. }
+            | Expr::Matches { .. }
             | Expr::Missing
             | Expr::IncludeBytes => false,
         }
@@ -330,6 +338,63 @@ impl<'db> InferenceContext<'db> {
         tracing::trace!(?expr);
         let ty = match expr {
             Expr::Missing => self.err_ty(),
+            Expr::Assert { condition, body } => {
+                self.infer_expr_coerce_never(
+                    *condition,
+                    &Expectation::HasType(self.types.types.bool),
+                    ExprIsRead::Yes,
+                );
+                if let Some(body) = body {
+                    self.infer_expr(
+                        *body,
+                        &Expectation::HasType(self.types.types.unit),
+                        ExprIsRead::No,
+                    );
+                }
+                self.types.types.unit
+            }
+            Expr::AssertForall { closure, body } => {
+                self.infer_expr_no_expect(*closure, ExprIsRead::Yes);
+                self.infer_expr(
+                    *body,
+                    &Expectation::HasType(self.types.types.unit),
+                    ExprIsRead::No,
+                );
+                self.types.types.unit
+            }
+            Expr::Assume { condition } => {
+                self.infer_expr_coerce_never(
+                    *condition,
+                    &Expectation::HasType(self.types.types.bool),
+                    ExprIsRead::Yes,
+                );
+                self.types.types.unit
+            }
+            Expr::Final { expr } => self.infer_expr_inner(*expr, expected, is_read),
+            Expr::View { expr } => {
+                self.infer_expr_no_expect(*expr, ExprIsRead::Yes);
+                self.err_ty()
+            }
+            Expr::Is { expr, type_ref } => {
+                let ty = self.make_body_ty(*type_ref);
+                let ty = self.insert_type_vars_shallow(ty);
+                self.infer_expr(*expr, &Expectation::HasType(ty), ExprIsRead::Yes);
+                self.types.types.bool
+            }
+            Expr::Has { collection, element } => {
+                self.infer_expr_no_expect(*collection, ExprIsRead::Yes);
+                self.infer_expr_no_expect(*element, ExprIsRead::Yes);
+                self.types.types.bool
+            }
+            Expr::Arrow { expr, name: _ } => {
+                self.infer_expr_no_expect(*expr, ExprIsRead::No);
+                self.err_ty()
+            }
+            Expr::Matches { expr, pat } => {
+                let input_ty = self.infer_expr_no_expect(*expr, ExprIsRead::Yes);
+                self.infer_top_pat(*pat, input_ty, PatOrigin::MatchArm);
+                self.types.types.bool
+            }
             &Expr::If { condition, then_branch, else_branch } => {
                 let expected = &expected.adjust_for_branches(&mut self.table, tgt_expr.into());
                 self.infer_expr_coerce_never(

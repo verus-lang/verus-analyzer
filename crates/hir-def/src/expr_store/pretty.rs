@@ -867,6 +867,54 @@ impl Printer<'_> {
             Expr::Const(id) => {
                 w!(self, "const {{ /* {id:?} */ }}");
             }
+            Expr::Assert { condition, body } => {
+                w!(self, "assert(");
+                self.print_expr(*condition);
+                w!(self, ")");
+                if let Some(body) = body {
+                    w!(self, " by ");
+                    self.print_expr(*body);
+                }
+            }
+            Expr::AssertForall { closure, body } => {
+                w!(self, "assert forall ");
+                self.print_expr(*closure);
+                w!(self, " by ");
+                self.print_expr(*body);
+            }
+            Expr::Assume { condition } => {
+                w!(self, "assume(");
+                self.print_expr(*condition);
+                w!(self, ")");
+            }
+            Expr::Final { expr } => {
+                w!(self, "final(");
+                self.print_expr(*expr);
+                w!(self, ")");
+            }
+            Expr::View { expr } => {
+                self.print_expr_in(prec, *expr);
+                w!(self, "@");
+            }
+            Expr::Is { expr, type_ref } => {
+                self.print_expr_in(prec, *expr);
+                w!(self, " is ");
+                self.print_type_ref(*type_ref);
+            }
+            Expr::Has { collection, element } => {
+                self.print_expr_in(prec, *collection);
+                w!(self, " has ");
+                self.print_expr_in(prec, *element);
+            }
+            Expr::Arrow { expr, name } => {
+                self.print_expr_in(prec, *expr);
+                w!(self, "->{}", name.display(self.db, self.edition));
+            }
+            Expr::Matches { expr, pat } => {
+                self.print_expr_in(prec, *expr);
+                w!(self, " matches ");
+                self.print_pat(*pat);
+            }
             &Expr::Assignment { target, value } => {
                 self.print_pat(target);
                 w!(self, " = ");

@@ -55,6 +55,30 @@ impl<'db> InferenceContext<'db> {
     fn infer_mut_expr_without_adjust(&mut self, tgt_expr: ExprId, mutability: Mutability) {
         match &self.store[tgt_expr] {
             Expr::Missing => (),
+            Expr::Assert { condition, body } => {
+                self.infer_mut_expr(*condition, Mutability::Not);
+                if let Some(body) = body {
+                    self.infer_mut_expr(*body, Mutability::Not);
+                }
+            }
+            Expr::AssertForall { closure, body } => {
+                self.infer_mut_expr(*closure, Mutability::Not);
+                self.infer_mut_expr(*body, Mutability::Not);
+            }
+            Expr::Assume { condition } => {
+                self.infer_mut_expr(*condition, Mutability::Not);
+            }
+            Expr::Final { expr }
+            | Expr::View { expr }
+            | Expr::Is { expr, type_ref: _ }
+            | Expr::Arrow { expr, name: _ }
+            | Expr::Matches { expr, pat: _ } => {
+                self.infer_mut_expr(*expr, Mutability::Not);
+            }
+            Expr::Has { collection, element } => {
+                self.infer_mut_expr(*collection, Mutability::Not);
+                self.infer_mut_expr(*element, Mutability::Not);
+            }
             Expr::InlineAsm(e) => {
                 e.operands.iter().for_each(|(_, op)| match op {
                     AsmOperand::In { expr, .. }

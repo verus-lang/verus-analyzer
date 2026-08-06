@@ -76,6 +76,7 @@ pub(crate) fn reorder_impl_items(acc: &mut Assists, ctx: &AssistContext<'_, '_>)
         .cloned()
         .sorted_by_key(|i| {
             let name = match i {
+                ast::AssocItem::BroadcastGroup(_) => None,
                 ast::AssocItem::Const(c) => c.name(),
                 ast::AssocItem::Fn(f) => f.name(),
                 ast::AssocItem::TypeAlias(t) => t.name(),

@@ -273,6 +273,39 @@ pub enum RecordSpread {
 pub enum Expr {
     /// This is produced if the syntax tree does not have a required expression piece.
     Missing,
+    Assert {
+        condition: ExprId,
+        body: Option<ExprId>,
+    },
+    AssertForall {
+        closure: ExprId,
+        body: ExprId,
+    },
+    Assume {
+        condition: ExprId,
+    },
+    Final {
+        expr: ExprId,
+    },
+    View {
+        expr: ExprId,
+    },
+    Is {
+        expr: ExprId,
+        type_ref: TypeRefId,
+    },
+    Has {
+        collection: ExprId,
+        element: ExprId,
+    },
+    Arrow {
+        expr: ExprId,
+        name: Name,
+    },
+    Matches {
+        expr: ExprId,
+        pat: PatId,
+    },
     Path(Path),
     If {
         condition: ExprId,
@@ -424,9 +457,13 @@ impl Expr {
             | Expr::IncludeBytes => ExprPrecedence::Unambiguous,
 
             Expr::Await { .. }
+            | Expr::Arrow { .. }
             | Expr::Call { .. }
             | Expr::Field { .. }
+            | Expr::Has { .. }
             | Expr::Index { .. }
+            | Expr::Is { .. }
+            | Expr::Matches { .. }
             | Expr::MethodCall { .. } => ExprPrecedence::Postfix,
 
             Expr::Let { .. } | Expr::UnaryOp { .. } | Expr::Ref { .. } => ExprPrecedence::Prefix,
@@ -437,6 +474,9 @@ impl Expr {
                 None => ExprPrecedence::Unambiguous,
                 Some(BinaryOp::LogicOp(LogicOp::Or)) => ExprPrecedence::LOr,
                 Some(BinaryOp::LogicOp(LogicOp::And)) => ExprPrecedence::LAnd,
+                Some(BinaryOp::LogicOp(LogicOp::Imply | LogicOp::RevImply | LogicOp::Iff)) => {
+                    ExprPrecedence::LOr
+                }
                 Some(BinaryOp::CmpOp(_)) => ExprPrecedence::Compare,
                 Some(BinaryOp::Assignment { .. }) => ExprPrecedence::Assign,
                 Some(BinaryOp::ArithOp(arith_op)) => match arith_op {
@@ -459,6 +499,12 @@ impl Expr {
             | Expr::Yield { .. } => ExprPrecedence::Jump,
 
             Expr::Continue { .. } => ExprPrecedence::Unambiguous,
+
+            Expr::Assert { .. }
+            | Expr::AssertForall { .. }
+            | Expr::Assume { .. }
+            | Expr::Final { .. }
+            | Expr::View { .. } => ExprPrecedence::Unambiguous,
 
             Expr::Range { .. } => ExprPrecedence::Range,
         }

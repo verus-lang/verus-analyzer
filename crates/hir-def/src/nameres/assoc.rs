@@ -260,6 +260,7 @@ impl<'db> AssocItemCollector<'db> {
 
     fn record_item(&mut self, item: ast::AssocItem) {
         match item {
+            ast::AssocItem::BroadcastGroup(_) => {}
             ast::AssocItem::Fn(function) => {
                 let Some(name) = function.name() else { return };
                 let ast_id = self.ast_id_map.ast_id(&function);

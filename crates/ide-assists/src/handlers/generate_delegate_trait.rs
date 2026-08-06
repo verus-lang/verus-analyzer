@@ -731,6 +731,7 @@ fn process_assoc_item(
     base_name: &str,
 ) -> Option<ast::AssocItem> {
     match item {
+        AssocItem::BroadcastGroup(_) => None,
         AssocItem::Const(c) => const_assoc_item(c, qual_path_ty),
         AssocItem::Fn(f) => func_assoc_item(f, qual_path_ty, base_name),
         AssocItem::MacroCall(_) => {

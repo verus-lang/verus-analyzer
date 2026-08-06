@@ -479,6 +479,17 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
             Expr::InlineAsm(_) => {
                 not_supported!("builtin#asm")
             }
+            Expr::Assert { .. }
+            | Expr::AssertForall { .. }
+            | Expr::Assume { .. }
+            | Expr::Final { .. }
+            | Expr::View { .. }
+            | Expr::Is { .. }
+            | Expr::Has { .. }
+            | Expr::Arrow { .. }
+            | Expr::Matches { .. } => {
+                not_supported!("Verus expression")
+            }
             Expr::Missing => {
                 if let Some(f) = self.owner.as_function() {
                     let assoc = f.lookup(self.db);
@@ -1116,6 +1127,11 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
                     let value_to_short = match op {
                         syntax::ast::LogicOp::And => 0,
                         syntax::ast::LogicOp::Or => 1,
+                        syntax::ast::LogicOp::Imply
+                        | syntax::ast::LogicOp::RevImply
+                        | syntax::ast::LogicOp::Iff => {
+                            not_supported!("Verus logical operator")
+                        }
                     };
                     let start_of_then = self.new_basic_block();
                     self.push_assignment(
@@ -1153,6 +1169,11 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
                             hir_def::hir::BinaryOp::LogicOp(op) => match op {
                                 hir_def::hir::LogicOp::And => BinOp::BitAnd, // FIXME: make these short circuit
                                 hir_def::hir::LogicOp::Or => BinOp::BitOr,
+                                hir_def::hir::LogicOp::Imply
+                                | hir_def::hir::LogicOp::RevImply
+                                | hir_def::hir::LogicOp::Iff => {
+                                    not_supported!("Verus logical operator")
+                                }
                             },
                             hir_def::hir::BinaryOp::ArithOp(op) => BinOp::from(op),
                             hir_def::hir::BinaryOp::CmpOp(op) => BinOp::from(op),

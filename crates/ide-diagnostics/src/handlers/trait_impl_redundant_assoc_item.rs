@@ -143,6 +143,7 @@ fn find_insert_after(
 
     fn name_of(it: &syntax::ast::AssocItem) -> Option<syntax::ast::Name> {
         match it {
+            syntax::ast::AssocItem::BroadcastGroup(_) => None,
             syntax::ast::AssocItem::Const(it) => it.name(),
             syntax::ast::AssocItem::Fn(it) => it.name(),
             syntax::ast::AssocItem::TypeAlias(it) => it.name(),

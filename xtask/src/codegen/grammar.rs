@@ -1111,6 +1111,7 @@ fn extract_struct_traits(ast: &mut AstSrc) {
         "MacroRules",
         "MacroDef",
         "Use",
+        "BroadcastGroup",
     ];
 
     for node in &mut ast.nodes {
