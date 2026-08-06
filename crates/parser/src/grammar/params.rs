@@ -101,6 +101,9 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
         // test fn_def_param
         // fn foo(..., (x, y): (i32, i32)) {}
         Flavor::FnDef => {
+            if p.at_contextual_kw(T![tracked]) && !p.nth_at(1, T![:]) {
+                p.eat_contextual_kw(T![tracked]);
+            }
             patterns::pattern(p);
             if !variadic_param(p) {
                 if p.at(T![:]) {
@@ -165,6 +168,9 @@ fn variadic_param(p: &mut Parser<'_>) -> bool {
 //     fn e(mut self) {}
 // }
 fn opt_self_param(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
+    let tracked = p.at_contextual_kw(T![tracked])
+        && matches!(p.nth(1), T![self] | T![mut] | T![&])
+        && p.eat_contextual_kw(T![tracked]);
     if p.at(T![self]) || p.at(T![mut]) && p.nth(1) == T![self] {
         p.eat(T![mut]);
         self_as_name(p);
@@ -186,6 +192,11 @@ fn opt_self_param(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
                 | (T![&], T![mut] | LIFETIME_IDENT, T![self], _)
                 | (T![&], LIFETIME_IDENT, T![mut], T![self])
         ) {
+            if tracked {
+                p.error("expected `self` after `tracked`");
+                m.complete(p, ERROR);
+                return Ok(());
+            }
             return Err(m);
         }
         p.bump(T![&]);

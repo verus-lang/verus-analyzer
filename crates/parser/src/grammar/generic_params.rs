@@ -263,6 +263,9 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
             T!['{'] | T![;] | T![=] => break,
             _ => (),
         }
+        if is_verus_contract_keyword(p) {
+            break;
+        }
 
         if !comma {
             p.error("expected comma");
@@ -272,11 +275,25 @@ pub(super) fn opt_where_clause(p: &mut Parser<'_>) {
     m.complete(p, WHERE_CLAUSE);
 
     fn is_where_predicate(p: &mut Parser<'_>) -> bool {
+        if is_verus_contract_keyword(p) {
+            return false;
+        }
         match p.current() {
             LIFETIME_IDENT => true,
             T![impl] => false,
             token => types::TYPE_FIRST.contains(token),
         }
+    }
+
+    fn is_verus_contract_keyword(p: &Parser<'_>) -> bool {
+        p.at_contextual_kw(T![requires])
+            || p.at_contextual_kw(T![recommends])
+            || p.at_contextual_kw(T![ensures])
+            || p.at_contextual_kw(T![default_ensures])
+            || p.at_contextual_kw(T![returns])
+            || p.at_contextual_kw(T![decreases])
+            || p.at_contextual_kw(T![opens_invariants])
+            || p.at_contextual_kw(T![no_unwind])
     }
 }
 

@@ -20,12 +20,22 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
     let attr = p.start();
     p.bump(T![#]);
 
-    if inner {
+    let true_inner = if inner {
         p.bump(T![!]);
-    }
+        true
+    } else if p.at(T![!]) && p.nth_at(1, T!['[']) && p.nth_at_contextual_kw(2, T![trigger]) {
+        p.bump(T![!]);
+        true
+    } else {
+        false
+    };
 
     if p.expect(T!['[']) {
-        meta(p);
+        if p.at_contextual_kw(T![trigger]) {
+            verus::trigger_attribute(p, true_inner);
+        } else {
+            meta(p);
+        }
         p.expect(T![']']);
     }
 

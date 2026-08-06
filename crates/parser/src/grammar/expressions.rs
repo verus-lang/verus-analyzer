@@ -12,7 +12,7 @@ pub(super) enum Semicolon {
     Forbidden,
 }
 
-const EXPR_FIRST: TokenSet = LHS_FIRST;
+pub(super) const EXPR_FIRST: TokenSet = LHS_FIRST;
 
 pub(super) fn expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let r = Restrictions { forbid_structs: false, prefer_stmt: false };
@@ -27,7 +27,7 @@ pub(super) fn expr_stmt(
     expr_bp(p, m, r, 1)
 }
 
-fn expr_no_struct(p: &mut Parser<'_>) {
+pub(super) fn expr_no_struct(p: &mut Parser<'_>) {
     let r = Restrictions { forbid_structs: true, prefer_stmt: false };
     expr_bp(p, None, r, 1);
 }
@@ -114,6 +114,11 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
     p.eat(T![super]);
     p.bump(T![let]);
+    if (p.at_contextual_kw(T![ghost]) || p.at_contextual_kw(T![tracked]))
+        && !matches!(p.nth(1), T![=] | T![:] | T![;] | T![,])
+    {
+        p.bump_remap(if p.at_contextual_kw(T![ghost]) { T![ghost] } else { T![tracked] });
+    }
     patterns::pattern(p);
     if p.at(T![:]) {
         // test let_stmt_ascription
@@ -201,6 +206,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
     use Associativity::*;
     const NOT_AN_OP: (u8, SyntaxKind, Associativity) = (0, T![@], Left);
     match p.current() {
+        T![|] if p.at(T![|||]) => (1,  T![|||], Left),
         T![|] if p.at(T![||])  => (3,  T![||],  Left),
         T![|] if p.at(T![|=])  => (1,  T![|=],  Right),
         T![|]                  => (6,  T![|],   Left),
@@ -208,8 +214,14 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
         T![>] if p.at(T![>>])  => (9,  T![>>],  Left),
         T![>] if p.at(T![>=])  => (5,  T![>=],  Left),
         T![>]                  => (5,  T![>],   Left),
+        T![=] if p.at(T![=~~=]) => (1, T![=~~=], Left),
+        T![=] if p.at(T![=~=]) => (1, T![=~=], Left),
+        T![=] if p.at(T![==>]) => (2, T![==>], Left),
+        T![=] if p.at(T![===]) => (5, T![===], Left),
         T![=] if p.at(T![==])  => (5,  T![==],  Left),
         T![=] if !p.at(T![=>]) => (1,  T![=],   Right),
+        T![<] if p.at(T![<==>]) => (2, T![<==>], Left),
+        T![<] if p.at(T![<==]) => (2, T![<==], Left),
         T![<] if p.at(T![<=])  => (5,  T![<=],  Left),
         T![<] if p.at(T![<<=]) => (1,  T![<<=], Right),
         T![<] if p.at(T![<<])  => (9,  T![<<],  Left),
@@ -220,6 +232,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
         T![^]                  => (7,  T![^],   Left),
         T![%] if p.at(T![%=])  => (1,  T![%=],  Right),
         T![%]                  => (11, T![%],   Left),
+        T![&] if p.at(T![&&&]) => (1, T![&&&], Left),
         T![&] if p.at(T![&=])  => (1,  T![&=],  Right),
         // If you update this, remember to update `expr_let()` too.
         T![&] if p.at(T![&&])  => (4,  T![&&],  Left),
@@ -230,6 +243,9 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
         T![*]                  => (11, T![*],   Left),
         T![.] if p.at(T![..=]) => (2,  T![..=], Left),
         T![.] if p.at(T![..])  => (2,  T![..],  Left),
+        T![!] if p.at(T![!~~=]) => (1, T![!~~=], Left),
+        T![!] if p.at(T![!~=]) => (1, T![!~=], Left),
+        T![!] if p.at(T![!==]) => (5, T![!==], Left),
         T![!] if p.at(T![!=])  => (5,  T![!=],  Left),
         T![-] if p.at(T![-=])  => (1,  T![-=],  Right),
         T![-]                  => (10, T![-],   Left),
@@ -334,6 +350,16 @@ const LHS_FIRST: TokenSet =
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
     let kind = match p.current() {
+        T![&] if p.at(T![&&&]) => {
+            m = p.start();
+            p.bump(T![&&&]);
+            PREFIX_EXPR
+        }
+        T![|] if p.at(T![|||]) => {
+            m = p.start();
+            p.bump(T![|||]);
+            PREFIX_EXPR
+        }
         // test ref_expr
         // fn foo() {
         //     // reference operator
@@ -449,6 +475,17 @@ fn postfix_expr(
                 }
             },
             T![?] => try_expr(p, lhs),
+            T![@] if allow_calls => verus::view_expr(p, lhs),
+            T![!] if allow_calls && p.nth_at_contextual_kw(1, T![is]) => {
+                verus::is_expr(p, lhs, true)
+            }
+            T![!] if allow_calls && p.nth_at_contextual_kw(1, T![has]) => {
+                verus::has_expr(p, lhs, true)
+            }
+            T![-] if allow_calls && p.at(T![->]) => verus::arrow_expr(p, lhs),
+            _ if allow_calls && p.at_contextual_kw(T![is]) => verus::is_expr(p, lhs, false),
+            _ if allow_calls && p.at_contextual_kw(T![has]) => verus::has_expr(p, lhs, false),
+            _ if allow_calls && p.at_contextual_kw(T![matches]) => verus::matches_expr(p, lhs),
             _ => break,
         };
         allow_calls = true;
@@ -681,7 +718,11 @@ fn path_expr(p: &mut Parser<'_>, r: Restrictions) -> (CompletedMarker, BlockLike
             record_expr_field_list(p);
             (m.complete(p, RECORD_EXPR), BlockLike::NotBlock)
         }
-        T![!] if !p.at(T![!=]) => {
+        T![!]
+            if !p.at(T![!=])
+                && !p.nth_at_contextual_kw(1, T![is])
+                && !p.nth_at_contextual_kw(1, T![has]) =>
+        {
             let block_like = items::macro_call_after_excl(p);
             (m.complete(p, MACRO_CALL).precede(p).complete(p, MACRO_EXPR), block_like)
         }

@@ -124,7 +124,7 @@ MacroStmts =
   Expr?
 
 Attr =
-  '#' '!'? '[' Meta ']'
+  '#' '!'? '[' (TriggerAttribute | Meta) ']'
 
 CfgAttrMeta =
   'cfg_attr' '(' CfgPredicate ',' (Meta (',' Meta)* ','?) ')'
@@ -190,6 +190,10 @@ Item =
 | Union
 | Use
 | AsmExpr
+| VerusGlobal
+| BroadcastGroup
+| BroadcastUse
+| AssumeSpecification
 
 MacroRules =
   Attr* Visibility?
@@ -228,9 +232,11 @@ UseTreeList =
   '{' (UseTree (',' UseTree)* ','?)? '}'
 
 Fn =
- Attr* Visibility?
- 'default'? 'const'? 'async'? 'gen'? 'unsafe'? 'safe'? Abi?
+ Attr* Visibility? Publish?
+ 'default'? 'const'? 'async'? 'gen'? 'unsafe'? 'safe'? Abi? 'broadcast'? FnMode?
  'fn' Name GenericParamList? ParamList RetType? WhereClause?
+ Prover? RequiresClause? RecommendsClause? EnsuresClause? DefaultEnsuresClause?
+ ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
  (body:BlockExpr | ';')
 
 Abi =
@@ -244,20 +250,20 @@ ParamList =
 | '|' (Param (',' Param)* ','?)? '|'
 
 SelfParam =
-  Attr* (
+  Attr* 'tracked'? (
     ('&' Lifetime?)? 'mut'? Name
   | 'mut'? Name ':' Type
   )
 
 Param =
   Attr* (
-    Pat (':' Type)?
+    'tracked'? Pat (':' Type)?
   | Type
   | '...'
   )
 
 RetType =
-  '->' Type
+  '->' 'tracked'? (('(' Pat ':' Type ')') | Type)
 
 TypeAlias =
   Attr* Visibility?
@@ -266,7 +272,7 @@ TypeAlias =
   ('=' Type)? ';'
 
 Struct =
-  Attr* Visibility?
+  Attr* Visibility? DataMode?
   'struct' Name GenericParamList? (
     WhereClause? (RecordFieldList | ';')
   | TupleFieldList WhereClause? ';'
@@ -276,7 +282,7 @@ RecordFieldList =
  '{' fields:(RecordField (',' RecordField)* ','?)? '}'
 
 RecordField =
-  Attr* Visibility? 'unsafe'?
+  Attr* Visibility? DataMode? 'unsafe'?
   MutRestriction?
   Name ':' Type ('=' default_val:ConstArg)?
 
@@ -284,7 +290,7 @@ TupleFieldList =
   '(' fields:(TupleField (',' TupleField)* ','?)? ')'
 
 TupleField =
-  Attr* Visibility?
+  Attr* Visibility? DataMode?
   MutRestriction?
   Type
 
@@ -296,7 +302,7 @@ MutRestriction =
   'mut' VisibilityInner
 
 Enum =
-  Attr* Visibility?
+  Attr* Visibility? DataMode?
   'enum' Name GenericParamList? WhereClause?
   VariantList
 
@@ -330,14 +336,13 @@ Const =
   'default'?
   'type'?
   'const' (Name | '_') GenericParamList? ':' Type
-  ('=' body:Expr)?
-  WhereClause? ';'
+  (('=' body:Expr)? WhereClause? ';' | EnsuresClause BlockExpr)
 
 Static =
   Attr* Visibility?
   'unsafe'? 'safe'?
   'static' 'mut'? Name ':' Type
-  ('=' body:Expr)? ';'
+  (('=' body:Expr)? ';' | EnsuresClause BlockExpr)
 
 Trait =
   Attr* Visibility?
@@ -358,6 +363,7 @@ AssocItem =
 | Fn
 | MacroCall
 | TypeAlias
+| BroadcastGroup
 
 Impl =
   Attr* Visibility?
@@ -394,7 +400,7 @@ Stmt =
 | LetStmt
 
 LetStmt =
-  Attr* 'super'? 'let' Pat (':' Type)?
+  Attr* 'super'? 'let' 'ghost'? 'tracked'? Pat (':' Type)?
   '=' initializer:Expr
   LetElse?
   ';'
@@ -443,6 +449,15 @@ Expr =
 | LetExpr
 | UnderscoreExpr
 | IncludeBytesExpr
+| ViewExpr
+| AssertExpr
+| AssumeExpr
+| FinalExpr
+| AssertForallExpr
+| IsExpr
+| HasExpr
+| ArrowExpr
+| MatchesExpr
 
 // We need a special expression for this because we don't have access to the file,
 // and emitting a specific array will have problems with the length.
@@ -529,7 +544,7 @@ BlockExpr =
   Attr* Label? (TryBlockModifier | 'unsafe' | ('async' 'move'?) | ('gen' 'move'?) | 'const') StmtList
 
 PrefixExpr =
-  Attr* op:('-' | '!' | '*') Expr
+  Attr* op:('-' | '!' | '*' | '&&&' | '|||') Expr
 
 BinExpr =
   Attr*
@@ -539,6 +554,8 @@ BinExpr =
   | '==' | '!=' | '<=' | '>=' | '<' | '>'
   | '+' | '*' | '-' | '/' | '%' | '<<' | '>>' | '^' | '|' | '&'
   | '=' | '+=' | '/=' | '*=' | '%=' | '>>=' | '<<=' | '-=' | '|=' | '&=' | '^='
+  | '&&&' | '|||' | '<==>' | '==>' | '<==' | '===' | '!=='
+  | '=~=' | '!~=' | '=~~=' | '!~~='
   )
   rhs:Expr
 
@@ -586,7 +603,9 @@ FieldExpr =
   Attr* Expr '.' NameRef
 
 ClosureExpr =
-  Attr* ForBinder? 'const'? 'static'? 'async'? 'gen'? 'move'?  ParamList RetType?
+  Attr* ForBinder? 'const'? 'static'? 'async'? 'gen'? 'move'?
+  ProofFnWithCharacteristics? 'forall'? 'exists'? 'choose'?
+  ParamList RetType? RequiresClause? EnsuresClause? Attr*
   body:Expr
 
 ForBinder =
@@ -597,15 +616,15 @@ IfExpr =
   ('else' else_branch:(IfExpr | BlockExpr))?
 
 LoopExpr =
-  Attr* Label? 'loop'
+  Attr* Label? 'loop' LoopClause*
   loop_body:BlockExpr
 
 ForExpr =
-  Attr* Label? 'for' Pat 'in' iterable:Expr
+  Attr* Label? 'for' Pat 'in' (iter_name:Name ':')? iterable:Expr LoopClause*
   loop_body:BlockExpr
 
 WhileExpr =
-  Attr* Label? 'while' condition:Expr
+  Attr* Label? 'while' condition:Expr LoopClause*
   loop_body:BlockExpr
 
 Label =
@@ -676,6 +695,7 @@ Type =
 | RefType
 | SliceType
 | TupleType
+| ProofFnType
 
 ParenType =
   '(' Type ')'
@@ -828,3 +848,116 @@ MacroPat =
 
 ConstBlockPat =
   'const' BlockExpr
+
+//************************//
+//        Verus           //
+//************************//
+
+Publish =
+  'closed' | 'open' ('(' 'in'? Path ')')? | 'uninterp'
+
+FnMode =
+  'spec' ('(' 'checked' ')')? | 'proof' | 'exec' | 'axiom'
+
+DataMode =
+  'ghost' | 'tracked'
+
+RequiresClause =
+  'requires' (Expr (',' Expr)* ','?)
+
+EnsuresClause =
+  'ensures' (Expr (',' Expr)* ','?)
+
+DefaultEnsuresClause =
+  'default_ensures' (Expr (',' Expr)* ','?)
+
+ReturnsClause =
+  'returns' Expr
+
+LoopClause =
+  InvariantExceptBreakClause
+| InvariantClause
+| EnsuresClause
+| DecreasesClause
+
+InvariantClause =
+  'invariant' (Expr (',' Expr)* ','?)
+
+InvariantExceptBreakClause =
+  'invariant_except_break' (Expr (',' Expr)* ','?)
+
+RecommendsClause =
+  'recommends' (Expr (',' Expr)* ','?) ('via' Expr)?
+
+DecreasesClause =
+  'decreases' (Expr (',' Expr)* ','?)
+
+OpensInvariantsClause =
+  'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']' | Expr)
+
+NoUnwindClause =
+  'no_unwind' ('when' Expr)?
+
+SignatureDecreases =
+  DecreasesClause ('when' Expr)? ('via' Expr)?
+
+ViewExpr =
+  Attr* Expr '@'
+
+AssertExpr =
+  Attr* 'assert' '(' Expr ')' 'by'? ('(' Name ')')? RequiresClause? BlockExpr?
+
+AssumeExpr =
+  Attr* 'assume' '(' Expr ')'
+
+FinalExpr =
+  Attr* 'final' '(' Expr ')'
+
+AssertForallExpr =
+  Attr* 'assert' ClosureExpr ('implies' Expr)? 'by' BlockExpr
+
+Prover =
+  'by' '(' Name ')'
+
+TriggerAttribute =
+  'trigger' (Expr (',' Expr)* ','?)?
+
+VerusGlobal =
+  Attr* 'global' (
+    'size_of' Type size_eq:'==' value:'@int_number'
+  | 'layout' Type 'is' 'size' size_eq:'==' value:'@int_number'
+    ',' 'align' align_eq:'==' align:'@int_number'
+  ) ';'
+
+BroadcastUse =
+  Attr* 'broadcast' 'use'
+  ('{' (Path (',' Path)* ','?)? '}' | Path (',' Path)* ','?) ';'
+
+BroadcastGroup =
+  Attr* Visibility? 'broadcast' 'group' Name '{' (Path (',' Path)* ','?)? '}'
+
+AssumeSpecification =
+  Attr* Visibility? 'assume_specification' GenericParamList? '[' Path ']'
+  ParamList? RetType? WhereClause? RequiresClause? RecommendsClause? EnsuresClause?
+  ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause? ';'
+
+ProofFnCharacteristics =
+  '[' fields:(Path (',' Path)* ','?) ']'
+
+ProofFnWithCharacteristics =
+  'proof_fn' ProofFnCharacteristics?
+
+ProofFnType =
+  'proof_fn' ProofFnCharacteristics? GenericParamList? ParamList? RetType?
+
+IsExpr =
+  Attr* Expr 'is' Type
+
+HasExpr =
+  Attr* collection:Expr 'has' element:Expr
+
+ArrowExpr =
+  Attr* Expr '->' (NameRef | value:'@int_number')
+
+MatchesExpr =
+  Attr* Expr 'matches' Pat

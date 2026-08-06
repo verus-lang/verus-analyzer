@@ -91,6 +91,9 @@ pub fn precedence(expr: &ast::Expr) -> ExprPrecedence {
                 BinaryOp::LogicOp(logic_op) => match logic_op {
                     ast::LogicOp::And => ExprPrecedence::LAnd,
                     ast::LogicOp::Or => ExprPrecedence::LOr,
+                    ast::LogicOp::Imply | ast::LogicOp::RevImply | ast::LogicOp::Iff => {
+                        ExprPrecedence::LOr
+                    }
                 },
                 BinaryOp::ArithOp(arith_op) => match arith_op {
                     ast::ArithOp::Add | ast::ArithOp::Sub => ExprPrecedence::Sum,
@@ -116,7 +119,12 @@ pub fn precedence(expr: &ast::Expr) -> ExprPrecedence {
         | Expr::FieldExpr(_)
         | Expr::IndexExpr(_)
         | Expr::MethodCallExpr(_)
-        | Expr::TryExpr(_) => ExprPrecedence::Postfix,
+        | Expr::TryExpr(_)
+        | Expr::ArrowExpr(_)
+        | Expr::HasExpr(_)
+        | Expr::IsExpr(_)
+        | Expr::MatchesExpr(_)
+        | Expr::ViewExpr(_) => ExprPrecedence::Postfix,
 
         Expr::ArrayExpr(_)
         | Expr::AsmExpr(_)
@@ -136,6 +144,10 @@ pub fn precedence(expr: &ast::Expr) -> ExprPrecedence {
         | Expr::UnderscoreExpr(_)
         | Expr::WhileExpr(_)
         | Expr::IncludeBytesExpr(_) => ExprPrecedence::Unambiguous,
+        Expr::AssertExpr(_)
+        | Expr::AssertForallExpr(_)
+        | Expr::AssumeExpr(_)
+        | Expr::FinalExpr(_) => ExprPrecedence::Unambiguous,
     }
 }
 
@@ -360,6 +372,7 @@ impl Expr {
                     LogicOp(op) => match op {
                         Or => (7, 8),
                         And => (9, 10),
+                        Imply | RevImply | Iff => (7, 8),
                     },
                     CmpOp(_) => (11, 11),
                     ArithOp(op) => match op {
@@ -380,11 +393,15 @@ impl Expr {
             AwaitExpr(_) | CallExpr(_) | MethodCallExpr(_) | IndexExpr(_) | TryExpr(_)
             | MacroExpr(_) => (29, 0),
 
-            FieldExpr(_) => (31, 32),
+            FieldExpr(_) | IsExpr(_) | HasExpr(_) | ArrowExpr(_) | MatchesExpr(_) => (31, 32),
 
             ArrayExpr(_) | TupleExpr(_) | Literal(_) | PathExpr(_) | ParenExpr(_) | IfExpr(_)
             | WhileExpr(_) | ForExpr(_) | LoopExpr(_) | MatchExpr(_) | BlockExpr(_)
             | RecordExpr(_) | UnderscoreExpr(_) | IncludeBytesExpr(_) => (0, 0),
+
+            ViewExpr(_) | AssertExpr(_) | AssumeExpr(_) | FinalExpr(_) | AssertForallExpr(_) => {
+                (29, 0)
+            }
         }
     }
 
@@ -526,10 +543,16 @@ impl Expr {
                 OffsetOfExpr(e) => e.builtin_token(),
                 FormatArgsExpr(e) => e.builtin_token(),
                 AsmExpr(e) => e.builtin_token(),
+                ViewExpr(e) => e.at_token(),
+                ArrowExpr(e) => e.thin_arrow_token(),
+                IsExpr(e) => e.is_token(),
+                HasExpr(e) => e.has_token(),
+                MatchesExpr(e) => e.matches_token(),
                 ArrayExpr(_) | TupleExpr(_) | Literal(_) | PathExpr(_) | ParenExpr(_)
                 | IfExpr(_) | WhileExpr(_) | ForExpr(_) | LoopExpr(_) | MatchExpr(_)
                 | BlockExpr(_) | RecordExpr(_) | UnderscoreExpr(_) | MacroExpr(_)
-                | IncludeBytesExpr(_) => None,
+                | IncludeBytesExpr(_) | AssertExpr(_) | AssumeExpr(_) | FinalExpr(_)
+                | AssertForallExpr(_) => None,
             };
 
             token.map(|t| t.text_range()).unwrap_or_else(|| this.syntax().text_range()).start()
@@ -544,7 +567,9 @@ impl Expr {
             | ClosureExpr(_) | FieldExpr(_) | IndexExpr(_) | Literal(_) | LoopExpr(_)
             | MacroExpr(_) | MethodCallExpr(_) | ParenExpr(_) | PathExpr(_) | RecordExpr(_)
             | TryExpr(_) | TupleExpr(_) | UnderscoreExpr(_) | OffsetOfExpr(_)
-            | FormatArgsExpr(_) | AsmExpr(_) => false,
+            | FormatArgsExpr(_) | AsmExpr(_) | ViewExpr(_) | IsExpr(_) | HasExpr(_)
+            | ArrowExpr(_) | MatchesExpr(_) | AssertExpr(_) | AssumeExpr(_) | FinalExpr(_)
+            | AssertForallExpr(_) => false,
 
             // For BinExpr and RangeExpr this is technically wrong -- the child can be on the left...
             BinExpr(_) | RangeExpr(_) | BreakExpr(_) | ContinueExpr(_) | PrefixExpr(_)

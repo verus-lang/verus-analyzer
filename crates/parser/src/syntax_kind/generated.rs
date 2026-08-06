@@ -62,6 +62,17 @@ pub enum SyntaxKind {
     SHR,
     SHLEQ,
     SHREQ,
+    BIGAND,
+    BIGOR,
+    EQUIV,
+    IMPLY,
+    EXPLY,
+    EQEQEQ,
+    NEEQ,
+    EXT_EQ,
+    EXT_NE,
+    EXT_DEEP_EQ,
+    EXT_DEEP_NE,
     SELF_TYPE_KW,
     ABSTRACT_KW,
     AS_KW,
@@ -76,7 +87,6 @@ pub enum SyntaxKind {
     ENUM_KW,
     EXTERN_KW,
     FALSE_KW,
-    FINAL_KW,
     FN_KW,
     FOR_KW,
     IF_KW,
@@ -109,47 +119,92 @@ pub enum SyntaxKind {
     WHERE_KW,
     WHILE_KW,
     YIELD_KW,
+    ALIGN_KW,
+    ANY_KW,
     ASM_KW,
+    ASSERT_KW,
+    ASSUME_KW,
+    ASSUME_SPECIFICATION_KW,
     ASYNC_KW,
     ATT_SYNTAX_KW,
     AUTO_KW,
     AWAIT_KW,
+    AXIOM_KW,
     BIKESHED_KW,
+    BROADCAST_KW,
     BUILTIN_KW,
+    BY_KW,
     CFG_ATTR_KW,
     CFG_KW,
+    CHECKED_KW,
+    CHOOSE_KW,
     CLOBBER_ABI_KW,
+    CLOSED_KW,
+    DECREASES_KW,
+    DEFAULT_ENSURES_KW,
     DEFAULT_KW,
     DEREF_KW,
     DYN_KW,
+    ENSURES_KW,
+    EXEC_KW,
+    EXISTS_KW,
+    FINAL_KW,
+    FORALL_KW,
     FORMAT_ARGS_KW,
     GEN_KW,
+    GHOST_KW,
     GLOBAL_ASM_KW,
+    GLOBAL_KW,
+    GROUP_KW,
+    HAS_KW,
+    IMPLIES_KW,
     INCLUDE_BYTES_KW,
     INLATEOUT_KW,
     INOUT_KW,
+    INVARIANT_EXCEPT_BREAK_KW,
+    INVARIANT_KW,
     IS_KW,
     LABEL_KW,
     LATEOUT_KW,
+    LAYOUT_KW,
     MACRO_RULES_KW,
+    MATCHES_KW,
     MAY_UNWIND_KW,
     NAKED_ASM_KW,
     NOMEM_KW,
+    NONE_KW,
     NORETURN_KW,
     NOSTACK_KW,
+    NO_UNWIND_KW,
     NULL_KW,
     OFFSET_OF_KW,
+    OPENS_INVARIANTS_KW,
+    OPEN_KW,
     OPTIONS_KW,
     OUT_KW,
     PATTERN_TYPE_KW,
     PRESERVES_FLAGS_KW,
+    PROOF_FN_KW,
+    PROOF_KW,
     PURE_KW,
     RAW_KW,
     READONLY_KW,
+    RECOMMENDS_KW,
+    REQUIRES_KW,
+    RETURNS_KW,
     SAFE_KW,
+    SIZE_KW,
+    SIZE_OF_KW,
+    SPEC_KW,
     SYM_KW,
+    TRACKED_KW,
+    TRIGGER_KW,
     TRY_KW,
+    UNINTERP_KW,
     UNION_KW,
+    VERUS_KW,
+    VIA_KW,
+    WHEN_KW,
     YEET_KW,
     BYTE,
     BYTE_STRING,
@@ -170,6 +225,7 @@ pub enum SyntaxKind {
     ARG_LIST,
     ARRAY_EXPR,
     ARRAY_TYPE,
+    ARROW_EXPR,
     ASM_CLOBBER_ABI,
     ASM_CONST,
     ASM_DIR_SPEC,
@@ -182,8 +238,12 @@ pub enum SyntaxKind {
     ASM_REG_OPERAND,
     ASM_REG_SPEC,
     ASM_SYM,
+    ASSERT_EXPR,
+    ASSERT_FORALL_EXPR,
     ASSOC_ITEM_LIST,
     ASSOC_TYPE_ARG,
+    ASSUME_EXPR,
+    ASSUME_SPECIFICATION,
     ATTR,
     AWAIT_EXPR,
     BECOME_EXPR,
@@ -191,6 +251,8 @@ pub enum SyntaxKind {
     BLOCK_EXPR,
     BOX_PAT,
     BREAK_EXPR,
+    BROADCAST_GROUP,
+    BROADCAST_USE,
     CALL_EXPR,
     CAST_EXPR,
     CFG_ATOM,
@@ -203,15 +265,21 @@ pub enum SyntaxKind {
     CONST_BLOCK_PAT,
     CONST_PARAM,
     CONTINUE_EXPR,
+    DATA_MODE,
+    DECREASES_CLAUSE,
+    DEFAULT_ENSURES_CLAUSE,
     DEREF_PAT,
     DYN_TRAIT_TYPE,
+    ENSURES_CLAUSE,
     ENUM,
     EXPR_STMT,
     EXTERN_BLOCK,
     EXTERN_CRATE,
     EXTERN_ITEM_LIST,
     FIELD_EXPR,
+    FINAL_EXPR,
     FN,
+    FN_MODE,
     FN_PTR_TYPE,
     FORMAT_ARGS_ARG,
     FORMAT_ARGS_ARG_NAME,
@@ -221,6 +289,7 @@ pub enum SyntaxKind {
     FOR_TYPE,
     GENERIC_ARG_LIST,
     GENERIC_PARAM_LIST,
+    HAS_EXPR,
     IDENT_PAT,
     IF_EXPR,
     IMPL,
@@ -229,6 +298,9 @@ pub enum SyntaxKind {
     INCLUDE_BYTES_EXPR,
     INDEX_EXPR,
     INFER_TYPE,
+    INVARIANT_CLAUSE,
+    INVARIANT_EXCEPT_BREAK_CLAUSE,
+    IS_EXPR,
     ITEM_LIST,
     KEY_VALUE_META,
     LABEL,
@@ -249,6 +321,7 @@ pub enum SyntaxKind {
     MACRO_RULES,
     MACRO_STMTS,
     MACRO_TYPE,
+    MATCHES_EXPR,
     MATCH_ARM,
     MATCH_ARM_LIST,
     MATCH_EXPR,
@@ -260,7 +333,9 @@ pub enum SyntaxKind {
     NAME_REF,
     NEVER_TYPE,
     NOT_NULL,
+    NO_UNWIND_CLAUSE,
     OFFSET_OF_EXPR,
+    OPENS_INVARIANTS_CLAUSE,
     OR_PAT,
     PARAM,
     PARAM_LIST,
@@ -276,9 +351,15 @@ pub enum SyntaxKind {
     PATH_TYPE,
     PATTERN_TYPE,
     PREFIX_EXPR,
+    PROOF_FN_CHARACTERISTICS,
+    PROOF_FN_TYPE,
+    PROOF_FN_WITH_CHARACTERISTICS,
+    PROVER,
     PTR_TYPE,
+    PUBLISH,
     RANGE_EXPR,
     RANGE_PAT,
+    RECOMMENDS_CLAUSE,
     RECORD_EXPR,
     RECORD_EXPR_FIELD,
     RECORD_EXPR_FIELD_LIST,
@@ -291,11 +372,14 @@ pub enum SyntaxKind {
     REF_PAT,
     REF_TYPE,
     RENAME,
+    REQUIRES_CLAUSE,
     REST_PAT,
+    RETURNS_CLAUSE,
     RETURN_EXPR,
     RETURN_TYPE_SYNTAX,
     RET_TYPE,
     SELF_PARAM,
+    SIGNATURE_DECREASES,
     SLICE_PAT,
     SLICE_TYPE,
     SOURCE_FILE,
@@ -305,6 +389,7 @@ pub enum SyntaxKind {
     TOKEN_TREE,
     TOKEN_TREE_META,
     TRAIT,
+    TRIGGER_ATTRIBUTE,
     TRY_BLOCK_MODIFIER,
     TRY_EXPR,
     TUPLE_EXPR,
@@ -328,6 +413,8 @@ pub enum SyntaxKind {
     USE_TREE_LIST,
     VARIANT,
     VARIANT_LIST,
+    VERUS_GLOBAL,
+    VIEW_EXPR,
     VISIBILITY,
     VISIBILITY_INNER,
     WHERE_CLAUSE,
@@ -358,6 +445,7 @@ impl SyntaxKind {
             | ARG_LIST
             | ARRAY_EXPR
             | ARRAY_TYPE
+            | ARROW_EXPR
             | ASM_CLOBBER_ABI
             | ASM_CONST
             | ASM_DIR_SPEC
@@ -370,8 +458,12 @@ impl SyntaxKind {
             | ASM_REG_OPERAND
             | ASM_REG_SPEC
             | ASM_SYM
+            | ASSERT_EXPR
+            | ASSERT_FORALL_EXPR
             | ASSOC_ITEM_LIST
             | ASSOC_TYPE_ARG
+            | ASSUME_EXPR
+            | ASSUME_SPECIFICATION
             | ATTR
             | AWAIT_EXPR
             | BECOME_EXPR
@@ -379,6 +471,8 @@ impl SyntaxKind {
             | BLOCK_EXPR
             | BOX_PAT
             | BREAK_EXPR
+            | BROADCAST_GROUP
+            | BROADCAST_USE
             | CALL_EXPR
             | CAST_EXPR
             | CFG_ATOM
@@ -391,15 +485,21 @@ impl SyntaxKind {
             | CONST_BLOCK_PAT
             | CONST_PARAM
             | CONTINUE_EXPR
+            | DATA_MODE
+            | DECREASES_CLAUSE
+            | DEFAULT_ENSURES_CLAUSE
             | DEREF_PAT
             | DYN_TRAIT_TYPE
+            | ENSURES_CLAUSE
             | ENUM
             | EXPR_STMT
             | EXTERN_BLOCK
             | EXTERN_CRATE
             | EXTERN_ITEM_LIST
             | FIELD_EXPR
+            | FINAL_EXPR
             | FN
+            | FN_MODE
             | FN_PTR_TYPE
             | FORMAT_ARGS_ARG
             | FORMAT_ARGS_ARG_NAME
@@ -409,6 +509,7 @@ impl SyntaxKind {
             | FOR_TYPE
             | GENERIC_ARG_LIST
             | GENERIC_PARAM_LIST
+            | HAS_EXPR
             | IDENT_PAT
             | IF_EXPR
             | IMPL
@@ -417,6 +518,9 @@ impl SyntaxKind {
             | INCLUDE_BYTES_EXPR
             | INDEX_EXPR
             | INFER_TYPE
+            | INVARIANT_CLAUSE
+            | INVARIANT_EXCEPT_BREAK_CLAUSE
+            | IS_EXPR
             | ITEM_LIST
             | KEY_VALUE_META
             | LABEL
@@ -437,6 +541,7 @@ impl SyntaxKind {
             | MACRO_RULES
             | MACRO_STMTS
             | MACRO_TYPE
+            | MATCHES_EXPR
             | MATCH_ARM
             | MATCH_ARM_LIST
             | MATCH_EXPR
@@ -448,7 +553,9 @@ impl SyntaxKind {
             | NAME_REF
             | NEVER_TYPE
             | NOT_NULL
+            | NO_UNWIND_CLAUSE
             | OFFSET_OF_EXPR
+            | OPENS_INVARIANTS_CLAUSE
             | OR_PAT
             | PARAM
             | PARAM_LIST
@@ -464,9 +571,15 @@ impl SyntaxKind {
             | PATH_TYPE
             | PATTERN_TYPE
             | PREFIX_EXPR
+            | PROOF_FN_CHARACTERISTICS
+            | PROOF_FN_TYPE
+            | PROOF_FN_WITH_CHARACTERISTICS
+            | PROVER
             | PTR_TYPE
+            | PUBLISH
             | RANGE_EXPR
             | RANGE_PAT
+            | RECOMMENDS_CLAUSE
             | RECORD_EXPR
             | RECORD_EXPR_FIELD
             | RECORD_EXPR_FIELD_LIST
@@ -479,11 +592,14 @@ impl SyntaxKind {
             | REF_PAT
             | REF_TYPE
             | RENAME
+            | REQUIRES_CLAUSE
             | REST_PAT
+            | RETURNS_CLAUSE
             | RETURN_EXPR
             | RETURN_TYPE_SYNTAX
             | RET_TYPE
             | SELF_PARAM
+            | SIGNATURE_DECREASES
             | SLICE_PAT
             | SLICE_TYPE
             | SOURCE_FILE
@@ -493,6 +609,7 @@ impl SyntaxKind {
             | TOKEN_TREE
             | TOKEN_TREE_META
             | TRAIT
+            | TRIGGER_ATTRIBUTE
             | TRY_BLOCK_MODIFIER
             | TRY_EXPR
             | TUPLE_EXPR
@@ -516,6 +633,8 @@ impl SyntaxKind {
             | USE_TREE_LIST
             | VARIANT
             | VARIANT_LIST
+            | VERUS_GLOBAL
+            | VIEW_EXPR
             | VISIBILITY
             | VISIBILITY_INNER
             | WHERE_CLAUSE
@@ -584,6 +703,17 @@ impl SyntaxKind {
             SHR => ">>",
             SHLEQ => "<<=",
             SHREQ => ">>=",
+            BIGAND => "&&&",
+            BIGOR => "|||",
+            EQUIV => "<==>",
+            IMPLY => "==>",
+            EXPLY => "<==",
+            EQEQEQ => "===",
+            NEEQ => "!==",
+            EXT_EQ => "=~=",
+            EXT_NE => "!~=",
+            EXT_DEEP_EQ => "=~~=",
+            EXT_DEEP_NE => "!~~=",
             SELF_TYPE_KW => "Self",
             ABSTRACT_KW => "abstract",
             AS_KW => "as",
@@ -598,7 +728,6 @@ impl SyntaxKind {
             ENUM_KW => "enum",
             EXTERN_KW => "extern",
             FALSE_KW => "false",
-            FINAL_KW => "final",
             FN_KW => "fn",
             FOR_KW => "for",
             IF_KW => "if",
@@ -631,43 +760,88 @@ impl SyntaxKind {
             WHERE_KW => "where",
             WHILE_KW => "while",
             YIELD_KW => "yield",
+            ALIGN_KW => "align",
+            ANY_KW => "any",
             ASM_KW => "asm",
+            ASSERT_KW => "assert",
+            ASSUME_KW => "assume",
+            ASSUME_SPECIFICATION_KW => "assume_specification",
             ATT_SYNTAX_KW => "att_syntax",
             AUTO_KW => "auto",
+            AXIOM_KW => "axiom",
             BIKESHED_KW => "bikeshed",
+            BROADCAST_KW => "broadcast",
             BUILTIN_KW => "builtin",
+            BY_KW => "by",
             CFG_KW => "cfg",
             CFG_ATTR_KW => "cfg_attr",
+            CHECKED_KW => "checked",
+            CHOOSE_KW => "choose",
             CLOBBER_ABI_KW => "clobber_abi",
+            CLOSED_KW => "closed",
+            DECREASES_KW => "decreases",
             DEFAULT_KW => "default",
+            DEFAULT_ENSURES_KW => "default_ensures",
             DEREF_KW => "deref",
             DYN_KW => "dyn",
+            ENSURES_KW => "ensures",
+            EXEC_KW => "exec",
+            EXISTS_KW => "exists",
+            FINAL_KW => "final",
+            FORALL_KW => "forall",
             FORMAT_ARGS_KW => "format_args",
+            GHOST_KW => "ghost",
+            GLOBAL_KW => "global",
             GLOBAL_ASM_KW => "global_asm",
+            GROUP_KW => "group",
+            HAS_KW => "has",
+            IMPLIES_KW => "implies",
             INCLUDE_BYTES_KW => "include_bytes",
             INLATEOUT_KW => "inlateout",
             INOUT_KW => "inout",
+            INVARIANT_KW => "invariant",
+            INVARIANT_EXCEPT_BREAK_KW => "invariant_except_break",
             IS_KW => "is",
             LABEL_KW => "label",
             LATEOUT_KW => "lateout",
+            LAYOUT_KW => "layout",
             MACRO_RULES_KW => "macro_rules",
+            MATCHES_KW => "matches",
             MAY_UNWIND_KW => "may_unwind",
             NAKED_ASM_KW => "naked_asm",
+            NO_UNWIND_KW => "no_unwind",
             NOMEM_KW => "nomem",
+            NONE_KW => "none",
             NORETURN_KW => "noreturn",
             NOSTACK_KW => "nostack",
             NULL_KW => "null",
             OFFSET_OF_KW => "offset_of",
+            OPEN_KW => "open",
+            OPENS_INVARIANTS_KW => "opens_invariants",
             OPTIONS_KW => "options",
             OUT_KW => "out",
             PATTERN_TYPE_KW => "pattern_type",
             PRESERVES_FLAGS_KW => "preserves_flags",
+            PROOF_KW => "proof",
+            PROOF_FN_KW => "proof_fn",
             PURE_KW => "pure",
             RAW_KW => "raw",
             READONLY_KW => "readonly",
+            RECOMMENDS_KW => "recommends",
+            REQUIRES_KW => "requires",
+            RETURNS_KW => "returns",
             SAFE_KW => "safe",
+            SIZE_KW => "size",
+            SIZE_OF_KW => "size_of",
+            SPEC_KW => "spec",
             SYM_KW => "sym",
+            TRACKED_KW => "tracked",
+            TRIGGER_KW => "trigger",
+            UNINTERP_KW => "uninterp",
             UNION_KW => "union",
+            VERUS_KW => "verus",
+            VIA_KW => "via",
+            WHEN_KW => "when",
             YEET_KW => "yeet",
             ASYNC_KW => "async",
             AWAIT_KW => "await",
@@ -695,7 +869,6 @@ impl SyntaxKind {
                 | ENUM_KW
                 | EXTERN_KW
                 | FALSE_KW
-                | FINAL_KW
                 | FN_KW
                 | FOR_KW
                 | IF_KW
@@ -741,43 +914,88 @@ impl SyntaxKind {
     #[doc = r" Weak keywords are identifiers that are considered keywords only in certain contexts."]
     pub fn is_contextual_keyword(self, edition: Edition) -> bool {
         match self {
+            ALIGN_KW => true,
+            ANY_KW => true,
             ASM_KW => true,
+            ASSERT_KW => true,
+            ASSUME_KW => true,
+            ASSUME_SPECIFICATION_KW => true,
             ATT_SYNTAX_KW => true,
             AUTO_KW => true,
+            AXIOM_KW => true,
             BIKESHED_KW => true,
+            BROADCAST_KW => true,
             BUILTIN_KW => true,
+            BY_KW => true,
             CFG_KW => true,
             CFG_ATTR_KW => true,
+            CHECKED_KW => true,
+            CHOOSE_KW => true,
             CLOBBER_ABI_KW => true,
+            CLOSED_KW => true,
+            DECREASES_KW => true,
             DEFAULT_KW => true,
+            DEFAULT_ENSURES_KW => true,
             DEREF_KW => true,
             DYN_KW if edition < Edition::Edition2018 => true,
+            ENSURES_KW => true,
+            EXEC_KW => true,
+            EXISTS_KW => true,
+            FINAL_KW => true,
+            FORALL_KW => true,
             FORMAT_ARGS_KW => true,
+            GHOST_KW => true,
+            GLOBAL_KW => true,
             GLOBAL_ASM_KW => true,
+            GROUP_KW => true,
+            HAS_KW => true,
+            IMPLIES_KW => true,
             INCLUDE_BYTES_KW => true,
             INLATEOUT_KW => true,
             INOUT_KW => true,
+            INVARIANT_KW => true,
+            INVARIANT_EXCEPT_BREAK_KW => true,
             IS_KW => true,
             LABEL_KW => true,
             LATEOUT_KW => true,
+            LAYOUT_KW => true,
             MACRO_RULES_KW => true,
+            MATCHES_KW => true,
             MAY_UNWIND_KW => true,
             NAKED_ASM_KW => true,
+            NO_UNWIND_KW => true,
             NOMEM_KW => true,
+            NONE_KW => true,
             NORETURN_KW => true,
             NOSTACK_KW => true,
             NULL_KW => true,
             OFFSET_OF_KW => true,
+            OPEN_KW => true,
+            OPENS_INVARIANTS_KW => true,
             OPTIONS_KW => true,
             OUT_KW => true,
             PATTERN_TYPE_KW => true,
             PRESERVES_FLAGS_KW => true,
+            PROOF_KW => true,
+            PROOF_FN_KW => true,
             PURE_KW => true,
             RAW_KW => true,
             READONLY_KW => true,
+            RECOMMENDS_KW => true,
+            REQUIRES_KW => true,
+            RETURNS_KW => true,
             SAFE_KW => true,
+            SIZE_KW => true,
+            SIZE_OF_KW => true,
+            SPEC_KW => true,
             SYM_KW => true,
+            TRACKED_KW => true,
+            TRIGGER_KW => true,
+            UNINTERP_KW => true,
             UNION_KW => true,
+            VERUS_KW => true,
+            VIA_KW => true,
+            WHEN_KW => true,
             YEET_KW => true,
             _ => false,
         }
@@ -800,7 +1018,6 @@ impl SyntaxKind {
                 | ENUM_KW
                 | EXTERN_KW
                 | FALSE_KW
-                | FINAL_KW
                 | FN_KW
                 | FOR_KW
                 | IF_KW
@@ -839,43 +1056,88 @@ impl SyntaxKind {
             DYN_KW if Edition::Edition2018 <= edition => true,
             GEN_KW if Edition::Edition2024 <= edition => true,
             TRY_KW if Edition::Edition2018 <= edition => true,
+            ALIGN_KW => true,
+            ANY_KW => true,
             ASM_KW => true,
+            ASSERT_KW => true,
+            ASSUME_KW => true,
+            ASSUME_SPECIFICATION_KW => true,
             ATT_SYNTAX_KW => true,
             AUTO_KW => true,
+            AXIOM_KW => true,
             BIKESHED_KW => true,
+            BROADCAST_KW => true,
             BUILTIN_KW => true,
+            BY_KW => true,
             CFG_KW => true,
             CFG_ATTR_KW => true,
+            CHECKED_KW => true,
+            CHOOSE_KW => true,
             CLOBBER_ABI_KW => true,
+            CLOSED_KW => true,
+            DECREASES_KW => true,
             DEFAULT_KW => true,
+            DEFAULT_ENSURES_KW => true,
             DEREF_KW => true,
             DYN_KW if edition < Edition::Edition2018 => true,
+            ENSURES_KW => true,
+            EXEC_KW => true,
+            EXISTS_KW => true,
+            FINAL_KW => true,
+            FORALL_KW => true,
             FORMAT_ARGS_KW => true,
+            GHOST_KW => true,
+            GLOBAL_KW => true,
             GLOBAL_ASM_KW => true,
+            GROUP_KW => true,
+            HAS_KW => true,
+            IMPLIES_KW => true,
             INCLUDE_BYTES_KW => true,
             INLATEOUT_KW => true,
             INOUT_KW => true,
+            INVARIANT_KW => true,
+            INVARIANT_EXCEPT_BREAK_KW => true,
             IS_KW => true,
             LABEL_KW => true,
             LATEOUT_KW => true,
+            LAYOUT_KW => true,
             MACRO_RULES_KW => true,
+            MATCHES_KW => true,
             MAY_UNWIND_KW => true,
             NAKED_ASM_KW => true,
+            NO_UNWIND_KW => true,
             NOMEM_KW => true,
+            NONE_KW => true,
             NORETURN_KW => true,
             NOSTACK_KW => true,
             NULL_KW => true,
             OFFSET_OF_KW => true,
+            OPEN_KW => true,
+            OPENS_INVARIANTS_KW => true,
             OPTIONS_KW => true,
             OUT_KW => true,
             PATTERN_TYPE_KW => true,
             PRESERVES_FLAGS_KW => true,
+            PROOF_KW => true,
+            PROOF_FN_KW => true,
             PURE_KW => true,
             RAW_KW => true,
             READONLY_KW => true,
+            RECOMMENDS_KW => true,
+            REQUIRES_KW => true,
+            RETURNS_KW => true,
             SAFE_KW => true,
+            SIZE_KW => true,
+            SIZE_OF_KW => true,
+            SPEC_KW => true,
             SYM_KW => true,
+            TRACKED_KW => true,
+            TRIGGER_KW => true,
+            UNINTERP_KW => true,
             UNION_KW => true,
+            VERUS_KW => true,
+            VIA_KW => true,
+            WHEN_KW => true,
             YEET_KW => true,
             _ => false,
         }
@@ -935,6 +1197,17 @@ impl SyntaxKind {
                 | SHR
                 | SHLEQ
                 | SHREQ
+                | BIGAND
+                | BIGOR
+                | EQUIV
+                | IMPLY
+                | EXPLY
+                | EQEQEQ
+                | NEEQ
+                | EXT_EQ
+                | EXT_NE
+                | EXT_DEEP_EQ
+                | EXT_DEEP_NE
         )
     }
     pub fn is_literal(self) -> bool {
@@ -956,7 +1229,6 @@ impl SyntaxKind {
             "enum" => ENUM_KW,
             "extern" => EXTERN_KW,
             "false" => FALSE_KW,
-            "final" => FINAL_KW,
             "fn" => FN_KW,
             "for" => FOR_KW,
             "if" => IF_KW,
@@ -1000,43 +1272,88 @@ impl SyntaxKind {
     }
     pub fn from_contextual_keyword(ident: &str, edition: Edition) -> Option<SyntaxKind> {
         let kw = match ident {
+            "align" => ALIGN_KW,
+            "any" => ANY_KW,
             "asm" => ASM_KW,
+            "assert" => ASSERT_KW,
+            "assume" => ASSUME_KW,
+            "assume_specification" => ASSUME_SPECIFICATION_KW,
             "att_syntax" => ATT_SYNTAX_KW,
             "auto" => AUTO_KW,
+            "axiom" => AXIOM_KW,
             "bikeshed" => BIKESHED_KW,
+            "broadcast" => BROADCAST_KW,
             "builtin" => BUILTIN_KW,
+            "by" => BY_KW,
             "cfg" => CFG_KW,
             "cfg_attr" => CFG_ATTR_KW,
+            "checked" => CHECKED_KW,
+            "choose" => CHOOSE_KW,
             "clobber_abi" => CLOBBER_ABI_KW,
+            "closed" => CLOSED_KW,
+            "decreases" => DECREASES_KW,
             "default" => DEFAULT_KW,
+            "default_ensures" => DEFAULT_ENSURES_KW,
             "deref" => DEREF_KW,
             "dyn" if edition < Edition::Edition2018 => DYN_KW,
+            "ensures" => ENSURES_KW,
+            "exec" => EXEC_KW,
+            "exists" => EXISTS_KW,
+            "final" => FINAL_KW,
+            "forall" => FORALL_KW,
             "format_args" => FORMAT_ARGS_KW,
+            "ghost" => GHOST_KW,
+            "global" => GLOBAL_KW,
             "global_asm" => GLOBAL_ASM_KW,
+            "group" => GROUP_KW,
+            "has" => HAS_KW,
+            "implies" => IMPLIES_KW,
             "include_bytes" => INCLUDE_BYTES_KW,
             "inlateout" => INLATEOUT_KW,
             "inout" => INOUT_KW,
+            "invariant" => INVARIANT_KW,
+            "invariant_except_break" => INVARIANT_EXCEPT_BREAK_KW,
             "is" => IS_KW,
             "label" => LABEL_KW,
             "lateout" => LATEOUT_KW,
+            "layout" => LAYOUT_KW,
             "macro_rules" => MACRO_RULES_KW,
+            "matches" => MATCHES_KW,
             "may_unwind" => MAY_UNWIND_KW,
             "naked_asm" => NAKED_ASM_KW,
+            "no_unwind" => NO_UNWIND_KW,
             "nomem" => NOMEM_KW,
+            "none" => NONE_KW,
             "noreturn" => NORETURN_KW,
             "nostack" => NOSTACK_KW,
             "null" => NULL_KW,
             "offset_of" => OFFSET_OF_KW,
+            "open" => OPEN_KW,
+            "opens_invariants" => OPENS_INVARIANTS_KW,
             "options" => OPTIONS_KW,
             "out" => OUT_KW,
             "pattern_type" => PATTERN_TYPE_KW,
             "preserves_flags" => PRESERVES_FLAGS_KW,
+            "proof" => PROOF_KW,
+            "proof_fn" => PROOF_FN_KW,
             "pure" => PURE_KW,
             "raw" => RAW_KW,
             "readonly" => READONLY_KW,
+            "recommends" => RECOMMENDS_KW,
+            "requires" => REQUIRES_KW,
+            "returns" => RETURNS_KW,
             "safe" => SAFE_KW,
+            "size" => SIZE_KW,
+            "size_of" => SIZE_OF_KW,
+            "spec" => SPEC_KW,
             "sym" => SYM_KW,
+            "tracked" => TRACKED_KW,
+            "trigger" => TRIGGER_KW,
+            "uninterp" => UNINTERP_KW,
             "union" => UNION_KW,
+            "verus" => VERUS_KW,
+            "via" => VIA_KW,
+            "when" => WHEN_KW,
             "yeet" => YEET_KW,
             _ => return None,
         };
@@ -1132,6 +1449,17 @@ macro_rules ! T_ {
     [>>] => { $ crate :: SyntaxKind :: SHR };
     [<<=] => { $ crate :: SyntaxKind :: SHLEQ };
     [>>=] => { $ crate :: SyntaxKind :: SHREQ };
+    [&&&] => { $ crate :: SyntaxKind :: BIGAND };
+    [|||] => { $ crate :: SyntaxKind :: BIGOR };
+    [<==>] => { $ crate :: SyntaxKind :: EQUIV };
+    [==>] => { $ crate :: SyntaxKind :: IMPLY };
+    [<==] => { $ crate :: SyntaxKind :: EXPLY };
+    [===] => { $ crate :: SyntaxKind :: EQEQEQ };
+    [!==] => { $ crate :: SyntaxKind :: NEEQ };
+    [=~=] => { $ crate :: SyntaxKind :: EXT_EQ };
+    [!~=] => { $ crate :: SyntaxKind :: EXT_NE };
+    [=~~=] => { $ crate :: SyntaxKind :: EXT_DEEP_EQ };
+    [!~~=] => { $ crate :: SyntaxKind :: EXT_DEEP_NE };
     [Self] => { $ crate :: SyntaxKind :: SELF_TYPE_KW };
     [abstract] => { $ crate :: SyntaxKind :: ABSTRACT_KW };
     [as] => { $ crate :: SyntaxKind :: AS_KW };
@@ -1146,7 +1474,6 @@ macro_rules ! T_ {
     [enum] => { $ crate :: SyntaxKind :: ENUM_KW };
     [extern] => { $ crate :: SyntaxKind :: EXTERN_KW };
     [false] => { $ crate :: SyntaxKind :: FALSE_KW };
-    [final] => { $ crate :: SyntaxKind :: FINAL_KW };
     [fn] => { $ crate :: SyntaxKind :: FN_KW };
     [for] => { $ crate :: SyntaxKind :: FOR_KW };
     [if] => { $ crate :: SyntaxKind :: IF_KW };
@@ -1179,43 +1506,88 @@ macro_rules ! T_ {
     [where] => { $ crate :: SyntaxKind :: WHERE_KW };
     [while] => { $ crate :: SyntaxKind :: WHILE_KW };
     [yield] => { $ crate :: SyntaxKind :: YIELD_KW };
+    [align] => { $ crate :: SyntaxKind :: ALIGN_KW };
+    [any] => { $ crate :: SyntaxKind :: ANY_KW };
     [asm] => { $ crate :: SyntaxKind :: ASM_KW };
+    [assert] => { $ crate :: SyntaxKind :: ASSERT_KW };
+    [assume] => { $ crate :: SyntaxKind :: ASSUME_KW };
+    [assume_specification] => { $ crate :: SyntaxKind :: ASSUME_SPECIFICATION_KW };
     [att_syntax] => { $ crate :: SyntaxKind :: ATT_SYNTAX_KW };
     [auto] => { $ crate :: SyntaxKind :: AUTO_KW };
+    [axiom] => { $ crate :: SyntaxKind :: AXIOM_KW };
     [bikeshed] => { $ crate :: SyntaxKind :: BIKESHED_KW };
+    [broadcast] => { $ crate :: SyntaxKind :: BROADCAST_KW };
     [builtin] => { $ crate :: SyntaxKind :: BUILTIN_KW };
+    [by] => { $ crate :: SyntaxKind :: BY_KW };
     [cfg] => { $ crate :: SyntaxKind :: CFG_KW };
     [cfg_attr] => { $ crate :: SyntaxKind :: CFG_ATTR_KW };
+    [checked] => { $ crate :: SyntaxKind :: CHECKED_KW };
+    [choose] => { $ crate :: SyntaxKind :: CHOOSE_KW };
     [clobber_abi] => { $ crate :: SyntaxKind :: CLOBBER_ABI_KW };
+    [closed] => { $ crate :: SyntaxKind :: CLOSED_KW };
+    [decreases] => { $ crate :: SyntaxKind :: DECREASES_KW };
     [default] => { $ crate :: SyntaxKind :: DEFAULT_KW };
+    [default_ensures] => { $ crate :: SyntaxKind :: DEFAULT_ENSURES_KW };
     [deref] => { $ crate :: SyntaxKind :: DEREF_KW };
     [dyn] => { $ crate :: SyntaxKind :: DYN_KW };
+    [ensures] => { $ crate :: SyntaxKind :: ENSURES_KW };
+    [exec] => { $ crate :: SyntaxKind :: EXEC_KW };
+    [exists] => { $ crate :: SyntaxKind :: EXISTS_KW };
+    [final] => { $ crate :: SyntaxKind :: FINAL_KW };
+    [forall] => { $ crate :: SyntaxKind :: FORALL_KW };
     [format_args] => { $ crate :: SyntaxKind :: FORMAT_ARGS_KW };
+    [ghost] => { $ crate :: SyntaxKind :: GHOST_KW };
+    [global] => { $ crate :: SyntaxKind :: GLOBAL_KW };
     [global_asm] => { $ crate :: SyntaxKind :: GLOBAL_ASM_KW };
+    [group] => { $ crate :: SyntaxKind :: GROUP_KW };
+    [has] => { $ crate :: SyntaxKind :: HAS_KW };
+    [implies] => { $ crate :: SyntaxKind :: IMPLIES_KW };
     [include_bytes] => { $ crate :: SyntaxKind :: INCLUDE_BYTES_KW };
     [inlateout] => { $ crate :: SyntaxKind :: INLATEOUT_KW };
     [inout] => { $ crate :: SyntaxKind :: INOUT_KW };
+    [invariant] => { $ crate :: SyntaxKind :: INVARIANT_KW };
+    [invariant_except_break] => { $ crate :: SyntaxKind :: INVARIANT_EXCEPT_BREAK_KW };
     [is] => { $ crate :: SyntaxKind :: IS_KW };
     [label] => { $ crate :: SyntaxKind :: LABEL_KW };
     [lateout] => { $ crate :: SyntaxKind :: LATEOUT_KW };
+    [layout] => { $ crate :: SyntaxKind :: LAYOUT_KW };
     [macro_rules] => { $ crate :: SyntaxKind :: MACRO_RULES_KW };
+    [matches] => { $ crate :: SyntaxKind :: MATCHES_KW };
     [may_unwind] => { $ crate :: SyntaxKind :: MAY_UNWIND_KW };
     [naked_asm] => { $ crate :: SyntaxKind :: NAKED_ASM_KW };
+    [no_unwind] => { $ crate :: SyntaxKind :: NO_UNWIND_KW };
     [nomem] => { $ crate :: SyntaxKind :: NOMEM_KW };
+    [none] => { $ crate :: SyntaxKind :: NONE_KW };
     [noreturn] => { $ crate :: SyntaxKind :: NORETURN_KW };
     [nostack] => { $ crate :: SyntaxKind :: NOSTACK_KW };
     [null] => { $ crate :: SyntaxKind :: NULL_KW };
     [offset_of] => { $ crate :: SyntaxKind :: OFFSET_OF_KW };
+    [open] => { $ crate :: SyntaxKind :: OPEN_KW };
+    [opens_invariants] => { $ crate :: SyntaxKind :: OPENS_INVARIANTS_KW };
     [options] => { $ crate :: SyntaxKind :: OPTIONS_KW };
     [out] => { $ crate :: SyntaxKind :: OUT_KW };
     [pattern_type] => { $ crate :: SyntaxKind :: PATTERN_TYPE_KW };
     [preserves_flags] => { $ crate :: SyntaxKind :: PRESERVES_FLAGS_KW };
+    [proof] => { $ crate :: SyntaxKind :: PROOF_KW };
+    [proof_fn] => { $ crate :: SyntaxKind :: PROOF_FN_KW };
     [pure] => { $ crate :: SyntaxKind :: PURE_KW };
     [raw] => { $ crate :: SyntaxKind :: RAW_KW };
     [readonly] => { $ crate :: SyntaxKind :: READONLY_KW };
+    [recommends] => { $ crate :: SyntaxKind :: RECOMMENDS_KW };
+    [requires] => { $ crate :: SyntaxKind :: REQUIRES_KW };
+    [returns] => { $ crate :: SyntaxKind :: RETURNS_KW };
     [safe] => { $ crate :: SyntaxKind :: SAFE_KW };
+    [size] => { $ crate :: SyntaxKind :: SIZE_KW };
+    [size_of] => { $ crate :: SyntaxKind :: SIZE_OF_KW };
+    [spec] => { $ crate :: SyntaxKind :: SPEC_KW };
     [sym] => { $ crate :: SyntaxKind :: SYM_KW };
+    [tracked] => { $ crate :: SyntaxKind :: TRACKED_KW };
+    [trigger] => { $ crate :: SyntaxKind :: TRIGGER_KW };
+    [uninterp] => { $ crate :: SyntaxKind :: UNINTERP_KW };
     [union] => { $ crate :: SyntaxKind :: UNION_KW };
+    [verus] => { $ crate :: SyntaxKind :: VERUS_KW };
+    [via] => { $ crate :: SyntaxKind :: VIA_KW };
+    [when] => { $ crate :: SyntaxKind :: WHEN_KW };
     [yeet] => { $ crate :: SyntaxKind :: YEET_KW };
     [async] => { $ crate :: SyntaxKind :: ASYNC_KW };
     [await] => { $ crate :: SyntaxKind :: AWAIT_KW };

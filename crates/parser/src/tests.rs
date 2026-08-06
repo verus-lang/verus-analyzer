@@ -77,6 +77,128 @@ fn parse_err() {
     }
 }
 
+#[test]
+fn verus_keywords_remain_valid_rust_identifiers() {
+    let source = r#"
+fn f(mut matches: Matches) {
+    for (_, m) in matches.by_node.drain() {
+        matches.matches.push(m);
+    }
+    matches.matches.sort_by(|a, b| {});
+    let _ = matches!(matches.kind, Kind::Plain | Kind::Self_);
+}
+"#;
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+}
+
+#[test]
+fn verus_syntax_extensions_parse() {
+    let cases = [
+        r#"
+verus! {
+    pub(crate) open spec fn compute(tracked x: int) -> (result: int)
+        requires x >= 0,
+        recommends x < 100,
+        ensures result >= x,
+        returns result
+        decreases 100 - x when x < 100 via compute
+        opens_invariants any
+        no_unwind when x == 0
+    {
+        result
+    }
+
+    proof fn prove(a: int) {
+        assert(a === a);
+        assert(a !== a + 1);
+        assert(a =~= a);
+        assert(a =~~= a);
+        assert(true ==> true);
+        assert(true <== true);
+        assert(true <==> true);
+        assume(exists|x: int| x == a);
+        let witness = choose|x: int| x == a;
+        let quantified = forall|x: int|
+            #![trigger identity(x)]
+            identity(x) == x;
+        assert forall|x: int| x == x by {}
+    }
+
+    spec fn conjunctions(a: bool, b: bool) -> bool {
+        &&& a ==> a
+        &&& b
+        ||| a
+        ||| b
+    }
+}
+"#,
+        r#"
+verus! {
+    ghost struct GhostState {
+        tracked token: Token,
+        ghost value: int,
+    }
+
+    tracked enum TrackedState {
+        Empty,
+        Full(tracked Token),
+    }
+
+    fn loops(v: Seq<int>) {
+        let ghost snapshot = v;
+        let tracked token: Token = get_token();
+        while ready()
+            invariant snapshot.len() == v.len(),
+            decreases remaining(),
+        {}
+        loop
+            invariant true,
+            ensures true,
+            decreases remaining(),
+        {}
+        for x in iter: v
+            invariant v has x,
+            decreases remaining(),
+        {}
+    }
+}
+"#,
+        r#"
+verus! {
+    global size_of usize == 8;
+    global layout Pair is size == 16, align == 8;
+
+    broadcast group arithmetic {
+        lemma_add,
+        lemma_mul,
+    }
+    broadcast use {lemma_add, lemma_mul};
+
+    assume_specification[external::function](x: int) -> int
+        requires x >= 0,
+        ensures x >= 0,
+    ;
+
+    proof fn postfix(v: Value, s: Set<Value>) {
+        let view = v@;
+        assert(v is Variant);
+        assert(v !is Other);
+        assert(s has v);
+        assert(s !has view);
+        assert(v->field == view);
+        assert(v matches Variant { .. });
+    }
+}
+"#,
+    ];
+
+    for source in cases {
+        let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+        assert!(!errors, "{actual}");
+    }
+}
+
 fn parse(entry: TopEntryPoint, text: &str, edition: Edition) -> (String, bool) {
     let lexed = LexedStr::new(edition, text);
     let input = lexed.to_input(edition);

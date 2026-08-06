@@ -46,6 +46,17 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
 ]);
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool, is_in_extern: bool) {
+    if p.at_contextual_kw(T![verus]) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+        p.bump_remap(T![verus]);
+        p.bump(T![!]);
+        p.bump(T!['{']);
+        while !p.at(EOF) && !p.at(T!['}']) {
+            item_or_macro(p, true, is_in_extern);
+        }
+        p.expect(T!['}']);
+        return;
+    }
+
     let m = p.start();
     attributes::outer_attrs(p);
 
@@ -111,6 +122,23 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
     // fn foo() { pub 92; }
     let has_visibility = opt_visibility(p, false);
 
+    let publish_before_fn = (p.at_contextual_kw(T![open])
+        && (p.nth_at(1, T![fn])
+            || p.nth_at_contextual_kw(1, T![spec])
+            || p.nth_at_contextual_kw(1, T![proof])
+            || p.nth_at_contextual_kw(1, T![exec])
+            || p.nth_at_contextual_kw(1, T![axiom])
+            || p.nth_at(1, T!['(']) && p.nth_at(2, T![in])))
+        || ((p.at_contextual_kw(T![closed]) || p.at_contextual_kw(T![uninterp]))
+            && (p.nth_at(1, T![fn])
+                || p.nth_at_contextual_kw(1, T![spec])
+                || p.nth_at_contextual_kw(1, T![proof])
+                || p.nth_at_contextual_kw(1, T![exec])
+                || p.nth_at_contextual_kw(1, T![axiom])));
+    if publish_before_fn {
+        verus::publish(p);
+    }
+
     let m = match opt_item_without_modifiers(p, m) {
         Ok(()) => return Ok(()),
         Err(m) => m,
@@ -118,6 +146,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
 
     let mut has_mods = false;
     let mut has_extern = false;
+    let mut saw_broadcast = false;
 
     if p.at(T![impl])
         && p.nth(1) == T!['(']
@@ -169,6 +198,19 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
         has_mods = true;
     }
 
+    if p.at_contextual_kw(T![broadcast])
+        && (p.nth_at(1, T![fn])
+            || p.nth_at(1, T![use])
+            || p.nth_at_contextual_kw(1, T![group])
+            || p.nth_at_contextual_kw(1, T![spec])
+            || p.nth_at_contextual_kw(1, T![proof])
+            || p.nth_at_contextual_kw(1, T![exec]))
+        && p.eat_contextual_kw(T![broadcast])
+    {
+        has_mods = true;
+        saw_broadcast = true;
+    }
+
     // test safe_outside_of_extern
     // fn foo() { safe = true; }
     if is_in_extern && p.at_contextual_kw(T![safe]) {
@@ -180,6 +222,15 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
         has_extern = true;
         has_mods = true;
         abi(p);
+    }
+    if (p.at_contextual_kw(T![spec]) && (p.nth_at(1, T![fn]) || p.nth_at(1, T!['('])))
+        || ((p.at_contextual_kw(T![proof])
+            || p.at_contextual_kw(T![exec])
+            || p.at_contextual_kw(T![axiom]))
+            && p.nth_at(1, T![fn]))
+    {
+        verus::fn_mode(p);
+        has_mods = true;
     }
     if p.at_contextual_kw(T![auto]) && p.nth(1) == T![trait] {
         p.bump_remap(T![auto]);
@@ -225,6 +276,16 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
         }
     }
 
+    if saw_broadcast && p.eat_contextual_kw(T![group]) {
+        verus::broadcast_group(p, m);
+        return Ok(());
+    }
+
+    if p.at_contextual_kw(T![assume_specification]) && matches!(p.nth(1), T!['['] | T![<]) {
+        assume_specification(p, m);
+        return Ok(());
+    }
+
     // items
     match p.current() {
         T![fn] => fn_(p, m),
@@ -237,6 +298,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
 
         T![type] if p.nth(1) == T![const] => consts::konst(p, m),
         T![type] => type_alias(p, m),
+
+        T![use] if saw_broadcast => {
+            verus::broadcast_use(p, m);
+        }
 
         // test extern_block
         // unsafe extern "C" {}
@@ -262,6 +327,19 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     let la = p.nth(1);
+    if p.at_contextual_kw(T![global]) {
+        verus::global_clause(p, m);
+        return Ok(());
+    }
+    if (p.at_contextual_kw(T![ghost]) || p.at_contextual_kw(T![tracked])) && p.nth_at(1, T![struct])
+    {
+        adt::strukt(p, m);
+        return Ok(());
+    }
+    if (p.at_contextual_kw(T![ghost]) || p.at_contextual_kw(T![tracked])) && p.nth_at(1, T![enum]) {
+        adt::enum_(p, m);
+        return Ok(());
+    }
     match p.current() {
         T![extern] if la == T![crate] => extern_crate(p, m),
         T![use] => use_item::use_(p, m),
@@ -445,7 +523,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // test function_ret_type
     // fn foo() {}
     // fn bar() -> () {}
-    if !opt_ret_type(p) {
+    if !verus::ret_type(p) {
         // test_err function_ret_type_missing_arrow
         // fn foo() usize {}
         // fn bar() super::Foo {}
@@ -463,6 +541,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // test function_where_clause
     // fn foo<T>() where T: Copy {}
     generic_params::opt_where_clause(p);
+    parse_verus_contracts(p);
 
     // test fn_decl
     // trait T { fn foo(); }
@@ -470,6 +549,55 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         expressions::block_expr(p);
     }
     m.complete(p, FN);
+}
+
+fn parse_verus_contracts(p: &mut Parser<'_>) {
+    if p.at_contextual_kw(T![by]) {
+        verus::prover(p);
+    }
+    if p.at_contextual_kw(T![requires]) {
+        verus::requires(p);
+    }
+    if p.at_contextual_kw(T![recommends]) {
+        verus::recommends(p);
+    }
+    if p.at_contextual_kw(T![ensures]) {
+        verus::ensures(p);
+    }
+    if p.at_contextual_kw(T![default_ensures]) {
+        verus::default_ensures(p);
+    }
+    if p.at_contextual_kw(T![returns]) {
+        verus::returns(p);
+    }
+    if p.at_contextual_kw(T![decreases]) {
+        verus::signature_decreases(p);
+    }
+    if p.at_contextual_kw(T![opens_invariants]) {
+        verus::opens_invariants(p);
+    }
+    if p.at_contextual_kw(T![no_unwind]) {
+        verus::no_unwind(p);
+    }
+}
+
+fn assume_specification(p: &mut Parser<'_>, m: Marker) {
+    p.expect_contextual_kw(T![assume_specification]);
+    generic_params::opt_generic_param_list(p);
+    if p.eat(T!['[']) {
+        paths::expr_path(p);
+        p.expect(T![']']);
+    } else {
+        p.error("expected path to the wrapped function");
+    }
+    if p.at(T!['(']) {
+        params::param_list_fn_def(p);
+    }
+    verus::ret_type(p);
+    generic_params::opt_where_clause(p);
+    parse_verus_contracts(p);
+    p.expect(T![;]);
+    m.complete(p, ASSUME_SPECIFICATION);
 }
 
 fn macro_call(p: &mut Parser<'_>, m: Marker) {

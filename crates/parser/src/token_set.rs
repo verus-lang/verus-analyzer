@@ -2,9 +2,11 @@
 
 use crate::SyntaxKind;
 
+const TOKEN_SET_WORDS: usize = (SyntaxKind::SHEBANG as usize / 64) + 1;
+
 /// A bit-set of `SyntaxKind`s
 #[derive(Clone, Copy)]
-pub(crate) struct TokenSet([u64; 3]);
+pub(crate) struct TokenSet([u64; TOKEN_SET_WORDS]);
 
 /// `TokenSet`s should only include token `SyntaxKind`s, so the discriminant of any passed/included
 /// `SyntaxKind` must *not* be greater than that of the last token `SyntaxKind`.
@@ -12,10 +14,10 @@ pub(crate) struct TokenSet([u64; 3]);
 const LAST_TOKEN_KIND_DISCRIMINANT: usize = SyntaxKind::SHEBANG as usize;
 
 impl TokenSet {
-    pub(crate) const EMPTY: TokenSet = TokenSet([0; 3]);
+    pub(crate) const EMPTY: TokenSet = TokenSet([0; TOKEN_SET_WORDS]);
 
     pub(crate) const fn new(kinds: &[SyntaxKind]) -> TokenSet {
-        let mut res = [0; 3];
+        let mut res = [0; TOKEN_SET_WORDS];
         let mut i = 0;
         while i < kinds.len() {
             let discriminant = kinds[i] as usize;
@@ -31,7 +33,13 @@ impl TokenSet {
     }
 
     pub(crate) const fn union(self, other: TokenSet) -> TokenSet {
-        TokenSet([self.0[0] | other.0[0], self.0[1] | other.0[1], self.0[2] | other.0[2]])
+        let mut result = [0; TOKEN_SET_WORDS];
+        let mut index = 0;
+        while index < TOKEN_SET_WORDS {
+            result[index] = self.0[index] | other.0[index];
+            index += 1;
+        }
+        TokenSet(result)
     }
 
     pub(crate) const fn contains(&self, kind: SyntaxKind) -> bool {
