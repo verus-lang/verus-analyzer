@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2026-07-29
+
+### Changed
+- Updated to Rust version to 1.97.1
+
 ## 2026-06-16
 
 ### Changed
