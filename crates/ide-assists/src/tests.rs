@@ -130,6 +130,24 @@ pub(crate) fn check_assist(
 }
 
 #[track_caller]
+pub(crate) fn check_assist_with_verus_error(
+    assist: Handler,
+    verus_errors: Vec<crate::proof_plumber_api::verus_error::VerusError>,
+    #[rust_analyzer::rust_fixture] ra_fixture_before: &str,
+    #[rust_analyzer::rust_fixture] ra_fixture_after: &str,
+) {
+    let ra_fixture_after = trim_indent(ra_fixture_after);
+    check_with_config_and_errors(
+        TEST_CONFIG,
+        assist,
+        ra_fixture_before,
+        ExpectedResult::After(&ra_fixture_after),
+        None,
+        verus_errors,
+    );
+}
+
+#[track_caller]
 pub(crate) fn check_assist_with_config(
     assist: Handler,
     config: AssistConfig,
@@ -328,6 +346,18 @@ fn check_with_config(
     expected: ExpectedResult<'_>,
     assist_label: Option<&str>,
 ) {
+    check_with_config_and_errors(config, handler, before, expected, assist_label, Vec::new());
+}
+
+#[track_caller]
+fn check_with_config_and_errors(
+    config: AssistConfig,
+    handler: Handler,
+    before: &str,
+    expected: ExpectedResult<'_>,
+    assist_label: Option<&str>,
+    verus_errors: Vec<crate::proof_plumber_api::verus_error::VerusError>,
+) {
     let _tracing = setup_tracing();
     let (mut db, file_with_caret_id, range_or_offset) = RootDatabase::with_range_or_offset(before);
     db.enable_proc_attr_macros();
@@ -339,7 +369,7 @@ fn check_with_config(
 
     let frange = hir::FileRange { file_id: file_with_caret_id, range: range_or_offset.into() };
 
-    let ctx = AssistContext::new(sema, &config, frange);
+    let ctx = AssistContext::new_with_verus_errors(sema, &config, frange, verus_errors);
     let resolve = match expected {
         ExpectedResult::Unresolved | ExpectedResult::Label(_) => AssistResolveStrategy::None,
         _ => AssistResolveStrategy::All,

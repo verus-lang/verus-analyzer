@@ -523,7 +523,7 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
     // test function_ret_type
     // fn foo() {}
     // fn bar() -> () {}
-    if !verus::ret_type(p) {
+    if !verus::ret_type(p) && !verus::at_contract_boundary(p) {
         // test_err function_ret_type_missing_arrow
         // fn foo() usize {}
         // fn bar() super::Foo {}

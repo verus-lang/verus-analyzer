@@ -3,6 +3,9 @@
 pub(crate) mod nodes;
 #[rustfmt::skip]
 pub(crate) mod tokens;
+#[rustfmt::skip]
+#[allow(unused_mut)]
+pub mod vst_nodes;
 
 use crate::{
     AstNode,

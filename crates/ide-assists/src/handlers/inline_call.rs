@@ -269,15 +269,15 @@ pub(crate) fn inline_call(acc: &mut Assists, ctx: &AssistContext<'_, '_>) -> Opt
     })
 }
 
-struct CallInfo {
-    node: ast::CallableExpr,
-    arguments: Vec<ast::Expr>,
-    generic_arg_list: Option<ast::GenericArgList>,
-    krate: Crate,
+pub(crate) struct CallInfo {
+    pub(crate) node: ast::CallableExpr,
+    pub(crate) arguments: Vec<ast::Expr>,
+    pub(crate) generic_arg_list: Option<ast::GenericArgList>,
+    pub(crate) krate: Crate,
 }
 
 impl CallInfo {
-    fn from_name_ref(name_ref: ast::NameRef, krate: Crate) -> Option<CallInfo> {
+    pub(crate) fn from_name_ref(name_ref: ast::NameRef, krate: Crate) -> Option<CallInfo> {
         let parent = name_ref.syntax().parent()?;
         if let Some(call) = ast::MethodCallExpr::cast(parent.clone()) {
             let receiver = call.receiver()?;
@@ -306,7 +306,7 @@ impl CallInfo {
     }
 }
 
-fn get_fn_params<'db>(
+pub(crate) fn get_fn_params<'db>(
     db: &'db dyn HirDatabase,
     function: hir::Function,
     param_list: &ast::ParamList,
@@ -335,7 +335,7 @@ fn get_fn_params<'db>(
     Some(params)
 }
 
-fn inline<'db>(
+pub(crate) fn inline<'db>(
     sema: &Semantics<'db, RootDatabase>,
     function_def_file_id: EditionedFileId,
     function: hir::Function,

@@ -19,6 +19,8 @@ itertools.workspace = true
 either.workspace = true
 smallvec.workspace = true
 tracing = { workspace = true, features = ["attributes"] }
+tempfile = "3.23.0"
+verusfmt = { version = "0.5.5", default-features = false }
 
 # local deps
 stdx.workspace = true
@@ -30,11 +32,12 @@ hir.workspace = true
 expect-test = "1.5.1"
 
 # local deps
-test-utils.workspace = true
 test-fixture.workspace = true
+test-utils.workspace = true
 
 [features]
 in-rust-tree = []
+proof-action = []
 
 [lints]
 workspace = true

@@ -12,7 +12,7 @@ fn expect_kw(p: &mut Parser<'_>, kw: SyntaxKind) {
     p.expect_contextual_kw(kw);
 }
 
-fn at_contract_boundary(p: &Parser<'_>) -> bool {
+pub(super) fn at_contract_boundary(p: &Parser<'_>) -> bool {
     p.at(EOF)
         || p.at(T!['{'])
         || p.at(T![;])
@@ -255,7 +255,7 @@ pub(super) fn final_expr(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
 
 pub(super) fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     expect_kw(p, T![assert]);
-    if eat_kw(p, T![forall]) {
+    if at_kw(p, T![forall]) {
         closure_expr(p, None, true);
         if eat_kw(p, T![implies]) {
             expressions::expr(p);

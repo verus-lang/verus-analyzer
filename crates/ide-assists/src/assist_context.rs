@@ -11,6 +11,7 @@ use syntax::{
 
 use crate::{
     Assist, AssistId, AssistKind, AssistResolveStrategy, GroupLabel, assist_config::AssistConfig,
+    proof_plumber_api::verus_error::VerusError,
 };
 
 pub(crate) use ide_db::source_change::SourceChangeBuilder;
@@ -55,6 +56,7 @@ pub(crate) struct AssistContext<'a, 'db> {
     token_at_offset: TokenAtOffset<SyntaxToken>,
     // We cache this here to speed up things slightly
     covering_element: SyntaxElement,
+    verus_errors: Vec<VerusError>,
 }
 
 impl<'a, 'db> AssistContext<'a, 'db> {
@@ -62,6 +64,15 @@ impl<'a, 'db> AssistContext<'a, 'db> {
         sema: Semantics<'db, RootDatabase>,
         config: &'a AssistConfig,
         frange: FileRange,
+    ) -> AssistContext<'a, 'db> {
+        Self::new_with_verus_errors(sema, config, frange, Vec::new())
+    }
+
+    pub(crate) fn new_with_verus_errors(
+        sema: Semantics<'db, RootDatabase>,
+        config: &'a AssistConfig,
+        frange: FileRange,
+        verus_errors: Vec<VerusError>,
     ) -> AssistContext<'a, 'db> {
         let source_file = sema.parse(frange.file_id);
 
@@ -92,6 +103,7 @@ impl<'a, 'db> AssistContext<'a, 'db> {
             trimmed_range,
             token_at_offset,
             covering_element,
+            verus_errors,
         }
     }
 
@@ -130,6 +142,10 @@ impl<'a, 'db> AssistContext<'a, 'db> {
         &self.source_file
     }
 
+    pub(crate) fn verus_errors(&self) -> Vec<VerusError> {
+        self.verus_errors.clone()
+    }
+
     pub(crate) fn token_at_offset(&self) -> TokenAtOffset<SyntaxToken> {
         self.token_at_offset.clone()
     }
@@ -147,6 +163,9 @@ impl<'a, 'db> AssistContext<'a, 'db> {
     }
     pub(crate) fn find_node_at_range<N: AstNode>(&self) -> Option<N> {
         find_node_at_range(self.source_file.syntax(), self.trimmed_range)
+    }
+    pub(crate) fn find_node_at_given_range<N: AstNode>(&self, range: TextRange) -> Option<N> {
+        find_node_at_range(self.source_file.syntax(), range)
     }
     pub(crate) fn find_node_at_offset_with_descend<N: AstNode>(&self) -> Option<N> {
         self.sema.find_node_at_offset_with_descend(self.source_file.syntax(), self.offset())

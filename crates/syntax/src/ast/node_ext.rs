@@ -33,6 +33,18 @@ impl ast::Name {
     }
 }
 
+impl ast::ArrowExpr {
+    pub fn value(&self) -> Option<SyntaxToken> {
+        support::token(self.syntax(), T![int_number])
+    }
+}
+
+impl ast::VerusGlobal {
+    pub fn value(&self) -> Option<SyntaxToken> {
+        support::token(self.syntax(), T![int_number])
+    }
+}
+
 impl ast::NameRef {
     pub fn text(&self) -> &str {
         text_of_first_token(self.syntax())

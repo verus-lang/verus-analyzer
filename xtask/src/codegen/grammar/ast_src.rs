@@ -334,12 +334,13 @@ pub(crate) struct AstNodeSrc {
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) enum Field {
-    Token { name: Option<String>, token: String },
+    Token { name: Option<String>, token: String, cardinality: Cardinality },
     Node { name: String, ty: String, cardinality: Cardinality },
 }
 
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) enum Cardinality {
+    One,
     Optional,
     Many,
 }

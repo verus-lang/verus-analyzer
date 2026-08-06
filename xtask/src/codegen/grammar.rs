@@ -24,6 +24,7 @@ use crate::{
 };
 
 mod ast_src;
+mod sourcegen_vst;
 use self::ast_src::{AstEnumSrc, AstNodeSrc, AstSrc, Cardinality, Field, KindsSrc};
 
 pub(crate) fn generate(check: bool) {
@@ -31,7 +32,7 @@ pub(crate) fn generate(check: bool) {
         .unwrap()
         .parse()
         .unwrap();
-    let ast = lower(&grammar);
+    let ast = lower(&grammar, false);
     let kinds_src = generate_kind_src(&ast.nodes, &ast.enums, &grammar);
 
     let syntax_kinds = generate_syntax_kinds(kinds_src);
@@ -60,6 +61,10 @@ pub(crate) fn generate(check: bool) {
         &ast_nodes,
         check,
     );
+
+    let vst = sourcegen_vst::generate_vst(kinds_src, &lower(&grammar, true));
+    let vst_file = project_root().join("crates/syntax/src/ast/generated/vst_nodes.rs");
+    ensure_file_contents(crate::flags::CodegenType::Grammar, vst_file.as_path(), &vst, check);
 }
 
 fn generate_tokens(grammar: &AstSrc) -> String {
@@ -775,10 +780,28 @@ fn pluralize(s: &str) -> String {
 }
 
 impl Field {
-    fn is_many(&self) -> bool {
+    pub(crate) fn is_many(&self) -> bool {
         matches!(self, Field::Node { cardinality: Cardinality::Many, .. })
     }
-    fn token_kind(&self) -> Option<proc_macro2::TokenStream> {
+    pub(crate) fn is_one(&self) -> bool {
+        matches!(self, Field::Node { cardinality: Cardinality::One, .. })
+    }
+    pub(crate) fn is_token_one(&self) -> bool {
+        matches!(self, Field::Token { cardinality: Cardinality::One, .. })
+    }
+    pub(crate) fn stores_token_text(&self) -> bool {
+        match self {
+            Field::Token { name: Some(_), .. } => true,
+            Field::Token { token, .. } => {
+                matches!(
+                    clean_token_name(token).as_str(),
+                    "ident" | "int_number" | "lifetime_ident"
+                )
+            }
+            Field::Node { .. } => false,
+        }
+    }
+    pub(crate) fn token_kind(&self) -> Option<proc_macro2::TokenStream> {
         match self {
             Field::Token { token, .. } => {
                 let token: proc_macro2::TokenStream = token.parse().unwrap();
@@ -787,7 +810,7 @@ impl Field {
             _ => None,
         }
     }
-    fn method_name(&self) -> String {
+    pub(crate) fn method_name(&self) -> String {
         match self {
             Field::Token { name, token, .. } => {
                 if let Some(name) = name {
@@ -827,16 +850,14 @@ impl Field {
                 };
                 format!("{name}_token",)
             }
-            Field::Node { name, .. } => {
-                if name == "type" {
-                    String::from("ty")
-                } else {
-                    name.to_owned()
-                }
-            }
+            Field::Node { name, .. } => match name.as_str() {
+                "type" => String::from("ty"),
+                "trait" => String::from("trait_"),
+                _ => name.to_owned(),
+            },
         }
     }
-    fn ty(&self) -> proc_macro2::Ident {
+    pub(crate) fn ty(&self) -> proc_macro2::Ident {
         match self {
             Field::Token { .. } => format_ident!("SyntaxToken"),
             Field::Node { ty, .. } => format_ident!("{}", ty),
@@ -849,7 +870,7 @@ fn clean_token_name(name: &str) -> String {
     if cleaned.is_empty() { name.to_owned() } else { cleaned.to_owned() }
 }
 
-fn lower(grammar: &Grammar) -> AstSrc {
+fn lower(grammar: &Grammar, is_vst: bool) -> AstSrc {
     let mut res = AstSrc {
         tokens:
             "Whitespace Comment String ByteString CString IntNumber FloatNumber Char Byte Ident"
@@ -872,7 +893,7 @@ fn lower(grammar: &Grammar) -> AstSrc {
             }
             None => {
                 let mut fields = Vec::new();
-                lower_rule(&mut fields, grammar, None, rule);
+                lower_rule(&mut fields, grammar, None, rule, is_vst, false, false);
                 res.nodes.push(AstNodeSrc { doc: Vec::new(), name, traits: Vec::new(), fields });
             }
         }
@@ -880,17 +901,19 @@ fn lower(grammar: &Grammar) -> AstSrc {
 
     deduplicate_fields(&mut res);
     extract_enums(&mut res);
-    extract_struct_traits(&mut res);
+    extract_struct_traits(&mut res, is_vst);
     extract_enum_traits(&mut res);
     res.nodes.sort_by_key(|it| it.name.clone());
     res.enums.sort_by_key(|it| it.name.clone());
     res.tokens.sort();
     res.nodes.iter_mut().for_each(|it| {
         it.traits.sort();
-        it.fields.sort_by_key(|it| match it {
-            Field::Token { token, .. } => (true, token.clone()),
-            Field::Node { name, .. } => (false, name.clone()),
-        });
+        if !is_vst {
+            it.fields.sort_by_key(|it| match it {
+                Field::Token { token, .. } => (true, token.clone()),
+                Field::Node { name, .. } => (false, name.clone()),
+            });
+        }
     });
     res.enums.iter_mut().for_each(|it| {
         it.traits.sort();
@@ -915,7 +938,15 @@ fn lower_enum(grammar: &Grammar, rule: &Rule) -> Option<Vec<String>> {
     Some(variants)
 }
 
-fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, rule: &Rule) {
+fn lower_rule(
+    acc: &mut Vec<Field>,
+    grammar: &Grammar,
+    label: Option<&String>,
+    rule: &Rule,
+    is_vst: bool,
+    inside_opt: bool,
+    inside_alt: bool,
+) {
     if lower_separated_list(acc, grammar, label, rule) {
         return;
     }
@@ -924,7 +955,16 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         Rule::Node(node) => {
             let ty = grammar[*node].name.clone();
             let name = label.cloned().unwrap_or_else(|| to_lower_snake_case(&ty));
-            let field = Field::Node { name, ty, cardinality: Cardinality::Optional };
+            let cardinality = if is_vst
+                && !inside_opt
+                && !inside_alt
+                && !matches!(ty.as_str(), "Pat" | "PathType" | "ParamList" | "Type")
+            {
+                Cardinality::One
+            } else {
+                Cardinality::Optional
+            };
+            let field = Field::Node { name, ty, cardinality };
             acc.push(field);
         }
         Rule::Token(token) => {
@@ -932,7 +972,12 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
             if "[]{}()".contains(&token) {
                 token = format!("'{token}'");
             }
-            let field = Field::Token { name: label.cloned(), token };
+            let cardinality = if is_vst && !inside_opt && !inside_alt {
+                Cardinality::One
+            } else {
+                Cardinality::Optional
+            };
+            let field = Field::Token { name: label.cloned(), token, cardinality };
             acc.push(field);
         }
         Rule::Rep(inner) => {
@@ -966,17 +1011,22 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
                     | "args"
                     | "body"
             );
-            if manually_implemented {
+            if manually_implemented && !is_vst {
                 return;
             }
-            lower_rule(acc, grammar, Some(l), rule);
+            lower_rule(acc, grammar, Some(l), rule, is_vst, inside_opt, inside_alt);
         }
-        Rule::Seq(rules) | Rule::Alt(rules) => {
+        Rule::Seq(rules) => {
             for rule in rules {
-                lower_rule(acc, grammar, label, rule)
+                lower_rule(acc, grammar, label, rule, is_vst, inside_opt, inside_alt)
             }
         }
-        Rule::Opt(rule) => lower_rule(acc, grammar, label, rule),
+        Rule::Alt(rules) => {
+            for rule in rules {
+                lower_rule(acc, grammar, label, rule, is_vst, inside_opt, true)
+            }
+        }
+        Rule::Opt(rule) => lower_rule(acc, grammar, label, rule, is_vst, true, inside_alt),
     }
 }
 
@@ -1021,7 +1071,7 @@ fn lower_separated_list(
     match nt {
         Either::Right(token) => {
             let token = clean_token_name(&grammar[*token].name);
-            let field = Field::Token { token, name: None };
+            let field = Field::Token { token, name: None, cardinality: Cardinality::Optional };
             acc.push(field);
         }
         Either::Left(node) => {
@@ -1042,6 +1092,19 @@ fn deduplicate_fields(ast: &mut AstSrc) {
                 let f1 = &node.fields[i];
                 let f2 = &node.fields[j];
                 if f1 == f2 {
+                    node.fields.remove(i);
+                    continue 'outer;
+                }
+                let same_name = match (f1, f2) {
+                    (Field::Node { name: left, .. }, Field::Node { name: right, .. }) => {
+                        left == right
+                    }
+                    (Field::Token { .. }, Field::Token { .. }) => {
+                        f1.method_name() == f2.method_name()
+                    }
+                    _ => false,
+                };
+                if same_name {
                     node.fields.remove(i);
                     continue 'outer;
                 }
@@ -1083,10 +1146,10 @@ const TRAITS: &[(&str, &[&str])] = &[
     ("HasArgList", &["arg_list"]),
 ];
 
-fn extract_struct_traits(ast: &mut AstSrc) {
+fn extract_struct_traits(ast: &mut AstSrc, is_vst: bool) {
     for node in &mut ast.nodes {
         for (name, methods) in TRAITS {
-            extract_struct_trait(node, name, methods);
+            extract_struct_trait(node, name, methods, is_vst);
         }
     }
 
@@ -1121,7 +1184,7 @@ fn extract_struct_traits(ast: &mut AstSrc) {
     }
 }
 
-fn extract_struct_trait(node: &mut AstNodeSrc, trait_name: &str, methods: &[&str]) {
+fn extract_struct_trait(node: &mut AstNodeSrc, trait_name: &str, methods: &[&str], is_vst: bool) {
     let mut to_remove = Vec::new();
     for (i, field) in node.fields.iter().enumerate() {
         let method_name = field.method_name();
@@ -1131,7 +1194,9 @@ fn extract_struct_trait(node: &mut AstNodeSrc, trait_name: &str, methods: &[&str
     }
     if to_remove.len() == methods.len() {
         node.traits.push(trait_name.to_owned());
-        node.remove_field(to_remove);
+        if !is_vst {
+            node.remove_field(to_remove);
+        }
     }
 }
 

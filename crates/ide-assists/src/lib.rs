@@ -64,6 +64,7 @@
 
 mod assist_config;
 mod assist_context;
+pub mod proof_plumber_api;
 #[cfg(test)]
 mod tests;
 pub mod utils;
@@ -92,6 +93,28 @@ pub fn assists(
     let sema = Semantics::new(db);
     let file_id = sema.attach_first_edition(range.file_id);
     let ctx = AssistContext::new(sema, config, hir::FileRange { file_id, range: range.range });
+    let mut acc = Assists::new(&ctx, resolve);
+    handlers::all().iter().for_each(|handler| {
+        handler(&mut acc, &ctx);
+    });
+    acc.finish()
+}
+
+pub fn assists_with_verus_errors(
+    db: &RootDatabase,
+    config: &AssistConfig,
+    resolve: AssistResolveStrategy,
+    range: ide_db::FileRange,
+    verus_errors: Vec<proof_plumber_api::verus_error::VerusError>,
+) -> Vec<Assist> {
+    let sema = Semantics::new(db);
+    let file_id = sema.attach_first_edition(range.file_id);
+    let ctx = AssistContext::new_with_verus_errors(
+        sema,
+        config,
+        hir::FileRange { file_id, range: range.range },
+        verus_errors,
+    );
     let mut acc = Assists::new(&ctx, resolve);
     handlers::all().iter().for_each(|handler| {
         handler(&mut acc, &ctx);
@@ -178,7 +201,7 @@ mod handlers {
     mod generate_new;
     mod generate_single_field_struct_from;
     mod generate_trait_from_impl;
-    mod inline_call;
+    pub(crate) mod inline_call;
     mod inline_const_as_literal;
     mod inline_local_variable;
     mod inline_macro;
@@ -199,6 +222,7 @@ mod handlers {
     mod normalize_import;
     mod number_representation;
     mod promote_local_to_const;
+    mod proof_action;
     mod pull_assignment_up;
     mod qualify_method_call;
     mod qualify_path;
@@ -409,6 +433,19 @@ mod handlers {
             generate_getter_or_setter::generate_setter,
             generate_delegate_methods::generate_delegate_methods,
             generate_deref::generate_deref,
+            proof_action::insert_assert_by_block::assert_by,
+            proof_action::insert_failing_postcondition::intro_failing_ensures,
+            proof_action::insert_failing_precondition::intro_failing_requires,
+            proof_action::weakest_pre_step::wp_move_assertion,
+            proof_action::reveal_opaque_in_by_block::assert_by_reveal,
+            proof_action::reveal_opaque_above::insert_reveal,
+            proof_action::convert_imply_to_if::imply_to_if,
+            proof_action::split_imply_ensures::split_imply_ensures,
+            proof_action::intro_forall::intro_forall,
+            proof_action::intro_forall_implies::intro_forall_implies,
+            proof_action::intro_assume_false::by_assume_false,
+            proof_action::split_smaller_or_equal_to::split_smaller_or_equal_to,
+            proof_action::seq_index_inbound::seq_index_inbound,
             // Are you sure you want to add new assist here, and not to the
             // sorted list above?
         ]
