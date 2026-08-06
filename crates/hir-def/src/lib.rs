@@ -57,7 +57,7 @@ pub mod import_map;
 pub mod visibility;
 
 use intern::Interned;
-pub use rustc_abi as layout;
+pub extern crate ra_ap_rustc_abi as layout;
 use triomphe::Arc;
 
 #[cfg(test)]
