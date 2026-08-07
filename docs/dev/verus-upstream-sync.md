@@ -22,6 +22,13 @@ The main fork-specific surfaces are:
 - Verifier command construction, JSON diagnostic parsing, and proof-action error context.
 - VS Code Verus acquisition and `VERUS_BINARY_PATH` propagation.
 - User-facing `verus-analyzer` protocol, configuration, command, and artifact names.
+- Fork CI and release workflow repository gates, VSIX names, and marketplace publishing.
 
 Archive the pre-sync tip before each update and checkpoint each layer after its focused tests pass.
 This keeps future conflict diagnosis and regression bisection tractable.
+
+Before declaring a sync complete, refresh `upstream/master`, run both the self-contained nextest
+suite and the verifier-backed proof-action suite, validate the TypeScript extension, and smoke-test
+the host release bundle. Search release workflows and package metadata for stale upstream artifact
+or repository names; internal Rust crate and binary names may remain `rust-analyzer` where changing
+them would add no user-facing value.

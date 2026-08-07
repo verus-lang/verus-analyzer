@@ -5,6 +5,7 @@ import {
     determineNewProjectOpenAction,
     validateNewProjectName,
 } from "../../src/new_project";
+import { proofBlockStartLines } from "../../src/commands";
 import type { Context } from ".";
 
 export async function getTests(ctx: Context) {
@@ -75,6 +76,22 @@ export async function getTests(ctx: Context) {
 
         suite.addTest("builds library cargo args", async () => {
             assert.deepEqual(cargoNewArgs("lib", "demo"), ["new", "--lib", "demo"]);
+        });
+    });
+
+    await ctx.suite("Proof block folding", (suite) => {
+        suite.addTest("filters, orders, and deduplicates proof block ranges", async () => {
+            const ranges = [
+                { startLine: 2, endLine: 12, kind: "region", collapsedText: "proof_block" },
+                { startLine: 5, endLine: 8, kind: "region", collapsedText: "proof_block" },
+                { startLine: 2, endLine: 9, kind: "region", collapsedText: "proof_block" },
+                { startLine: 20, endLine: 20, kind: "region", collapsedText: "proof_block" },
+                { startLine: 30, endLine: 35, kind: "region" },
+                { startLine: 40, endLine: 45, kind: "imports", collapsedText: "proof_block" },
+            ];
+
+            assert.deepEqual(proofBlockStartLines(ranges, true), [5, 2]);
+            assert.deepEqual(proofBlockStartLines(ranges, false), [2, 5]);
         });
     });
 }

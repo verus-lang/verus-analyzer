@@ -105,6 +105,18 @@ pub(super) fn atom_expr(
     if p.at_contextual_kw(T![proof_fn]) {
         return Some((closure_expr(p), BlockLike::NotBlock));
     }
+    // test verus_proof_block
+    // fn main() {
+    //     proof {
+    //         assert(true);
+    //     }
+    // }
+    if p.at_contextual_kw(T![proof]) && p.nth_at(1, T!['{']) {
+        let m = p.start();
+        verus::fn_mode(p);
+        stmt_list(p);
+        return Some((m.complete(p, BLOCK_EXPR), BlockLike::Block));
+    }
     if p.at_contextual_kw(T![matches]) && p.nth_at(1, T![!]) {
         let m = p.start();
         let macro_call = p.start();

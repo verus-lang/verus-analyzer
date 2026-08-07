@@ -1,0 +1,34 @@
+SOURCE_FILE
+  FN
+    FN_KW "fn"
+    WHITESPACE " "
+    NAME
+      IDENT "main"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    BLOCK_EXPR
+      STMT_LIST
+        L_CURLY "{"
+        WHITESPACE "\n    "
+        BLOCK_EXPR
+          FN_MODE
+            PROOF_KW "proof"
+          WHITESPACE " "
+          STMT_LIST
+            L_CURLY "{"
+            WHITESPACE "\n        "
+            EXPR_STMT
+              ASSERT_EXPR
+                ASSERT_KW "assert"
+                L_PAREN "("
+                LITERAL
+                  TRUE_KW "true"
+                R_PAREN ")"
+              SEMICOLON ";"
+            WHITESPACE "\n    "
+            R_CURLY "}"
+        WHITESPACE "\n"
+        R_CURLY "}"
+  WHITESPACE "\n"

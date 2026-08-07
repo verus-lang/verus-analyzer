@@ -36,8 +36,9 @@
     ],
     "scripts": {
         "vscode:prepublish": "npm run build-base -- --minify",
-        "package": "vsce package -o verus-analyzer.vsix",
-        "build-base": "esbuild ./src/main.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node --target=node20",
+        "package": "vsce package --no-dependencies -o verus-analyzer.vsix",
+        "copy-webview-assets": "node ./scripts/copy-webview-assets.mjs",
+        "build-base": "npm run copy-webview-assets && esbuild ./src/main.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node --target=node20",
         "build": "npm run build-base -- --sourcemap",
         "watch": "npm run build-base -- --sourcemap --watch",
         "format": "node --experimental-strip-types node_modules/prettier/bin/prettier.cjs . --write",
@@ -119,6 +120,16 @@
             }
         ],
         "commands": [
+            {
+                "command": "verus-analyzer.foldProofBlocks",
+                "title": "Fold Proof Blocks",
+                "category": "verus-analyzer"
+            },
+            {
+                "command": "verus-analyzer.unfoldProofBlocks",
+                "title": "Unfold Proof Blocks",
+                "category": "verus-analyzer"
+            },
             {
                 "command": "verus-analyzer.viewHir",
                 "title": "View Hir",
@@ -369,11 +380,21 @@
                 "command": "verus-analyzer.joinLines",
                 "key": "ctrl+shift+j",
                 "when": "editorTextFocus && editorLangId == rust"
+            },
+            {
+                "command": "verus-analyzer.foldProofBlocks",
+                "key": "ctrl+alt+[",
+                "when": "editorTextFocus && editorLangId == rust"
+            },
+            {
+                "command": "verus-analyzer.unfoldProofBlocks",
+                "key": "ctrl+alt+]",
+                "when": "editorTextFocus && editorLangId == rust"
             }
         ],
         "configuration": [
             {
-                "title": "Rust Analyzer"
+                "title": "Verus Analyzer"
             },
             {
                 "title": "Assist"
@@ -639,7 +660,7 @@
                                 },
                                 {
                                     "scheme": "output",
-                                    "pattern": "extension-output-rust-lang.verus-analyzer*"
+                                    "pattern": "extension-output-verus-lang.verus-analyzer*"
                                 }
                             ]
                         }
@@ -710,7 +731,7 @@
                     },
                     "verus-analyzer.trace.extension": {
                         "description": "Enable logging of VS Code extensions itself.",
-                        "markdownDeprecationMessage": "Log level is now controlled by the [Developer: Set Log Level...](command:workbench.action.setLogLevel) command.You can set the log level for the current session and also the default log level from there. This is also available by clicking the gear icon on the OUTPUT tab when Rust Analyzer Client is visible or by passing the --log rust-lang.verus-analyzer:debug parameter to VS Code.",
+                        "markdownDeprecationMessage": "Log level is now controlled by the [Developer: Set Log Level...](command:workbench.action.setLogLevel) command.You can set the log level for the current session and also the default log level from there. This is also available by clicking the gear icon on the OUTPUT tab when Verus Analyzer Client is visible or by passing the --log verus-lang.verus-analyzer:debug parameter to VS Code.",
                         "type": "boolean",
                         "default": false
                     }

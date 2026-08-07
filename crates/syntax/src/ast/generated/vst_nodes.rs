@@ -253,6 +253,7 @@ pub struct BecomeExpr {
 pub struct BlockExpr {
     pub attrs: Vec<Attr>,
     pub label: Option<Box<Label>>,
+    pub fn_mode: Option<Box<FnMode>>,
     pub try_block_modifier: Option<Box<TryBlockModifier>>,
     pub unsafe_token: bool,
     pub async_token: bool,
@@ -2489,6 +2490,10 @@ impl TryFrom<super::nodes::BlockExpr> for BlockExpr {
                 .collect::<Result<Vec<Attr>, String>>()?,
             label: match item.label() {
                 Some(it) => Some(Box::new(Label::try_from(it)?)),
+                None => None,
+            },
+            fn_mode: match item.fn_mode() {
+                Some(it) => Some(Box::new(FnMode::try_from(it)?)),
                 None => None,
             },
             try_block_modifier: match item.try_block_modifier() {
@@ -7110,6 +7115,10 @@ impl std::fmt::Display for BlockExpr {
         let mut s = String::new();
         s.push_str(&self.attrs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
         if let Some(it) = &self.label {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.fn_mode {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
@@ -12835,6 +12844,7 @@ impl BlockExpr {
         Self {
             attrs: vec![],
             label: None,
+            fn_mode: None,
             try_block_modifier: None,
             unsafe_token: false,
             async_token: false,

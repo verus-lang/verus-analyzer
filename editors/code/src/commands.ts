@@ -31,6 +31,7 @@ import { HOVER_REFERENCE_COMMAND } from "./client";
 import type { DependencyId } from "./dependencies_provider";
 import { log } from "./util";
 import type { SyntaxElement } from "./syntax_tree_provider";
+import { EXTENSION_ID } from "./config";
 
 export * from "./run";
 export { newProject } from "./new_project";
@@ -854,7 +855,7 @@ export function viewItemTree(ctx: CtxInit): Cmd {
 
 function crateGraph(ctx: CtxInit, full: boolean): Cmd {
     return async () => {
-        const nodeModulesPath = vscode.Uri.file(path.join(ctx.extensionPath, "node_modules"));
+        const webviewAssetsPath = vscode.Uri.file(path.join(ctx.extensionPath, "out", "webview"));
 
         const panel = vscode.window.createWebviewPanel(
             "verus-analyzer.crate-graph",
@@ -863,7 +864,7 @@ function crateGraph(ctx: CtxInit, full: boolean): Cmd {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
-                localResourceRoots: [nodeModulesPath],
+                localResourceRoots: [webviewAssetsPath],
             },
         );
         const params = {
@@ -871,7 +872,7 @@ function crateGraph(ctx: CtxInit, full: boolean): Cmd {
         };
         const client = ctx.client;
         const dot = await client.sendRequest(ra.viewCrateGraph, params);
-        const uri = panel.webview.asWebviewUri(nodeModulesPath);
+        const uri = panel.webview.asWebviewUri(webviewAssetsPath);
 
         const html = `
             <!DOCTYPE html>
@@ -891,9 +892,9 @@ function crateGraph(ctx: CtxInit, full: boolean): Cmd {
                 </style>
             </head>
             <body>
-                <script type="text/javascript" src="${uri}/d3/dist/d3.min.js"></script>
-                <script type="text/javascript" src="${uri}/@hpcc-js/wasm/dist/graphviz.umd.js"></script>
-                <script type="text/javascript" src="${uri}/d3-graphviz/build/d3-graphviz.min.js"></script>
+                <script type="text/javascript" src="${uri}/d3.min.js"></script>
+                <script type="text/javascript" src="${uri}/graphviz.umd.js"></script>
+                <script type="text/javascript" src="${uri}/d3-graphviz.min.js"></script>
                 <div id="graph"></div>
                 <script>
                     let dot = \`${dot}\`;
@@ -1637,11 +1638,70 @@ export function toggleLSPLogs(ctx: Ctx): Cmd {
     };
 }
 
+interface FoldingRange {
+    startLine: number;
+    endLine: number;
+    kind?: string;
+    collapsedText?: string;
+}
+
+export function proofBlockStartLines(
+    ranges: readonly FoldingRange[],
+    innerFirst: boolean,
+): number[] {
+    const proofRanges = ranges.filter(
+        (range) =>
+            range.kind === "region" &&
+            range.collapsedText === "proof_block" &&
+            range.endLine > range.startLine,
+    );
+    if (innerFirst) {
+        proofRanges.sort(
+            (left, right) => left.endLine - left.startLine - (right.endLine - right.startLine),
+        );
+    }
+    return [...new Set(proofRanges.map((range) => range.startLine))];
+}
+
+async function proofBlockFoldingRanges(ctx: CtxInit): Promise<FoldingRange[]> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return [];
+
+    return (
+        ((await ctx.client.sendRequest("textDocument/foldingRange", {
+            textDocument: ctx.client.code2ProtocolConverter.asTextDocumentIdentifier(
+                editor.document,
+            ),
+        })) as FoldingRange[] | null) ?? []
+    );
+}
+
+export function foldProofBlocks(ctx: CtxInit): Cmd {
+    return async () => {
+        const lines = proofBlockStartLines(await proofBlockFoldingRanges(ctx), true);
+        if (lines.length === 0) return;
+
+        // Reset proof-block folding before folding inner blocks and then outer blocks.
+        await vscode.commands.executeCommand("editor.unfold", { selectionLines: lines });
+        for (const line of lines) {
+            await vscode.commands.executeCommand("editor.fold", { selectionLines: [line] });
+        }
+    };
+}
+
+export function unfoldProofBlocks(ctx: CtxInit): Cmd {
+    return async () => {
+        const lines = proofBlockStartLines(await proofBlockFoldingRanges(ctx), false);
+        if (lines.length === 0) return;
+        await vscode.commands.executeCommand("editor.unfold", { selectionLines: lines });
+    };
+}
+
 export function openWalkthrough(_: Ctx): Cmd {
     return async () => {
         await vscode.commands.executeCommand(
             "workbench.action.openWalkthrough",
-            "rust-lang.verus-analyzer#landing",
+            `${EXTENSION_ID}#landing`,
             false,
         );
     };

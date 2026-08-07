@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a bug report for rust-analyzer.
+about: Create a bug report for verus-analyzer.
 title: ''
 labels: 'C-bug'
 assignees: ''
@@ -9,24 +9,22 @@ assignees: ''
 
 <!--
 Troubleshooting guide: https://rust-analyzer.github.io/book/troubleshooting.html
-Forum for questions: https://users.rust-lang.org/c/ide/14
-
-Before submitting, please make sure that you're not running into one of these known issues:
-
- 1. on-the-fly diagnostics are mostly unimplemented (`cargo check` diagnostics will be shown when saving a file): #3107
+Forum for Verus questions: https://verus-lang.zulipchat.com/
 
 Otherwise please try to provide information which will help us to fix the issue faster. Minimal reproducible examples with few dependencies are especially lovely <3.
 -->
 
-**rust-analyzer version**: (eg. output of "rust-analyzer: Show RA Version" command, accessible in VSCode via <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
+**verus-analyzer version**: (output of the "verus-analyzer: Show RA Version" command)
 
 **rustc version**: (eg. output of `rustc -V`)
 
+**Verus version**: (eg. output of `verus --version`)
+
 **editor or extension**: (eg. VSCode, Vim, Emacs, etc. For VSCode users, specify your extension version; for users of other editors, provide the distribution if applicable)
 
-**relevant settings**: (eg. client settings, or environment variables like `CARGO`, `RUSTC`, `RUSTUP_HOME` or `CARGO_HOME`)
+**relevant settings**: (especially `verus-analyzer.verus.*`, `verus-analyzer.cargo.verusEnable`, or `VERUS_BINARY_PATH`)
 
-**repository link (if public, optional)**: (eg. [rust-analyzer](https://github.com/rust-lang/rust-analyzer))
+**repository link (if public, optional)**: (eg. [verus-analyzer](https://github.com/verus-lang/verus-analyzer))
 
 **code snippet to reproduce**:
 ```rust

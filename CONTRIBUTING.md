@@ -69,14 +69,24 @@ CARGO_BUILD_JOBS=1 cargo test -p ide-assists --lib handlers::proof_action
 CARGO_BUILD_JOBS=1 cargo test -p rust-analyzer --lib flycheck::tests
 ```
 
+The disabled experimental proof actions have verifier-backed regression tests. Run them against a
+current Verus release:
+
+```bash
+VERUS_BINARY_PATH=/path/to/verus \
+  CARGO_BUILD_JOBS=1 cargo test -p ide-assists --lib handlers::proof_action \
+  --features verus-integration-tests -- --test-threads=1
+```
+
 Before merging an upstream sync or broad Verus change, run:
 
 ```bash
 CARGO_BUILD_JOBS=1 cargo nextest run --no-fail-fast
+(cd editors/code && npm ci && npm run typecheck && npm run lint && npm run format:check)
 ```
 
-If the VS Code dependencies are installed, also run `npm run typecheck` and `npm run lint` from
-`editors/code`. Tests that execute a locally installed verifier may require `VERUS_BINARY_PATH`.
+Release changes must also pass `npm run package` from `editors/code` and a host-target
+`cargo xtask dist --client-patch-version 0` smoke test.
 
 ## Changing Verus syntax
 

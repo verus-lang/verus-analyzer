@@ -929,10 +929,11 @@ pub(crate) fn folding_range(
     line_folding_only: bool,
     Fold { range: text_range, kind, collapsed_text }: Fold,
 ) -> lsp_types::FoldingRange {
+    let is_proof_block = kind == FoldKind::ProofBlock;
     let kind = match kind {
         FoldKind::Comment => Some(lsp_types::FoldingRangeKind::Comment),
         FoldKind::Imports => Some(lsp_types::FoldingRangeKind::Imports),
-        FoldKind::Region => Some(lsp_types::FoldingRangeKind::Region),
+        FoldKind::Region | FoldKind::ProofBlock => Some(lsp_types::FoldingRangeKind::Region),
         FoldKind::Modules
         | FoldKind::Block
         | FoldKind::ArgList
@@ -948,6 +949,8 @@ pub(crate) fn folding_range(
         | FoldKind::Stmt
         | FoldKind::TailExpr => None,
     };
+    let collapsed_text =
+        if is_proof_block { Some("proof_block".to_owned()) } else { collapsed_text };
 
     let range = range(line_index, text_range);
 
@@ -967,12 +970,16 @@ pub(crate) fn folding_range(
             range.end.line
         };
 
-        let collapsed_text = collapsed_text.map(|collapsed_text| {
-            let range_start = text_range.start();
-            let line_start = range_start - TextSize::from(range.start.character);
-            let text_before_range = &text[TextRange::new(line_start, range_start)];
-            format!("{text_before_range}{collapsed_text}")
-        });
+        let collapsed_text = if is_proof_block {
+            collapsed_text
+        } else {
+            collapsed_text.map(|collapsed_text| {
+                let range_start = text_range.start();
+                let line_start = range_start - TextSize::from(range.start.character);
+                let text_before_range = &text[TextRange::new(line_start, range_start)];
+                format!("{text_before_range}{collapsed_text}")
+            })
+        };
 
         lsp_types::FoldingRange {
             start_line: range.start.line,
@@ -2152,6 +2159,39 @@ fn main() {
             assert_eq!(folding_range.end_line, *end_line);
             assert_eq!(folding_range.end_character, None);
         }
+    }
+
+    #[test]
+    fn conv_proof_block_folding_marker() {
+        let text = r#"fn main() {
+    proof {
+        assert(true);
+    }
+}"#;
+        let (analysis, file_id) = Analysis::from_single_file(
+            text.to_owned(),
+            Arc::new(AbsPathBuf::assert_utf8(std::env::current_dir().unwrap())),
+        );
+        let line_index = LineIndex {
+            index: Arc::new(ide::LineIndex::new(text)),
+            endings: LineEndings::Unix,
+            encoding: PositionEncoding::Utf8,
+        };
+        let all_folds: Vec<_> = analysis
+            .folding_ranges(file_id, true)
+            .unwrap()
+            .into_iter()
+            .map(|fold| folding_range(text, &line_index, true, fold))
+            .collect();
+        let converted: Vec<_> = all_folds
+            .iter()
+            .filter(|fold| fold.collapsed_text.as_deref() == Some("proof_block"))
+            .collect();
+
+        assert_eq!(converted.len(), 1, "all folds: {all_folds:#?}");
+        assert_eq!(converted[0].kind, Some(lsp_types::FoldingRangeKind::Region));
+        assert_eq!(converted[0].start_line, 1);
+        assert_eq!(converted[0].end_line, 3);
     }
 
     #[test]

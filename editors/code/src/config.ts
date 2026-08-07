@@ -24,8 +24,10 @@ export type ConfigurationValue =
 
 type ShowStatusBar = "always" | "never" | { documentSelector: vscode.DocumentSelector };
 
+export const EXTENSION_ID = "verus-lang.verus-analyzer";
+
 export class Config {
-    readonly extensionId = "verus-lang.verus-analyzer";
+    readonly extensionId = EXTENSION_ID;
 
     configureLang: vscode.Disposable | undefined;
     workspaceState: vscode.Memento;

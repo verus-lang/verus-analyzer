@@ -41,7 +41,9 @@ export const relatedTests = new lc.RequestType<lc.TextDocumentPositionParams, Te
     "verus-analyzer/relatedTests",
 );
 export const reloadWorkspace = new lc.RequestType0<null, void>("verus-analyzer/reloadWorkspace");
-export const rebuildProcMacros = new lc.RequestType0<null, void>("verus-analyzer/rebuildProcMacros");
+export const rebuildProcMacros = new lc.RequestType0<null, void>(
+    "verus-analyzer/rebuildProcMacros",
+);
 
 export const runFlycheck = new lc.NotificationType<{
     textDocument: lc.TextDocumentIdentifier | null;

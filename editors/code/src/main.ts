@@ -7,6 +7,7 @@ import * as diagnostics from "./diagnostics";
 import { activateTaskProvider } from "./tasks";
 import { setContextValue } from "./util";
 import { initializeDebugSessionTrackingAndRebuild } from "./debug";
+import { EXTENSION_ID } from "./config";
 
 const RUST_PROJECT_CONTEXT_NAME = "inRustProject";
 
@@ -223,6 +224,8 @@ function createCommands(): Record<string, CommandFactory> {
             enabled: commands.syntaxTreeShowWhitespace,
         },
         getFailedObligations: { enabled: commands.getFailedObligations },
+        foldProofBlocks: { enabled: commands.foldProofBlocks },
+        unfoldProofBlocks: { enabled: commands.unfoldProofBlocks },
     };
 }
 
@@ -230,7 +233,7 @@ function checkConflictingExtensions() {
     if (vscode.extensions.getExtension("rust-lang.rust")) {
         vscode.window
             .showWarningMessage(
-                `You have both the verus-analyzer (rust-lang.verus-analyzer) and Rust (rust-lang.rust) ` +
+                `You have both the verus-analyzer (${EXTENSION_ID}) and Rust (rust-lang.rust) ` +
                     "plugins enabled. These are known to conflict and cause various functions of " +
                     "both plugins to not work correctly. You should disable one of them.",
                 "Got it",

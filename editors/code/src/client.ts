@@ -288,7 +288,7 @@ export async function createClient(
 
     const client = new RaLanguageClient(
         "verus-analyzer",
-        "Rust Analyzer Language Server",
+        "Verus Analyzer Language Server",
         serverOptions,
         clientOptions,
     );

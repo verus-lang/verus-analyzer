@@ -25,6 +25,7 @@ pub enum FoldKind {
     ReturnType,
     MatchArm,
     Function,
+    ProofBlock,
     // region: item runs
     Modules,
     Consts,
@@ -68,9 +69,17 @@ pub(crate) fn folding_ranges(file: &SourceFile, add_collapsed_text: bool) -> Vec
 
     for element in file.syntax().descendants_with_tokens() {
         // Fold items that span multiple lines
-        if let Some((kind, collapsed_text)) = fold_kind(element.clone(), add_collapsed_text) {
+        if let Some((mut kind, mut collapsed_text)) = fold_kind(element.clone(), add_collapsed_text)
+        {
             let is_multiline = match &element {
-                NodeOrToken::Node(node) => node.text().contains_char('\n'),
+                NodeOrToken::Node(node) => {
+                    if matches!(kind, FoldKind::Block | FoldKind::TailExpr) && is_proof_block(node)
+                    {
+                        kind = FoldKind::ProofBlock;
+                        collapsed_text = Some("proof_block".to_owned());
+                    }
+                    node.text().contains_char('\n')
+                }
                 NodeOrToken::Token(token) => token.text().contains('\n'),
             };
 
@@ -100,7 +109,26 @@ pub(crate) fn folding_ranges(file: &SourceFile, add_collapsed_text: bool) -> Vec
                     }
                 }
 
-                let fold = Fold::new(element.text_range(), kind).with_text(collapsed_text);
+                let range = if kind == FoldKind::ProofBlock {
+                    element
+                        .as_node()
+                        .and_then(|node| node.children().find(|it| it.kind() == STMT_LIST))
+                        .and_then(|stmt_list| {
+                            stmt_list.children_with_tokens().find(|it| it.kind() == L_CURLY)
+                        })
+                        .map_or_else(
+                            || element.text_range(),
+                            |l_curly| {
+                                TextRange::new(
+                                    l_curly.text_range().start(),
+                                    element.text_range().end(),
+                                )
+                            },
+                        )
+                } else {
+                    element.text_range()
+                };
+                let fold = Fold::new(range, kind).with_text(collapsed_text);
                 res.push(fold);
                 continue;
             }
@@ -440,6 +468,77 @@ fn contiguous_range_for_comment(
     }
 }
 
+fn is_proof_block(node: &SyntaxNode) -> bool {
+    match node.kind() {
+        BLOCK_EXPR => {
+            // `proof { ... }` has FN_MODE as a direct child of BLOCK_EXPR.
+            if node.children().any(|child| {
+                child.kind() == FN_MODE
+                    && child.children_with_tokens().any(|it| it.kind() == PROOF_KW)
+            }) {
+                return true;
+            }
+            let Some(parent) = node.parent() else {
+                return false;
+            };
+
+            // `proof! { ... }` has a PREFIX_EXPR parent containing proof mode and `!`.
+            if parent.kind() == PREFIX_EXPR {
+                let has_proof_mode = parent.children().any(|child| {
+                    child.kind() == FN_MODE
+                        && child.children_with_tokens().any(|it| it.kind() == PROOF_KW)
+                });
+                let has_bang = parent.children_with_tokens().any(|it| it.kind() == BANG);
+                return has_proof_mode && has_bang;
+            }
+            // `assert(...) by { ... }` has an ASSERT_EXPR parent and a `by` sibling.
+            if parent.kind() == ASSERT_EXPR {
+                return parent.children_with_tokens().any(|it| it.kind() == BY_KW);
+            }
+            // A proof function body has an FN parent with proof mode.
+            if parent.kind() == FN {
+                return parent.children().any(|child| {
+                    child.kind() == FN_MODE
+                        && child.children_with_tokens().any(|it| it.kind() == PROOF_KW)
+                });
+            }
+            false
+        }
+        TOKEN_TREE => {
+            let Some(parent) = node.parent() else {
+                return false;
+            };
+
+            // `proof_decl! { ... }` is represented as a macro call token tree.
+            if parent.kind() == MACRO_CALL {
+                return parent.children().any(|child| {
+                    child.kind() == PATH
+                        && matches!(child.text().to_string().trim(), "proof" | "proof_decl")
+                });
+            }
+            // Find `ghost name => { ... }` blocks inside `atomic_with_ghost!`.
+            if parent.kind() == TOKEN_TREE
+                && node.children_with_tokens().next().is_some_and(|it| it.kind() == L_CURLY)
+            {
+                let mut sibling = node.prev_sibling_or_token();
+                while let Some(element) = sibling {
+                    if element.kind() == SEMICOLON || element.kind() == COMMA {
+                        break;
+                    }
+                    if element.kind() == GHOST_KW
+                        || element.as_token().is_some_and(|token| token.text() == "ghost")
+                    {
+                        return true;
+                    }
+                    sibling = element.prev_sibling_or_token();
+                }
+            }
+            false
+        }
+        _ => false,
+    }
+}
+
 fn fold_range_for_multiline_match_arm(match_arm: ast::MatchArm) -> Option<TextRange> {
     if fold_kind(match_arm.expr()?.syntax().syntax_element(), false).is_some() {
         None
@@ -512,6 +611,7 @@ mod tests {
                 FoldKind::ReturnType => "returntype",
                 FoldKind::MatchArm => "matcharm",
                 FoldKind::Function => "function",
+                FoldKind::ProofBlock => "proof_block",
                 FoldKind::ExternCrates => "externcrates",
                 FoldKind::Stmt => "stmt",
                 FoldKind::TailExpr => "tailexpr",
@@ -523,6 +623,65 @@ mod tests {
                 assert_eq!(fold.collapsed_text, None);
             }
         }
+    }
+
+    fn check_proof_block(ra_fixture: &str) {
+        let (ranges, text) = extract_tags(ra_fixture, "fold");
+        let expected: Vec<_> = ranges.into_iter().map(|(range, _)| range).collect();
+        let parse = SourceFile::parse(&text, span::Edition::CURRENT);
+        let actual: Vec<_> = folding_ranges(&parse.tree(), true)
+            .into_iter()
+            .filter(|fold| fold.kind == FoldKind::ProofBlock)
+            .map(|fold| fold.range)
+            .collect();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn fold_verus_proof_blocks() {
+        check_proof_block(
+            r#"
+fn main() {
+    proof <fold>{
+        assert(true);
+    }</fold>
+
+    proof! <fold>{
+        assert(true);
+    }</fold>
+
+    proof_decl! <fold>{
+        let tracked mut g = 0u32;
+    }</fold>
+
+    assert(1 > 0) by <fold>{
+        assert(true);
+    }</fold>;
+
+    atomic_with_ghost!(
+        value => compare_exchange(false, true);
+        returning res;
+        ghost g => <fold>{
+            assert(true);
+        }</fold>
+    );
+}
+
+fn proof_tail_expr() {
+    proof <fold>{
+        assert(true);
+    }</fold>
+}
+
+proof fn helper()
+    requires false,
+    ensures true,
+    <fold>{
+    assert(true);
+}</fold>
+"#,
+        );
     }
 
     #[test]

@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Create a feature request for rust-analyzer.
+about: Create a feature request for verus-analyzer.
 title: ''
 labels: 'C-feature'
 assignees: ''

@@ -3,8 +3,8 @@
 use crate::{AssistContext, Assists};
 use ide_db::assists::{AssistId, AssistKind};
 use syntax::{
-    ast::{self, vst::*, LogicOp},
     AstNode, T,
+    ast::{self, LogicOp, vst::*},
 };
 
 /*

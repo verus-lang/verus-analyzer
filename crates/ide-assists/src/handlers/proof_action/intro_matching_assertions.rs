@@ -6,8 +6,8 @@ use crate::proof_plumber_api::vst_ext::vst_walk_expr;
 use crate::{AssistContext, AssistId, AssistKind, Assists};
 
 use syntax::{
-    ast::{self, vst::*},
     AstNode, T,
+    ast::{self, vst::*},
 };
 
 pub(crate) fn intro_match(acc: &mut Assists, ctx: &AssistContext<'_, '_>) -> Option<()> {
@@ -55,7 +55,8 @@ pub(crate) fn vst_rewriter_intro_match(
     let en = ctx.type_of_expr_enum(enum_expr_inside_assertion)?;
     let mut match_arms: Vec<MatchArm> = vec![];
     for variant in &en.variant_list.variants {
-        let vst_pat = Literal::new(format!("{}::{}(..)", en.name, variant.name));
+        let variant_name = variant.name.as_deref()?;
+        let vst_pat = Literal::new(format!("{}::{}(..)", en.name, variant_name));
         let vst_pat = LiteralPat::new(vst_pat);
         let arm = MatchArm::new(vst_pat.into(), assert.clone());
         match_arms.push(arm);

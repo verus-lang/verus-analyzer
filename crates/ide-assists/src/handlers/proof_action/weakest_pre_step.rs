@@ -230,7 +230,7 @@ pub(crate) fn vst_rewriter_wp_move_assertion(
                             // when match arm is a block, insert assertion at the end
                             Expr::BlockExpr(mut bb) => {
                                 bb.stmt_list.statements.push(adding_assert.clone());
-                                arm.expr = Box::new(Expr::BlockExpr(bb));
+                                *arm.expr = Expr::BlockExpr(bb);
                             }
                             // when match arm is a single expression, convert it to a block and insert the assertion before it
                             _ => {
@@ -238,7 +238,7 @@ pub(crate) fn vst_rewriter_wp_move_assertion(
                                 let mut new_blk = BlockExpr::new(StmtList::new());
                                 new_blk.stmt_list.statements = vec![adding_assert.clone()];
                                 new_blk.stmt_list.tail_expr = Some(existing_expr.clone());
-                                arm.expr = Box::new(Expr::from(new_blk));
+                                *arm.expr = Expr::from(new_blk);
                             }
                         }
                     });

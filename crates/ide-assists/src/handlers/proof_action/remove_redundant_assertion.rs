@@ -3,17 +3,16 @@
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use crate::proof_plumber_api::vst_ext::vst_map_expr_visitor;
 use crate::{
+    AssistId, AssistKind,
     assist_context::{AssistContext, Assists},
     proof_plumber_api::run_verus::VerifResult,
-    AssistId, AssistKind,
 };
 use syntax::{
-    ast::{
-        self,
-        vst::{self, *},
-        AstNode,
-    },
     T,
+    ast::{
+        self, AstNode,
+        vst::{self, *},
+    },
 };
 
 /// Proof action: remove redundant assertions

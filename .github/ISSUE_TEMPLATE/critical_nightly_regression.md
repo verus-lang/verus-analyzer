@@ -1,6 +1,6 @@
 ---
 name: Critical Nightly Regression
-about: You are using nightly rust-analyzer and the latest version is unusable.
+about: You are using nightly verus-analyzer and the latest version is unusable.
 title: ''
 labels: 'Broken Window'
 assignees: ''

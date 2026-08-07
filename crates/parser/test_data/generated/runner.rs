@@ -780,6 +780,10 @@ mod ok {
         run_and_expect_no_errors("test_data/parser/inline/ok/variant_discriminant.rs");
     }
     #[test]
+    fn verus_proof_block() {
+        run_and_expect_no_errors("test_data/parser/inline/ok/verus_proof_block.rs");
+    }
+    #[test]
     fn where_clause() { run_and_expect_no_errors("test_data/parser/inline/ok/where_clause.rs"); }
     #[test]
     fn where_pred_for() {

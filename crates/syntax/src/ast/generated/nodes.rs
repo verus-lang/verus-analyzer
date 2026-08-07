@@ -429,6 +429,8 @@ pub struct BlockExpr {
 impl ast::HasAttrs for BlockExpr {}
 impl BlockExpr {
     #[inline]
+    pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
+    #[inline]
     pub fn label(&self) -> Option<Label> { support::child(&self.syntax) }
     #[inline]
     pub fn stmt_list(&self) -> Option<StmtList> { support::child(&self.syntax) }

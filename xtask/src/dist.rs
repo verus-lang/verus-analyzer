@@ -80,6 +80,7 @@ fn dist_client(
     if let Some(symbols_path) = &target.symbols_path {
         sh.copy_file(symbols_path, &bundle_path)?;
     }
+    sh.copy_file("CHANGELOG.md", "editors/code/CHANGELOG.md")?;
 
     let _d = sh.push_dir("./editors/code");
 
@@ -156,7 +157,12 @@ fn dist_server(
 
     let dst = Path::new("dist").join(&target.artifact_name);
     if target_name.contains("-windows-") {
-        zip(&target.server_path, target.symbols_path.as_ref(), &dst.with_extension("zip"))?;
+        zip(
+            &target.server_path,
+            "verus-analyzer.exe",
+            target.symbols_path.as_ref(),
+            &dst.with_extension("zip"),
+        )?;
     } else {
         gzip(&target.server_path, &dst.with_extension("gz"))?;
     }
@@ -186,11 +192,16 @@ fn gzip(src_path: &Path, dest_path: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn zip(src_path: &Path, symbols_path: Option<&PathBuf>, dest_path: &Path) -> anyhow::Result<()> {
+fn zip(
+    src_path: &Path,
+    binary_name: &str,
+    symbols_path: Option<&PathBuf>,
+    dest_path: &Path,
+) -> anyhow::Result<()> {
     let file = File::create(dest_path)?;
     let mut writer = ZipWriter::new(BufWriter::new(file));
     writer.start_file(
-        src_path.file_name().unwrap().to_str().unwrap(),
+        binary_name,
         SimpleFileOptions::default()
             .last_modified_time(
                 DateTime::try_from(OffsetDateTime::from(std::fs::metadata(src_path)?.modified()?))

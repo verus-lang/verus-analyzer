@@ -225,9 +225,7 @@ export async function getVerus(
     );
 }
 
-function verusReleasePlatform():
-    | { assetMarker: string; releaseDirectory: string }
-    | undefined {
+function verusReleasePlatform(): { assetMarker: string; releaseDirectory: string } | undefined {
     if (process.platform === "win32" && process.arch === "x64") {
         return { assetMarker: "x86-win", releaseDirectory: "verus-x86-win" };
     }

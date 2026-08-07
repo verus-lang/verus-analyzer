@@ -4,8 +4,8 @@ use crate::{AssistContext, Assists};
 use ide_db::assists::{AssistId, AssistKind};
 use itertools::Itertools;
 use syntax::{
-    ast::{self, vst::*},
     AstNode,
+    ast::{self, vst::*},
 };
 
 pub(crate) fn apply_induction(acc: &mut Assists, ctx: &AssistContext<'_, '_>) -> Option<()> {
@@ -22,11 +22,7 @@ pub(crate) fn apply_induction(acc: &mut Assists, ctx: &AssistContext<'_, '_>) ->
         .iter()
         .map(|p| {
             let p = p.pat.clone()?;
-            if let Pat::IdentPat(pat) = *p {
-                pat.name.ident_token
-            } else {
-                None
-            }
+            if let Pat::IdentPat(pat) = *p { pat.name.ident_token } else { None }
         })
         .collect();
     let param_names = param_names?;
@@ -110,10 +106,11 @@ fn apply_induction_on_enum(
 ) -> Option<BlockExpr> {
     let mut match_arms = vec![];
     for variant in &en.variant_list.variants {
+        let variant_name = variant.name.as_deref()?;
         let fields = variant.field_list.as_ref();
 
         if fields == None {
-            let arm = format!("{}::{} => {{}}", en.name, variant.name);
+            let arm = format!("{}::{} => {{}}", en.name, variant_name);
             match_arms.push(arm);
             continue;
         }
@@ -145,7 +142,7 @@ fn apply_induction_on_enum(
                     })
                     .collect::<Vec<_>>()
                     .join(";");
-                let arm = format!("{}::{}{{{}}} => {{{};}}", en.name, variant.name, names, calls);
+                let arm = format!("{}::{}{{{}}} => {{{};}}", en.name, variant_name, names, calls);
                 match_arms.push(arm);
             }
             FieldList::TupleFieldList(_) => {

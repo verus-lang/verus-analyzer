@@ -130,7 +130,7 @@ pub(crate) fn generate_vst(_kinds: KindsSrc, grammar: &AstSrc) -> String {
                     let name = field_name(field);
                     let lowercase_name = format_ident!("{}", field.method_name().to_lowercase());
                     let mut ty = field.ty();
-                    let is_expr = ty.to_string() == "Expr";
+                    let is_expr = ty == "Expr";
 
                     if is_expr && field.is_one() {
                         ty = format_ident!("ET{}", count);
@@ -466,7 +466,7 @@ pub(crate) fn generate_vst(_kinds: KindsSrc, grammar: &AstSrc) -> String {
             let name = format_ident!("{}", en.name);
             let variants: Vec<_> = en.variants.iter().map(|var| format_ident!("{}", var)).collect();
             let vars = variants.iter().map(|v| {
-                if grammar.enums.iter().any(|en| en.name == v.to_string()) {
+                if grammar.enums.iter().any(|en| v == en.name.as_str()) {
                     quote! {
                         #name::#v(it) => Some(super::nodes::#name::#v(it.cst()?.clone())),
                     }

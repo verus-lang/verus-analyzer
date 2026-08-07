@@ -1,66 +1,58 @@
-<p align="center">
-  <img
-    src="https://raw.githubusercontent.com/rust-lang/rust-analyzer/master/assets/logo-wide.svg"
-    alt="rust-analyzer logo">
-</p>
+# verus-analyzer
 
-rust-analyzer is a language server that provides IDE functionality for
-writing Rust programs. You can use it with any editor that supports
-the [Language Server
-Protocol](https://microsoft.github.io/language-server-protocol/) (VS
-Code, Vim, Emacs, Zed, etc).
+verus-analyzer is a fork of [rust-analyzer](https://github.com/rust-lang/rust-analyzer) that adds
+IDE support for the [Verus](https://github.com/verus-lang/verus) verification language. It tracks
+current rust-analyzer while adding:
 
-rust-analyzer features include go-to-definition, find-all-references,
-refactorings and code completion. rust-analyzer also supports
-integrated formatting (with rustfmt) and integrated diagnostics (with
-rustc and clippy).
+- Parsing, highlighting, lowering, and analysis for Verus syntax.
+- Verus verification on save, with diagnostics shown in the editor.
+- Experimental proof actions for debugging failed proofs.
+- Automatic Verus installation in the VS Code extension.
 
-Internally, rust-analyzer is structured as a set of libraries for
-analyzing Rust code. See
-[Architecture](https://rust-analyzer.github.io/book/contributing/architecture.html)
-in the manual.
-
-[![codecov](https://codecov.io/github/rust-lang/rust-analyzer/graph/badge.svg)](https://app.codecov.io/github/rust-lang/rust-analyzer/tree/master)
+The project is experimental. Verus-specific analysis is not yet as complete as rust-analyzer's
+analysis of ordinary Rust.
 
 ## Quick Start
 
-https://rust-analyzer.github.io/book/installation.html
+Install the
+[verus-analyzer VS Code extension](https://marketplace.visualstudio.com/items?itemName=verus-lang.verus-analyzer)
+and open a Cargo project containing Verus code. The extension downloads the latest Verus release
+for supported platforms and runs the verifier whenever a Rust file is saved.
 
-## Documentation
+The most relevant settings are:
 
-If you want to **contribute** to rust-analyzer check out the [CONTRIBUTING.md](./CONTRIBUTING.md) or
-if you are just curious about how things work under the hood, see the
-[Contributing](https://rust-analyzer.github.io/book/contributing) section of the manual.
+- `verus-analyzer.verus.enable`: enable verification on save.
+- `verus-analyzer.verus.binary`: use a specific Verus executable instead of downloading one.
+- `verus-analyzer.verus.extraArgs`: pass additional arguments to Verus.
+- `verus-analyzer.verus.reportAllErrorsEnable`: report errors from the whole crate instead of the
+  module containing the saved file.
+- `verus-analyzer.cargo.verusEnable`: run `cargo verus` instead of invoking Verus directly.
 
-If you want to **use** rust-analyzer's language server with your editor of
-choice, check [the manual](https://rust-analyzer.github.io/book/).
-It also contains some tips & tricks to help you be more productive when using rust-analyzer.
+Verus arguments can also be specified in a project manifest:
 
-## Security and Privacy
+```toml
+[package.metadata.verus.ide]
+extra_args = ["--rlimit", "20"]
+```
 
-See the [security](https://rust-analyzer.github.io/book/security.html) and
-[privacy](https://rust-analyzer.github.io/book/privacy.html) sections of the manual.
+## Proof Actions
 
-## Communication
+Proof actions are experimental code actions based on
+[Proof Plumber](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf). They appear as
+light-bulb actions near failed assertions, preconditions, and postconditions and automate common
+proof-debugging transformations.
 
-For usage and troubleshooting requests, please use "IDEs and Editors" category of the Rust forum:
+## Development
 
-https://users.rust-lang.org/c/ide/14
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the Verus architecture and test matrix. The
+[rust-analyzer manual](https://rust-analyzer.github.io/book/) remains the reference for inherited
+editor features and internals.
 
-For questions about development and implementation, join rust-analyzer working group on Zulip:
-
-https://rust-lang.zulipchat.com/#narrow/stream/185405-t-compiler.2Frust-analyzer
-
-## Quick Links
-
-* Website: https://rust-analyzer.github.io/
-* Metrics: https://rust-analyzer.github.io/metrics/
-* API docs: https://rust-lang.github.io/rust-analyzer/ide/
-* Changelog: https://rust-analyzer.github.io/thisweek
+Questions about Verus-specific behavior belong in the
+[Verus Zulip](https://verus-lang.zulipchat.com/). Upstream rust-analyzer design discussions belong
+in the [rust-analyzer Zulip stream](https://rust-lang.zulipchat.com/#narrow/stream/185405-t-compiler.2Frust-analyzer).
 
 ## License
 
-rust-analyzer is primarily distributed under the terms of both the MIT
-license and the Apache License (Version 2.0).
-
-See [LICENSE-APACHE](LICENSE-APACHE) and [LICENSE-MIT](LICENSE-MIT) for details.
+verus-analyzer is distributed under the terms of the MIT and Apache 2.0 licenses. See
+[LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE](LICENSE-APACHE).

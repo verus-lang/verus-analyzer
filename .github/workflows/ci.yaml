@@ -39,7 +39,7 @@ jobs:
               - 'editors/code/**'
 
   proc-macro-srv:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     name: proc-macro-srv
     runs-on: ubuntu-latest
 
@@ -75,7 +75,7 @@ jobs:
         run: "! (cargo tree -p proc-macro-srv-cli -p proc-macro-srv -p proc-macro-srv-cli -p proc-macro-api -i salsa)"
 
   rust:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     name: Rust
     runs-on: ${{ matrix.os }}
     env:
@@ -128,8 +128,43 @@ jobs:
       - name: Run cargo-machete
         run: cargo machete
 
+  verus:
+    if: github.repository == 'verus-lang/verus-analyzer'
+    name: Verus integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        run: |
+          rustup update --no-self-update stable
+          rustup default stable
+          rustup component add rust-src rustfmt
+
+      - name: Install latest Verus release
+        run: |
+          VERUS_URL="$(
+            curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
+              -H 'Accept: application/vnd.github+json' \
+              https://api.github.com/repos/verus-lang/verus/releases/latest |
+              jq -r '.assets[] | select(.name | contains("x86-linux")) | .browser_download_url'
+          )"
+          test -n "$VERUS_URL"
+          curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
+            "$VERUS_URL" -o verus.zip
+          unzip -q verus.zip
+          echo "VERUS_BINARY_PATH=$GITHUB_WORKSPACE/verus-x86-linux/verus" >> "$GITHUB_ENV"
+
+      - name: Test verifier-backed proof actions
+        run: cargo test -p ide-assists --lib handlers::proof_action --features verus-integration-tests -- --test-threads=1
+
+      - name: Test verifier command construction
+        run: cargo test -p rust-analyzer --lib flycheck::tests
+
   analysis-stats:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     runs-on: ubuntu-latest
     env:
       RUSTC_BOOTSTRAP: 1
@@ -159,7 +194,7 @@ jobs:
         run: ./target/debug/rust-analyzer analysis-stats --with-deps --no-sysroot --no-test $(rustc --print sysroot)/lib/rustlib/src/rust/library/ -q
 
   rustfmt:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     runs-on: ubuntu-latest
 
     steps:
@@ -175,7 +210,7 @@ jobs:
       - run: cargo fmt -- --check
 
   clippy:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     runs-on: ubuntu-latest
 
     steps:
@@ -197,7 +232,7 @@ jobs:
       - run: cargo clippy --all-targets -- -D clippy::disallowed_macros -D clippy::dbg_macro -D clippy::todo -D clippy::print_stdout -D clippy::print_stderr
 
   miri:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     runs-on: ubuntu-latest
 
     steps:
@@ -220,7 +255,7 @@ jobs:
 
   # Weird targets to catch non-portable code
   rust-cross:
-    if: github.repository == 'rust-lang/rust-analyzer'
+    if: github.repository == 'verus-lang/verus-analyzer'
     name: Rust Cross
     runs-on: ubuntu-latest
 
@@ -252,7 +287,7 @@ jobs:
 
   typescript:
     needs: changes
-    if: github.repository == 'rust-lang/rust-analyzer' && needs.changes.outputs.typescript == 'true'
+    if: github.repository == 'verus-lang/verus-analyzer' && needs.changes.outputs.typescript == 'true'
     name: TypeScript
     strategy:
       fail-fast: false
@@ -341,6 +376,7 @@ jobs:
         rustfmt,
         clippy,
         analysis-stats,
+        verus,
       ]
     # We need to ensure this job does *not* get skipped if its dependencies fail,
     # because a skipped job is considered a success by GitHub. So we have to
