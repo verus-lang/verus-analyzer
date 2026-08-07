@@ -128,7 +128,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
             || p.nth_at_contextual_kw(1, T![proof])
             || p.nth_at_contextual_kw(1, T![exec])
             || p.nth_at_contextual_kw(1, T![axiom])
-            || p.nth_at(1, T!['(']) && p.nth_at(2, T![in])))
+            || p.nth_at(1, T!['('])))
         || ((p.at_contextual_kw(T![closed]) || p.at_contextual_kw(T![uninterp]))
             && (p.nth_at(1, T![fn])
                 || p.nth_at_contextual_kw(1, T![spec])
@@ -227,7 +227,8 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
         || ((p.at_contextual_kw(T![proof])
             || p.at_contextual_kw(T![exec])
             || p.at_contextual_kw(T![axiom]))
-            && p.nth_at(1, T![fn]))
+            && (p.nth_at(1, T![fn]) || p.nth_at(1, T![const]) || p.nth_at(1, T![static])))
+        || (p.at_contextual_kw(T![spec]) && (p.nth_at(1, T![const]) || p.nth_at(1, T![static])))
     {
         verus::fn_mode(p);
         has_mods = true;

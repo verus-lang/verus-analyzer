@@ -94,7 +94,7 @@ config_data! {
 
         /// List of files to ignore
         ///
-        /// These paths (file/directories) will be ignored by rust-analyzer. They are relative to
+        /// These paths (file/directories) will be ignored by verus-analyzer. They are relative to
         /// the workspace root, and globs are not supported. You may also need to add the folders to
         /// Code's `files.watcherExclude`.
         files_exclude | files_excludeDirs: Vec<Utf8PathBuf> = vec![],
@@ -372,7 +372,7 @@ config_data! {
         /// will be treated as standalone files) or JSON objects in `rust-project.json` format.
         linkedProjects: Vec<ManifestOrProjectJson> = vec![],
 
-        /// Number of syntax trees rust-analyzer keeps in memory. Defaults to 128.
+        /// Number of syntax trees verus-analyzer keeps in memory. Defaults to 128.
         lru_capacity: Option<u16> = None,
 
         /// The LRU capacity of the specified queries.
@@ -393,7 +393,7 @@ config_data! {
 
         /// Number of proc-macro server processes to spawn.
         ///
-        /// Controls how many independent `proc-macro-srv` processes rust-analyzer
+        /// Controls how many independent `proc-macro-srv` processes verus-analyzer
         /// runs in parallel to handle macro expansion.
         procMacro_processes: NumProcesses = NumProcesses::Concrete(2),
 
@@ -402,7 +402,7 @@ config_data! {
 
         /// The path where to save memory profiling output.
         ///
-        /// **Note:** Memory profiling is not enabled by default in rust-analyzer builds, you need to build
+        /// **Note:** Memory profiling is not enabled by default in verus-analyzer builds, you need to build
         /// from source for it.
         profiling_memoryProfile: Option<Utf8PathBuf> = None,
 
@@ -421,41 +421,41 @@ config_data! {
 
         /// Inject additional highlighting into doc comments.
         ///
-        /// When enabled, rust-analyzer will highlight rust source in doc comments as well as intra
+        /// When enabled, verus-analyzer will highlight rust source in doc comments as well as intra
         /// doc links.
         semanticHighlighting_doc_comment_inject_enable: bool = true,
 
         /// Emit non-standard tokens and modifiers
         ///
-        /// When enabled, rust-analyzer will emit tokens and modifiers that are not part of the
+        /// When enabled, verus-analyzer will emit tokens and modifiers that are not part of the
         /// standard set of semantic tokens.
         semanticHighlighting_nonStandardTokens: bool = true,
 
         /// Use semantic tokens for operators.
         ///
-        /// When disabled, rust-analyzer will emit semantic tokens only for operator tokens when
+        /// When disabled, verus-analyzer will emit semantic tokens only for operator tokens when
         /// they are tagged with modifiers.
         semanticHighlighting_operator_enable: bool = true,
 
         /// Use specialized semantic tokens for operators.
         ///
-        /// When enabled, rust-analyzer will emit special token types for operator tokens instead
+        /// When enabled, verus-analyzer will emit special token types for operator tokens instead
         /// of the generic `operator` token type.
         semanticHighlighting_operator_specialization_enable: bool = false,
 
         /// Use semantic tokens for punctuation.
         ///
-        /// When disabled, rust-analyzer will emit semantic tokens only for punctuation tokens when
+        /// When disabled, verus-analyzer will emit semantic tokens only for punctuation tokens when
         /// they are tagged with modifiers or have a special role.
         semanticHighlighting_punctuation_enable: bool = false,
 
-        /// When enabled, rust-analyzer will emit a punctuation semantic token for the `!` of macro
+        /// When enabled, verus-analyzer will emit a punctuation semantic token for the `!` of macro
         /// calls.
         semanticHighlighting_punctuation_separate_macro_bang: bool = false,
 
         /// Use specialized semantic tokens for punctuation.
         ///
-        /// When enabled, rust-analyzer will emit special token types for punctuation tokens instead
+        /// When enabled, verus-analyzer will emit special token types for punctuation tokens instead
         /// of the generic `punctuation` token type.
         semanticHighlighting_punctuation_specialization_enable: bool = false,
 
@@ -488,11 +488,11 @@ config_data! {
         typing_triggerChars: Option<String> = Some("=.".to_owned()),
 
 
-        /// Configure a command that rust-analyzer can invoke to
+        /// Configure a command that verus-analyzer can invoke to
         /// obtain configuration.
         ///
         /// This is an alternative to manually generating
-        /// `rust-project.json`: it enables rust-analyzer to generate
+        /// `rust-project.json`: it enables verus-analyzer to generate
         /// rust-project.json on the fly, and regenerate it when
         /// switching or modifying projects.
         ///
@@ -509,7 +509,7 @@ config_data! {
         /// Here's an example of a valid configuration:
         ///
         /// ```json
-        /// "rust-analyzer.workspace.discoverConfig": {
+        /// "verus-analyzer.workspace.discoverConfig": {
         ///     "command": [
         ///         "rust-project",
         ///         "develop-json",
@@ -536,7 +536,7 @@ config_data! {
         /// }
         /// ```
         ///
-        /// rust-analyzer will use the path invocation to find and
+        /// verus-analyzer will use the path invocation to find and
         /// generate a `rust-project.json` and therefore a
         /// workspace. Example:
         ///
@@ -545,7 +545,7 @@ config_data! {
         /// rust-project develop-json '{ "path": "myproject/src/main.rs" }'
         /// ```
         ///
-        /// rust-analyzer will use build file invocations to update an
+        /// verus-analyzer will use build file invocations to update an
         /// existing workspace. Example:
         ///
         /// Or with a build file and the configuration above:
@@ -592,7 +592,7 @@ config_data! {
         ///     "kind": "finished",
         ///     // the file used by a non-Cargo build system to define
         ///     // a package or target.
-        ///     "buildfile": "rust-analyzer/BUCK",
+        ///     "buildfile": "verus-analyzer/BUCK",
         ///     // the contents of a rust-project.json, elided for brevity
         ///     "project": {
         ///         "sysroot": "foo",
@@ -606,7 +606,7 @@ config_data! {
         /// progress or errors.
         ///
         /// Stderr is not parsed as JSONL. It is treated as command log
-        /// output and forwarded to rust-analyzer's own logs.
+        /// output and forwarded to verus-analyzer's own logs.
         workspace_discoverConfig: Option<DiscoverWorkspaceConfig> = None,
     }
 }
@@ -712,13 +712,13 @@ config_data! {
         /// Term search fuel in "units of work" for autocompletion (Defaults to 1000).
         completion_termSearch_fuel: usize = 1000,
 
-        /// List of rust-analyzer diagnostics to disable.
+        /// List of verus-analyzer diagnostics to disable.
         diagnostics_disabled: FxHashSet<String> = FxHashSet::default(),
 
-        /// Show native rust-analyzer diagnostics.
+        /// Show native verus-analyzer diagnostics.
         diagnostics_enable: bool = true,
 
-        /// Show experimental rust-analyzer diagnostics that might have more false positives than
+        /// Show experimental verus-analyzer diagnostics that might have more false positives than
         /// usual.
         diagnostics_experimental_enable: bool = false,
 
@@ -743,10 +743,10 @@ config_data! {
 
         /// Disable support for `#[rust_analyzer::rust_fixture]` snippets.
         ///
-        /// If you are not working on rust-analyzer itself, you should ignore this config.
+        /// If you are not working on verus-analyzer itself, you should ignore this config.
         disableFixtureSupport: bool = false,
 
-        /// Enforce the import granularity setting for all files. If set to false rust-analyzer will
+        /// Enforce the import granularity setting for all files. If set to false verus-analyzer will
         /// try to keep import styles consistent per file.
         imports_granularity_enforce: bool = false,
 
@@ -798,7 +798,7 @@ config_data! {
         /// This config only has an effect when `#rust-analyzer.cargo.buildScripts.overrideCommand#`
         /// is set.
         cargo_buildScripts_invocationStrategy: InvocationStrategy = InvocationStrategy::PerWorkspace,
-        /// Override the command rust-analyzer uses to run build scripts and
+        /// Override the command verus-analyzer uses to run build scripts and
         /// build procedural macros. The command is required to output json
         /// and should therefore include `--message-format=json` or a similar
         /// option.
@@ -821,7 +821,7 @@ config_data! {
         /// Rerun proc-macros building/build-scripts running when proc-macro
         /// or build-script sources change and are saved.
         cargo_buildScripts_rebuildOnSave: bool = true,
-        /// Use `RUSTC_WRAPPER=rust-analyzer` when running build scripts to
+        /// Use `RUSTC_WRAPPER=verus-analyzer` when running build scripts to
         /// avoid checking unnecessary things.
         cargo_buildScripts_useRustcWrapper: bool = true,
         /// List of cfg options to enable with the given values.
@@ -834,7 +834,7 @@ config_data! {
         },
         /// Path to a `.cargo/config.toml` style file to pass to cargo via `--config`
         /// for every cargo invocation (metadata, build scripts, config discovery).
-        /// Useful to give rust-analyzer a consistent view of the project configuration.
+        /// Useful to give verus-analyzer a consistent view of the project configuration.
         cargo_configPath: Option<Utf8PathBuf> = None,
         /// Extra arguments that are passed to every cargo invocation.
         cargo_extraArgs: Vec<String> = vec![],
@@ -858,19 +858,19 @@ config_data! {
         ///
         /// Unsetting this disables sysroot loading.
         ///
-        /// This option does not take effect until rust-analyzer is restarted.
+        /// This option does not take effect until verus-analyzer is restarted.
         cargo_sysroot: Option<String>    = Some("discover".to_owned()),
         /// Relative path to the sysroot library sources. If left unset, this will default to
         /// `{cargo.sysroot}/lib/rustlib/src/rust/library`.
         ///
-        /// This option does not take effect until rust-analyzer is restarted.
+        /// This option does not take effect until verus-analyzer is restarted.
         cargo_sysrootSrc: Option<String>    = None,
         /// Compilation target override (target tuple).
         // FIXME(@poliorcetics): move to multiple targets here too, but this will need more work
         // than `checkOnSave_target`
         cargo_target: Option<String>     = None,
-        /// Optional path to a rust-analyzer specific target directory.
-        /// This prevents rust-analyzer's `cargo check` and initial build-script and proc-macro
+        /// Optional path to a verus-analyzer specific target directory.
+        /// This prevents verus-analyzer's `cargo check` and initial build-script and proc-macro
         /// building from locking the `Cargo.lock` at the expense of duplicating build artifacts.
         ///
         /// Set to `true` to use a subdirectory of the existing target directory or
@@ -913,7 +913,7 @@ config_data! {
         /// Whether to pass `--no-default-features` to Cargo. Defaults to
         /// `#rust-analyzer.cargo.noDefaultFeatures#`.
         check_noDefaultFeatures | checkOnSave_noDefaultFeatures: Option<bool>         = None,
-        /// Override the command rust-analyzer uses instead of `cargo check` for
+        /// Override the command verus-analyzer uses instead of `cargo check` for
         /// diagnostics on save. The command is required to output json and
         /// should therefore include `--message-format=json` or a similar option
         /// (if your client supports the `colorDiagnosticOutput` experimental
@@ -931,13 +931,13 @@ config_data! {
         /// It supports two interpolation syntaxes, both mainly intended to be used with
         /// [non-Cargo build systems](./non_cargo_based_projects.md):
         ///
-        /// - If `{saved_file}` is part of the command, rust-analyzer will pass
+        /// - If `{saved_file}` is part of the command, verus-analyzer will pass
         ///   the absolute path of the saved file to the provided command.
         ///   (A previous version, `$saved_file`, also works.)
-        /// - If `{label}` is part of the command, rust-analyzer will pass the
+        /// - If `{label}` is part of the command, verus-analyzer will pass the
         ///   Cargo package ID, which can be used with `cargo check -p`, or a build label from
-        ///   `rust-project.json`. If `{label}` is included, rust-analyzer behaves much like
-        ///   [`"rust-analyzer.check.workspace": false`](#check.workspace).
+        ///   `rust-project.json`. If `{label}` is included, verus-analyzer behaves much like
+        ///   [`"verus-analyzer.check.workspace": false`](#check.workspace).
         ///
         ///
         ///
@@ -983,7 +983,7 @@ config_data! {
         /// - `${exact}`: `--exact` for single benchmarks, empty for modules.
         /// - `${include_ignored}`: always empty for benchmarks.
         /// - `${executable_args}`: all of the above binary args bundled together
-        ///   (includes `rust-analyzer.runnables.extraTestBinaryArgs`).
+        ///   (includes `verus-analyzer.runnables.extraTestBinaryArgs`).
         runnables_bench_overrideCommand: Option<Vec<String>> = None,
         /// Command to be executed instead of 'cargo' for runnables.
         runnables_command: Option<String> = None,
@@ -998,7 +998,7 @@ config_data! {
         /// - `${exact}`: always empty for doc-tests.
         /// - `${include_ignored}`: always empty for doc-tests.
         /// - `${executable_args}`: all of the above binary args bundled together
-        ///   (includes `rust-analyzer.runnables.extraTestBinaryArgs`).
+        ///   (includes `verus-analyzer.runnables.extraTestBinaryArgs`).
         runnables_doctest_overrideCommand: Option<Vec<String>> = None,
         /// Additional arguments to be passed to cargo for runnables such as
         /// tests or binaries. For example, it may be `--release`.
@@ -1024,22 +1024,22 @@ config_data! {
         /// - `${exact}`: `--exact` for single tests, empty for modules.
         /// - `${include_ignored}`: `--include-ignored` for single tests, empty otherwise.
         /// - `${executable_args}`: all of the above binary args bundled together
-        ///   (includes `rust-analyzer.runnables.extraTestBinaryArgs`).
+        ///   (includes `verus-analyzer.runnables.extraTestBinaryArgs`).
         runnables_test_overrideCommand: Option<Vec<String>> = None,
 
         /// Path to the Cargo.toml of the rust compiler workspace, for usage in rustc_private
         /// projects, or "discover" to try to automatically find it if the `rustc-dev` component
         /// is installed.
         ///
-        /// Any project which uses rust-analyzer with the rustcPrivate
+        /// Any project which uses verus-analyzer with the rustcPrivate
         /// crates must set `[package.metadata.rust-analyzer] rustc_private=true` to use it.
         ///
-        /// This option does not take effect until rust-analyzer is restarted.
+        /// This option does not take effect until verus-analyzer is restarted.
         rustc_source: Option<String> = None,
 
         /// Additional arguments to `rustfmt`.
         rustfmt_extraArgs: Vec<String>               = vec![],
-        /// Advanced option, fully override the command rust-analyzer uses for
+        /// Advanced option, fully override the command verus-analyzer uses for
         /// formatting. This should be the equivalent of `rustfmt` here, and
         /// not that of `cargo fmt`. The file contents will be passed on the
         /// standard input and the formatted result will be read from the

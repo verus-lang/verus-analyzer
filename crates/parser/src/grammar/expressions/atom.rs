@@ -52,6 +52,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![do],
         T![gen],
         T![for],
+        T![final],
         T![if],
         T![let],
         T![loop],
@@ -84,7 +85,8 @@ pub(super) fn atom_expr(
         && (p.nth_at(1, T!['(']) || p.nth_at_contextual_kw(1, T![forall]))
     {
         let m = p.start();
-        return Some((verus::assert(p, m), BlockLike::NotBlock));
+        let (assert, has_block) = verus::assert(p, m);
+        return Some((assert, if has_block { BlockLike::Block } else { BlockLike::NotBlock }));
     }
     if p.at_contextual_kw(T![assume]) && p.nth_at(1, T!['(']) {
         let m = p.start();

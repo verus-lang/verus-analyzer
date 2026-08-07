@@ -29,6 +29,7 @@ pub(super) fn at_contract_boundary(p: &Parser<'_>) -> bool {
         || at_kw(p, T![invariant_except_break])
         || at_kw(p, T![when])
         || at_kw(p, T![via])
+        || at_kw(p, T![by])
 }
 
 fn expr_list(p: &mut Parser<'_>) {
@@ -253,7 +254,7 @@ pub(super) fn final_expr(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     m.complete(p, FINAL_EXPR)
 }
 
-pub(super) fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+pub(super) fn assert(p: &mut Parser<'_>, m: Marker) -> (CompletedMarker, bool) {
     expect_kw(p, T![assert]);
     if at_kw(p, T![forall]) {
         closure_expr(p, None, true);
@@ -262,7 +263,7 @@ pub(super) fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
         }
         expect_kw(p, T![by]);
         expressions::block_expr(p);
-        return m.complete(p, ASSERT_FORALL_EXPR);
+        return (m.complete(p, ASSERT_FORALL_EXPR), true);
     }
 
     p.expect(T!['(']);
@@ -275,10 +276,13 @@ pub(super) fn assert(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
     if at_kw(p, T![requires]) {
         requires(p);
     }
-    if p.at(T!['{']) {
+    let has_block = if p.at(T!['{']) {
         expressions::block_expr(p);
-    }
-    m.complete(p, ASSERT_EXPR)
+        true
+    } else {
+        false
+    };
+    (m.complete(p, ASSERT_EXPR), has_block)
 }
 
 pub(super) fn prover(p: &mut Parser<'_>) -> CompletedMarker {

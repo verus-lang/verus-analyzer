@@ -26,6 +26,46 @@ fn main() {
 }
 
 #[test]
+fn verus_regressions_parse_and_lift_to_vst() {
+    use ast::HasModuleItem;
+
+    let code = r#"
+verus! {
+    pub open(crate) spec fn visible() {}
+    pub open(super) spec fn inherited() {}
+
+    proof fn prover_before_contract(x: int)
+        by (nonlinear_arith)
+        requires x >= 0,
+    {}
+
+    fn assertions() {
+        assert(true) by {
+            assert(true);
+        }
+        assert forall|x: int| x == x by {}
+    }
+
+    fn final_values(x: &mut u64)
+        ensures *final(x) == 10,
+    {
+        *x = 10;
+    }
+
+    spec const SPEC_VALUE: u64 = 7;
+    exec const VALUE: u64 ensures VALUE == SPEC_VALUE { 7 }
+    exec static STATIC_VALUE: u64 ensures true { 7 }
+}
+"#;
+
+    let parse = SourceFile::parse(code, Edition::CURRENT);
+    assert!(parse.errors().is_empty(), "{:#?}", parse.errors());
+    for item in parse.tree().items() {
+        let _: ast::generated::vst_nodes::Item = item.try_into().unwrap();
+    }
+}
+
+#[test]
 fn benchmark_parser() {
     if std::env::var("RUN_SLOW_BENCHES").is_err() {
         return;

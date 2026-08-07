@@ -225,6 +225,47 @@ export async function getVerus(
     );
 }
 
+export type VerusVersionInfo = {
+    version?: string;
+    toolchain?: string;
+};
+
+export async function getVerusVersionInfo(path: string): Promise<VerusVersionInfo> {
+    const result = await spawnAsync(path, ["--version"]);
+    if (result.error || result.status !== 0) {
+        log.warn("Failed to determine Verus version", result);
+        return {};
+    }
+    return parseVerusVersionInfo(result.stdout);
+}
+
+export async function warnIfVerusToolchainMissing(info: VerusVersionInfo): Promise<void> {
+    if (!info.toolchain) return;
+
+    const result = await spawnAsync("rustup", ["toolchain", "list"]);
+    if (result.error || result.status !== 0) {
+        log.warn("Failed to inspect installed Rust toolchains", result);
+        return;
+    }
+    const installed = result.stdout
+        .split(/\r?\n/)
+        .map((line) => line.trim().split(/\s+/, 1)[0])
+        .filter((toolchain): toolchain is string => toolchain !== undefined);
+    if (!installed.includes(info.toolchain)) {
+        void vscode.window.showWarningMessage(
+            `Verus ${info.version ?? ""} requires Rust ${info.toolchain}, but that toolchain is not installed. ` +
+                `Install it with \`rustup toolchain install ${info.toolchain}\`.`,
+        );
+    }
+}
+
+function parseVerusVersionInfo(output: string): VerusVersionInfo {
+    return {
+        version: /^\s*Version:\s*(\S.*?)\s*$/m.exec(output)?.[1],
+        toolchain: /^\s*Toolchain:\s*(\S.*?)\s*$/m.exec(output)?.[1],
+    };
+}
+
 function verusReleasePlatform(): { assetMarker: string; releaseDirectory: string } | undefined {
     if (process.platform === "win32" && process.arch === "x64") {
         return { assetMarker: "x86-win", releaseDirectory: "verus-x86-win" };
@@ -473,4 +514,5 @@ export const _private = {
     declaresRaComponent,
     earliestToolchainPath,
     orderFromPath,
+    parseVerusVersionInfo,
 };

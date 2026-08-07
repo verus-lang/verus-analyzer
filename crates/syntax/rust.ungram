@@ -335,12 +335,14 @@ Const =
   Attr* Visibility?
   'default'?
   'type'?
+  FnMode?
   'const' (Name | '_') GenericParamList? ':' Type
   (('=' body:Expr)? WhereClause? ';' | EnsuresClause BlockExpr)
 
 Static =
   Attr* Visibility?
   'unsafe'? 'safe'?
+  FnMode?
   'static' 'mut'? Name ':' Type
   (('=' body:Expr)? ';' | EnsuresClause BlockExpr)
 

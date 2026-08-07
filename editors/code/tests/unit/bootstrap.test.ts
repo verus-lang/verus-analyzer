@@ -3,6 +3,25 @@ import { _private } from "../../src/bootstrap";
 import type { Context } from ".";
 
 export async function getTests(ctx: Context) {
+    await ctx.suite("Bootstrap/Verus version", (suite) => {
+        suite.addTest("Parses current Verus version output", async () => {
+            const output = `Verus
+  Version: 0.2026.08.02.b677dd5
+  Profile: release
+  Platform: linux_x86_64
+  Toolchain: 1.97.1-x86_64-unknown-linux-gnu
+`;
+            assert.deepEqual(_private.parseVerusVersionInfo(output), {
+                version: "0.2026.08.02.b677dd5",
+                toolchain: "1.97.1-x86_64-unknown-linux-gnu",
+            });
+            assert.deepEqual(_private.parseVerusVersionInfo("Verus"), {
+                version: undefined,
+                toolchain: undefined,
+            });
+        });
+    });
+
     await ctx.suite("Bootstrap/Select toolchain RA", (suite) => {
         suite.addTest("Order of nightly RA", async () => {
             assert.deepStrictEqual(

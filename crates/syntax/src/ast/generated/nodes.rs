@@ -642,6 +642,8 @@ impl Const {
     #[inline]
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
     #[inline]
+    pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
+    #[inline]
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
     #[inline]
     pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
@@ -2212,6 +2214,8 @@ impl Static {
     pub fn block_expr(&self) -> Option<BlockExpr> { support::child(&self.syntax) }
     #[inline]
     pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
+    #[inline]
+    pub fn fn_mode(&self) -> Option<FnMode> { support::child(&self.syntax) }
     #[inline]
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
     #[inline]

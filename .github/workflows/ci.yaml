@@ -5,6 +5,7 @@ name: CI
 on:
   pull_request:
   merge_group:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -149,13 +150,17 @@ jobs:
             curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
               -H 'Accept: application/vnd.github+json' \
               https://api.github.com/repos/verus-lang/verus/releases/latest |
-              jq -r '.assets[] | select(.name | contains("x86-linux")) | .browser_download_url'
+              jq -r 'first(.assets[] | select(.name | contains("x86-linux")) | .browser_download_url)'
           )"
           test -n "$VERUS_URL"
           curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
             "$VERUS_URL" -o verus.zip
           unzip -q verus.zip
-          echo "VERUS_BINARY_PATH=$GITHUB_WORKSPACE/verus-x86-linux/verus" >> "$GITHUB_ENV"
+          VERUS_BINARY_PATH="$GITHUB_WORKSPACE/verus-x86-linux/verus"
+          VERUS_TOOLCHAIN="$("$VERUS_BINARY_PATH" --version | sed -n 's/^  Toolchain: //p')"
+          test -n "$VERUS_TOOLCHAIN"
+          rustup toolchain install "$VERUS_TOOLCHAIN"
+          echo "VERUS_BINARY_PATH=$VERUS_BINARY_PATH" >> "$GITHUB_ENV"
 
       - name: Test verifier-backed proof actions
         run: cargo test -p ide-assists --lib handlers::proof_action --features verus-integration-tests -- --test-threads=1

@@ -948,7 +948,7 @@
                 "title": "Cargo",
                 "properties": {
                     "verus-analyzer.cargo.buildScripts.overrideCommand": {
-                        "markdownDescription": "Override the command rust-analyzer uses to run build scripts and\nbuild procedural macros. The command is required to output json\nand should therefore include `--message-format=json` or a similar\noption.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#verus-analyzer.cargo.buildScripts.invocationStrategy#`.\n\nBy default, a cargo invocation will be constructed for the configured\ntargets and features, with the following base command line:\n\n```bash\ncargo check --quiet --workspace --message-format=json --all-targets --keep-going\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
+                        "markdownDescription": "Override the command verus-analyzer uses to run build scripts and\nbuild procedural macros. The command is required to output json\nand should therefore include `--message-format=json` or a similar\noption.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#verus-analyzer.cargo.buildScripts.invocationStrategy#`.\n\nBy default, a cargo invocation will be constructed for the configured\ntargets and features, with the following base command line:\n\n```bash\ncargo check --quiet --workspace --message-format=json --all-targets --keep-going\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
                         "default": null,
                         "type": [
                             "null",
@@ -974,7 +974,7 @@
                 "title": "Cargo",
                 "properties": {
                     "verus-analyzer.cargo.buildScripts.useRustcWrapper": {
-                        "markdownDescription": "Use `RUSTC_WRAPPER=rust-analyzer` when running build scripts to\navoid checking unnecessary things.",
+                        "markdownDescription": "Use `RUSTC_WRAPPER=verus-analyzer` when running build scripts to\navoid checking unnecessary things.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1000,7 +1000,7 @@
                 "title": "Cargo",
                 "properties": {
                     "verus-analyzer.cargo.configPath": {
-                        "markdownDescription": "Path to a `.cargo/config.toml` style file to pass to cargo via `--config`\nfor every cargo invocation (metadata, build scripts, config discovery).\nUseful to give rust-analyzer a consistent view of the project configuration.",
+                        "markdownDescription": "Path to a `.cargo/config.toml` style file to pass to cargo via `--config`\nfor every cargo invocation (metadata, build scripts, config discovery).\nUseful to give verus-analyzer a consistent view of the project configuration.",
                         "default": null,
                         "type": [
                             "null",
@@ -1095,7 +1095,7 @@
                 "title": "Cargo",
                 "properties": {
                     "verus-analyzer.cargo.sysroot": {
-                        "markdownDescription": "Relative path to the sysroot, or \"discover\" to try to automatically find it via\n\"rustc --print sysroot\".\n\nUnsetting this disables sysroot loading.\n\nThis option does not take effect until rust-analyzer is restarted.",
+                        "markdownDescription": "Relative path to the sysroot, or \"discover\" to try to automatically find it via\n\"rustc --print sysroot\".\n\nUnsetting this disables sysroot loading.\n\nThis option does not take effect until verus-analyzer is restarted.",
                         "default": "discover",
                         "type": [
                             "null",
@@ -1108,7 +1108,7 @@
                 "title": "Cargo",
                 "properties": {
                     "verus-analyzer.cargo.sysrootSrc": {
-                        "markdownDescription": "Relative path to the sysroot library sources. If left unset, this will default to\n`{cargo.sysroot}/lib/rustlib/src/rust/library`.\n\nThis option does not take effect until rust-analyzer is restarted.",
+                        "markdownDescription": "Relative path to the sysroot library sources. If left unset, this will default to\n`{cargo.sysroot}/lib/rustlib/src/rust/library`.\n\nThis option does not take effect until verus-analyzer is restarted.",
                         "default": null,
                         "type": [
                             "null",
@@ -1134,7 +1134,7 @@
                 "title": "Cargo",
                 "properties": {
                     "verus-analyzer.cargo.targetDir": {
-                        "markdownDescription": "Optional path to a rust-analyzer specific target directory.\nThis prevents rust-analyzer's `cargo check` and initial build-script and proc-macro\nbuilding from locking the `Cargo.lock` at the expense of duplicating build artifacts.\n\nSet to `true` to use a subdirectory of the existing target directory or\nset to a path relative to the workspace to use that path.",
+                        "markdownDescription": "Optional path to a verus-analyzer specific target directory.\nThis prevents verus-analyzer's `cargo check` and initial build-script and proc-macro\nbuilding from locking the `Cargo.lock` at the expense of duplicating build artifacts.\n\nSet to `true` to use a subdirectory of the existing target directory or\nset to a path relative to the workspace to use that path.",
                         "default": null,
                         "anyOf": [
                             {
@@ -1304,7 +1304,7 @@
                 "title": "Check",
                 "properties": {
                     "verus-analyzer.check.overrideCommand": {
-                        "markdownDescription": "Override the command rust-analyzer uses instead of `cargo check` for\ndiagnostics on save. The command is required to output json and\nshould therefore include `--message-format=json` or a similar option\n(if your client supports the `colorDiagnosticOutput` experimental\ncapability, you can use `--message-format=json-diagnostic-rendered-ansi`).\n\nIf you're changing this because you're using some tool wrapping\nCargo, you might also want to change\n`#verus-analyzer.cargo.buildScripts.overrideCommand#`.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#verus-analyzer.check.invocationStrategy#`.\n\nIt supports two interpolation syntaxes, both mainly intended to be used with\n[non-Cargo build systems](./non_cargo_based_projects.md):\n\n- If `{saved_file}` is part of the command, rust-analyzer will pass\n    the absolute path of the saved file to the provided command.\n    (A previous version, `$saved_file`, also works.)\n- If `{label}` is part of the command, rust-analyzer will pass the\n    Cargo package ID, which can be used with `cargo check -p`, or a build label from\n    `rust-project.json`. If `{label}` is included, rust-analyzer behaves much like\n    [`\"rust-analyzer.check.workspace\": false`](#check.workspace).\n\n\n\nAn example command would be:\n\n```bash\ncargo check --workspace --message-format=json --all-targets\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
+                        "markdownDescription": "Override the command verus-analyzer uses instead of `cargo check` for\ndiagnostics on save. The command is required to output json and\nshould therefore include `--message-format=json` or a similar option\n(if your client supports the `colorDiagnosticOutput` experimental\ncapability, you can use `--message-format=json-diagnostic-rendered-ansi`).\n\nIf you're changing this because you're using some tool wrapping\nCargo, you might also want to change\n`#verus-analyzer.cargo.buildScripts.overrideCommand#`.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#verus-analyzer.check.invocationStrategy#`.\n\nIt supports two interpolation syntaxes, both mainly intended to be used with\n[non-Cargo build systems](./non_cargo_based_projects.md):\n\n- If `{saved_file}` is part of the command, verus-analyzer will pass\n    the absolute path of the saved file to the provided command.\n    (A previous version, `$saved_file`, also works.)\n- If `{label}` is part of the command, verus-analyzer will pass the\n    Cargo package ID, which can be used with `cargo check -p`, or a build label from\n    `rust-project.json`. If `{label}` is included, verus-analyzer behaves much like\n    [`\"verus-analyzer.check.workspace\": false`](#check.workspace).\n\n\n\nAn example command would be:\n\n```bash\ncargo check --workspace --message-format=json --all-targets\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
                         "default": null,
                         "type": [
                             "null",
@@ -1620,7 +1620,7 @@
                 "title": "Diagnostics",
                 "properties": {
                     "verus-analyzer.diagnostics.disabled": {
-                        "markdownDescription": "List of rust-analyzer diagnostics to disable.",
+                        "markdownDescription": "List of verus-analyzer diagnostics to disable.",
                         "default": [],
                         "type": "array",
                         "items": {
@@ -1634,7 +1634,7 @@
                 "title": "Diagnostics",
                 "properties": {
                     "verus-analyzer.diagnostics.enable": {
-                        "markdownDescription": "Show native rust-analyzer diagnostics.",
+                        "markdownDescription": "Show native verus-analyzer diagnostics.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1644,7 +1644,7 @@
                 "title": "Diagnostics",
                 "properties": {
                     "verus-analyzer.diagnostics.experimental.enable": {
-                        "markdownDescription": "Show experimental rust-analyzer diagnostics that might have more false positives than\nusual.",
+                        "markdownDescription": "Show experimental verus-analyzer diagnostics that might have more false positives than\nusual.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -1700,7 +1700,7 @@
                 "title": "verus-analyzer",
                 "properties": {
                     "verus-analyzer.disableFixtureSupport": {
-                        "markdownDescription": "Disable support for `#[rust_analyzer::rust_fixture]` snippets.\n\nIf you are not working on rust-analyzer itself, you should ignore this config.",
+                        "markdownDescription": "Disable support for `#[rust_analyzer::rust_fixture]` snippets.\n\nIf you are not working on verus-analyzer itself, you should ignore this config.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -1720,7 +1720,7 @@
                 "title": "Files",
                 "properties": {
                     "verus-analyzer.files.exclude": {
-                        "markdownDescription": "List of files to ignore\n\nThese paths (file/directories) will be ignored by rust-analyzer. They are relative to\nthe workspace root, and globs are not supported. You may also need to add the folders to\nCode's `files.watcherExclude`.",
+                        "markdownDescription": "List of files to ignore\n\nThese paths (file/directories) will be ignored by verus-analyzer. They are relative to\nthe workspace root, and globs are not supported. You may also need to add the folders to\nCode's `files.watcherExclude`.",
                         "default": [],
                         "type": "array",
                         "items": {
@@ -2127,7 +2127,7 @@
                 "title": "Imports",
                 "properties": {
                     "verus-analyzer.imports.granularity.enforce": {
-                        "markdownDescription": "Enforce the import granularity setting for all files. If set to false rust-analyzer will\ntry to keep import styles consistent per file.",
+                        "markdownDescription": "Enforce the import granularity setting for all files. If set to false verus-analyzer will\ntry to keep import styles consistent per file.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -2812,7 +2812,7 @@
                 "title": "Lru",
                 "properties": {
                     "verus-analyzer.lru.capacity": {
-                        "markdownDescription": "Number of syntax trees rust-analyzer keeps in memory. Defaults to 128.",
+                        "markdownDescription": "Number of syntax trees verus-analyzer keeps in memory. Defaults to 128.",
                         "default": null,
                         "type": [
                             "null",
@@ -2907,7 +2907,7 @@
                 "title": "Proc Macro",
                 "properties": {
                     "verus-analyzer.procMacro.processes": {
-                        "markdownDescription": "Number of proc-macro server processes to spawn.\n\nControls how many independent `proc-macro-srv` processes rust-analyzer\nruns in parallel to handle macro expansion.",
+                        "markdownDescription": "Number of proc-macro server processes to spawn.\n\nControls how many independent `proc-macro-srv` processes verus-analyzer\nruns in parallel to handle macro expansion.",
                         "default": 2,
                         "anyOf": [
                             {
@@ -2945,7 +2945,7 @@
                 "title": "Profiling",
                 "properties": {
                     "verus-analyzer.profiling.memoryProfile": {
-                        "markdownDescription": "The path where to save memory profiling output.\n\n**Note:** Memory profiling is not enabled by default in rust-analyzer builds, you need to build\nfrom source for it.",
+                        "markdownDescription": "The path where to save memory profiling output.\n\n**Note:** Memory profiling is not enabled by default in verus-analyzer builds, you need to build\nfrom source for it.",
                         "default": null,
                         "type": [
                             "null",
@@ -2998,7 +2998,7 @@
                 "title": "Runnables",
                 "properties": {
                     "verus-analyzer.runnables.bench.overrideCommand": {
-                        "markdownDescription": "Override the command used for bench runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nUse the placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::bench_func`.\n- `${exact}`: `--exact` for single benchmarks, empty for modules.\n- `${include_ignored}`: always empty for benchmarks.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `rust-analyzer.runnables.extraTestBinaryArgs`).",
+                        "markdownDescription": "Override the command used for bench runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nUse the placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::bench_func`.\n- `${exact}`: `--exact` for single benchmarks, empty for modules.\n- `${include_ignored}`: always empty for benchmarks.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `verus-analyzer.runnables.extraTestBinaryArgs`).",
                         "default": null,
                         "type": [
                             "null",
@@ -3027,7 +3027,7 @@
                 "title": "Runnables",
                 "properties": {
                     "verus-analyzer.runnables.doctest.overrideCommand": {
-                        "markdownDescription": "Override the command used for doc-test runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nUse the placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::func`.\n- `${exact}`: always empty for doc-tests.\n- `${include_ignored}`: always empty for doc-tests.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `rust-analyzer.runnables.extraTestBinaryArgs`).",
+                        "markdownDescription": "Override the command used for doc-test runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nUse the placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::func`.\n- `${exact}`: always empty for doc-tests.\n- `${include_ignored}`: always empty for doc-tests.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `verus-analyzer.runnables.extraTestBinaryArgs`).",
                         "default": null,
                         "type": [
                             "null",
@@ -3081,7 +3081,7 @@
                 "title": "Runnables",
                 "properties": {
                     "verus-analyzer.runnables.test.overrideCommand": {
-                        "markdownDescription": "Override the command used for test runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nAvailable placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::test_func`.\n- `${exact}`: `--exact` for single tests, empty for modules.\n- `${include_ignored}`: `--include-ignored` for single tests, empty otherwise.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `rust-analyzer.runnables.extraTestBinaryArgs`).",
+                        "markdownDescription": "Override the command used for test runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nAvailable placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::test_func`.\n- `${exact}`: `--exact` for single tests, empty for modules.\n- `${include_ignored}`: `--include-ignored` for single tests, empty otherwise.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `verus-analyzer.runnables.extraTestBinaryArgs`).",
                         "default": null,
                         "type": [
                             "null",
@@ -3097,7 +3097,7 @@
                 "title": "Rustc",
                 "properties": {
                     "verus-analyzer.rustc.source": {
-                        "markdownDescription": "Path to the Cargo.toml of the rust compiler workspace, for usage in rustc_private\nprojects, or \"discover\" to try to automatically find it if the `rustc-dev` component\nis installed.\n\nAny project which uses rust-analyzer with the rustcPrivate\ncrates must set `[package.metadata.rust-analyzer] rustc_private=true` to use it.\n\nThis option does not take effect until rust-analyzer is restarted.",
+                        "markdownDescription": "Path to the Cargo.toml of the rust compiler workspace, for usage in rustc_private\nprojects, or \"discover\" to try to automatically find it if the `rustc-dev` component\nis installed.\n\nAny project which uses verus-analyzer with the rustcPrivate\ncrates must set `[package.metadata.rust-analyzer] rustc_private=true` to use it.\n\nThis option does not take effect until verus-analyzer is restarted.",
                         "default": null,
                         "type": [
                             "null",
@@ -3123,7 +3123,7 @@
                 "title": "Rustfmt",
                 "properties": {
                     "verus-analyzer.rustfmt.overrideCommand": {
-                        "markdownDescription": "Advanced option, fully override the command rust-analyzer uses for\nformatting. This should be the equivalent of `rustfmt` here, and\nnot that of `cargo fmt`. The file contents will be passed on the\nstandard input and the formatted result will be read from the\nstandard output.\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
+                        "markdownDescription": "Advanced option, fully override the command verus-analyzer uses for\nformatting. This should be the equivalent of `rustfmt` here, and\nnot that of `cargo fmt`. The file contents will be passed on the\nstandard input and the formatted result will be read from the\nstandard output.\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
                         "default": null,
                         "type": [
                             "null",
@@ -3159,7 +3159,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.doc.comment.inject.enable": {
-                        "markdownDescription": "Inject additional highlighting into doc comments.\n\nWhen enabled, rust-analyzer will highlight rust source in doc comments as well as intra\ndoc links.",
+                        "markdownDescription": "Inject additional highlighting into doc comments.\n\nWhen enabled, verus-analyzer will highlight rust source in doc comments as well as intra\ndoc links.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -3169,7 +3169,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.nonStandardTokens": {
-                        "markdownDescription": "Emit non-standard tokens and modifiers\n\nWhen enabled, rust-analyzer will emit tokens and modifiers that are not part of the\nstandard set of semantic tokens.",
+                        "markdownDescription": "Emit non-standard tokens and modifiers\n\nWhen enabled, verus-analyzer will emit tokens and modifiers that are not part of the\nstandard set of semantic tokens.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -3179,7 +3179,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.operator.enable": {
-                        "markdownDescription": "Use semantic tokens for operators.\n\nWhen disabled, rust-analyzer will emit semantic tokens only for operator tokens when\nthey are tagged with modifiers.",
+                        "markdownDescription": "Use semantic tokens for operators.\n\nWhen disabled, verus-analyzer will emit semantic tokens only for operator tokens when\nthey are tagged with modifiers.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -3189,7 +3189,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.operator.specialization.enable": {
-                        "markdownDescription": "Use specialized semantic tokens for operators.\n\nWhen enabled, rust-analyzer will emit special token types for operator tokens instead\nof the generic `operator` token type.",
+                        "markdownDescription": "Use specialized semantic tokens for operators.\n\nWhen enabled, verus-analyzer will emit special token types for operator tokens instead\nof the generic `operator` token type.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -3199,7 +3199,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.punctuation.enable": {
-                        "markdownDescription": "Use semantic tokens for punctuation.\n\nWhen disabled, rust-analyzer will emit semantic tokens only for punctuation tokens when\nthey are tagged with modifiers or have a special role.",
+                        "markdownDescription": "Use semantic tokens for punctuation.\n\nWhen disabled, verus-analyzer will emit semantic tokens only for punctuation tokens when\nthey are tagged with modifiers or have a special role.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -3209,7 +3209,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.punctuation.separate.macro.bang": {
-                        "markdownDescription": "When enabled, rust-analyzer will emit a punctuation semantic token for the `!` of macro\ncalls.",
+                        "markdownDescription": "When enabled, verus-analyzer will emit a punctuation semantic token for the `!` of macro\ncalls.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -3219,7 +3219,7 @@
                 "title": "Semantic Highlighting",
                 "properties": {
                     "verus-analyzer.semanticHighlighting.punctuation.specialization.enable": {
-                        "markdownDescription": "Use specialized semantic tokens for punctuation.\n\nWhen enabled, rust-analyzer will emit special token types for punctuation tokens instead\nof the generic `punctuation` token type.",
+                        "markdownDescription": "Use specialized semantic tokens for punctuation.\n\nWhen enabled, verus-analyzer will emit special token types for punctuation tokens instead\nof the generic `punctuation` token type.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -3326,7 +3326,7 @@
                 "title": "Workspace",
                 "properties": {
                     "verus-analyzer.workspace.discoverConfig": {
-                        "markdownDescription": "Configure a command that rust-analyzer can invoke to\nobtain configuration.\n\nThis is an alternative to manually generating\n`rust-project.json`: it enables rust-analyzer to generate\nrust-project.json on the fly, and regenerate it when\nswitching or modifying projects.\n\nThis is an object with three fields:\n\n* `command`: the shell command to invoke\n\n* `filesToWatch`: which build system-specific files should\nbe watched to trigger regenerating the configuration\n\n* `progressLabel`: the name of the command, used in\nprogress indicators in the IDE\n\nHere's an example of a valid configuration:\n\n```json\n\"rust-analyzer.workspace.discoverConfig\": {\n        \"command\": [\n                \"rust-project\",\n                \"develop-json\",\n                \"{arg}\"\n        ],\n        \"progressLabel\": \"buck2/rust-project\",\n        \"filesToWatch\": [\n                \"BUCK\"\n        ]\n}\n```\n\n## Argument Substitutions\n\nIf `command` includes the argument `{arg}`, that argument will be substituted\nwith the JSON-serialized form of the following enum:\n\n```norun\n#[derive(PartialEq, Clone, Debug, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub enum DiscoverArgument {\n     Path(AbsPathBuf),\n     Buildfile(AbsPathBuf),\n}\n```\n\nrust-analyzer will use the path invocation to find and\ngenerate a `rust-project.json` and therefore a\nworkspace. Example:\n\n\n```norun\nrust-project develop-json '{ \"path\": \"myproject/src/main.rs\" }'\n```\n\nrust-analyzer will use build file invocations to update an\nexisting workspace. Example:\n\nOr with a build file and the configuration above:\n\n```norun\nrust-project develop-json '{ \"buildfile\": \"myproject/BUCK\" }'\n```\n\nAs a reference for implementors, buck2's `rust-project`\nwill likely be useful:\n<https://github.com/facebook/buck2/tree/main/integrations/rust-project>.\n\n## Discover Command Output\n\n**Warning**: This format is provisional and subject to change.\n\nThe discover command should output JSON objects to stdout,\none per line (JSONL format). These objects should correspond\nto this Rust data type:\n\n```norun\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(tag = \"kind\")]\n#[serde(rename_all = \"snake_case\")]\nenum DiscoverProjectData {\n        Finished { buildfile: Utf8PathBuf, project: ProjectJsonData },\n        Error { error: String, source: Option<String> },\n        Progress { message: String },\n}\n```\n\nFor example, a progress event:\n\n```json\n{\"kind\":\"progress\",\"message\":\"generating rust-project.json\"}\n```\n\nA finished event can look like this (expanded and\ncommented for readability):\n\n```json\n{\n        // the internally-tagged representation of the enum.\n        \"kind\": \"finished\",\n        // the file used by a non-Cargo build system to define\n        // a package or target.\n        \"buildfile\": \"rust-analyzer/BUCK\",\n        // the contents of a rust-project.json, elided for brevity\n        \"project\": {\n                \"sysroot\": \"foo\",\n                \"crates\": []\n        }\n}\n```\n\nOnly the finished event is required, but the other\nvariants are encouraged to give users more feedback about\nprogress or errors.\n\nStderr is not parsed as JSONL. It is treated as command log\noutput and forwarded to rust-analyzer's own logs.",
+                        "markdownDescription": "Configure a command that verus-analyzer can invoke to\nobtain configuration.\n\nThis is an alternative to manually generating\n`rust-project.json`: it enables verus-analyzer to generate\nrust-project.json on the fly, and regenerate it when\nswitching or modifying projects.\n\nThis is an object with three fields:\n\n* `command`: the shell command to invoke\n\n* `filesToWatch`: which build system-specific files should\nbe watched to trigger regenerating the configuration\n\n* `progressLabel`: the name of the command, used in\nprogress indicators in the IDE\n\nHere's an example of a valid configuration:\n\n```json\n\"verus-analyzer.workspace.discoverConfig\": {\n        \"command\": [\n                \"rust-project\",\n                \"develop-json\",\n                \"{arg}\"\n        ],\n        \"progressLabel\": \"buck2/rust-project\",\n        \"filesToWatch\": [\n                \"BUCK\"\n        ]\n}\n```\n\n## Argument Substitutions\n\nIf `command` includes the argument `{arg}`, that argument will be substituted\nwith the JSON-serialized form of the following enum:\n\n```norun\n#[derive(PartialEq, Clone, Debug, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub enum DiscoverArgument {\n     Path(AbsPathBuf),\n     Buildfile(AbsPathBuf),\n}\n```\n\nverus-analyzer will use the path invocation to find and\ngenerate a `rust-project.json` and therefore a\nworkspace. Example:\n\n\n```norun\nrust-project develop-json '{ \"path\": \"myproject/src/main.rs\" }'\n```\n\nverus-analyzer will use build file invocations to update an\nexisting workspace. Example:\n\nOr with a build file and the configuration above:\n\n```norun\nrust-project develop-json '{ \"buildfile\": \"myproject/BUCK\" }'\n```\n\nAs a reference for implementors, buck2's `rust-project`\nwill likely be useful:\n<https://github.com/facebook/buck2/tree/main/integrations/rust-project>.\n\n## Discover Command Output\n\n**Warning**: This format is provisional and subject to change.\n\nThe discover command should output JSON objects to stdout,\none per line (JSONL format). These objects should correspond\nto this Rust data type:\n\n```norun\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(tag = \"kind\")]\n#[serde(rename_all = \"snake_case\")]\nenum DiscoverProjectData {\n        Finished { buildfile: Utf8PathBuf, project: ProjectJsonData },\n        Error { error: String, source: Option<String> },\n        Progress { message: String },\n}\n```\n\nFor example, a progress event:\n\n```json\n{\"kind\":\"progress\",\"message\":\"generating rust-project.json\"}\n```\n\nA finished event can look like this (expanded and\ncommented for readability):\n\n```json\n{\n        // the internally-tagged representation of the enum.\n        \"kind\": \"finished\",\n        // the file used by a non-Cargo build system to define\n        // a package or target.\n        \"buildfile\": \"verus-analyzer/BUCK\",\n        // the contents of a rust-project.json, elided for brevity\n        \"project\": {\n                \"sysroot\": \"foo\",\n                \"crates\": []\n        }\n}\n```\n\nOnly the finished event is required, but the other\nvariants are encouraged to give users more feedback about\nprogress or errors.\n\nStderr is not parsed as JSONL. It is treated as command log\noutput and forwarded to verus-analyzer's own logs.",
                         "default": null,
                         "anyOf": [
                             {

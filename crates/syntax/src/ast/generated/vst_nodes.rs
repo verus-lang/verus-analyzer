@@ -377,6 +377,7 @@ pub struct Const {
     pub visibility: Option<Box<Visibility>>,
     pub default_token: bool,
     pub type_token: bool,
+    pub fn_mode: Option<Box<FnMode>>,
     pub const_token: bool,
     pub name: Option<Box<Name>>,
     pub underscore_token: bool,
@@ -1361,6 +1362,7 @@ pub struct Static {
     pub visibility: Option<Box<Visibility>>,
     pub unsafe_token: bool,
     pub safe_token: bool,
+    pub fn_mode: Option<Box<FnMode>>,
     pub static_token: bool,
     pub mut_token: bool,
     pub name: Box<Name>,
@@ -2782,6 +2784,10 @@ impl TryFrom<super::nodes::Const> for Const {
             },
             default_token: item.default_token().is_some(),
             type_token: item.type_token().is_some(),
+            fn_mode: match item.fn_mode() {
+                Some(it) => Some(Box::new(FnMode::try_from(it)?)),
+                None => None,
+            },
             const_token: item.const_token().is_some(),
             name: match item.name() {
                 Some(it) => Some(Box::new(Name::try_from(it)?)),
@@ -5173,6 +5179,10 @@ impl TryFrom<super::nodes::Static> for Static {
             },
             unsafe_token: item.unsafe_token().is_some(),
             safe_token: item.safe_token().is_some(),
+            fn_mode: match item.fn_mode() {
+                Some(it) => Some(Box::new(FnMode::try_from(it)?)),
+                None => None,
+            },
             static_token: item.static_token().is_some(),
             mut_token: item.mut_token().is_some(),
             name: Box::new(
@@ -7527,6 +7537,10 @@ impl std::fmt::Display for Const {
             let mut tmp = stringify!(type_token).to_string();
             tmp.truncate(tmp.len() - 6);
             s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.fn_mode {
+            s.push_str(&it.to_string());
             s.push_str(" ");
         }
         if self.const_token {
@@ -10351,6 +10365,10 @@ impl std::fmt::Display for Static {
             s.push_str(token_ascii(&tmp));
             s.push_str(" ");
         }
+        if let Some(it) = &self.fn_mode {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if self.static_token {
             let mut tmp = stringify!(static_token).to_string();
             tmp.truncate(tmp.len() - 6);
@@ -12990,6 +13008,7 @@ impl Const {
             visibility: None,
             default_token: false,
             type_token: false,
+            fn_mode: None,
             const_token: true,
             name: None,
             underscore_token: false,
@@ -14020,6 +14039,7 @@ impl Static {
             visibility: None,
             unsafe_token: false,
             safe_token: false,
+            fn_mode: None,
             static_token: true,
             mut_token: false,
             name: Box::new(name),
