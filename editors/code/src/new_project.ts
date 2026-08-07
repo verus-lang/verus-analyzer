@@ -75,7 +75,7 @@ export function newProject(ctx: Ctx): Cmd {
 }
 
 async function resolveNewProjectCargo(ctx: Ctx): Promise<NewProjectCargo> {
-    // Use the same effective environment rust-analyzer uses elsewhere so project creation sees
+    // Use the same effective environment verus-analyzer uses elsewhere so project creation sees
     // toolchain wrappers, PATH overrides, and CARGO_HOME changes from configuration.
     const cargoEnv = { ...process.env, ...ctx.config.serverExtraEnv };
     return { cargo: await cargoPath(cargoEnv), cargoEnv };
@@ -302,7 +302,7 @@ async function executeNewProjectOpenAction(
 
     const index = vscode.workspace.workspaceFolders?.length ?? 0;
     vscode.workspace.updateWorkspaceFolders(index, 0, { uri: projectUri });
-    // Reuse the existing workspace window when requested, but nudge rust-analyzer afterwards so
+    // Reuse the existing workspace window when requested, but nudge verus-analyzer afterwards so
     // the newly added Cargo project is discovered immediately instead of waiting for a later
     // background refresh.
     if (ctx.client?.isRunning()) {

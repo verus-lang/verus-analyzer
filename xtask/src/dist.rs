@@ -74,7 +74,9 @@ fn dist_client(
 ) -> anyhow::Result<()> {
     let bundle_path = Path::new("editors").join("code").join("server");
     sh.create_dir(&bundle_path)?;
-    sh.copy_file(&target.server_path, &bundle_path)?;
+    let bundled_server =
+        bundle_path.join(if cfg!(windows) { "verus-analyzer.exe" } else { "verus-analyzer" });
+    sh.copy_file(&target.server_path, &bundled_server)?;
     if let Some(symbols_path) = &target.symbols_path {
         sh.copy_file(symbols_path, &bundle_path)?;
     }
@@ -242,7 +244,7 @@ impl Target {
             (String::new(), None)
         };
         let server_path = out_path.join(format!("rust-analyzer{exe_suffix}"));
-        let artifact_name = format!("rust-analyzer-{name}{exe_suffix}");
+        let artifact_name = format!("verus-analyzer-{name}{exe_suffix}");
         Self { name, libc_suffix, server_path, symbols_path, artifact_name }
     }
 

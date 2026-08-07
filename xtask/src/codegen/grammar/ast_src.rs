@@ -180,7 +180,6 @@ const CONTEXTUAL_KEYWORDS: &[&str] = &[
     "tracked",
     "has",
     "matches",
-    "final",
 ];
 // keywords we use for special macro expansions
 const CONTEXTUAL_BUILTIN_KEYWORDS: &[&str] = &[

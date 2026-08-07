@@ -1534,6 +1534,7 @@ pub(crate) fn handle_code_action(
         &snap.config.diagnostic_fixes(Some(source_root)),
         resolve,
         frange,
+        snap.verus_errors.get(&file_id).map(Vec::as_slice).unwrap_or_default(),
     )?;
     let client_commands = snap.config.client_commands();
     for (index, assist) in assists.into_iter().enumerate() {
@@ -1627,6 +1628,7 @@ pub(crate) fn handle_code_action_resolve(
         &snap.config.diagnostic_fixes(Some(source_root)),
         AssistResolveStrategy::Single(assist_resolve),
         frange,
+        snap.verus_errors.get(&file_id).map(Vec::as_slice).unwrap_or_default(),
     )?;
 
     let assist = match assists.get(assist_index) {

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /**
- * This file mirrors `crates/rust-analyzer/src/lsp_ext.rs` declarations.
+ * This file mirrors `crates/rust-analyzer/src/lsp/ext.rs` declarations.
  */
 
 import * as lc from "vscode-languageclient";
 
-// rust-analyzer overrides
+// verus-analyzer overrides
 
 export const hover = new lc.RequestType<
     HoverParams,
@@ -25,47 +25,47 @@ export type CommandLinkGroup = {
     commands: CommandLink[];
 };
 
-// rust-analyzer extensions
+// verus-analyzer extensions
 
 export const analyzerStatus = new lc.RequestType<AnalyzerStatusParams, string, void>(
-    "rust-analyzer/analyzerStatus",
+    "verus-analyzer/analyzerStatus",
 );
-export const cancelFlycheck = new lc.NotificationType0("rust-analyzer/cancelFlycheck");
-export const clearFlycheck = new lc.NotificationType0("rust-analyzer/clearFlycheck");
+export const cancelFlycheck = new lc.NotificationType0("verus-analyzer/cancelFlycheck");
+export const clearFlycheck = new lc.NotificationType0("verus-analyzer/clearFlycheck");
 export const expandMacro = new lc.RequestType<ExpandMacroParams, ExpandedMacro | null, void>(
-    "rust-analyzer/expandMacro",
+    "verus-analyzer/expandMacro",
 );
-export const memoryUsage = new lc.RequestType0<string, void>("rust-analyzer/memoryUsage");
-export const openServerLogs = new lc.NotificationType0("rust-analyzer/openServerLogs");
+export const memoryUsage = new lc.RequestType0<string, void>("verus-analyzer/memoryUsage");
+export const openServerLogs = new lc.NotificationType0("verus-analyzer/openServerLogs");
 export const relatedTests = new lc.RequestType<lc.TextDocumentPositionParams, TestInfo[], void>(
-    "rust-analyzer/relatedTests",
+    "verus-analyzer/relatedTests",
 );
-export const reloadWorkspace = new lc.RequestType0<null, void>("rust-analyzer/reloadWorkspace");
-export const rebuildProcMacros = new lc.RequestType0<null, void>("rust-analyzer/rebuildProcMacros");
+export const reloadWorkspace = new lc.RequestType0<null, void>("verus-analyzer/reloadWorkspace");
+export const rebuildProcMacros = new lc.RequestType0<null, void>("verus-analyzer/rebuildProcMacros");
 
 export const runFlycheck = new lc.NotificationType<{
     textDocument: lc.TextDocumentIdentifier | null;
-}>("rust-analyzer/runFlycheck");
+}>("verus-analyzer/runFlycheck");
 export const viewSyntaxTree = new lc.RequestType<ViewSyntaxTreeParams, string, void>(
-    "rust-analyzer/viewSyntaxTree",
+    "verus-analyzer/viewSyntaxTree",
 );
 export const viewCrateGraph = new lc.RequestType<ViewCrateGraphParams, string, void>(
-    "rust-analyzer/viewCrateGraph",
+    "verus-analyzer/viewCrateGraph",
 );
 export const viewFileText = new lc.RequestType<lc.TextDocumentIdentifier, string, void>(
-    "rust-analyzer/viewFileText",
+    "verus-analyzer/viewFileText",
 );
 export const viewHir = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/viewHir",
+    "verus-analyzer/viewHir",
 );
 export const viewMir = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/viewMir",
+    "verus-analyzer/viewMir",
 );
 export const interpretFunction = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/interpretFunction",
+    "verus-analyzer/interpretFunction",
 );
 export const viewItemTree = new lc.RequestType<ViewItemTreeParams, string, void>(
-    "rust-analyzer/viewItemTree",
+    "verus-analyzer/viewItemTree",
 );
 export type EvaluatePredicateParams = {
     text: string;
@@ -81,9 +81,9 @@ export const evaluatePredicate = new lc.RequestType<
     EvaluatePredicateParams,
     EvaluatePredicateResult,
     void
->("rust-analyzer/evaluatePredicate");
+>("verus-analyzer/evaluatePredicate");
 export const getFailedObligations = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/getFailedObligations",
+    "verus-analyzer/getFailedObligations",
 );
 
 export type DiscoverTestParams = { testId?: string | undefined };
@@ -145,7 +145,7 @@ export const fetchDependencyList = new lc.RequestType<
     FetchDependencyListParams,
     FetchDependencyListResult,
     void
->("rust-analyzer/fetchDependencyList");
+>("verus-analyzer/fetchDependencyList");
 
 export interface FetchDependencyGraphParams {}
 
@@ -161,7 +161,7 @@ export const fetchDependencyGraph = new lc.RequestType<
     FetchDependencyGraphParams,
     FetchDependencyGraphResult,
     void
->("rust-analyzer/fetchDependencyGraph");
+>("verus-analyzer/fetchDependencyGraph");
 
 export type ExpandMacroParams = {
     textDocument: lc.TextDocumentIdentifier;
@@ -225,7 +225,7 @@ export const viewRecursiveMemoryLayout = new lc.RequestType<
     lc.TextDocumentPositionParams,
     RecursiveMemoryLayout | null,
     void
->("rust-analyzer/viewRecursiveMemoryLayout");
+>("verus-analyzer/viewRecursiveMemoryLayout");
 
 export type JoinLinesParams = {
     textDocument: lc.TextDocumentIdentifier;
@@ -293,7 +293,7 @@ export type CargoRunnableArgs = {
      * Command to execute instead of `cargo`.
      */
     // This is supplied by the user via config. We could pull this through the client config in the
-    // extension directly, but that would prevent us from honoring the rust-analyzer.toml for it.
+    // extension directly, but that would prevent us from honoring the verus-analyzer.toml for it.
     overrideCargo?: string;
 } & CommonRunnableArgs;
 

@@ -17,6 +17,7 @@ type bits = u64;
 pub struct Input {
     kind: Vec<SyntaxKind>,
     joint: Vec<bits>,
+    adjacent: Vec<bits>,
     contextual_kind: Vec<SyntaxKind>,
     edition: Vec<Edition>,
 }
@@ -28,6 +29,7 @@ impl Input {
         Self {
             kind: Vec::with_capacity(capacity),
             joint: Vec::with_capacity(capacity.div_ceil(bits::BITS as usize)),
+            adjacent: Vec::with_capacity(capacity.div_ceil(bits::BITS as usize)),
             contextual_kind: Vec::with_capacity(capacity),
             edition: Vec::with_capacity(capacity),
         }
@@ -62,11 +64,19 @@ impl Input {
         let (idx, b_idx) = self.bit_index(n);
         self.joint[idx] |= 1 << b_idx;
     }
+    /// Records that no trivia separates the last token from the next token.
+    #[inline]
+    pub fn was_adjacent(&mut self) {
+        let n = self.len() - 1;
+        let (idx, b_idx) = self.bit_index(n);
+        self.adjacent[idx] |= 1 << b_idx;
+    }
     #[inline]
     fn push_impl(&mut self, kind: SyntaxKind, contextual_kind: SyntaxKind, edition: Edition) {
         let idx = self.len();
         if idx.is_multiple_of(bits::BITS as usize) {
             self.joint.push(0);
+            self.adjacent.push(0);
         }
         self.kind.push(kind);
         self.contextual_kind.push(contextual_kind);
@@ -88,6 +98,10 @@ impl Input {
     pub(crate) fn is_joint(&self, n: usize) -> bool {
         let (idx, b_idx) = self.bit_index(n);
         self.joint[idx] & (1 << b_idx) != 0
+    }
+    pub(crate) fn is_adjacent(&self, n: usize) -> bool {
+        let (idx, b_idx) = self.bit_index(n);
+        self.adjacent[idx] & (1 << b_idx) != 0
     }
 }
 

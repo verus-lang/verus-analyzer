@@ -82,6 +82,7 @@ pub fn to_parser_input(
                         res.push(kind, ctx_edition(punct.span.ctx));
                         if punct.spacing == tt::Spacing::Joint {
                             res.was_joint();
+                            res.was_adjacent();
                         }
                     }
                 }

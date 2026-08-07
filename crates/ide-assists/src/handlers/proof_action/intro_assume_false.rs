@@ -1,3 +1,5 @@
+//! Adds an `assume(false)` proof block to a Verus assertion.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},
@@ -63,15 +65,15 @@ mod tests {
         check_assist(
             by_assume_false,
             "
-proof fn f(x: int) { 
-    ass$0ert(x == 3); 
+proof fn f(x: int) {
+    ass$0ert(x == 3);
 }
             ",
             "
-proof fn f(x: int) { 
+proof fn f(x: int) {
     assert(x == 3) by {
         assume(false);
-    }; 
+    };
 }
             ",
         )
@@ -84,13 +86,13 @@ proof fn f(x: int) {
             // proof to be modified below
             // `$0` indicates the cursor location
             "
-spec fn pow2(e: nat) -> nat 
+spec fn pow2(e: nat) -> nat
     decreases(e),
 {
     if e == 0 { 1 } else { 2 * pow2((e - 1) as nat)}
 }
 
-proof fn lemma_pow2_unfold3(e: nat) 
+proof fn lemma_pow2_unfold3(e: nat)
     requires e > 3,
     ensures pow2(e) == pow2((e-3) as nat) * 8,
 {
@@ -99,13 +101,13 @@ proof fn lemma_pow2_unfold3(e: nat)
 ",
             // modified proof below
             "
-spec fn pow2(e: nat) -> nat 
+spec fn pow2(e: nat) -> nat
     decreases(e),
 {
     if e == 0 { 1 } else { 2 * pow2((e - 1) as nat)}
 }
 
-proof fn lemma_pow2_unfold3(e: nat) 
+proof fn lemma_pow2_unfold3(e: nat)
     requires e > 3,
     ensures pow2(e) == pow2((e-3) as nat) * 8,
 {
@@ -122,12 +124,12 @@ proof fn lemma_pow2_unfold3(e: nat)
         check_assist(
             by_assume_false,
             "
-proof fn f(a: u64, b: u64) { 
+proof fn f(a: u64, b: u64) {
     asser$0t((a & (a | b)) == a);
 }
             ",
             "
-proof fn f(a: u64, b: u64) { 
+proof fn f(a: u64, b: u64) {
     assert((a & (a | b)) == a) by {
         assume(false);
     };

@@ -83,6 +83,10 @@ use view_memory_layout::{RecursiveMemoryLayout, view_memory_layout};
 
 use crate::navigation_target::ToNav;
 
+pub use ide_assists::proof_plumber_api::verus_error::{
+    AssertFailure, PostFailure, PreFailure, VerusError,
+};
+
 pub use crate::{
     annotations::{Annotation, AnnotationConfig, AnnotationKind, AnnotationLocation},
     call_hierarchy::{CallHierarchyConfig, CallItem},
@@ -836,6 +840,7 @@ impl Analysis {
         diagnostics_config: &DiagnosticsConfig,
         resolve: AssistResolveStrategy,
         frange: FileRange,
+        verus_errors: &[VerusError],
     ) -> Cancellable<Vec<Assist>> {
         let include_fixes = match &assist_config.allowed {
             Some(it) => it.contains(&AssistKind::QuickFix),
@@ -853,7 +858,13 @@ impl Analysis {
                 Vec::new()
             };
             let ssr_assists = ssr::ssr_assists(db, &resolve, frange);
-            let assists = ide_assists::assists(db, assist_config, resolve, frange);
+            let assists = ide_assists::assists_with_verus_errors(
+                db,
+                assist_config,
+                resolve,
+                frange,
+                verus_errors.to_vec(),
+            );
 
             let mut res = diagnostic_assists;
             res.extend(ssr_assists);

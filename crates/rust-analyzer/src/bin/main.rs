@@ -54,7 +54,7 @@ fn actual_main() -> anyhow::Result<ExitCode> {
                 break 'lsp_server;
             }
             if cmd.version {
-                println!("rust-analyzer {}", rust_analyzer::version());
+                println!("verus-analyzer {}", rust_analyzer::version());
                 break 'lsp_server;
             }
 

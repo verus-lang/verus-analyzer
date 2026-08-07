@@ -24,7 +24,7 @@ import {
 import { SyntaxTreeProvider, type SyntaxElement } from "./syntax_tree_provider";
 import { execRevealDependency } from "./commands";
 import { PersistentState } from "./persistent_state";
-import { bootstrap } from "./bootstrap";
+import { bootstrap, getVerus } from "./bootstrap";
 import { prepareTestExplorer } from "./test_explorer";
 import { spawn } from "node:child_process";
 import { text } from "node:stream/consumers";
@@ -198,11 +198,11 @@ export class Ctx implements RustAnalyzerExtensionApi {
         }
 
         if (!this.traceOutputChannel) {
-            this.traceOutputChannel = new LazyOutputChannel("rust-analyzer LSP Trace");
+            this.traceOutputChannel = new LazyOutputChannel("verus-analyzer LSP Trace");
             this.pushExtCleanup(this.traceOutputChannel);
         }
         if (!this.outputChannel) {
-            this.outputChannel = vscode.window.createOutputChannel("rust-analyzer Language Server");
+            this.outputChannel = vscode.window.createOutputChannel("verus-analyzer Language Server");
             this.pushExtCleanup(this.outputChannel);
         }
 
@@ -210,7 +210,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             this._serverPath = await this.bootstrap();
             text(spawn(this._serverPath, ["--version"]).stdout.setEncoding("utf-8")).then(
                 (data) => {
-                    const prefix = `rust-analyzer `;
+                    const prefix = `verus-analyzer `;
                     this._serverVersion = data
                         .slice(data.startsWith(prefix) ? prefix.length : 0)
                         .trim();
@@ -227,6 +227,13 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     newEnv[k] = v;
                 } else if (k in newEnv) {
                     delete newEnv[k];
+                }
+            }
+            if (this.config.verusEnabled) {
+                const verusPath = await getVerus(this.extCtx, this.config);
+                if (verusPath) {
+                    newEnv["VERUS_BINARY_PATH"] = verusPath;
+                    log.info("Using Verus binary at", verusPath);
                 }
             }
             const run: lc.Executable = {
@@ -273,7 +280,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
                     async (params: lc.ShowMessageParams) => {
                         // When an MSRV warning is detected and a rust-toolchain file exists,
                         // show an additional message with actionable guidance about adding
-                        // the rust-analyzer component.
+                        // the verus-analyzer component.
                         await handleMsrvWarning(params.message);
                     },
                 ),
@@ -479,7 +486,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
         };
 
         for (const [name, factory] of Object.entries(this.commandFactories)) {
-            const fullName = `rust-analyzer.${name}`;
+            const fullName = `verus-analyzer.${name}`;
             let callback;
             if (isClientRunning(this)) {
                 // we asserted that `client` is defined
@@ -489,7 +496,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             } else {
                 callback = () =>
                     vscode.window.showErrorMessage(
-                        `command ${fullName} failed: rust-analyzer server is not running`,
+                        `command ${fullName} failed: verus-analyzer server is not running`,
                     );
             }
 
@@ -517,9 +524,9 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 statusBar.color = undefined;
                 statusBar.backgroundColor = undefined;
                 if (this.config.statusBarClickAction === "stopServer") {
-                    statusBar.command = "rust-analyzer.stopServer";
+                    statusBar.command = "verus-analyzer.stopServer";
                 } else {
-                    statusBar.command = "rust-analyzer.openLogs";
+                    statusBar.command = "verus-analyzer.openLogs";
                 }
                 this.dependenciesProvider?.refresh();
                 void this.syntaxTreeProvider?.refresh();
@@ -529,26 +536,26 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 statusBar.backgroundColor = new vscode.ThemeColor(
                     "statusBarItem.warningBackground",
                 );
-                statusBar.command = "rust-analyzer.openLogs";
+                statusBar.command = "verus-analyzer.openLogs";
                 icon = "$(warning) ";
                 break;
             case "error":
                 statusBar.color = new vscode.ThemeColor("statusBarItem.errorForeground");
                 statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-                statusBar.command = "rust-analyzer.openLogs";
+                statusBar.command = "verus-analyzer.openLogs";
                 icon = "$(error) ";
                 break;
             case "stopped":
                 statusBar.tooltip.appendText("Server is stopped");
                 statusBar.tooltip.appendMarkdown(
-                    "\n\n[Start server](command:rust-analyzer.startServer)",
+                    "\n\n[Start server](command:verus-analyzer.startServer)",
                 );
                 statusBar.color = new vscode.ThemeColor("statusBarItem.warningForeground");
                 statusBar.backgroundColor = new vscode.ThemeColor(
                     "statusBarItem.warningBackground",
                 );
-                statusBar.command = "rust-analyzer.startServer";
-                statusBar.text = "$(stop-circle) rust-analyzer";
+                statusBar.command = "verus-analyzer.startServer";
+                statusBar.text = "$(stop-circle) verus-analyzer";
                 return;
         }
         if (status.message) {
@@ -560,17 +567,17 @@ export class Ctx implements RustAnalyzerExtensionApi {
 
         const toggleCheckOnSave = this.config.checkOnSave ? "Disable" : "Enable";
         statusBar.tooltip.appendMarkdown(
-            `[Extension Info](command:rust-analyzer.serverVersion "Show version and server binary info"): Version ${this.version}, Server Version ${this._serverVersion}\n\n` +
+            `[Extension Info](command:verus-analyzer.serverVersion "Show version and server binary info"): Version ${this.version}, Server Version ${this._serverVersion}\n\n` +
                 `---\n\n` +
-                `[$(terminal) Open Logs](command:rust-analyzer.openLogs "Open the server logs")\n\n` +
-                `[$(settings) ${toggleCheckOnSave} Check on Save](command:rust-analyzer.toggleCheckOnSave "Temporarily ${toggleCheckOnSave.toLowerCase()} check on save functionality")\n\n` +
-                `[$(refresh) Reload Workspace](command:rust-analyzer.reloadWorkspace "Reload and rediscover workspaces")\n\n` +
-                `[$(symbol-property) Rebuild Build Dependencies](command:rust-analyzer.rebuildProcMacros "Rebuild build scripts and proc-macros")\n\n` +
-                `[$(stop-circle) Stop server](command:rust-analyzer.stopServer "Stop the server")\n\n` +
-                `[$(debug-restart) Restart server](command:rust-analyzer.restartServer "Restart the server")`,
+                `[$(terminal) Open Logs](command:verus-analyzer.openLogs "Open the server logs")\n\n` +
+                `[$(settings) ${toggleCheckOnSave} Check on Save](command:verus-analyzer.toggleCheckOnSave "Temporarily ${toggleCheckOnSave.toLowerCase()} check on save functionality")\n\n` +
+                `[$(refresh) Reload Workspace](command:verus-analyzer.reloadWorkspace "Reload and rediscover workspaces")\n\n` +
+                `[$(symbol-property) Rebuild Build Dependencies](command:verus-analyzer.rebuildProcMacros "Rebuild build scripts and proc-macros")\n\n` +
+                `[$(stop-circle) Stop server](command:verus-analyzer.stopServer "Stop the server")\n\n` +
+                `[$(debug-restart) Restart server](command:verus-analyzer.restartServer "Restart the server")`,
         );
         if (!status.quiescent) icon = "$(loading~spin) ";
-        statusBar.text = `${icon}rust-analyzer`;
+        statusBar.text = `${icon}verus-analyzer`;
     }
 
     private updateStatusBarVisibility(editor: vscode.TextEditor | undefined) {
@@ -606,9 +613,9 @@ export interface Disposable {
 export type Cmd = (...args: any[]) => unknown;
 
 /**
- * Pattern to detect MSRV warning messages from the rust-analyzer server.
+ * Pattern to detect MSRV warning messages from the verus-analyzer server.
  */
-const MSRV_WARNING_PATTERN = /using an outdated toolchain version.*rust-analyzer only supports/is;
+const MSRV_WARNING_PATTERN = /using an outdated toolchain version.*verus-analyzer only supports/is;
 
 /**
  * Handles the MSRV warning by checking for rust-toolchain files and showing
@@ -626,10 +633,10 @@ export async function handleMsrvWarning(message: string): Promise<boolean> {
 
     const openFile = "Open rust-toolchain file";
     const result = await vscode.window.showWarningMessage(
-        "Your workspace uses a rust-toolchain file with a toolchain too old for the extension shipped rust-analyzer to work properly. " +
-            "Consider adding the rust-analyzer component to the toolchain file to use a compatible rust-analyzer version. " +
+        "Your workspace uses a rust-toolchain file with a toolchain too old for the extension shipped verus-analyzer to work properly. " +
+            "Consider adding the verus-analyzer component to the toolchain file to use a compatible verus-analyzer version. " +
             "Add the following to your rust-toolchain file's `[toolchain]` section:\n" +
-            'components = ["rust-analyzer"]',
+            'components = ["verus-analyzer"]',
         { modal: true },
         openFile,
     );

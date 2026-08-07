@@ -166,7 +166,7 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
         })),
         diagnostic_provider: Some(lsp_types::DiagnosticProvider::DiagnosticOptions(
             lsp_types::DiagnosticOptions {
-                identifier: Some("rust-analyzer".to_owned()),
+                identifier: Some("verus-analyzer".to_owned()),
                 inter_file_dependencies: true,
                 // FIXME
                 workspace_diagnostics: false,

@@ -1,3 +1,5 @@
+//! Performs one weakest-precondition step over a Verus proof statement.
+
 use crate::proof_plumber_api::vst_ext::*;
 use crate::{AssistContext, Assists};
 use ide_db::assists::{AssistId, AssistKind};

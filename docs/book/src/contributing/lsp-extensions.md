@@ -1,5 +1,5 @@
 <!---
-lsp/ext.rs hash: 98191ad3d886c851
+lsp/ext.rs hash: 68cb27bf03055a25
 
 If you need to change the above hash to make the test pass, please check if you
 need to adjust this doc as well and ping this issue:
@@ -10,12 +10,12 @@ need to adjust this doc as well and ping this issue:
 
 # LSP Extensions
 
-This document describes LSP extensions used by rust-analyzer.
+This document describes LSP extensions used by verus-analyzer.
 It's a best effort document, when in doubt, consult the source (and send a PR with clarification ;-) ).
 We aim to upstream all non Rust-specific extensions to the protocol, but this is not a top priority.
 All capabilities are enabled via the `experimental` field of `ClientCapabilities` or `ServerCapabilities`.
 Requests which we hope to upstream live under `experimental/` namespace.
-Requests, which are likely to always remain specific to `rust-analyzer` are under `rust-analyzer/` namespace.
+Requests which are specific to `verus-analyzer` are under the `verus-analyzer/` namespace.
 
 If you want to be notified about the changes to this document, subscribe to [#4604](https://github.com/rust-lang/rust-analyzer/issues/4604).
 
@@ -581,7 +581,7 @@ interface ExternalDocsResponse {
 
 ## Analyzer Status
 
-**Method:** `rust-analyzer/analyzerStatus`
+**Method:** `verus-analyzer/analyzerStatus`
 
 **Request:**
 
@@ -598,7 +598,7 @@ Returns internal status message, mostly for debugging purposes.
 
 ## Reload Workspace
 
-**Method:** `rust-analyzer/reloadWorkspace`
+**Method:** `verus-analyzer/reloadWorkspace`
 
 **Request:** `null`
 
@@ -608,7 +608,7 @@ Reloads project information (that is, re-executes `cargo metadata`).
 
 ## Rebuild proc-macros
 
-**Method:** `rust-analyzer/rebuildProcMacros`
+**Method:** `verus-analyzer/rebuildProcMacros`
 
 **Request:** `null`
 
@@ -657,7 +657,7 @@ Clients are discouraged from but are allowed to use the `health` status to decid
 
 The flycheck/checkOnSave feature can be controlled via notifications sent by the client to the server.
 
-**Method:** `rust-analyzer/runFlycheck`
+**Method:** `verus-analyzer/runFlycheck`
 
 **Notification:**
 
@@ -671,7 +671,7 @@ interface RunFlycheckParams {
 
 Triggers the flycheck processes.
 
-**Method:** `rust-analyzer/clearFlycheck`
+**Method:** `verus-analyzer/clearFlycheck`
 
 **Notification:**
 
@@ -681,7 +681,7 @@ interface ClearFlycheckParams {}
 
 Clears the flycheck diagnostics.
 
-**Method:** `rust-analyzer/cancelFlycheck`
+**Method:** `verus-analyzer/cancelFlycheck`
 
 **Notification:**
 
@@ -693,7 +693,7 @@ Cancels all running flycheck processes.
 
 ## View Syntax Tree
 
-**Method:** `rust-analyzer/viewSyntaxTree`
+**Method:** `verus-analyzer/viewSyntaxTree`
 
 **Request:**
 
@@ -710,7 +710,7 @@ Used to create a treeView for debugging and working on rust-analyzer itself.
 
 ## View Hir
 
-**Method:** `rust-analyzer/viewHir`
+**Method:** `verus-analyzer/viewHir`
 
 **Request:** `TextDocumentPositionParams`
 
@@ -721,7 +721,7 @@ For debugging or when working on rust-analyzer itself.
 
 ## View Mir
 
-**Method:** `rust-analyzer/viewMir`
+**Method:** `verus-analyzer/viewMir`
 
 **Request:** `TextDocumentPositionParams`
 
@@ -732,7 +732,7 @@ For debugging or when working on rust-analyzer itself.
 
 ## Get Failed Obligations
 
-**Method:** `rust-analyzer/getFailedObligations`
+**Method:** `verus-analyzer/getFailedObligations`
 
 **Request:** `TextDocumentPositionParams`
 
@@ -743,7 +743,7 @@ For debugging or when working on rust-analyzer itself.
 
 ## Interpret Function
 
-**Method:** `rust-analyzer/interpretFunction`
+**Method:** `verus-analyzer/interpretFunction`
 
 **Request:** `TextDocumentPositionParams`
 
@@ -755,7 +755,7 @@ future. Highly experimental.
 
 ## View File Text
 
-**Method:** `rust-analyzer/viewFileText`
+**Method:** `verus-analyzer/viewFileText`
 
 **Request:** `TextDocumentIdentifier`
 
@@ -766,7 +766,7 @@ This is for debugging file sync problems.
 
 ## View ItemTree
 
-**Method:** `rust-analyzer/viewItemTree`
+**Method:** `verus-analyzer/viewItemTree`
 
 **Request:**
 
@@ -782,7 +782,7 @@ Returns a textual representation of the `ItemTree` of the currently open file, f
 
 ## View Crate Graph
 
-**Method:** `rust-analyzer/viewCrateGraph`
+**Method:** `verus-analyzer/viewCrateGraph`
 
 **Request:**
 
@@ -800,7 +800,7 @@ If `full` is `true`, the graph includes non-workspace crates (crates.io dependen
 
 ## Expand Macro
 
-**Method:** `rust-analyzer/expandMacro`
+**Method:** `verus-analyzer/expandMacro`
 
 **Request:**
 
@@ -891,7 +891,7 @@ This request is sent from client to server to open the current project's Cargo.t
 
 This request is sent from client to server to get the list of tests for the specified position.
 
-**Method:** `rust-analyzer/relatedTests`
+**Method:** `verus-analyzer/relatedTests`
 
 **Request:** `TextDocumentPositionParams`
 
@@ -1039,7 +1039,7 @@ export interface Diagnostic {
 
 ## Dependency Tree
 
-**Method:** `rust-analyzer/fetchDependencyList`
+**Method:** `verus-analyzer/fetchDependencyList`
 
 **Request:**
 
@@ -1063,7 +1063,7 @@ Returns all crates from this workspace, so it can be used create a viewTree to h
 
 ## View Recursive Memory Layout
 
-**Method:** `rust-analyzer/viewRecursiveMemoryLayout`
+**Method:** `verus-analyzer/viewRecursiveMemoryLayout`
 
 **Request:** `TextDocumentPositionParams`
 

@@ -1,3 +1,5 @@
+//! Splits a non-strict quantified bound into strict and equality cases.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},
@@ -134,7 +136,6 @@ proof fn test_split_smaller_or_equal_to()
         assert forall|x: int| x == 10 implies smaller_than_10(x) by {};
         assert forall|x: int| x <= 10 implies smaller_than_10(x) by {};
     }
-    
 }
 ",
         )

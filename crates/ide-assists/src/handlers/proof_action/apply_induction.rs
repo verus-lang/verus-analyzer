@@ -1,3 +1,5 @@
+//! Applies an induction proof skeleton at the selected proof function.
+
 use crate::{AssistContext, Assists};
 use ide_db::assists::{AssistId, AssistKind};
 use itertools::Itertools;

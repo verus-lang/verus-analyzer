@@ -87,6 +87,7 @@ pub enum SyntaxKind {
     ENUM_KW,
     EXTERN_KW,
     FALSE_KW,
+    FINAL_KW,
     FN_KW,
     FOR_KW,
     IF_KW,
@@ -148,7 +149,6 @@ pub enum SyntaxKind {
     ENSURES_KW,
     EXEC_KW,
     EXISTS_KW,
-    FINAL_KW,
     FORALL_KW,
     FORMAT_ARGS_KW,
     GEN_KW,
@@ -728,6 +728,7 @@ impl SyntaxKind {
             ENUM_KW => "enum",
             EXTERN_KW => "extern",
             FALSE_KW => "false",
+            FINAL_KW => "final",
             FN_KW => "fn",
             FOR_KW => "for",
             IF_KW => "if",
@@ -787,7 +788,6 @@ impl SyntaxKind {
             ENSURES_KW => "ensures",
             EXEC_KW => "exec",
             EXISTS_KW => "exists",
-            FINAL_KW => "final",
             FORALL_KW => "forall",
             FORMAT_ARGS_KW => "format_args",
             GHOST_KW => "ghost",
@@ -869,6 +869,7 @@ impl SyntaxKind {
                 | ENUM_KW
                 | EXTERN_KW
                 | FALSE_KW
+                | FINAL_KW
                 | FN_KW
                 | FOR_KW
                 | IF_KW
@@ -941,7 +942,6 @@ impl SyntaxKind {
             ENSURES_KW => true,
             EXEC_KW => true,
             EXISTS_KW => true,
-            FINAL_KW => true,
             FORALL_KW => true,
             FORMAT_ARGS_KW => true,
             GHOST_KW => true,
@@ -1018,6 +1018,7 @@ impl SyntaxKind {
                 | ENUM_KW
                 | EXTERN_KW
                 | FALSE_KW
+                | FINAL_KW
                 | FN_KW
                 | FOR_KW
                 | IF_KW
@@ -1083,7 +1084,6 @@ impl SyntaxKind {
             ENSURES_KW => true,
             EXEC_KW => true,
             EXISTS_KW => true,
-            FINAL_KW => true,
             FORALL_KW => true,
             FORMAT_ARGS_KW => true,
             GHOST_KW => true,
@@ -1229,6 +1229,7 @@ impl SyntaxKind {
             "enum" => ENUM_KW,
             "extern" => EXTERN_KW,
             "false" => FALSE_KW,
+            "final" => FINAL_KW,
             "fn" => FN_KW,
             "for" => FOR_KW,
             "if" => IF_KW,
@@ -1299,7 +1300,6 @@ impl SyntaxKind {
             "ensures" => ENSURES_KW,
             "exec" => EXEC_KW,
             "exists" => EXISTS_KW,
-            "final" => FINAL_KW,
             "forall" => FORALL_KW,
             "format_args" => FORMAT_ARGS_KW,
             "ghost" => GHOST_KW,
@@ -1474,6 +1474,7 @@ macro_rules ! T_ {
     [enum] => { $ crate :: SyntaxKind :: ENUM_KW };
     [extern] => { $ crate :: SyntaxKind :: EXTERN_KW };
     [false] => { $ crate :: SyntaxKind :: FALSE_KW };
+    [final] => { $ crate :: SyntaxKind :: FINAL_KW };
     [fn] => { $ crate :: SyntaxKind :: FN_KW };
     [for] => { $ crate :: SyntaxKind :: FOR_KW };
     [if] => { $ crate :: SyntaxKind :: IF_KW };
@@ -1533,7 +1534,6 @@ macro_rules ! T_ {
     [ensures] => { $ crate :: SyntaxKind :: ENSURES_KW };
     [exec] => { $ crate :: SyntaxKind :: EXEC_KW };
     [exists] => { $ crate :: SyntaxKind :: EXISTS_KW };
-    [final] => { $ crate :: SyntaxKind :: FINAL_KW };
     [forall] => { $ crate :: SyntaxKind :: FORALL_KW };
     [format_args] => { $ crate :: SyntaxKind :: FORMAT_ARGS_KW };
     [ghost] => { $ crate :: SyntaxKind :: GHOST_KW };

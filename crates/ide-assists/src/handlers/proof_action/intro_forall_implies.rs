@@ -1,3 +1,5 @@
+//! Converts a quantified implication to Verus `assert forall ... implies` syntax.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},
@@ -111,7 +113,6 @@ proof fn test_intro_forall_implies1() {
   assert forall|x: int, y: int| x <= y implies twice(x) <= twice(y) by {
         reveal(twice);
     }
-    
 }
 ",
         )

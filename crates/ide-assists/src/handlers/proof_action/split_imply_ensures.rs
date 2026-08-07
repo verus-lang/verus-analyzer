@@ -1,3 +1,5 @@
+//! Splits an implication in a Verus postcondition into requires and ensures clauses.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},
@@ -73,7 +75,7 @@ mod tests {
             split_imply_ensures,
             "
 fn test_split_imply_ensures(b: bool) -> (ret: u32)
-    ens$0ures 
+    ens$0ures
       b ==> ret == 2
 {
     let mut ret: u32 = 1;
@@ -81,7 +83,7 @@ fn test_split_imply_ensures(b: bool) -> (ret: u32)
         ret = ret + 1;
     }
     ret
-}  
+}
 ",
             "
 fn test_split_imply_ensures(b: bool) -> (ret: u32)
@@ -96,7 +98,7 @@ fn test_split_imply_ensures(b: bool) -> (ret: u32)
     }
     ret
 }
-  
+
 ",
         )
     }
@@ -106,7 +108,7 @@ fn test_split_imply_ensures(b: bool) -> (ret: u32)
         check_assist(
             split_imply_ensures,
             "
-proof fn lemma_mul_inequality(x: int, y: int, z: int) 
+proof fn lemma_mul_inequality(x: int, y: int, z: int)
     by(nonlinear_arith)
     ensu$0res  x <= y && z > 0 ==> x * z <= y * z,
 {

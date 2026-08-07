@@ -1,3 +1,5 @@
+//! Adds a bounds assertion for Verus sequence indexing.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},

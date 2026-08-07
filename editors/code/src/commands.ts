@@ -37,7 +37,7 @@ export { newProject } from "./new_project";
 
 export function analyzerStatus(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-status://status");
+        readonly uri = vscode.Uri.parse("verus-analyzer-status://status");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
 
         async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
@@ -58,7 +58,7 @@ export function analyzerStatus(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-status", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-status", tdcp),
     );
 
     return async () => {
@@ -370,7 +370,7 @@ async function revealParentChain(document: RustDocument, ctx: CtxInit) {
 }
 
 export async function execRevealDependency(e: RustEditor): Promise<void> {
-    await vscode.commands.executeCommand("rust-analyzer.revealDependency", e);
+    await vscode.commands.executeCommand("verus-analyzer.revealDependency", e);
 }
 
 export function syntaxTreeReveal(): Cmd {
@@ -502,7 +502,7 @@ export function evaluatePredicate(ctx: CtxInit): Cmd {
         const editor = ctx.activeRustEditor;
         if (!editor) {
             await vscode.window.showWarningMessage(
-                "rust-analyzer: evaluate predicate requires an active Rust editor",
+                "verus-analyzer: evaluate predicate requires an active Rust editor",
             );
             return;
         }
@@ -594,11 +594,11 @@ function predicateEvaluationValidationMessage(
 export function serverVersion(ctx: CtxInit): Cmd {
     return async () => {
         if (!ctx.serverPath) {
-            void vscode.window.showWarningMessage(`rust-analyzer server is not running`);
+            void vscode.window.showWarningMessage(`verus-analyzer server is not running`);
             return;
         }
         void vscode.window.showInformationMessage(
-            `rust-analyzer version: ${ctx.serverVersion} [${ctx.serverPath}]`,
+            `verus-analyzer version: ${ctx.serverVersion} [${ctx.serverPath}]`,
         );
     };
 }
@@ -606,8 +606,8 @@ export function serverVersion(ctx: CtxInit): Cmd {
 function viewHirOrMir(ctx: CtxInit, xir: "hir" | "mir"): Cmd {
     const viewXir = xir === "hir" ? "viewHir" : "viewMir";
     const requestType = xir === "hir" ? ra.viewHir : ra.viewMir;
-    const uri = `rust-analyzer-${xir}://${viewXir}/${xir}.rs`;
-    const scheme = `rust-analyzer-${xir}`;
+    const uri = `verus-analyzer-${xir}://${viewXir}/${xir}.rs`;
+    const scheme = `verus-analyzer-${xir}`;
     return viewFileUsingTextDocumentContentProvider(ctx, requestType, uri, scheme, true);
 }
 
@@ -697,8 +697,8 @@ export function viewMir(ctx: CtxInit): Cmd {
 }
 
 export function getFailedObligations(ctx: CtxInit): Cmd {
-    const uri = `rust-analyzer-failed-obligations://getFailedObligations/failedObligations.rs`;
-    const scheme = `rust-analyzer-failed-obligations`;
+    const uri = `verus-analyzer-failed-obligations://getFailedObligations/failedObligations.rs`;
+    const scheme = `verus-analyzer-failed-obligations`;
     return viewFileUsingTextDocumentContentProvider(
         ctx,
         ra.getFailedObligations,
@@ -712,19 +712,19 @@ export function getFailedObligations(ctx: CtxInit): Cmd {
 //
 // The contents of the file come from the `TextDocumentContentProvider`
 export function interpretFunction(ctx: CtxInit): Cmd {
-    const uri = `rust-analyzer-interpret-function://interpretFunction/result.log`;
+    const uri = `verus-analyzer-interpret-function://interpretFunction/result.log`;
     return viewFileUsingTextDocumentContentProvider(
         ctx,
         ra.interpretFunction,
         uri,
-        `rust-analyzer-interpret-function`,
+        `verus-analyzer-interpret-function`,
         false,
     );
 }
 
 export function viewFileText(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-file-text://viewFileText/file.rs");
+        readonly uri = vscode.Uri.parse("verus-analyzer-file-text://viewFileText/file.rs");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -773,7 +773,7 @@ export function viewFileText(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-file-text", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-file-text", tdcp),
     );
 
     return async () => {
@@ -788,7 +788,7 @@ export function viewFileText(ctx: CtxInit): Cmd {
 
 export function viewItemTree(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-item-tree://viewItemTree/itemtree.rs");
+        readonly uri = vscode.Uri.parse("verus-analyzer-item-tree://viewItemTree/itemtree.rs");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -839,7 +839,7 @@ export function viewItemTree(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-item-tree", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-item-tree", tdcp),
     );
 
     return async () => {
@@ -857,8 +857,8 @@ function crateGraph(ctx: CtxInit, full: boolean): Cmd {
         const nodeModulesPath = vscode.Uri.file(path.join(ctx.extensionPath, "node_modules"));
 
         const panel = vscode.window.createWebviewPanel(
-            "rust-analyzer.crate-graph",
-            "rust-analyzer crate graph",
+            "verus-analyzer.crate-graph",
+            "verus-analyzer crate graph",
             vscode.ViewColumn.Two,
             {
                 enableScripts: true,
@@ -942,7 +942,7 @@ export function expandMacro(ctx: CtxInit): Cmd {
     }
 
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        uri = vscode.Uri.parse("rust-analyzer-expand-macro://expandMacro/[EXPANSION].rs");
+        uri = vscode.Uri.parse("verus-analyzer-expand-macro://expandMacro/[EXPANSION].rs");
         eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
             const editor = vscode.window.activeTextEditor;
@@ -969,7 +969,7 @@ export function expandMacro(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-expand-macro", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-expand-macro", tdcp),
     );
 
     return async () => {
@@ -1014,7 +1014,7 @@ export function applyActionGroup(_ctx: CtxInit): Cmd {
         const selectedAction = await vscode.window.showQuickPick(actions);
         if (!selectedAction) return;
         await vscode.commands.executeCommand(
-            "rust-analyzer.resolveCodeAction",
+            "verus-analyzer.resolveCodeAction",
             selectedAction.arguments,
         );
     };
@@ -1263,7 +1263,7 @@ export function runSingle(ctx: CtxInit): Cmd {
 
         if (isUpdatingTest(runnable) && ctx.config.askBeforeUpdateTest) {
             const selection = await vscode.window.showInformationMessage(
-                "rust-analyzer",
+                "verus-analyzer",
                 { detail: "Do you want to update tests?", modal: true },
                 "Update Now",
                 "Update (and Don't ask again)",
@@ -1626,7 +1626,7 @@ export function toggleCheckOnSave(ctx: Ctx): Cmd {
 
 export function toggleLSPLogs(ctx: Ctx): Cmd {
     return async () => {
-        const config = vscode.workspace.getConfiguration("rust-analyzer");
+        const config = vscode.workspace.getConfiguration("verus-analyzer");
         const targetValue =
             config.get<string | undefined>("trace.server") === "verbose" ? undefined : "verbose";
 
@@ -1641,7 +1641,7 @@ export function openWalkthrough(_: Ctx): Cmd {
     return async () => {
         await vscode.commands.executeCommand(
             "workbench.action.openWalkthrough",
-            "rust-lang.rust-analyzer#landing",
+            "rust-lang.verus-analyzer#landing",
             false,
         );
     };

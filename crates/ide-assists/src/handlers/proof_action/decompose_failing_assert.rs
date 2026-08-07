@@ -1,3 +1,5 @@
+//! Decomposes a failing Verus assertion into smaller proof obligations.
+
 use crate::{AssistContext, Assists};
 use ide_db::assists::{AssistId, AssistKind};
 use syntax::{
@@ -216,7 +218,7 @@ use vstd::prelude::*;
 
 proof fn lemma_mul_inequality(x: int, y: int, z: int) by(nonlinear_arith)
     requires x <= y && z > 0
-    ensures  x * z <= y * z    
+    ensures  x * z <= y * z
 {}
 
 proof fn lemma_mul_strict_upper_bound(x: int, xbound: int, y: int, ybound: int)
@@ -238,7 +240,7 @@ use vstd::prelude::*;
 
 proof fn lemma_mul_inequality(x: int, y: int, z: int) by(nonlinear_arith)
     requires x <= y && z > 0
-    ensures  x * z <= y * z    
+    ensures  x * z <= y * z
 {}
 
 proof fn lemma_mul_strict_upper_bound(x: int, xbound: int, y: int, ybound: int)
@@ -268,7 +270,7 @@ fn main() {}
             r#"
 use vstd::prelude::*;
 use vstd::seq::*;
-spec fn seq_bounded_by_length(s1: Seq<int>) -> bool 
+spec fn seq_bounded_by_length(s1: Seq<int>) -> bool
 {
     forall|i:int| (0 <= i && i < s1.len())  ==>  (0 <= s1.index(i) && s1.index(i) < s1.len())
 }
@@ -294,7 +296,7 @@ fn main() {}
             r#"
 use vstd::prelude::*;
 use vstd::seq::*;
-spec fn seq_bounded_by_length(s1: Seq<int>) -> bool 
+spec fn seq_bounded_by_length(s1: Seq<int>) -> bool
 {
     forall|i:int| (0 <= i && i < s1.len())  ==>  (0 <= s1.index(i) && s1.index(i) < s1.len())
 }

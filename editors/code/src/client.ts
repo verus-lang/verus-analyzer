@@ -33,18 +33,18 @@ export async function createClient(
                 _token: vscode.CancellationToken,
                 _next: lc.ConfigurationRequest.HandlerSignature,
             ) {
-                // The rust-analyzer LSP only ever asks for the "rust-analyzer"
+                // The verus-analyzer LSP only ever asks for the "verus-analyzer"
                 // section, so we only need to support that. Instead of letting
                 // the vscode-languageclient handle it, use the `cfg` property
                 // in the config.
                 if (
                     params.items.length !== 1 ||
-                    params.items[0]?.section !== "rust-analyzer" ||
+                    params.items[0]?.section !== "verus-analyzer" ||
                     params.items[0]?.scopeUri !== undefined
                 ) {
                     return new lc.ResponseError(
                         lc.ErrorCodes.InvalidParams,
-                        'Only the "rust-analyzer" config section is supported.',
+                        'Only the "verus-analyzer" config section is supported.',
                     );
                 }
                 return [prepareVSCodeConfig(config.cfg)];
@@ -71,7 +71,7 @@ export async function createClient(
                     (diag.message === "file not included in crate hierarchy" ||
                         diag.message.startsWith("This file is not included in any crates"))
                 ) {
-                    const config = vscode.workspace.getConfiguration("rust-analyzer");
+                    const config = vscode.workspace.getConfiguration("verus-analyzer");
                     if (config.get("showUnlinkedFileNotification")) {
                         unlinkedFiles.push(uri);
                         const folder = vscode.workspace.getWorkspaceFolder(uri)?.uri.fsPath;
@@ -224,7 +224,7 @@ export async function createClient(
                     const mkAction = () => {
                         const action = new vscode.CodeAction(item.title, kind);
                         action.command = {
-                            command: "rust-analyzer.resolveCodeAction",
+                            command: "verus-analyzer.resolveCodeAction",
                             title: item.title,
                             arguments: [item],
                         };
@@ -260,7 +260,7 @@ export async function createClient(
                         ];
                         primary.title = group;
                         primary.command = {
-                            command: "rust-analyzer.applyActionGroup",
+                            command: "verus-analyzer.applyActionGroup",
                             title: "",
                             arguments: [args],
                         };
@@ -287,7 +287,7 @@ export async function createClient(
     };
 
     const client = new RaLanguageClient(
-        "rust-analyzer",
+        "verus-analyzer",
         "Rust Analyzer Language Server",
         serverOptions,
         clientOptions,
@@ -323,12 +323,12 @@ class ExperimentalFeatures implements lc.StaticFeature {
             testExplorer: this.testExplorer,
             commands: {
                 commands: [
-                    "rust-analyzer.runSingle",
-                    "rust-analyzer.debugSingle",
-                    "rust-analyzer.showReferences",
-                    "rust-analyzer.gotoLocation",
-                    "rust-analyzer.triggerParameterHints",
-                    "rust-analyzer.rename",
+                    "verus-analyzer.runSingle",
+                    "verus-analyzer.debugSingle",
+                    "verus-analyzer.showReferences",
+                    "verus-analyzer.gotoLocation",
+                    "verus-analyzer.triggerParameterHints",
+                    "verus-analyzer.rename",
                 ],
             },
             ...capabilities.experimental,
@@ -400,7 +400,7 @@ export let HOVER_REFERENCE_COMMAND: ra.CommandLink[] = [];
 
 function renderCommand(cmd: ra.CommandLink): string {
     HOVER_REFERENCE_COMMAND.push(cmd);
-    return `[${cmd.title}](command:rust-analyzer.hoverRefCommandProxy?${
+    return `[${cmd.title}](command:verus-analyzer.hoverRefCommandProxy?${
         HOVER_REFERENCE_COMMAND.length - 1
     } '${cmd.tooltip}')`;
 }

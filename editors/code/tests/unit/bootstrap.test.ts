@@ -7,13 +7,13 @@ export async function getTests(ctx: Context) {
         suite.addTest("Order of nightly RA", async () => {
             assert.deepStrictEqual(
                 await _private.orderFromPath(
-                    "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/rust-analyzer",
+                    "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/verus-analyzer",
                     async function (path: string) {
                         assert.deepStrictEqual(
                             path,
-                            "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/rust-analyzer",
+                            "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/verus-analyzer",
                         );
-                        return "rust-analyzer 1.67.0-nightly (b7bc90fe 2022-11-21)";
+                        return "verus-analyzer 1.67.0-nightly (b7bc90fe 2022-11-21)";
                     },
                 ),
                 "0-2022-11-21/0",
@@ -23,13 +23,13 @@ export async function getTests(ctx: Context) {
         suite.addTest("Order of versioned RA", async () => {
             assert.deepStrictEqual(
                 await _private.orderFromPath(
-                    "/Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/rust-analyzer",
+                    "/Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/verus-analyzer",
                     async function (path: string) {
                         assert.deepStrictEqual(
                             path,
-                            "/Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/rust-analyzer",
+                            "/Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/verus-analyzer",
                         );
-                        return "rust-analyzer 1.72.1 (d5c2e9c3 2023-09-13)";
+                        return "verus-analyzer 1.72.1 (d5c2e9c3 2023-09-13)";
                     },
                 ),
                 "0-2023-09-13/1",
@@ -39,9 +39,9 @@ export async function getTests(ctx: Context) {
         suite.addTest("Order of versioned RA when unable to obtain version date", async () => {
             assert.deepStrictEqual(
                 await _private.orderFromPath(
-                    "/Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/rust-analyzer",
+                    "/Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/verus-analyzer",
                     async function () {
-                        return "rust-analyzer 1.72.1";
+                        return "verus-analyzer 1.72.1";
                     },
                 ),
                 "2",
@@ -51,13 +51,13 @@ export async function getTests(ctx: Context) {
         suite.addTest("Order of stable RA", async () => {
             assert.deepStrictEqual(
                 await _private.orderFromPath(
-                    "/Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rust-analyzer",
+                    "/Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/verus-analyzer",
                     async function (path: string) {
                         assert.deepStrictEqual(
                             path,
-                            "/Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rust-analyzer",
+                            "/Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/verus-analyzer",
                         );
-                        return "rust-analyzer 1.79.0 (129f3b99 2024-06-10)";
+                        return "verus-analyzer 1.79.0 (129f3b99 2024-06-10)";
                     },
                 ),
                 "0-2024-06-10/1",
@@ -76,20 +76,20 @@ export async function getTests(ctx: Context) {
         suite.addTest("Earliest RA between nightly and stable", async () => {
             assert.deepStrictEqual(
                 await _private.earliestToolchainPath(
-                    "/Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rust-analyzer",
-                    "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/rust-analyzer",
+                    "/Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/verus-analyzer",
+                    "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/verus-analyzer",
                     async function (path: string) {
                         if (
                             path ===
-                            "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/rust-analyzer"
+                            "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/verus-analyzer"
                         ) {
-                            return "rust-analyzer 1.67.0-nightly (b7bc90fe 2022-11-21)";
+                            return "verus-analyzer 1.67.0-nightly (b7bc90fe 2022-11-21)";
                         } else {
-                            return "rust-analyzer 1.79.0 (129f3b99 2024-06-10)";
+                            return "verus-analyzer 1.79.0 (129f3b99 2024-06-10)";
                         }
                     },
                 ),
-                "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/rust-analyzer",
+                "/Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/verus-analyzer",
             );
         });
     });
@@ -100,7 +100,7 @@ export async function getTests(ctx: Context) {
                 _private.declaresRaComponent(
                     `[toolchain]
 channel = "1.88"
-components = ["cargo", "rust-analyzer", "rustfmt"]
+components = ["cargo", "verus-analyzer", "rustfmt"]
 `,
                 ),
             );
@@ -113,7 +113,7 @@ components = ["cargo", "rust-analyzer", "rustfmt"]
 channel = "1.88"
 components = [
     "cargo",
-    "rust-analyzer",
+    "verus-analyzer",
     "rustfmt",
 ]
 profile = "default"
@@ -123,7 +123,7 @@ profile = "default"
         });
 
         suite.addTest("Components array with literal strings", async () => {
-            assert.ok(_private.declaresRaComponent(`components = ['cargo', 'rust-analyzer']`));
+            assert.ok(_private.declaresRaComponent(`components = ['cargo', 'verus-analyzer']`));
         });
 
         suite.addTest("Components array without RA", async () => {
@@ -158,7 +158,7 @@ channel = "1.88"
 components = [
     "cargo",
 ]
-# add "rust-analyzer" here to use the matching server
+# add "verus-analyzer" here to use the matching server
 `,
                 ),
             );

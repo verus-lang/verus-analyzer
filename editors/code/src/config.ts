@@ -25,12 +25,12 @@ export type ConfigurationValue =
 type ShowStatusBar = "always" | "never" | { documentSelector: vscode.DocumentSelector };
 
 export class Config {
-    readonly extensionId = "rust-lang.rust-analyzer";
+    readonly extensionId = "verus-lang.verus-analyzer";
 
     configureLang: vscode.Disposable | undefined;
     workspaceState: vscode.Memento;
 
-    private readonly rootSection = "rust-analyzer";
+    private readonly rootSection = "verus-analyzer";
     private readonly requiresServerReloadOpts = ["server", "files", "showSyntaxTree"].map(
         (opt) => `${this.rootSection}.${opt}`,
     );
@@ -56,7 +56,7 @@ export class Config {
 
     private readonly extensionConfigurationStateKey = "extensionConfigurations";
 
-    /// Returns the rust-analyzer-specific workspace configuration, incl. any
+    /// Returns the verus-analyzer-specific workspace configuration, incl. any
     /// configuration items overridden by (present) extensions.
     get extensionConfigurations(): Record<string, Record<string, unknown>> {
         return pickBy(
@@ -127,7 +127,7 @@ export class Config {
         if (!requiresServerReloadOpt) return;
 
         if (this.restartServerOnConfigChange) {
-            await vscode.commands.executeCommand("rust-analyzer.restartServer");
+            await vscode.commands.executeCommand("verus-analyzer.restartServer");
             return;
         }
 
@@ -135,7 +135,7 @@ export class Config {
         const userResponse = await vscode.window.showInformationMessage(message, "Restart now");
 
         if (userResponse) {
-            const command = "rust-analyzer.restartServer";
+            const command = "verus-analyzer.restartServer";
             await vscode.commands.executeCommand(command);
         }
     }
@@ -231,7 +231,7 @@ export class Config {
     // We don't do runtime config validation here for simplicity. More on stackoverflow:
     // https://stackoverflow.com/questions/60135780/what-is-the-best-way-to-type-check-the-configuration-for-vscode-extension
 
-    // Returns the raw configuration for rust-analyzer as returned by vscode. This
+    // Returns the raw configuration for verus-analyzer as returned by vscode. This
     // should only be used when modifications to the user/workspace configuration
     // are required.
     private get rawCfg(): vscode.WorkspaceConfiguration {
@@ -268,7 +268,7 @@ export class Config {
      * ```ts
      * const nullableNum = vscode
      *  .workspace
-     *  .getConfiguration("rust-analyzer")
+     *  .getConfiguration("verus-analyzer")
      *  .get<number | null>(path)!;
      *
      * // What happens is that type of `nullableNum` is `number` but not `null | number`:
@@ -282,6 +282,14 @@ export class Config {
 
     get serverPath() {
         return this.get<null | string>("server.path");
+    }
+
+    get verusBinary() {
+        return this.get<null | string>("verus.binary");
+    }
+
+    get verusEnabled() {
+        return this.get<boolean>("verus.enable");
     }
 
     get serverExtraEnv(): Env {

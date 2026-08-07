@@ -3,6 +3,7 @@
 
 use std::{
     fmt, io,
+    path::{Path, PathBuf},
     process::Command,
     sync::atomic::{AtomicUsize, Ordering},
     time::Duration,
@@ -153,6 +154,12 @@ pub(crate) enum FlycheckConfig {
         extra_env: FxHashMap<String, Option<String>>,
         invocation_strategy: InvocationStrategy,
     },
+    VerusCommand {
+        verus_args: Vec<String>,
+        cargo_verus_enable: bool,
+        cargo_options: CargoOptions,
+        report_all_errors: bool,
+    },
 }
 
 impl FlycheckConfig {
@@ -162,6 +169,7 @@ impl FlycheckConfig {
             FlycheckConfig::CustomCommand { invocation_strategy, .. } => {
                 invocation_strategy.clone()
             }
+            FlycheckConfig::VerusCommand { .. } => InvocationStrategy::PerWorkspace,
         }
     }
 }
@@ -197,6 +205,9 @@ impl fmt::Display for FlycheckConfig {
                     .collect::<Vec<_>>();
 
                 write!(f, "{command} {}", display_args.join(" "))
+            }
+            FlycheckConfig::VerusCommand { cargo_verus_enable, .. } => {
+                f.write_str(if *cargo_verus_enable { "cargo verus" } else { "verus" })
             }
         }
     }
@@ -365,6 +376,7 @@ pub(crate) enum Progress {
     DidFinish(io::Result<()>),
     DidCancel,
     DidFailToRestart(String),
+    VerusResult(String),
 }
 
 #[derive(Debug, Clone)]
@@ -406,6 +418,8 @@ enum FlycheckCommandOrigin {
     CheckOverrideCommand,
     /// From a runnable with [project_json::RunnableKind::Flycheck]
     ProjectJsonRunnable,
+    /// Verus verifier invocation
+    Verus,
 }
 
 #[derive(Debug)]
@@ -825,6 +839,9 @@ impl FlycheckActor {
                             diagnostic,
                         });
                     }
+                    CheckMessage::VerusResult(result) => {
+                        self.report_progress(Progress::VerusResult(result));
+                    }
                 },
             }
         }
@@ -995,7 +1012,113 @@ impl FlycheckActor {
 
                 Some((cmd, FlycheckCommandOrigin::CheckOverrideCommand))
             }
+            FlycheckConfig::VerusCommand {
+                verus_args,
+                cargo_verus_enable,
+                cargo_options,
+                report_all_errors,
+            } => {
+                let saved_file = saved_file?;
+                let command = if *cargo_verus_enable {
+                    self.cargo_verus_command(
+                        scope,
+                        saved_file,
+                        verus_args,
+                        cargo_options,
+                        *report_all_errors,
+                    )
+                } else {
+                    self.verus_command(saved_file, verus_args, *report_all_errors)
+                }?;
+                Some((command, FlycheckCommandOrigin::Verus))
+            }
         }
+    }
+
+    fn cargo_verus_command(
+        &self,
+        scope: &FlycheckScope,
+        saved_file: &AbsPath,
+        verus_args: &[String],
+        cargo_options: &CargoOptions,
+        report_all_errors: bool,
+    ) -> Option<Command> {
+        let project_dir = find_verus_project_dir(saved_file.as_ref())
+            .unwrap_or_else(|| AsRef::<Path>::as_ref(&*self.root).to_path_buf());
+        let cargo_verus = std::env::var_os("VERUS_BINARY_PATH")
+            .as_deref()
+            .map(Path::new)
+            .and_then(Path::parent)
+            .map(|dir| dir.join(if cfg!(windows) { "cargo-verus.exe" } else { "cargo-verus" }))
+            .unwrap_or_else(|| PathBuf::from("cargo-verus"));
+        let mut cmd = Command::new(cargo_verus);
+        cmd.current_dir(&project_dir);
+        cmd.args(["verify", "--message-format=json"]);
+
+        let package_repr = match scope {
+            FlycheckScope::Package { package: PackageSpecifier::Cargo { package_id }, .. } => {
+                cmd.arg("-p").arg(&package_id.repr);
+                Some(package_id.repr.as_str())
+            }
+            _ => None,
+        };
+        cargo_options.apply_on_command(
+            &mut cmd,
+            self.ws_target_dir.as_deref(),
+            package_repr,
+            self.toolchain_version.as_ref(),
+        );
+        cmd.args(&cargo_options.extra_args);
+        cmd.arg("--");
+        cmd.args(verus_args);
+        cmd.args(verus_manifest_extra_args(&project_dir.join("Cargo.toml")));
+        if !report_all_errors {
+            cmd.args(verus_module_args(saved_file.as_ref(), &project_dir)?);
+        }
+        Some(cmd)
+    }
+
+    fn verus_command(
+        &self,
+        saved_file: &AbsPath,
+        verus_args: &[String],
+        report_all_errors: bool,
+    ) -> Option<Command> {
+        let saved_file: &Path = saved_file.as_ref();
+        let project_dir = find_verus_project_dir(saved_file);
+        let (input_file, crate_type) = match project_dir.as_deref() {
+            Some(project_dir) => {
+                let main = project_dir.join("src/main.rs");
+                let lib = project_dir.join("src/lib.rs");
+                if main.is_file() {
+                    (main, None)
+                } else if lib.is_file() {
+                    (lib, Some("lib"))
+                } else {
+                    (saved_file.to_path_buf(), Some("lib"))
+                }
+            }
+            None => (saved_file.to_path_buf(), Some("lib")),
+        };
+
+        let mut cmd =
+            Command::new(std::env::var_os("VERUS_BINARY_PATH").unwrap_or_else(|| "verus".into()));
+        cmd.current_dir(
+            project_dir.as_deref().unwrap_or_else(|| AsRef::<Path>::as_ref(&*self.root)),
+        );
+        cmd.args(verus_args);
+        cmd.arg(&input_file);
+        if let Some(crate_type) = crate_type {
+            cmd.args(["--crate-type", crate_type]);
+        }
+        if let Some(project_dir) = project_dir.as_deref() {
+            cmd.args(verus_manifest_extra_args(&project_dir.join("Cargo.toml")));
+            if !report_all_errors && input_file != saved_file {
+                cmd.args(verus_module_args(saved_file, project_dir)?);
+            }
+        }
+        cmd.args(["--", "--error-format=json"]);
+        Some(cmd)
     }
 
     #[track_caller]
@@ -1012,6 +1135,8 @@ enum CheckMessage {
     CompilerArtifact(cargo_metadata::Artifact),
     /// A diagnostic message from rustc itself.
     Diagnostic { diagnostic: Diagnostic, package_id: Option<PackageSpecifier> },
+    /// Verus's human-readable verification summary.
+    VerusResult(String),
 }
 
 struct CheckParser;
@@ -1042,6 +1167,9 @@ impl CheckParser {
                 }
             };
         }
+        if line.contains("verification results::") {
+            return Some(CheckMessage::VerusResult(line.to_owned()));
+        }
 
         error.push_str(line);
         error.push('\n');
@@ -1070,6 +1198,57 @@ enum JsonMessage {
     Rustc(Diagnostic),
 }
 
+fn find_verus_project_dir(file: &Path) -> Option<PathBuf> {
+    file.parent()?.ancestors().find(|dir| dir.join("Cargo.toml").is_file()).map(Path::to_path_buf)
+}
+
+fn verus_module_args(file: &Path, project_dir: &Path) -> Option<Vec<String>> {
+    let relative = file.strip_prefix(project_dir.join("src")).ok()?;
+    if relative == Path::new("main.rs") || relative == Path::new("lib.rs") {
+        return Some(vec!["--verify-root".to_owned()]);
+    }
+
+    let mut components = relative.iter().map(|it| it.to_str()).collect::<Option<Vec<_>>>()?;
+    let last = components.pop()?;
+    let stem = last.strip_suffix(".rs")?;
+    if stem != "mod" {
+        components.push(stem);
+    }
+    if components.is_empty() {
+        return Some(vec!["--verify-root".to_owned()]);
+    }
+    Some(vec!["--verify-module".to_owned(), components.join("::")])
+}
+
+fn verus_manifest_extra_args(manifest: &Path) -> Vec<String> {
+    let Ok(contents) = std::fs::read_to_string(manifest) else {
+        return Vec::new();
+    };
+    verus_extra_args_from_toml(&contents)
+}
+
+fn verus_extra_args_from_toml(contents: &str) -> Vec<String> {
+    let Ok(value) = toml::from_str::<toml::Table>(contents) else {
+        return Vec::new();
+    };
+    let Some(extra_args) = value
+        .get("package")
+        .and_then(|it| it.get("metadata"))
+        .and_then(|it| it.get("verus"))
+        .and_then(|it| it.get("ide"))
+        .and_then(|it| it.get("extra_args"))
+    else {
+        return Vec::new();
+    };
+    if let Some(args) = extra_args.as_array() {
+        return args.iter().filter_map(|it| it.as_str().map(ToOwned::to_owned)).collect();
+    }
+    extra_args
+        .as_str()
+        .map(|args| args.split_whitespace().map(ToOwned::to_owned).collect())
+        .unwrap_or_default()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1077,6 +1256,48 @@ mod tests {
     use itertools::Itertools;
     use paths::Utf8Path;
     use project_model::project_json;
+
+    #[test]
+    fn verus_module_targeting() {
+        let root = Path::new("/workspace");
+        assert_eq!(
+            verus_module_args(Path::new("/workspace/src/lib.rs"), root),
+            Some(vec!["--verify-root".to_owned()])
+        );
+        assert_eq!(
+            verus_module_args(Path::new("/workspace/src/foo/bar.rs"), root),
+            Some(vec!["--verify-module".to_owned(), "foo::bar".to_owned()])
+        );
+        assert_eq!(
+            verus_module_args(Path::new("/workspace/src/foo/mod.rs"), root),
+            Some(vec!["--verify-module".to_owned(), "foo".to_owned()])
+        );
+    }
+
+    #[test]
+    fn verus_manifest_arguments() {
+        let string_args = r#"
+[package.metadata.verus.ide]
+extra_args = "--rlimit 20"
+"#;
+        assert_eq!(verus_extra_args_from_toml(string_args), ["--rlimit", "20"]);
+
+        let array_args = r#"
+[package.metadata.verus.ide]
+extra_args = ["--rlimit", "20"]
+"#;
+        assert_eq!(verus_extra_args_from_toml(array_args), ["--rlimit", "20"]);
+    }
+
+    #[test]
+    fn parses_verus_summary() {
+        let mut errors = String::new();
+        assert!(matches!(
+            CheckParser.parse_line("verification results:: 1 verified, 0 errors", &mut errors),
+            Some(CheckMessage::VerusResult(_))
+        ));
+        assert!(errors.is_empty());
+    }
 
     #[test]
     fn test_substitutions() {

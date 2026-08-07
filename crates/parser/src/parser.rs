@@ -107,8 +107,8 @@ impl<'t> Parser<'t> {
             T![..=] => self.at_composite3(n, T![.], T![.], T![=]),
             T![<<=] => self.at_composite3(n, T![<], T![<], T![=]),
             T![>>=] => self.at_composite3(n, T![>], T![>], T![=]),
-            T![&&&] => self.at_composite3(n, T![&], T![&], T![&]),
-            T![|||] => self.at_composite3(n, T![|], T![|], T![|]),
+            T![&&&] => self.at_exact_repeated3(n, T![&]),
+            T![|||] => self.at_exact_repeated3(n, T![|]),
             T![==>] => self.at_composite3(n, T![=], T![=], T![>]),
             T![<==] => self.at_composite3(n, T![<], T![=], T![=]),
             T![===] => self.at_composite3(n, T![=], T![=], T![=]),
@@ -187,6 +187,17 @@ impl<'t> Parser<'t> {
             && self.inp.kind(self.pos + n + 2) == k3
             && self.inp.is_joint(self.pos + n)
             && self.inp.is_joint(self.pos + n + 1)
+    }
+
+    fn at_exact_repeated3(&self, n: usize, kind: SyntaxKind) -> bool {
+        let pos = self.pos + n;
+        let extends_left = pos > 0 && self.inp.kind(pos - 1) == kind && self.inp.is_joint(pos - 1);
+        let extends_right = self.inp.kind(pos + 3) == kind && self.inp.is_joint(pos + 2);
+
+        self.at_composite3(n, kind, kind, kind)
+            && !extends_left
+            && !extends_right
+            && !self.inp.is_adjacent(pos + 2)
     }
 
     fn at_composite4(

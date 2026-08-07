@@ -18,7 +18,7 @@ export type Env = {
 };
 
 class Log {
-    private readonly output = vscode.window.createOutputChannel("rust-analyzer Extension", {
+    private readonly output = vscode.window.createOutputChannel("verus-analyzer Extension", {
         log: true,
     });
 

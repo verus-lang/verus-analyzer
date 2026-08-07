@@ -98,15 +98,15 @@ impl<'a, 'db> AssistContext<'a, 'db> {
                     }
                     if line.contains(end_marker) {
                         // trailing comment
-                        let mut new_line = String::from(line);
-                        new_line = new_line.replace(end_marker, "");
-                        if new_line.len() > 0 {
-                            result.push(new_line.to_string());
+                        let new_line = line.replace(end_marker, "");
+                        let new_line = new_line.trim_end();
+                        if !new_line.is_empty() {
+                            result.push(new_line.to_owned());
                         }
                         break;
                     }
                     if is_line_target {
-                        result.push(line.to_string())
+                        result.push(line.trim_end().to_owned())
                     }
                 }
                 return Some(result);

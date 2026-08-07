@@ -1,3 +1,5 @@
+//! Inserts an assertion for a failing Verus precondition.
+
 use crate::{AssistContext, AssistId, AssistKind, Assists};
 
 use syntax::{
@@ -70,7 +72,7 @@ mod tests {
             r#"
 proof fn lemma_mul_inequality(x: int, y: int, z: int) by(nonlinear_arith)
     requires x <= y && z > 0
-    ensures  x * z <= y * z    
+    ensures  x * z <= y * z
 {}
 
 proof fn lemma_mul_strict_upper_bound(x: int, xbound: int, y: int, ybound: int)
@@ -84,7 +86,7 @@ proof fn lemma_mul_strict_upper_bound(x: int, xbound: int, y: int, ybound: int)
             r#"
 proof fn lemma_mul_inequality(x: int, y: int, z: int) by(nonlinear_arith)
     requires x <= y && z > 0
-    ensures  x * z <= y * z    
+    ensures  x * z <= y * z
 {}
 
 proof fn lemma_mul_strict_upper_bound(x: int, xbound: int, y: int, ybound: int)

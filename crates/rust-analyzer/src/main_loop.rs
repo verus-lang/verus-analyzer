@@ -1214,6 +1214,8 @@ impl GlobalState {
                 diagnostic,
                 package_id,
             } => {
+                let mut verus_error =
+                    crate::verus_interaction::diagnostic_to_verus_error(&diagnostic);
                 let snap = self.snapshot();
                 let diagnostics = crate::diagnostics::flycheck_to_proto::map_rust_diagnostic_to_lsp(
                     &self.config.diagnostics_map(None),
@@ -1223,14 +1225,24 @@ impl GlobalState {
                 );
                 for diag in diagnostics {
                     match url_to_file_id(&self.vfs.read().0, &diag.url) {
-                        Ok(Some(file_id)) => self.diagnostics.add_check_diagnostic(
-                            id,
-                            generation,
-                            &package_id,
-                            file_id,
-                            diag.diagnostic,
-                            diag.fix,
-                        ),
+                        Ok(Some(file_id)) => {
+                            if let Some(error) = verus_error.take() {
+                                self.verus_errors
+                                    .entry(id)
+                                    .or_default()
+                                    .entry(file_id)
+                                    .or_default()
+                                    .push(error);
+                            }
+                            self.diagnostics.add_check_diagnostic(
+                                id,
+                                generation,
+                                &package_id,
+                                file_id,
+                                diag.diagnostic,
+                                diag.fix,
+                            )
+                        }
                         Ok(None) => {}
                         Err(err) => {
                             error!(
@@ -1275,6 +1287,7 @@ impl GlobalState {
 
                 let (state, message) = match progress {
                     flycheck::Progress::DidStart { user_facing_command } => {
+                        self.verus_errors.remove(&id);
                         self.flycheck_formatted_commands[id] = format_with_id(user_facing_command);
                         (Progress::Begin, None)
                     }
@@ -1295,6 +1308,15 @@ impl GlobalState {
                         *cargo_finished = true;
                         (Progress::End, None)
                     }
+                    flycheck::Progress::VerusResult(result) => {
+                        self.send_notification::<lsp_types::ShowMessageNotification>(
+                            lsp_types::ShowMessageParams {
+                                kind: lsp_types::MessageType::Info,
+                                message: result.clone(),
+                            },
+                        );
+                        (Progress::Report, Some(result))
+                    }
                 };
 
                 // Clone because we &mut self for report_progress
@@ -1304,7 +1326,7 @@ impl GlobalState {
                     state,
                     message,
                     None,
-                    Some(format!("rust-analyzer/flycheck/{id}")),
+                    Some(format!("verus-analyzer/flycheck/{id}")),
                 );
             }
         }

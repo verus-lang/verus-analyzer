@@ -246,7 +246,7 @@ pub(super) fn assume(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
 }
 
 pub(super) fn final_expr(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
-    expect_kw(p, T![final]);
+    p.expect(T![final]);
     p.expect(T!['(']);
     expressions::expr(p);
     p.expect(T![')']);

@@ -1,3 +1,5 @@
+//! Removes a Verus assertion shown to be redundant by the verifier.
+
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use crate::proof_plumber_api::vst_ext::vst_map_expr_visitor;
 use crate::{

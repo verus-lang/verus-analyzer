@@ -29,11 +29,18 @@ impl LexedStr<'_> {
         let _p = tracing::info_span!("LexedStr::to_input").entered();
         let mut res = crate::Input::with_capacity(self.len());
         let mut was_joint = false;
+        let mut was_adjacent = false;
         for i in 0..self.len() {
             let kind = self.kind(i);
             if kind.is_trivia() {
-                was_joint = false
-            } else if kind == SyntaxKind::IDENT {
+                was_joint = false;
+                was_adjacent = false;
+                continue;
+            }
+            if was_adjacent {
+                res.was_adjacent();
+            }
+            if kind == SyntaxKind::IDENT {
                 let token_text = self.text(i);
                 res.push_ident(
                     SyntaxKind::from_contextual_keyword(token_text, edition)
@@ -58,6 +65,7 @@ impl LexedStr<'_> {
                     was_joint = true;
                 }
             }
+            was_adjacent = true;
         }
         res
     }

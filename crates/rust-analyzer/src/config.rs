@@ -876,13 +876,14 @@ config_data! {
         /// Set to `true` to use a subdirectory of the existing target directory or
         /// set to a path relative to the workspace to use that path.
         cargo_targetDir | rust_analyzerTargetDir: Option<TargetDirectory> = None,
+        /// Run `cargo verus` instead of invoking the Verus binary directly.
+        cargo_verusEnable: bool = false,
 
         /// Set `cfg(test)` for local crates. Defaults to true.
         cfg_setTest: bool = true,
 
         /// Run the check command for diagnostics on save.
         checkOnSave | checkOnSave_enable: bool                         = true,
-
 
         /// Check all targets and tests (`--all-targets`). Defaults to
         /// `#rust-analyzer.cargo.allTargets#`.
@@ -1051,6 +1052,13 @@ config_data! {
         /// `textDocument/rangeFormatting` request. The rustfmt option is unstable and only
         /// available on a nightly build.
         rustfmt_rangeFormatting_enable: bool = false,
+
+        /// Run the Verus verifier when a Rust file is saved.
+        verus_enable: bool = true,
+        /// Extra Verus arguments passed to verifier invocations.
+        verus_extraArgs: Vec<String> = vec![],
+        /// Report verifier errors from the entire crate instead of restricting verification to the saved file's module.
+        verus_reportAllErrorsEnable: bool = false,
 
         /// Additional paths to include in the VFS. Generally for code that is
         /// generated or otherwise managed by a build system outside of Cargo,
@@ -2584,6 +2592,43 @@ impl Config {
     }
 
     pub(crate) fn flycheck(&self, source_root: Option<SourceRootId>) -> FlycheckConfig {
+        let cargo_options = || CargoOptions {
+            subcommand: self.check_command(source_root).clone(),
+            target_tuples: self
+                .check_targets(source_root)
+                .clone()
+                .and_then(|targets| match &targets.0[..] {
+                    [] => None,
+                    targets => Some(targets.into()),
+                })
+                .unwrap_or_else(|| self.cargo_target(source_root).clone().into_iter().collect()),
+            all_targets: self
+                .check_allTargets(source_root)
+                .unwrap_or(*self.cargo_allTargets(source_root)),
+            no_default_features: self
+                .check_noDefaultFeatures(source_root)
+                .unwrap_or(*self.cargo_noDefaultFeatures(source_root)),
+            all_features: matches!(
+                self.check_features(source_root)
+                    .as_ref()
+                    .unwrap_or(self.cargo_features(source_root)),
+                CargoFeaturesDef::All
+            ),
+            features: match self
+                .check_features(source_root)
+                .clone()
+                .unwrap_or_else(|| self.cargo_features(source_root).clone())
+            {
+                CargoFeaturesDef::All => vec![],
+                CargoFeaturesDef::Selected(it) => it,
+            },
+            extra_args: self.check_extra_args(source_root),
+            extra_test_bin_args: self.runnables_extraTestBinaryArgs(source_root).clone(),
+            extra_env: self.check_extra_env(source_root),
+            config_path: self.cargo_config_path(source_root),
+            target_dir_config: self.target_dir_from_config(source_root),
+            set_test: *self.cfg_setTest(source_root),
+        };
         match &self.check_overrideCommand(source_root) {
             Some(args) if !args.is_empty() => {
                 let mut args = args.clone();
@@ -2600,46 +2645,14 @@ impl Config {
                     },
                 }
             }
+            Some(_) | None if *self.verus_enable(source_root) => FlycheckConfig::VerusCommand {
+                verus_args: self.verus_extraArgs(source_root).clone(),
+                cargo_verus_enable: *self.cargo_verusEnable(source_root),
+                report_all_errors: *self.verus_reportAllErrorsEnable(source_root),
+                cargo_options: cargo_options(),
+            },
             Some(_) | None => FlycheckConfig::Automatic {
-                cargo_options: CargoOptions {
-                    subcommand: self.check_command(source_root).clone(),
-                    target_tuples: self
-                        .check_targets(source_root)
-                        .clone()
-                        .and_then(|targets| match &targets.0[..] {
-                            [] => None,
-                            targets => Some(targets.into()),
-                        })
-                        .unwrap_or_else(|| {
-                            self.cargo_target(source_root).clone().into_iter().collect()
-                        }),
-                    all_targets: self
-                        .check_allTargets(source_root)
-                        .unwrap_or(*self.cargo_allTargets(source_root)),
-                    no_default_features: self
-                        .check_noDefaultFeatures(source_root)
-                        .unwrap_or(*self.cargo_noDefaultFeatures(source_root)),
-                    all_features: matches!(
-                        self.check_features(source_root)
-                            .as_ref()
-                            .unwrap_or(self.cargo_features(source_root)),
-                        CargoFeaturesDef::All
-                    ),
-                    features: match self
-                        .check_features(source_root)
-                        .clone()
-                        .unwrap_or_else(|| self.cargo_features(source_root).clone())
-                    {
-                        CargoFeaturesDef::All => vec![],
-                        CargoFeaturesDef::Selected(it) => it,
-                    },
-                    extra_args: self.check_extra_args(source_root),
-                    extra_test_bin_args: self.runnables_extraTestBinaryArgs(source_root).clone(),
-                    extra_env: self.check_extra_env(source_root),
-                    config_path: self.cargo_config_path(source_root),
-                    target_dir_config: self.target_dir_from_config(source_root),
-                    set_test: *self.cfg_setTest(source_root),
-                },
+                cargo_options: cargo_options(),
                 ansi_color_output: self.color_diagnostic_output(),
             },
         }
@@ -2757,12 +2770,12 @@ impl Config {
         let get = |name: &str| commands.iter().any(|it| it == name);
 
         ClientCommandsConfig {
-            run_single: get("rust-analyzer.runSingle"),
-            debug_single: get("rust-analyzer.debugSingle"),
-            show_reference: get("rust-analyzer.showReferences"),
-            goto_location: get("rust-analyzer.gotoLocation"),
-            trigger_parameter_hints: get("rust-analyzer.triggerParameterHints"),
-            rename: get("rust-analyzer.rename"),
+            run_single: get("verus-analyzer.runSingle"),
+            debug_single: get("verus-analyzer.debugSingle"),
+            show_reference: get("verus-analyzer.showReferences"),
+            goto_location: get("verus-analyzer.gotoLocation"),
+            trigger_parameter_hints: get("verus-analyzer.triggerParameterHints"),
+            rename: get("verus-analyzer.rename"),
         }
     }
 
@@ -3710,8 +3723,8 @@ fn schema(fields: &[SchemaField]) -> serde_json::Value {
             let category = name
                 .split_once(".")
                 .map(|(category, _name)| to_title_case(category))
-                .unwrap_or("rust-analyzer".into());
-            let name = format!("rust-analyzer.{name}");
+                .unwrap_or("verus-analyzer".into());
+            let name = format!("verus-analyzer.{name}");
             let props = field_props(field, ty, doc, default);
             serde_json::json!({
                 "title": category,
@@ -4250,7 +4263,7 @@ fn validate_toml_table(
 fn manual(fields: &[SchemaField]) -> String {
     fields.iter().fold(String::new(), |mut acc, (field, _ty, doc, default)| {
         let id = field.replace('_', ".");
-        let name = format!("rust-analyzer.{id}");
+        let name = format!("verus-analyzer.{id}");
         let doc = doc_comment_to_string(doc);
         if default.contains('\n') {
             format_to_acc!(
@@ -4267,6 +4280,7 @@ fn doc_comment_to_string(doc: &[&str]) -> String {
     doc.iter()
         .map(|it| it.strip_prefix(' ').unwrap_or(it))
         .fold(String::new(), |mut acc, it| format_to_acc!(acc, "{it}\n"))
+        .replace("#rust-analyzer.", "#verus-analyzer.")
 }
 
 #[cfg(test)]
@@ -4408,7 +4422,7 @@ mod tests {
         assert_eq!(config.cargo_targetDir(None), &None);
         assert!(matches!(
             config.flycheck(None),
-            FlycheckConfig::Automatic {
+            FlycheckConfig::VerusCommand {
                 cargo_options: CargoOptions { target_dir_config: TargetDirectoryConfig::None, .. },
                 ..
             }
@@ -4432,7 +4446,7 @@ mod tests {
             Utf8PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or("target".to_owned()));
         assert!(matches!(
             config.flycheck(None),
-            FlycheckConfig::Automatic {
+            FlycheckConfig::VerusCommand {
                 cargo_options: CargoOptions { target_dir_config, .. },
                 ..
             } if target_dir_config.target_dir(Some(&ws_target_dir)).map(Cow::into_owned)
@@ -4458,7 +4472,7 @@ mod tests {
         );
         assert!(matches!(
             config.flycheck(None),
-            FlycheckConfig::Automatic {
+            FlycheckConfig::VerusCommand {
                 cargo_options: CargoOptions { target_dir_config, .. },
                 ..
             } if target_dir_config.target_dir(None).map(Cow::into_owned)

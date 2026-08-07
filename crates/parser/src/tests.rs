@@ -199,6 +199,31 @@ verus! {
     }
 }
 
+#[test]
+fn verus_repeated_operators_do_not_split_longer_rust_token_runs() {
+    let source = r#"
+fn references(value: usize) {
+    let _ = &&&&&&&value;
+    let _ = &&&value;
+    let _ = &&&(value);
+}
+
+fn contextual_identifiers(assert: Value, assume: Value) {
+    assert.clone();
+    assume.clone();
+}
+
+fn verus_operators(a: bool, b: bool) {
+    let _ = &&& a;
+    let _ = a &&& b;
+    let _ = ||| a;
+    let _ = a ||| b;
+}
+"#;
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+}
+
 fn parse(entry: TopEntryPoint, text: &str, edition: Edition) -> (String, bool) {
     let lexed = LexedStr::new(edition, text);
     let input = lexed.to_input(edition);

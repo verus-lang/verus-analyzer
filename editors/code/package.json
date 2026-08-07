@@ -1,18 +1,18 @@
 {
-    "name": "rust-analyzer",
-    "displayName": "rust-analyzer",
-    "description": "Rust language support for Visual Studio Code",
+    "name": "verus-analyzer",
+    "displayName": "verus-analyzer",
+    "description": "Verus language support for Visual Studio Code",
     "private": true,
     "icon": "icon.png",
     "version": "0.5.0-dev",
     "releaseTag": null,
-    "publisher": "rust-lang",
+    "publisher": "verus-lang",
     "type": "commonjs",
     "repository": {
-        "url": "https://github.com/rust-lang/rust-analyzer.git",
+        "url": "https://github.com/verus-lang/verus-analyzer.git",
         "type": "git"
     },
-    "homepage": "https://rust-analyzer.github.io/",
+    "homepage": "https://github.com/verus-lang/verus-analyzer",
     "license": "MIT OR Apache-2.0",
     "keywords": [
         "rust"
@@ -24,7 +24,7 @@
     "capabilities": {
         "untrustedWorkspaces": {
             "supported": false,
-            "description": "rust-analyzer invokes binaries set up by its configuration as well as the Rust toolchain's binaries. A malicious actor could exploit this to run arbitrary code on your machine."
+            "description": "verus-analyzer invokes binaries set up by its configuration as well as the Rust toolchain's binaries. A malicious actor could exploit this to run arbitrary code on your machine."
         }
     },
     "engines": {
@@ -36,7 +36,7 @@
     ],
     "scripts": {
         "vscode:prepublish": "npm run build-base -- --minify",
-        "package": "vsce package -o rust-analyzer.vsix",
+        "package": "vsce package -o verus-analyzer.vsix",
         "build-base": "esbuild ./src/main.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node --target=node20",
         "build": "npm run build-base -- --sourcemap",
         "watch": "npm run build-base -- --sourcemap --watch",
@@ -120,253 +120,253 @@
         ],
         "commands": [
             {
-                "command": "rust-analyzer.viewHir",
+                "command": "verus-analyzer.viewHir",
                 "title": "View Hir",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.viewMir",
+                "command": "verus-analyzer.viewMir",
                 "title": "View Mir",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.interpretFunction",
+                "command": "verus-analyzer.interpretFunction",
                 "title": "Interpret",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.viewFileText",
+                "command": "verus-analyzer.viewFileText",
                 "title": "View File Text (as seen by the server)",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.viewItemTree",
+                "command": "verus-analyzer.viewItemTree",
                 "title": "Debug ItemTree",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.memoryUsage",
+                "command": "verus-analyzer.memoryUsage",
                 "title": "Memory Usage (Clears Database)",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.viewCrateGraph",
+                "command": "verus-analyzer.viewCrateGraph",
                 "title": "View Crate Graph",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.viewFullCrateGraph",
+                "command": "verus-analyzer.viewFullCrateGraph",
                 "title": "View Crate Graph (Full)",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.expandMacro",
+                "command": "verus-analyzer.expandMacro",
                 "title": "Expand macro recursively at caret",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.matchingBrace",
+                "command": "verus-analyzer.matchingBrace",
                 "title": "Find matching brace",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.parentModule",
+                "command": "verus-analyzer.parentModule",
                 "title": "Locate parent module",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.childModules",
+                "command": "verus-analyzer.childModules",
                 "title": "Locate child modules",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.joinLines",
+                "command": "verus-analyzer.joinLines",
                 "title": "Join lines",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.run",
+                "command": "verus-analyzer.run",
                 "title": "Run",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.copyRunCommandLine",
+                "command": "verus-analyzer.copyRunCommandLine",
                 "title": "Copy Run Command Line",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.debug",
+                "command": "verus-analyzer.debug",
                 "title": "Debug",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.newDebugConfig",
+                "command": "verus-analyzer.newDebugConfig",
                 "title": "Generate launch configuration",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.analyzerStatus",
+                "command": "verus-analyzer.analyzerStatus",
                 "title": "Status",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.reloadWorkspace",
+                "command": "verus-analyzer.reloadWorkspace",
                 "title": "Reload workspace",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.newProject",
+                "command": "verus-analyzer.newProject",
                 "title": "Create New Project...",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.rebuildProcMacros",
+                "command": "verus-analyzer.rebuildProcMacros",
                 "title": "Rebuild proc macros and build scripts",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.restartServer",
+                "command": "verus-analyzer.restartServer",
                 "title": "Restart server",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.startServer",
+                "command": "verus-analyzer.startServer",
                 "title": "Start server",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.stopServer",
+                "command": "verus-analyzer.stopServer",
                 "title": "Stop server",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.onEnter",
+                "command": "verus-analyzer.onEnter",
                 "title": "Enhanced enter key",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.ssr",
+                "command": "verus-analyzer.ssr",
                 "title": "Structural Search Replace",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.serverVersion",
+                "command": "verus-analyzer.serverVersion",
                 "title": "Show RA Version",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.openDocs",
+                "command": "verus-analyzer.openDocs",
                 "title": "Open Docs",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.openExternalDocs",
+                "command": "verus-analyzer.openExternalDocs",
                 "title": "Open External Docs",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.openCargoToml",
+                "command": "verus-analyzer.openCargoToml",
                 "title": "Open Cargo.toml",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.peekTests",
+                "command": "verus-analyzer.peekTests",
                 "title": "Peek Related Tests",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.moveItemUp",
+                "command": "verus-analyzer.moveItemUp",
                 "title": "Move Item Up",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.moveItemDown",
+                "command": "verus-analyzer.moveItemDown",
                 "title": "Move Item Down",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.cancelFlycheck",
+                "command": "verus-analyzer.cancelFlycheck",
                 "title": "Cancel running flychecks",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.runFlycheck",
+                "command": "verus-analyzer.runFlycheck",
                 "title": "Run flycheck",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.clearFlycheck",
+                "command": "verus-analyzer.clearFlycheck",
                 "title": "Clear flycheck diagnostics",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.revealDependency",
+                "command": "verus-analyzer.revealDependency",
                 "title": "Reveal File",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.syntaxTreeReveal",
+                "command": "verus-analyzer.syntaxTreeReveal",
                 "title": "Reveal Syntax Element",
                 "icon": "$(search)",
-                "category": "rust-analyzer (syntax tree)"
+                "category": "verus-analyzer (syntax tree)"
             },
             {
-                "command": "rust-analyzer.syntaxTreeCopy",
+                "command": "verus-analyzer.syntaxTreeCopy",
                 "title": "Copy",
                 "icon": "$(copy)",
-                "category": "rust-analyzer (syntax tree)"
+                "category": "verus-analyzer (syntax tree)"
             },
             {
-                "command": "rust-analyzer.syntaxTreeHideWhitespace",
+                "command": "verus-analyzer.syntaxTreeHideWhitespace",
                 "title": "Hide Whitespace",
                 "icon": "$(filter)",
-                "category": "rust-analyzer (syntax tree)"
+                "category": "verus-analyzer (syntax tree)"
             },
             {
-                "command": "rust-analyzer.syntaxTreeShowWhitespace",
+                "command": "verus-analyzer.syntaxTreeShowWhitespace",
                 "title": "Show Whitespace",
                 "icon": "$(filter-filled)",
-                "category": "rust-analyzer (syntax tree)"
+                "category": "verus-analyzer (syntax tree)"
             },
             {
-                "command": "rust-analyzer.viewMemoryLayout",
+                "command": "verus-analyzer.viewMemoryLayout",
                 "title": "View Memory Layout",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.toggleCheckOnSave",
+                "command": "verus-analyzer.toggleCheckOnSave",
                 "title": "Toggle Check on Save",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.toggleLSPLogs",
+                "command": "verus-analyzer.toggleLSPLogs",
                 "title": "Toggle LSP Logs",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.openWalkthrough",
+                "command": "verus-analyzer.openWalkthrough",
                 "title": "Open Walkthrough",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             },
             {
-                "command": "rust-analyzer.getFailedObligations",
+                "command": "verus-analyzer.getFailedObligations",
                 "title": "Get Failed Obligations",
-                "category": "rust-analyzer (debug command)"
+                "category": "verus-analyzer (debug command)"
             },
             {
-                "command": "rust-analyzer.evaluatePredicate",
+                "command": "verus-analyzer.evaluatePredicate",
                 "title": "Evaluate Predicate",
-                "category": "rust-analyzer"
+                "category": "verus-analyzer"
             }
         ],
         "keybindings": [
             {
-                "command": "rust-analyzer.parentModule",
+                "command": "verus-analyzer.parentModule",
                 "key": "ctrl+shift+u",
                 "when": "editorTextFocus && editorLangId == rust"
             },
             {
-                "command": "rust-analyzer.joinLines",
+                "command": "verus-analyzer.joinLines",
                 "key": "ctrl+shift+j",
                 "when": "editorTextFocus && editorLangId == rust"
             }
@@ -460,45 +460,45 @@
                 "title": "Workspace"
             },
             {
-                "title": "rust-analyzer",
+                "title": "verus-analyzer",
                 "properties": {
-                    "rust-analyzer.restartServerOnConfigChange": {
+                    "verus-analyzer.restartServerOnConfigChange": {
                         "description": "Restart the server automatically when settings that require a restart are changed.",
                         "default": false,
                         "type": "boolean"
                     },
-                    "rust-analyzer.showUnlinkedFileNotification": {
+                    "verus-analyzer.showUnlinkedFileNotification": {
                         "description": "Show a notification for unlinked files, prompting the user to add the corresponding Cargo.toml to the linked projects setting.",
                         "default": true,
                         "type": "boolean"
                     },
-                    "rust-analyzer.showRequestFailedErrorNotification": {
+                    "verus-analyzer.showRequestFailedErrorNotification": {
                         "description": "Show error notifications when requests fail.",
                         "default": true,
                         "type": "boolean"
                     },
-                    "rust-analyzer.showDependenciesExplorer": {
+                    "verus-analyzer.showDependenciesExplorer": {
                         "description": "Show Rust Dependencies in the Explorer view.",
                         "default": true,
                         "type": "boolean"
                     },
-                    "rust-analyzer.showSyntaxTree": {
+                    "verus-analyzer.showSyntaxTree": {
                         "description": "Show Syntax Tree in the Explorer view.",
                         "default": false,
                         "type": "boolean"
                     },
-                    "rust-analyzer.testExplorer": {
+                    "verus-analyzer.testExplorer": {
                         "description": "Show the Test Explorer view.",
                         "default": false,
                         "type": "boolean"
                     },
-                    "rust-analyzer.initializeStopped": {
-                        "markdownDescription": "Do not start rust-analyzer server when the extension is activated.",
+                    "verus-analyzer.initializeStopped": {
+                        "markdownDescription": "Do not start verus-analyzer server when the extension is activated.",
                         "default": false,
                         "type": "boolean"
                     },
-                    "rust-analyzer.projectCreation.openAfterCreate": {
-                        "markdownDescription": "Control what happens after `rust-analyzer: Create New Project...` finishes creating a Cargo project.",
+                    "verus-analyzer.projectCreation.openAfterCreate": {
+                        "markdownDescription": "Control what happens after `verus-analyzer: Create New Project...` finishes creating a Cargo project.",
                         "default": "ask",
                         "enum": [
                             "ask",
@@ -519,7 +519,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.extraEnv": {
+                    "verus-analyzer.runnables.extraEnv": {
                         "anyOf": [
                             {
                                 "type": "null"
@@ -555,9 +555,9 @@
                             }
                         ],
                         "default": null,
-                        "markdownDescription": "Environment variables passed to the runnable launched using `Test` or `Debug` lens or `rust-analyzer.run` command."
+                        "markdownDescription": "Environment variables passed to the runnable launched using `Test` or `Debug` lens or `verus-analyzer.run` command."
                     },
-                    "rust-analyzer.runnables.problemMatcher": {
+                    "verus-analyzer.runnables.problemMatcher": {
                         "type": "array",
                         "items": {
                             "type": "string"
@@ -565,9 +565,9 @@
                         "default": [
                             "$rustc"
                         ],
-                        "markdownDescription": "Problem matchers to use for `rust-analyzer.run` command, eg `[\"$rustc\", \"$rust-panic\"]`."
+                        "markdownDescription": "Problem matchers to use for `verus-analyzer.run` command, eg `[\"$rustc\", \"$rust-panic\"]`."
                     },
-                    "rust-analyzer.runnables.askBeforeUpdateTest": {
+                    "verus-analyzer.runnables.askBeforeUpdateTest": {
                         "type": "boolean",
                         "default": true,
                         "markdownDescription": "Ask before updating the test when running it."
@@ -577,7 +577,7 @@
             {
                 "title": "Status Bar",
                 "properties": {
-                    "rust-analyzer.statusBar.clickAction": {
+                    "verus-analyzer.statusBar.clickAction": {
                         "type": "string",
                         "enum": [
                             "stopServer",
@@ -590,7 +590,7 @@
                         "default": "openLogs",
                         "markdownDescription": "Action to run when clicking the extension status bar item."
                     },
-                    "rust-analyzer.statusBar.showStatusBar": {
+                    "verus-analyzer.statusBar.showStatusBar": {
                         "markdownDescription": "When to show the extension status bar.\n\n`\"always\"` Always show the status bar.\n\n`\"never\"` Never show the status bar.\n\n`{ documentSelector: <DocumentSelector>[] }` Show the status bar if the open file matches any of the given document selectors.\n\nSee [VS Code -- DocumentSelector](https://code.visualstudio.com/api/references/document-selector) for more information.",
                         "anyOf": [
                             {
@@ -639,7 +639,7 @@
                                 },
                                 {
                                     "scheme": "output",
-                                    "pattern": "extension-output-rust-lang.rust-analyzer*"
+                                    "pattern": "extension-output-rust-lang.verus-analyzer*"
                                 }
                             ]
                         }
@@ -647,18 +647,32 @@
                 }
             },
             {
-                "title": "Server",
+                "title": "Verus",
                 "properties": {
-                    "rust-analyzer.server.path": {
+                    "verus-analyzer.verus.binary": {
                         "type": [
                             "null",
                             "string"
                         ],
                         "scope": "machine-overridable",
                         "default": null,
-                        "markdownDescription": "Path to rust-analyzer executable (points to bundled binary by default)."
+                        "markdownDescription": "Path to a Verus executable. The extension downloads the latest Verus release when this is unset."
+                    }
+                }
+            },
+            {
+                "title": "Server",
+                "properties": {
+                    "verus-analyzer.server.path": {
+                        "type": [
+                            "null",
+                            "string"
+                        ],
+                        "scope": "machine-overridable",
+                        "default": null,
+                        "markdownDescription": "Path to verus-analyzer executable (points to bundled binary by default)."
                     },
-                    "rust-analyzer.server.extraEnv": {
+                    "verus-analyzer.server.extraEnv": {
                         "type": [
                             "null",
                             "object"
@@ -671,14 +685,14 @@
                             ]
                         },
                         "default": null,
-                        "markdownDescription": "Extra environment variables that will be passed to the rust-analyzer executable. Useful for passing e.g. `RA_LOG` for debugging."
+                        "markdownDescription": "Extra environment variables that will be passed to the verus-analyzer executable. Useful for passing e.g. `RA_LOG` for debugging."
                     }
                 }
             },
             {
                 "title": "Trace",
                 "properties": {
-                    "rust-analyzer.trace.server": {
+                    "verus-analyzer.trace.server": {
                         "type": "string",
                         "scope": "window",
                         "enum": [
@@ -692,11 +706,11 @@
                             "Full log"
                         ],
                         "default": "off",
-                        "description": "Trace requests to the rust-analyzer (this is usually overly verbose and not recommended for regular users)."
+                        "description": "Trace requests to the verus-analyzer (this is usually overly verbose and not recommended for regular users)."
                     },
-                    "rust-analyzer.trace.extension": {
+                    "verus-analyzer.trace.extension": {
                         "description": "Enable logging of VS Code extensions itself.",
-                        "markdownDeprecationMessage": "Log level is now controlled by the [Developer: Set Log Level...](command:workbench.action.setLogLevel) command.You can set the log level for the current session and also the default log level from there. This is also available by clicking the gear icon on the OUTPUT tab when Rust Analyzer Client is visible or by passing the --log rust-lang.rust-analyzer:debug parameter to VS Code.",
+                        "markdownDeprecationMessage": "Log level is now controlled by the [Developer: Set Log Level...](command:workbench.action.setLogLevel) command.You can set the log level for the current session and also the default log level from there. This is also available by clicking the gear icon on the OUTPUT tab when Rust Analyzer Client is visible or by passing the --log rust-lang.verus-analyzer:debug parameter to VS Code.",
                         "type": "boolean",
                         "default": false
                     }
@@ -705,7 +719,7 @@
             {
                 "title": "Debug",
                 "properties": {
-                    "rust-analyzer.debug.engine": {
+                    "verus-analyzer.debug.engine": {
                         "type": "string",
                         "enum": [
                             "auto",
@@ -724,7 +738,7 @@
                             "Use [Native Debug](https://marketplace.visualstudio.com/items?itemName=webfreak.debug)"
                         ]
                     },
-                    "rust-analyzer.debug.sourceFileMap": {
+                    "verus-analyzer.debug.sourceFileMap": {
                         "type": [
                             "object",
                             "string"
@@ -735,12 +749,12 @@
                             "/rustc/<id>": "${env:USERPROFILE}/.rustup/toolchains/<toolchain-id>/lib/rustlib/src/rust"
                         }
                     },
-                    "rust-analyzer.debug.buildBeforeRestart": {
+                    "verus-analyzer.debug.buildBeforeRestart": {
                         "markdownDescription": "Whether to rebuild the project modules before debugging the same test again",
                         "type": "boolean",
                         "default": false
                     },
-                    "rust-analyzer.debug.engineSettings": {
+                    "verus-analyzer.debug.engineSettings": {
                         "type": "object",
                         "default": {},
                         "markdownDescription": "Optional settings passed to the debug engine. Example: `{ \"lldb\": { \"terminal\":\"external\"} }`"
@@ -750,7 +764,7 @@
             {
                 "title": "Typing",
                 "properties": {
-                    "rust-analyzer.typing.continueCommentsOnNewline": {
+                    "verus-analyzer.typing.continueCommentsOnNewline": {
                         "markdownDescription": "Whether to prefix newlines after comments with the corresponding comment prefix.",
                         "default": true,
                         "type": "boolean"
@@ -760,12 +774,12 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.previewRustcOutput": {
+                    "verus-analyzer.diagnostics.previewRustcOutput": {
                         "markdownDescription": "Whether to show the main part of the rendered rustc output of a diagnostic message.",
                         "default": false,
                         "type": "boolean"
                     },
-                    "rust-analyzer.diagnostics.useRustcErrorCode": {
+                    "verus-analyzer.diagnostics.useRustcErrorCode": {
                         "markdownDescription": "Whether to show diagnostics using the original rustc error code. If this is false, all rustc diagnostics will have the code 'rustc(Click for full compiler diagnostics)'",
                         "default": false,
                         "type": "boolean"
@@ -778,7 +792,7 @@
             {
                 "title": "Assist",
                 "properties": {
-                    "rust-analyzer.assist.emitMustUse": {
+                    "verus-analyzer.assist.emitMustUse": {
                         "markdownDescription": "Insert #[must_use] when generating `as_` methods for enum variants.",
                         "default": false,
                         "type": "boolean"
@@ -788,7 +802,7 @@
             {
                 "title": "Assist",
                 "properties": {
-                    "rust-analyzer.assist.expressionFillDefault": {
+                    "verus-analyzer.assist.expressionFillDefault": {
                         "markdownDescription": "Placeholder expression to use for missing expressions in assists.",
                         "default": "todo",
                         "type": "string",
@@ -806,7 +820,7 @@
             {
                 "title": "Assist",
                 "properties": {
-                    "rust-analyzer.assist.preferSelf": {
+                    "verus-analyzer.assist.preferSelf": {
                         "markdownDescription": "Prefer to use `Self` over the type name when inserting a type (e.g. in \"fill match arms\" assist).",
                         "default": false,
                         "type": "boolean"
@@ -816,7 +830,7 @@
             {
                 "title": "Assist",
                 "properties": {
-                    "rust-analyzer.assist.termSearch.fuel": {
+                    "verus-analyzer.assist.termSearch.fuel": {
                         "markdownDescription": "Term search fuel in \"units of work\" for assists (Defaults to 1800).",
                         "default": 1800,
                         "type": "integer",
@@ -827,7 +841,7 @@
             {
                 "title": "Cache Priming",
                 "properties": {
-                    "rust-analyzer.cachePriming.enable": {
+                    "verus-analyzer.cachePriming.enable": {
                         "markdownDescription": "Warm up caches on project load.",
                         "default": true,
                         "type": "boolean"
@@ -837,7 +851,7 @@
             {
                 "title": "Cache Priming",
                 "properties": {
-                    "rust-analyzer.cachePriming.numThreads": {
+                    "verus-analyzer.cachePriming.numThreads": {
                         "markdownDescription": "How many worker threads to handle priming caches. The default `0` means to pick\nautomatically.",
                         "default": "physical",
                         "anyOf": [
@@ -864,7 +878,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.allTargets": {
+                    "verus-analyzer.cargo.allTargets": {
                         "markdownDescription": "Pass `--all-targets` to cargo invocation.",
                         "default": true,
                         "type": "boolean"
@@ -874,7 +888,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.autoreload": {
+                    "verus-analyzer.cargo.autoreload": {
                         "markdownDescription": "Automatically refresh project info via `cargo metadata` on\n`Cargo.toml` or `.cargo/config.toml` changes.",
                         "default": true,
                         "type": "boolean"
@@ -884,7 +898,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.buildScripts.enable": {
+                    "verus-analyzer.cargo.buildScripts.enable": {
                         "markdownDescription": "Run build scripts (`build.rs`) for more precise code analysis.",
                         "default": true,
                         "type": "boolean"
@@ -894,8 +908,8 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.buildScripts.invocationStrategy": {
-                        "markdownDescription": "Specifies the invocation strategy to use when running the build scripts command.\nIf `per_workspace` is set, the command will be executed for each Rust workspace with the\nworkspace as the working directory.\nIf `once` is set, the command will be executed once with the opened project as the\nworking directory.\nThis config only has an effect when `#rust-analyzer.cargo.buildScripts.overrideCommand#`\nis set.",
+                    "verus-analyzer.cargo.buildScripts.invocationStrategy": {
+                        "markdownDescription": "Specifies the invocation strategy to use when running the build scripts command.\nIf `per_workspace` is set, the command will be executed for each Rust workspace with the\nworkspace as the working directory.\nIf `once` is set, the command will be executed once with the opened project as the\nworking directory.\nThis config only has an effect when `#verus-analyzer.cargo.buildScripts.overrideCommand#`\nis set.",
                         "default": "per_workspace",
                         "type": "string",
                         "enum": [
@@ -912,8 +926,8 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.buildScripts.overrideCommand": {
-                        "markdownDescription": "Override the command rust-analyzer uses to run build scripts and\nbuild procedural macros. The command is required to output json\nand should therefore include `--message-format=json` or a similar\noption.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#rust-analyzer.cargo.buildScripts.invocationStrategy#`.\n\nBy default, a cargo invocation will be constructed for the configured\ntargets and features, with the following base command line:\n\n```bash\ncargo check --quiet --workspace --message-format=json --all-targets --keep-going\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
+                    "verus-analyzer.cargo.buildScripts.overrideCommand": {
+                        "markdownDescription": "Override the command rust-analyzer uses to run build scripts and\nbuild procedural macros. The command is required to output json\nand should therefore include `--message-format=json` or a similar\noption.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#verus-analyzer.cargo.buildScripts.invocationStrategy#`.\n\nBy default, a cargo invocation will be constructed for the configured\ntargets and features, with the following base command line:\n\n```bash\ncargo check --quiet --workspace --message-format=json --all-targets --keep-going\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
                         "default": null,
                         "type": [
                             "null",
@@ -928,7 +942,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.buildScripts.rebuildOnSave": {
+                    "verus-analyzer.cargo.buildScripts.rebuildOnSave": {
                         "markdownDescription": "Rerun proc-macros building/build-scripts running when proc-macro\nor build-script sources change and are saved.",
                         "default": true,
                         "type": "boolean"
@@ -938,7 +952,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.buildScripts.useRustcWrapper": {
+                    "verus-analyzer.cargo.buildScripts.useRustcWrapper": {
                         "markdownDescription": "Use `RUSTC_WRAPPER=rust-analyzer` when running build scripts to\navoid checking unnecessary things.",
                         "default": true,
                         "type": "boolean"
@@ -948,7 +962,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.cfgs": {
+                    "verus-analyzer.cargo.cfgs": {
                         "markdownDescription": "List of cfg options to enable with the given values.\n\nTo enable a name without a value, use `\"key\"`.\nTo enable a name with a value, use `\"key=value\"`.\nTo disable, prefix the entry with a `!`.",
                         "default": [
                             "debug_assertions",
@@ -964,7 +978,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.configPath": {
+                    "verus-analyzer.cargo.configPath": {
                         "markdownDescription": "Path to a `.cargo/config.toml` style file to pass to cargo via `--config`\nfor every cargo invocation (metadata, build scripts, config discovery).\nUseful to give rust-analyzer a consistent view of the project configuration.",
                         "default": null,
                         "type": [
@@ -977,7 +991,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.extraArgs": {
+                    "verus-analyzer.cargo.extraArgs": {
                         "markdownDescription": "Extra arguments that are passed to every cargo invocation.",
                         "default": [],
                         "type": "array",
@@ -990,7 +1004,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.extraEnv": {
+                    "verus-analyzer.cargo.extraEnv": {
                         "markdownDescription": "Extra environment variables that will be set when running cargo, rustc\nor other commands within the workspace. Useful for setting RUSTFLAGS.",
                         "default": {},
                         "type": "object"
@@ -1000,7 +1014,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.features": {
+                    "verus-analyzer.cargo.features": {
                         "markdownDescription": "List of features to activate.\n\nSet this to `\"all\"` to pass `--all-features` to cargo.",
                         "default": [],
                         "anyOf": [
@@ -1026,7 +1040,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.metadataExtraArgs": {
+                    "verus-analyzer.cargo.metadataExtraArgs": {
                         "markdownDescription": "Extra arguments passed only to `cargo metadata`, not to other cargo invocations.\nUseful for flags like `--config` that `cargo metadata` supports.",
                         "default": [],
                         "type": "array",
@@ -1039,7 +1053,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.noDefaultFeatures": {
+                    "verus-analyzer.cargo.noDefaultFeatures": {
                         "markdownDescription": "Whether to pass `--no-default-features` to cargo.",
                         "default": false,
                         "type": "boolean"
@@ -1049,7 +1063,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.noDeps": {
+                    "verus-analyzer.cargo.noDeps": {
                         "markdownDescription": "Whether to skip fetching dependencies. If set to \"true\", the analysis is performed\nentirely offline, and Cargo metadata for dependencies is not fetched.",
                         "default": false,
                         "type": "boolean"
@@ -1059,7 +1073,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.sysroot": {
+                    "verus-analyzer.cargo.sysroot": {
                         "markdownDescription": "Relative path to the sysroot, or \"discover\" to try to automatically find it via\n\"rustc --print sysroot\".\n\nUnsetting this disables sysroot loading.\n\nThis option does not take effect until rust-analyzer is restarted.",
                         "default": "discover",
                         "type": [
@@ -1072,7 +1086,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.sysrootSrc": {
+                    "verus-analyzer.cargo.sysrootSrc": {
                         "markdownDescription": "Relative path to the sysroot library sources. If left unset, this will default to\n`{cargo.sysroot}/lib/rustlib/src/rust/library`.\n\nThis option does not take effect until rust-analyzer is restarted.",
                         "default": null,
                         "type": [
@@ -1085,7 +1099,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.target": {
+                    "verus-analyzer.cargo.target": {
                         "markdownDescription": "Compilation target override (target tuple).",
                         "default": null,
                         "type": [
@@ -1098,7 +1112,7 @@
             {
                 "title": "Cargo",
                 "properties": {
-                    "rust-analyzer.cargo.targetDir": {
+                    "verus-analyzer.cargo.targetDir": {
                         "markdownDescription": "Optional path to a rust-analyzer specific target directory.\nThis prevents rust-analyzer's `cargo check` and initial build-script and proc-macro\nbuilding from locking the `Cargo.lock` at the expense of duplicating build artifacts.\n\nSet to `true` to use a subdirectory of the existing target directory or\nset to a path relative to the workspace to use that path.",
                         "default": null,
                         "anyOf": [
@@ -1116,9 +1130,19 @@
                 }
             },
             {
+                "title": "Cargo",
+                "properties": {
+                    "verus-analyzer.cargo.verusEnable": {
+                        "markdownDescription": "Run `cargo verus` instead of invoking the Verus binary directly.",
+                        "default": false,
+                        "type": "boolean"
+                    }
+                }
+            },
+            {
                 "title": "Cfg",
                 "properties": {
-                    "rust-analyzer.cfg.setTest": {
+                    "verus-analyzer.cfg.setTest": {
                         "markdownDescription": "Set `cfg(test)` for local crates. Defaults to true.",
                         "default": true,
                         "type": "boolean"
@@ -1126,9 +1150,9 @@
                 }
             },
             {
-                "title": "rust-analyzer",
+                "title": "verus-analyzer",
                 "properties": {
-                    "rust-analyzer.checkOnSave": {
+                    "verus-analyzer.checkOnSave": {
                         "markdownDescription": "Run the check command for diagnostics on save.",
                         "default": true,
                         "type": "boolean"
@@ -1138,8 +1162,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.allTargets": {
-                        "markdownDescription": "Check all targets and tests (`--all-targets`). Defaults to\n`#rust-analyzer.cargo.allTargets#`.",
+                    "verus-analyzer.check.allTargets": {
+                        "markdownDescription": "Check all targets and tests (`--all-targets`). Defaults to\n`#verus-analyzer.cargo.allTargets#`.",
                         "default": null,
                         "type": [
                             "null",
@@ -1151,7 +1175,7 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.command": {
+                    "verus-analyzer.check.command": {
                         "markdownDescription": "Cargo command to use for `cargo check`.",
                         "default": "check",
                         "type": "string"
@@ -1161,7 +1185,7 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.extraArgs": {
+                    "verus-analyzer.check.extraArgs": {
                         "markdownDescription": "Extra arguments for `cargo check`.",
                         "default": [],
                         "type": "array",
@@ -1174,8 +1198,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.extraEnv": {
-                        "markdownDescription": "Extra environment variables that will be set when running `cargo check`.\nExtends `#rust-analyzer.cargo.extraEnv#`.",
+                    "verus-analyzer.check.extraEnv": {
+                        "markdownDescription": "Extra environment variables that will be set when running `cargo check`.\nExtends `#verus-analyzer.cargo.extraEnv#`.",
                         "default": {},
                         "type": "object"
                     }
@@ -1184,8 +1208,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.features": {
-                        "markdownDescription": "List of features to activate. Defaults to\n`#rust-analyzer.cargo.features#`.\n\nSet to `\"all\"` to pass `--all-features` to Cargo.",
+                    "verus-analyzer.check.features": {
+                        "markdownDescription": "List of features to activate. Defaults to\n`#verus-analyzer.cargo.features#`.\n\nSet to `\"all\"` to pass `--all-features` to Cargo.",
                         "default": null,
                         "anyOf": [
                             {
@@ -1213,7 +1237,7 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.ignore": {
+                    "verus-analyzer.check.ignore": {
                         "markdownDescription": "List of `cargo check` (or other command specified in `check.command`) diagnostics to ignore.\n\nFor example for `cargo check`: `dead_code`, `unused_imports`, `unused_variables`,...",
                         "default": [],
                         "type": "array",
@@ -1227,8 +1251,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.invocationStrategy": {
-                        "markdownDescription": "Specifies the invocation strategy to use when running the check command.\nIf `per_workspace` is set, the command will be executed for each workspace.\nIf `once` is set, the command will be executed once.\nThis config only has an effect when `#rust-analyzer.check.overrideCommand#`\nis set.",
+                    "verus-analyzer.check.invocationStrategy": {
+                        "markdownDescription": "Specifies the invocation strategy to use when running the check command.\nIf `per_workspace` is set, the command will be executed for each workspace.\nIf `once` is set, the command will be executed once.\nThis config only has an effect when `#verus-analyzer.check.overrideCommand#`\nis set.",
                         "default": "per_workspace",
                         "type": "string",
                         "enum": [
@@ -1245,8 +1269,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.noDefaultFeatures": {
-                        "markdownDescription": "Whether to pass `--no-default-features` to Cargo. Defaults to\n`#rust-analyzer.cargo.noDefaultFeatures#`.",
+                    "verus-analyzer.check.noDefaultFeatures": {
+                        "markdownDescription": "Whether to pass `--no-default-features` to Cargo. Defaults to\n`#verus-analyzer.cargo.noDefaultFeatures#`.",
                         "default": null,
                         "type": [
                             "null",
@@ -1258,8 +1282,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.overrideCommand": {
-                        "markdownDescription": "Override the command rust-analyzer uses instead of `cargo check` for\ndiagnostics on save. The command is required to output json and\nshould therefore include `--message-format=json` or a similar option\n(if your client supports the `colorDiagnosticOutput` experimental\ncapability, you can use `--message-format=json-diagnostic-rendered-ansi`).\n\nIf you're changing this because you're using some tool wrapping\nCargo, you might also want to change\n`#rust-analyzer.cargo.buildScripts.overrideCommand#`.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#rust-analyzer.check.invocationStrategy#`.\n\nIt supports two interpolation syntaxes, both mainly intended to be used with\n[non-Cargo build systems](./non_cargo_based_projects.md):\n\n- If `{saved_file}` is part of the command, rust-analyzer will pass\n    the absolute path of the saved file to the provided command.\n    (A previous version, `$saved_file`, also works.)\n- If `{label}` is part of the command, rust-analyzer will pass the\n    Cargo package ID, which can be used with `cargo check -p`, or a build label from\n    `rust-project.json`. If `{label}` is included, rust-analyzer behaves much like\n    [`\"rust-analyzer.check.workspace\": false`](#check.workspace).\n\n\n\nAn example command would be:\n\n```bash\ncargo check --workspace --message-format=json --all-targets\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
+                    "verus-analyzer.check.overrideCommand": {
+                        "markdownDescription": "Override the command rust-analyzer uses instead of `cargo check` for\ndiagnostics on save. The command is required to output json and\nshould therefore include `--message-format=json` or a similar option\n(if your client supports the `colorDiagnosticOutput` experimental\ncapability, you can use `--message-format=json-diagnostic-rendered-ansi`).\n\nIf you're changing this because you're using some tool wrapping\nCargo, you might also want to change\n`#verus-analyzer.cargo.buildScripts.overrideCommand#`.\n\nIf there are multiple linked projects/workspaces, this command is invoked for\neach of them, with the working directory being the workspace root\n(i.e., the folder containing the `Cargo.toml`). This can be overwritten\nby changing `#verus-analyzer.check.invocationStrategy#`.\n\nIt supports two interpolation syntaxes, both mainly intended to be used with\n[non-Cargo build systems](./non_cargo_based_projects.md):\n\n- If `{saved_file}` is part of the command, rust-analyzer will pass\n    the absolute path of the saved file to the provided command.\n    (A previous version, `$saved_file`, also works.)\n- If `{label}` is part of the command, rust-analyzer will pass the\n    Cargo package ID, which can be used with `cargo check -p`, or a build label from\n    `rust-project.json`. If `{label}` is included, rust-analyzer behaves much like\n    [`\"rust-analyzer.check.workspace\": false`](#check.workspace).\n\n\n\nAn example command would be:\n\n```bash\ncargo check --workspace --message-format=json --all-targets\n```\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
                         "default": null,
                         "type": [
                             "null",
@@ -1274,8 +1298,8 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.targets": {
-                        "markdownDescription": "Check for specific targets. Defaults to `#rust-analyzer.cargo.target#` if empty.\n\nCan be a single target, e.g. `\"x86_64-unknown-linux-gnu\"` or a list of targets, e.g.\n`[\"aarch64-apple-darwin\", \"x86_64-apple-darwin\"]`.\n\nAliased as `\"checkOnSave.targets\"`.",
+                    "verus-analyzer.check.targets": {
+                        "markdownDescription": "Check for specific targets. Defaults to `#verus-analyzer.cargo.target#` if empty.\n\nCan be a single target, e.g. `\"x86_64-unknown-linux-gnu\"` or a list of targets, e.g.\n`[\"aarch64-apple-darwin\", \"x86_64-apple-darwin\"]`.\n\nAliased as `\"checkOnSave.targets\"`.",
                         "default": null,
                         "anyOf": [
                             {
@@ -1297,7 +1321,7 @@
             {
                 "title": "Check",
                 "properties": {
-                    "rust-analyzer.check.workspace": {
+                    "verus-analyzer.check.workspace": {
                         "markdownDescription": "Whether `--workspace` should be passed to `cargo check`.\nIf false, `-p <package>` will be passed instead if applicable. In case it is not, no\ncheck will be performed.",
                         "default": true,
                         "type": "boolean"
@@ -1307,7 +1331,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.addColonsToModule": {
+                    "verus-analyzer.completion.addColonsToModule": {
                         "markdownDescription": "Automatically add `::` when completing the module.\n\nWill not be completed in `use`.",
                         "default": true,
                         "type": "boolean"
@@ -1317,7 +1341,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.addSemicolonToUnit": {
+                    "verus-analyzer.completion.addSemicolonToUnit": {
                         "markdownDescription": "Automatically add a semicolon when completing unit-returning functions.\n\nIn `match` arms it completes a comma instead.",
                         "default": true,
                         "type": "boolean"
@@ -1327,7 +1351,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.autoAwait.enable": {
+                    "verus-analyzer.completion.autoAwait.enable": {
                         "markdownDescription": "Show method calls and field accesses completions with `await` prefixed to them when\ncompleting on a future.",
                         "default": true,
                         "type": "boolean"
@@ -1337,7 +1361,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.autoIter.enable": {
+                    "verus-analyzer.completion.autoIter.enable": {
                         "markdownDescription": "Show method call completions with `iter()` or `into_iter()` prefixed to them when\ncompleting on a type that has them.",
                         "default": true,
                         "type": "boolean"
@@ -1347,7 +1371,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.autoimport.enable": {
+                    "verus-analyzer.completion.autoimport.enable": {
                         "markdownDescription": "Show completions that automatically add imports when completed.\n\nNote that your client must specify the `additionalTextEdits` LSP client capability to\ntruly have this feature enabled.",
                         "default": true,
                         "type": "boolean"
@@ -1357,8 +1381,8 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.autoimport.exclude": {
-                        "markdownDescription": "A list of full paths to items to exclude from auto-importing completions.\n\nTraits in this list won't have their methods suggested in completions unless the trait\nis in scope.\n\nYou can either specify a string path which defaults to type \"always\" or use the more\nverbose form `{ \"path\": \"path::to::item\", type: \"always\" }`.\n\nFor traits the type \"methods\" can be used to only exclude the methods but not the trait\nitself.\n\nFor modules the type \"sub_items\" can be used to only exclude the all items in it but not the module\nitself. This does not include items defined in nested modules.\n\nFor enums the type \"variants\" can be used to only exclude the all variants in it but not the enum\nitself.\n\nThis setting also inherits `#rust-analyzer.completion.excludeTraits#`.",
+                    "verus-analyzer.completion.autoimport.exclude": {
+                        "markdownDescription": "A list of full paths to items to exclude from auto-importing completions.\n\nTraits in this list won't have their methods suggested in completions unless the trait\nis in scope.\n\nYou can either specify a string path which defaults to type \"always\" or use the more\nverbose form `{ \"path\": \"path::to::item\", type: \"always\" }`.\n\nFor traits the type \"methods\" can be used to only exclude the methods but not the trait\nitself.\n\nFor modules the type \"sub_items\" can be used to only exclude the all items in it but not the module\nitself. This does not include items defined in nested modules.\n\nFor enums the type \"variants\" can be used to only exclude the all variants in it but not the enum\nitself.\n\nThis setting also inherits `#verus-analyzer.completion.excludeTraits#`.",
                         "default": [
                             {
                                 "path": "core::borrow::Borrow",
@@ -1406,7 +1430,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.autoself.enable": {
+                    "verus-analyzer.completion.autoself.enable": {
                         "markdownDescription": "Show method calls and field access completions with `self` prefixed to them when\ninside a method.",
                         "default": true,
                         "type": "boolean"
@@ -1416,7 +1440,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.callable.snippets": {
+                    "verus-analyzer.completion.callable.snippets": {
                         "markdownDescription": "Add parenthesis and argument snippets when completing function.",
                         "default": "fill_arguments",
                         "type": "string",
@@ -1436,7 +1460,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.excludeTraits": {
+                    "verus-analyzer.completion.excludeTraits": {
                         "markdownDescription": "A list of full paths to traits whose methods to exclude from completion.\n\nMethods from these traits won't be completed, even if the trait is in scope. However,\nthey will still be suggested on expressions whose type is `dyn Trait`, `impl Trait` or\n`T where T: Trait`.\n\nNote that the trait themselves can still be completed.",
                         "default": [],
                         "type": "array",
@@ -1449,7 +1473,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.fullFunctionSignatures.enable": {
+                    "verus-analyzer.completion.fullFunctionSignatures.enable": {
                         "markdownDescription": "Show full function / method signatures in completion docs.",
                         "default": false,
                         "type": "boolean"
@@ -1459,7 +1483,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.hideDeprecated": {
+                    "verus-analyzer.completion.hideDeprecated": {
                         "markdownDescription": "Omit deprecated items from completions. By default they are marked as deprecated but not\nhidden.",
                         "default": false,
                         "type": "boolean"
@@ -1469,7 +1493,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.limit": {
+                    "verus-analyzer.completion.limit": {
                         "markdownDescription": "Maximum number of completions to return. If `None`, the limit is infinite.",
                         "default": null,
                         "type": [
@@ -1483,7 +1507,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.postfix.enable": {
+                    "verus-analyzer.completion.postfix.enable": {
                         "markdownDescription": "Show postfix snippets like `dbg`, `if`, `not`, etc.",
                         "default": true,
                         "type": "boolean"
@@ -1493,7 +1517,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.privateEditable.enable": {
+                    "verus-analyzer.completion.privateEditable.enable": {
                         "markdownDescription": "Show completions of private items and fields that are defined in the current workspace\neven if they are not visible at the current position.",
                         "default": false,
                         "type": "boolean"
@@ -1503,7 +1527,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.snippets.custom": {
+                    "verus-analyzer.completion.snippets.custom": {
                         "markdownDescription": "Custom completion snippets.",
                         "default": {
                             "Ok": {
@@ -1553,7 +1577,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.termSearch.enable": {
+                    "verus-analyzer.completion.termSearch.enable": {
                         "markdownDescription": "Enable term search based snippets like `Some(foo.bar().baz())`.",
                         "default": false,
                         "type": "boolean"
@@ -1563,7 +1587,7 @@
             {
                 "title": "Completion",
                 "properties": {
-                    "rust-analyzer.completion.termSearch.fuel": {
+                    "verus-analyzer.completion.termSearch.fuel": {
                         "markdownDescription": "Term search fuel in \"units of work\" for autocompletion (Defaults to 1000).",
                         "default": 1000,
                         "type": "integer",
@@ -1574,7 +1598,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.disabled": {
+                    "verus-analyzer.diagnostics.disabled": {
                         "markdownDescription": "List of rust-analyzer diagnostics to disable.",
                         "default": [],
                         "type": "array",
@@ -1588,7 +1612,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.enable": {
+                    "verus-analyzer.diagnostics.enable": {
                         "markdownDescription": "Show native rust-analyzer diagnostics.",
                         "default": true,
                         "type": "boolean"
@@ -1598,7 +1622,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.experimental.enable": {
+                    "verus-analyzer.diagnostics.experimental.enable": {
                         "markdownDescription": "Show experimental rust-analyzer diagnostics that might have more false positives than\nusual.",
                         "default": false,
                         "type": "boolean"
@@ -1608,7 +1632,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.remapPrefix": {
+                    "verus-analyzer.diagnostics.remapPrefix": {
                         "markdownDescription": "Map of prefixes to be substituted when parsing diagnostic file paths. This should be the\nreverse mapping of what is passed to `rustc` as `--remap-path-prefix`.",
                         "default": {},
                         "type": "object"
@@ -1618,7 +1642,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.styleLints.enable": {
+                    "verus-analyzer.diagnostics.styleLints.enable": {
                         "markdownDescription": "Run additional style lints.",
                         "default": false,
                         "type": "boolean"
@@ -1628,7 +1652,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.warningsAsHint": {
+                    "verus-analyzer.diagnostics.warningsAsHint": {
                         "markdownDescription": "List of warnings that should be displayed with hint severity.\n\nThe warnings will be indicated by faded text or three dots in code and will not show up\nin the `Problems Panel`.",
                         "default": [],
                         "type": "array",
@@ -1641,7 +1665,7 @@
             {
                 "title": "Diagnostics",
                 "properties": {
-                    "rust-analyzer.diagnostics.warningsAsInfo": {
+                    "verus-analyzer.diagnostics.warningsAsInfo": {
                         "markdownDescription": "List of warnings that should be displayed with info severity.\n\nThe warnings will be indicated by a blue squiggly underline in code and a blue icon in\nthe `Problems Panel`.",
                         "default": [],
                         "type": "array",
@@ -1652,9 +1676,9 @@
                 }
             },
             {
-                "title": "rust-analyzer",
+                "title": "verus-analyzer",
                 "properties": {
-                    "rust-analyzer.disableFixtureSupport": {
+                    "verus-analyzer.disableFixtureSupport": {
                         "markdownDescription": "Disable support for `#[rust_analyzer::rust_fixture]` snippets.\n\nIf you are not working on rust-analyzer itself, you should ignore this config.",
                         "default": false,
                         "type": "boolean"
@@ -1664,7 +1688,7 @@
             {
                 "title": "Document",
                 "properties": {
-                    "rust-analyzer.document.symbol.search.excludeLocals": {
+                    "verus-analyzer.document.symbol.search.excludeLocals": {
                         "markdownDescription": "Exclude all locals from document symbol search.",
                         "default": true,
                         "type": "boolean"
@@ -1674,7 +1698,7 @@
             {
                 "title": "Files",
                 "properties": {
-                    "rust-analyzer.files.exclude": {
+                    "verus-analyzer.files.exclude": {
                         "markdownDescription": "List of files to ignore\n\nThese paths (file/directories) will be ignored by rust-analyzer. They are relative to\nthe workspace root, and globs are not supported. You may also need to add the folders to\nCode's `files.watcherExclude`.",
                         "default": [],
                         "type": "array",
@@ -1687,7 +1711,7 @@
             {
                 "title": "Files",
                 "properties": {
-                    "rust-analyzer.files.watcher": {
+                    "verus-analyzer.files.watcher": {
                         "markdownDescription": "Controls file watching implementation.",
                         "default": "client",
                         "type": "string",
@@ -1705,7 +1729,7 @@
             {
                 "title": "Goto Implementations",
                 "properties": {
-                    "rust-analyzer.gotoImplementations.filterAdjacentDerives": {
+                    "verus-analyzer.gotoImplementations.filterAdjacentDerives": {
                         "markdownDescription": "If this is `true`, when \"Goto Implementations\" and in \"Implementations\" lens, are triggered on a `struct` or `enum` or `union`, we filter out trait implementations that originate from `derive`s above the type.",
                         "default": false,
                         "type": "boolean"
@@ -1715,7 +1739,7 @@
             {
                 "title": "Highlight Related",
                 "properties": {
-                    "rust-analyzer.highlightRelated.branchExitPoints.enable": {
+                    "verus-analyzer.highlightRelated.branchExitPoints.enable": {
                         "markdownDescription": "Highlight related return values while the cursor is on any `match`, `if`, or match arm\narrow (`=>`).",
                         "default": true,
                         "type": "boolean"
@@ -1725,7 +1749,7 @@
             {
                 "title": "Highlight Related",
                 "properties": {
-                    "rust-analyzer.highlightRelated.breakPoints.enable": {
+                    "verus-analyzer.highlightRelated.breakPoints.enable": {
                         "markdownDescription": "Highlight related references while the cursor is on `break`, `loop`, `while`, or `for`\nkeywords.",
                         "default": true,
                         "type": "boolean"
@@ -1735,7 +1759,7 @@
             {
                 "title": "Highlight Related",
                 "properties": {
-                    "rust-analyzer.highlightRelated.closureCaptures.enable": {
+                    "verus-analyzer.highlightRelated.closureCaptures.enable": {
                         "markdownDescription": "Highlight all captures of a closure while the cursor is on the `|` or move keyword of a closure.",
                         "default": true,
                         "type": "boolean"
@@ -1745,7 +1769,7 @@
             {
                 "title": "Highlight Related",
                 "properties": {
-                    "rust-analyzer.highlightRelated.exitPoints.enable": {
+                    "verus-analyzer.highlightRelated.exitPoints.enable": {
                         "markdownDescription": "Highlight all exit points while the cursor is on any `return`, `?`, `fn`, or return type\narrow (`->`).",
                         "default": true,
                         "type": "boolean"
@@ -1755,7 +1779,7 @@
             {
                 "title": "Highlight Related",
                 "properties": {
-                    "rust-analyzer.highlightRelated.references.enable": {
+                    "verus-analyzer.highlightRelated.references.enable": {
                         "markdownDescription": "Highlight related references while the cursor is on any identifier.",
                         "default": true,
                         "type": "boolean"
@@ -1765,7 +1789,7 @@
             {
                 "title": "Highlight Related",
                 "properties": {
-                    "rust-analyzer.highlightRelated.yieldPoints.enable": {
+                    "verus-analyzer.highlightRelated.yieldPoints.enable": {
                         "markdownDescription": "Highlight all break points for a loop or block context while the cursor is on any\n`async` or `await` keywords.",
                         "default": true,
                         "type": "boolean"
@@ -1775,8 +1799,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.debug.enable": {
-                        "markdownDescription": "Show `Debug` action. Only applies when `#rust-analyzer.hover.actions.enable#` is set.",
+                    "verus-analyzer.hover.actions.debug.enable": {
+                        "markdownDescription": "Show `Debug` action. Only applies when `#verus-analyzer.hover.actions.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1785,7 +1809,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.enable": {
+                    "verus-analyzer.hover.actions.enable": {
                         "markdownDescription": "Show HoverActions in Rust files.",
                         "default": true,
                         "type": "boolean"
@@ -1795,8 +1819,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.gotoTypeDef.enable": {
-                        "markdownDescription": "Show `Go to Type Definition` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
+                    "verus-analyzer.hover.actions.gotoTypeDef.enable": {
+                        "markdownDescription": "Show `Go to Type Definition` action. Only applies when\n`#verus-analyzer.hover.actions.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1805,8 +1829,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.implementations.enable": {
-                        "markdownDescription": "Show `Implementations` action. Only applies when `#rust-analyzer.hover.actions.enable#`\nis set.",
+                    "verus-analyzer.hover.actions.implementations.enable": {
+                        "markdownDescription": "Show `Implementations` action. Only applies when `#verus-analyzer.hover.actions.enable#`\nis set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1815,8 +1839,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.references.enable": {
-                        "markdownDescription": "Show `References` action. Only applies when `#rust-analyzer.hover.actions.enable#` is\nset.",
+                    "verus-analyzer.hover.actions.references.enable": {
+                        "markdownDescription": "Show `References` action. Only applies when `#verus-analyzer.hover.actions.enable#` is\nset.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -1825,8 +1849,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.run.enable": {
-                        "markdownDescription": "Show `Run` action. Only applies when `#rust-analyzer.hover.actions.enable#` is set.",
+                    "verus-analyzer.hover.actions.run.enable": {
+                        "markdownDescription": "Show `Run` action. Only applies when `#verus-analyzer.hover.actions.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1835,8 +1859,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.actions.updateTest.enable": {
-                        "markdownDescription": "Show `Update Test` action. Only applies when `#rust-analyzer.hover.actions.enable#` and\n`#rust-analyzer.hover.actions.run.enable#` are set.",
+                    "verus-analyzer.hover.actions.updateTest.enable": {
+                        "markdownDescription": "Show `Update Test` action. Only applies when `#verus-analyzer.hover.actions.enable#` and\n`#verus-analyzer.hover.actions.run.enable#` are set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1845,7 +1869,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.documentation.enable": {
+                    "verus-analyzer.hover.documentation.enable": {
                         "markdownDescription": "Show documentation on hover.",
                         "default": true,
                         "type": "boolean"
@@ -1855,8 +1879,8 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.documentation.keywords.enable": {
-                        "markdownDescription": "Show keyword hover popups. Only applies when\n`#rust-analyzer.hover.documentation.enable#` is set.",
+                    "verus-analyzer.hover.documentation.keywords.enable": {
+                        "markdownDescription": "Show keyword hover popups. Only applies when\n`#verus-analyzer.hover.documentation.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -1865,7 +1889,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.dropGlue.enable": {
+                    "verus-analyzer.hover.dropGlue.enable": {
                         "markdownDescription": "Show drop glue information on hover.",
                         "default": true,
                         "type": "boolean"
@@ -1875,7 +1899,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.links.enable": {
+                    "verus-analyzer.hover.links.enable": {
                         "markdownDescription": "Use markdown syntax for links on hover.",
                         "default": true,
                         "type": "boolean"
@@ -1885,7 +1909,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.maxSubstitutionLength": {
+                    "verus-analyzer.hover.maxSubstitutionLength": {
                         "markdownDescription": "Show what types are used as generic arguments in calls etc. on hover, and limit the max\nlength to show such types, beyond which they will be shown with ellipsis.\n\nThis can take three values: `null` means \"unlimited\", the string `\"hide\"` means to not\nshow generic substitutions at all, and a number means to limit them to X characters.\n\nThe default is 20 characters.",
                         "default": 20,
                         "anyOf": [
@@ -1908,7 +1932,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.memoryLayout.alignment": {
+                    "verus-analyzer.hover.memoryLayout.alignment": {
                         "markdownDescription": "How to render the align information in a memory layout hover.",
                         "default": "hexadecimal",
                         "anyOf": [
@@ -1935,7 +1959,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.memoryLayout.enable": {
+                    "verus-analyzer.hover.memoryLayout.enable": {
                         "markdownDescription": "Show memory layout data on hover.",
                         "default": true,
                         "type": "boolean"
@@ -1945,7 +1969,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.memoryLayout.niches": {
+                    "verus-analyzer.hover.memoryLayout.niches": {
                         "markdownDescription": "How to render the niche information in a memory layout hover.",
                         "default": false,
                         "type": [
@@ -1958,7 +1982,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.memoryLayout.offset": {
+                    "verus-analyzer.hover.memoryLayout.offset": {
                         "markdownDescription": "How to render the offset information in a memory layout hover.",
                         "default": "hexadecimal",
                         "anyOf": [
@@ -1985,7 +2009,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.memoryLayout.padding": {
+                    "verus-analyzer.hover.memoryLayout.padding": {
                         "markdownDescription": "How to render the padding information in a memory layout hover.",
                         "default": null,
                         "anyOf": [
@@ -2012,7 +2036,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.memoryLayout.size": {
+                    "verus-analyzer.hover.memoryLayout.size": {
                         "markdownDescription": "How to render the size information in a memory layout hover.",
                         "default": "both",
                         "anyOf": [
@@ -2039,7 +2063,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.show.enumVariants": {
+                    "verus-analyzer.hover.show.enumVariants": {
                         "markdownDescription": "How many variants of an enum to display when hovering on. Show none if empty.",
                         "default": 5,
                         "type": [
@@ -2053,7 +2077,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.show.fields": {
+                    "verus-analyzer.hover.show.fields": {
                         "markdownDescription": "How many fields of a struct, variant or union to display when hovering on. Show none if\nempty.",
                         "default": 5,
                         "type": [
@@ -2067,7 +2091,7 @@
             {
                 "title": "Hover",
                 "properties": {
-                    "rust-analyzer.hover.show.traitAssocItems": {
+                    "verus-analyzer.hover.show.traitAssocItems": {
                         "markdownDescription": "How many associated items of a trait to display when hovering a trait.",
                         "default": null,
                         "type": [
@@ -2081,7 +2105,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.granularity.enforce": {
+                    "verus-analyzer.imports.granularity.enforce": {
                         "markdownDescription": "Enforce the import granularity setting for all files. If set to false rust-analyzer will\ntry to keep import styles consistent per file.",
                         "default": false,
                         "type": "boolean"
@@ -2091,7 +2115,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.granularity.group": {
+                    "verus-analyzer.imports.granularity.group": {
                         "markdownDescription": "How imports should be grouped into use statements.",
                         "default": "crate",
                         "type": "string",
@@ -2115,7 +2139,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.group.enable": {
+                    "verus-analyzer.imports.group.enable": {
                         "markdownDescription": "Group inserted imports by the [following\norder](https://rust-analyzer.github.io/book/features.html#auto-import). Groups are\nseparated by newlines.",
                         "default": true,
                         "type": "boolean"
@@ -2125,7 +2149,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.merge.glob": {
+                    "verus-analyzer.imports.merge.glob": {
                         "markdownDescription": "Allow import insertion to merge new imports into single path glob imports like `use\nstd::fmt::*;`.",
                         "default": true,
                         "type": "boolean"
@@ -2135,7 +2159,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.preferNoStd": {
+                    "verus-analyzer.imports.preferNoStd": {
                         "markdownDescription": "Prefer to unconditionally use imports of the core and alloc crate, over the std crate.",
                         "default": false,
                         "type": "boolean"
@@ -2145,7 +2169,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.preferPrelude": {
+                    "verus-analyzer.imports.preferPrelude": {
                         "markdownDescription": "Prefer import paths containing a `prelude` module.",
                         "default": false,
                         "type": "boolean"
@@ -2155,7 +2179,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.prefix": {
+                    "verus-analyzer.imports.prefix": {
                         "markdownDescription": "The path structure for newly inserted paths to use.",
                         "default": "crate",
                         "type": "string",
@@ -2175,7 +2199,7 @@
             {
                 "title": "Imports",
                 "properties": {
-                    "rust-analyzer.imports.prefixExternPrelude": {
+                    "verus-analyzer.imports.prefixExternPrelude": {
                         "markdownDescription": "Prefix external (including std, core) crate imports with `::`.\n\nE.g. `use ::std::io::Read;`.",
                         "default": false,
                         "type": "boolean"
@@ -2185,7 +2209,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.bindingModeHints.enable": {
+                    "verus-analyzer.inlayHints.bindingModeHints.enable": {
                         "markdownDescription": "Show inlay type hints for binding modes.",
                         "default": false,
                         "type": "boolean"
@@ -2195,7 +2219,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.chainingHints.enable": {
+                    "verus-analyzer.inlayHints.chainingHints.enable": {
                         "markdownDescription": "Show inlay type hints for method chains.",
                         "default": true,
                         "type": "boolean"
@@ -2205,7 +2229,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.closingBraceHints.enable": {
+                    "verus-analyzer.inlayHints.closingBraceHints.enable": {
                         "markdownDescription": "Show inlay hints after a closing `}` to indicate what item it belongs to.",
                         "default": true,
                         "type": "boolean"
@@ -2215,7 +2239,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.closingBraceHints.minLines": {
+                    "verus-analyzer.inlayHints.closingBraceHints.minLines": {
                         "markdownDescription": "Minimum number of lines required before the `}` until the hint is shown (set to 0 or 1\nto always show them).",
                         "default": 25,
                         "type": "integer",
@@ -2226,7 +2250,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.closureCaptureHints.enable": {
+                    "verus-analyzer.inlayHints.closureCaptureHints.enable": {
                         "markdownDescription": "Show inlay hints for closure and coroutine captures.",
                         "default": false,
                         "type": "boolean"
@@ -2236,7 +2260,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.closureReturnTypeHints.enable": {
+                    "verus-analyzer.inlayHints.closureReturnTypeHints.enable": {
                         "markdownDescription": "Show inlay type hints for return types of closures.",
                         "default": "never",
                         "type": "string",
@@ -2256,7 +2280,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.closureStyle": {
+                    "verus-analyzer.inlayHints.closureStyle": {
                         "markdownDescription": "Closure notation in type and chaining inlay hints.",
                         "default": "impl_fn",
                         "type": "string",
@@ -2278,7 +2302,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.discriminantHints.enable": {
+                    "verus-analyzer.inlayHints.discriminantHints.enable": {
                         "markdownDescription": "Show enum variant discriminant hints.",
                         "default": "never",
                         "type": "string",
@@ -2298,7 +2322,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.expressionAdjustmentHints.disableReborrows": {
+                    "verus-analyzer.inlayHints.expressionAdjustmentHints.disableReborrows": {
                         "markdownDescription": "Disable reborrows in expression adjustments inlay hints.\n\nReborrows are a pair of a builtin deref then borrow, i.e. `&*`. They are inserted by the compiler but are mostly useless to the programmer.\n\nNote: if the deref is not builtin (an overloaded deref), or the borrow is `&raw const`/`&raw mut`, they are not removed.",
                         "default": true,
                         "type": "boolean"
@@ -2308,7 +2332,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.expressionAdjustmentHints.enable": {
+                    "verus-analyzer.inlayHints.expressionAdjustmentHints.enable": {
                         "markdownDescription": "Show inlay hints for type adjustments.",
                         "default": "never",
                         "type": "string",
@@ -2328,7 +2352,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.expressionAdjustmentHints.hideOutsideUnsafe": {
+                    "verus-analyzer.inlayHints.expressionAdjustmentHints.hideOutsideUnsafe": {
                         "markdownDescription": "Hide inlay hints for type adjustments outside of `unsafe` blocks.",
                         "default": false,
                         "type": "boolean"
@@ -2338,7 +2362,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.expressionAdjustmentHints.mode": {
+                    "verus-analyzer.inlayHints.expressionAdjustmentHints.mode": {
                         "markdownDescription": "Show inlay hints as postfix ops (`.*` instead of `*`, etc).",
                         "default": "prefix",
                         "type": "string",
@@ -2360,7 +2384,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.genericParameterHints.const.enable": {
+                    "verus-analyzer.inlayHints.genericParameterHints.const.enable": {
                         "markdownDescription": "Show const generic parameter name inlay hints.",
                         "default": true,
                         "type": "boolean"
@@ -2370,7 +2394,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.genericParameterHints.lifetime.enable": {
+                    "verus-analyzer.inlayHints.genericParameterHints.lifetime.enable": {
                         "markdownDescription": "Show generic lifetime parameter name inlay hints.",
                         "default": false,
                         "type": "boolean"
@@ -2380,7 +2404,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.genericParameterHints.type.enable": {
+                    "verus-analyzer.inlayHints.genericParameterHints.type.enable": {
                         "markdownDescription": "Show generic type parameter name inlay hints.",
                         "default": false,
                         "type": "boolean"
@@ -2390,7 +2414,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.implicitDrops.enable": {
+                    "verus-analyzer.inlayHints.implicitDrops.enable": {
                         "markdownDescription": "Show implicit drop hints.",
                         "default": false,
                         "type": "boolean"
@@ -2400,7 +2424,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.implicitSizedBoundHints.enable": {
+                    "verus-analyzer.inlayHints.implicitSizedBoundHints.enable": {
                         "markdownDescription": "Show inlay hints for the implied type parameter `Sized` bound.",
                         "default": false,
                         "type": "boolean"
@@ -2410,7 +2434,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.impliedDynTraitHints.enable": {
+                    "verus-analyzer.inlayHints.impliedDynTraitHints.enable": {
                         "markdownDescription": "Show inlay hints for the implied `dyn` keyword in trait object types.",
                         "default": true,
                         "type": "boolean"
@@ -2420,7 +2444,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.lifetimeElisionHints.enable": {
+                    "verus-analyzer.inlayHints.lifetimeElisionHints.enable": {
                         "markdownDescription": "Show inlay type hints for elided lifetimes in function signatures.",
                         "default": "never",
                         "type": "string",
@@ -2440,7 +2464,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": {
+                    "verus-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": {
                         "markdownDescription": "Prefer using parameter names as the name for elided lifetime hints if possible.",
                         "default": false,
                         "type": "boolean"
@@ -2450,7 +2474,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.maxLength": {
+                    "verus-analyzer.inlayHints.maxLength": {
                         "markdownDescription": "Maximum length for inlay hints. Set to null to have an unlimited length.\n\n**Note:** This is mostly a hint, and we don't guarantee to strictly follow the limit.",
                         "default": 25,
                         "type": [
@@ -2464,7 +2488,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.parameterHints.enable": {
+                    "verus-analyzer.inlayHints.parameterHints.enable": {
                         "markdownDescription": "Show function parameter name inlay hints at the call site.",
                         "default": true,
                         "type": "boolean"
@@ -2474,7 +2498,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.parameterHints.missingArguments.enable": {
+                    "verus-analyzer.inlayHints.parameterHints.missingArguments.enable": {
                         "markdownDescription": "Show parameter name inlay hints for missing arguments at the call site.",
                         "default": false,
                         "type": "boolean"
@@ -2484,7 +2508,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.rangeExclusiveHints.enable": {
+                    "verus-analyzer.inlayHints.rangeExclusiveHints.enable": {
                         "markdownDescription": "Show exclusive range inlay hints.",
                         "default": false,
                         "type": "boolean"
@@ -2494,8 +2518,8 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.reborrowHints.enable": {
-                        "markdownDescription": "Show inlay hints for compiler inserted reborrows.\n\nThis setting is deprecated in favor of\n#rust-analyzer.inlayHints.expressionAdjustmentHints.enable#.",
+                    "verus-analyzer.inlayHints.reborrowHints.enable": {
+                        "markdownDescription": "Show inlay hints for compiler inserted reborrows.\n\nThis setting is deprecated in favor of\n#verus-analyzer.inlayHints.expressionAdjustmentHints.enable#.",
                         "default": "never",
                         "type": "string",
                         "enum": [
@@ -2514,7 +2538,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.renderColons": {
+                    "verus-analyzer.inlayHints.renderColons": {
                         "markdownDescription": "Whether to render leading colons for type hints, and trailing colons for parameter hints.",
                         "default": true,
                         "type": "boolean"
@@ -2524,7 +2548,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.typeHints.enable": {
+                    "verus-analyzer.inlayHints.typeHints.enable": {
                         "markdownDescription": "Show inlay type hints for variables.",
                         "default": true,
                         "type": "boolean"
@@ -2534,8 +2558,8 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.typeHints.hideClosureInitialization": {
-                        "markdownDescription": "Hide inlay type hints for `let` statements that initialize to a closure.\n\nOnly applies to closures with blocks, same as\n`#rust-analyzer.inlayHints.closureReturnTypeHints.enable#`.",
+                    "verus-analyzer.inlayHints.typeHints.hideClosureInitialization": {
+                        "markdownDescription": "Hide inlay type hints for `let` statements that initialize to a closure.\n\nOnly applies to closures with blocks, same as\n`#verus-analyzer.inlayHints.closureReturnTypeHints.enable#`.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -2544,7 +2568,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.typeHints.hideClosureParameter": {
+                    "verus-analyzer.inlayHints.typeHints.hideClosureParameter": {
                         "markdownDescription": "Hide inlay parameter type hints for closures.",
                         "default": false,
                         "type": "boolean"
@@ -2554,7 +2578,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.typeHints.hideInferredTypes": {
+                    "verus-analyzer.inlayHints.typeHints.hideInferredTypes": {
                         "markdownDescription": "Hide inlay type hints for inferred types.",
                         "default": false,
                         "type": "boolean"
@@ -2564,7 +2588,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.typeHints.hideNamedConstructor": {
+                    "verus-analyzer.inlayHints.typeHints.hideNamedConstructor": {
                         "markdownDescription": "Hide inlay type hints for constructors.",
                         "default": false,
                         "type": "boolean"
@@ -2574,7 +2598,7 @@
             {
                 "title": "Inlay Hints",
                 "properties": {
-                    "rust-analyzer.inlayHints.typeHints.location": {
+                    "verus-analyzer.inlayHints.typeHints.location": {
                         "markdownDescription": "Where to render type hints relative to their binding pattern.",
                         "default": "inline",
                         "type": "string",
@@ -2592,7 +2616,7 @@
             {
                 "title": "Interpret",
                 "properties": {
-                    "rust-analyzer.interpret.tests": {
+                    "verus-analyzer.interpret.tests": {
                         "markdownDescription": "Enable the experimental support for interpreting tests.",
                         "default": false,
                         "type": "boolean"
@@ -2602,7 +2626,7 @@
             {
                 "title": "Join Lines",
                 "properties": {
-                    "rust-analyzer.joinLines.joinAssignments": {
+                    "verus-analyzer.joinLines.joinAssignments": {
                         "markdownDescription": "Join lines merges consecutive declaration and initialization of an assignment.",
                         "default": true,
                         "type": "boolean"
@@ -2612,7 +2636,7 @@
             {
                 "title": "Join Lines",
                 "properties": {
-                    "rust-analyzer.joinLines.joinElseIf": {
+                    "verus-analyzer.joinLines.joinElseIf": {
                         "markdownDescription": "Join lines inserts else between consecutive ifs.",
                         "default": true,
                         "type": "boolean"
@@ -2622,7 +2646,7 @@
             {
                 "title": "Join Lines",
                 "properties": {
-                    "rust-analyzer.joinLines.removeTrailingComma": {
+                    "verus-analyzer.joinLines.removeTrailingComma": {
                         "markdownDescription": "Join lines removes trailing commas.",
                         "default": true,
                         "type": "boolean"
@@ -2632,7 +2656,7 @@
             {
                 "title": "Join Lines",
                 "properties": {
-                    "rust-analyzer.joinLines.unwrapTrivialBlock": {
+                    "verus-analyzer.joinLines.unwrapTrivialBlock": {
                         "markdownDescription": "Join lines unwraps trivial blocks.",
                         "default": true,
                         "type": "boolean"
@@ -2642,8 +2666,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.debug.enable": {
-                        "markdownDescription": "Show `Debug` lens. Only applies when `#rust-analyzer.lens.enable#` is set.",
+                    "verus-analyzer.lens.debug.enable": {
+                        "markdownDescription": "Show `Debug` lens. Only applies when `#verus-analyzer.lens.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -2652,7 +2676,7 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.enable": {
+                    "verus-analyzer.lens.enable": {
                         "markdownDescription": "Show CodeLens in Rust files.",
                         "default": true,
                         "type": "boolean"
@@ -2662,8 +2686,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.implementations.enable": {
-                        "markdownDescription": "Show `Implementations` lens. Only applies when `#rust-analyzer.lens.enable#` is set.",
+                    "verus-analyzer.lens.implementations.enable": {
+                        "markdownDescription": "Show `Implementations` lens. Only applies when `#verus-analyzer.lens.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -2672,7 +2696,7 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.location": {
+                    "verus-analyzer.lens.location": {
                         "markdownDescription": "Where to render annotations.",
                         "default": "above_name",
                         "type": "string",
@@ -2690,8 +2714,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.references.adt.enable": {
-                        "markdownDescription": "Show `References` lens for Struct, Enum, and Union. Only applies when\n`#rust-analyzer.lens.enable#` is set.",
+                    "verus-analyzer.lens.references.adt.enable": {
+                        "markdownDescription": "Show `References` lens for Struct, Enum, and Union. Only applies when\n`#verus-analyzer.lens.enable#` is set.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -2700,8 +2724,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.references.enumVariant.enable": {
-                        "markdownDescription": "Show `References` lens for Enum Variants. Only applies when\n`#rust-analyzer.lens.enable#` is set.",
+                    "verus-analyzer.lens.references.enumVariant.enable": {
+                        "markdownDescription": "Show `References` lens for Enum Variants. Only applies when\n`#verus-analyzer.lens.enable#` is set.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -2710,8 +2734,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.references.method.enable": {
-                        "markdownDescription": "Show `Method References` lens. Only applies when `#rust-analyzer.lens.enable#` is set.",
+                    "verus-analyzer.lens.references.method.enable": {
+                        "markdownDescription": "Show `Method References` lens. Only applies when `#verus-analyzer.lens.enable#` is set.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -2720,8 +2744,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.references.trait.enable": {
-                        "markdownDescription": "Show `References` lens for Trait. Only applies when `#rust-analyzer.lens.enable#` is\nset.",
+                    "verus-analyzer.lens.references.trait.enable": {
+                        "markdownDescription": "Show `References` lens for Trait. Only applies when `#verus-analyzer.lens.enable#` is\nset.",
                         "default": false,
                         "type": "boolean"
                     }
@@ -2730,8 +2754,8 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.run.enable": {
-                        "markdownDescription": "Show `Run` lens. Only applies when `#rust-analyzer.lens.enable#` is set.",
+                    "verus-analyzer.lens.run.enable": {
+                        "markdownDescription": "Show `Run` lens. Only applies when `#verus-analyzer.lens.enable#` is set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -2740,17 +2764,17 @@
             {
                 "title": "Lens",
                 "properties": {
-                    "rust-analyzer.lens.updateTest.enable": {
-                        "markdownDescription": "Show `Update Test` lens. Only applies when `#rust-analyzer.lens.enable#` and\n`#rust-analyzer.lens.run.enable#` are set.",
+                    "verus-analyzer.lens.updateTest.enable": {
+                        "markdownDescription": "Show `Update Test` lens. Only applies when `#verus-analyzer.lens.enable#` and\n`#verus-analyzer.lens.run.enable#` are set.",
                         "default": true,
                         "type": "boolean"
                     }
                 }
             },
             {
-                "title": "rust-analyzer",
+                "title": "verus-analyzer",
                 "properties": {
-                    "rust-analyzer.linkedProjects": {
+                    "verus-analyzer.linkedProjects": {
                         "markdownDescription": "Disable project auto-discovery in favor of explicitly specified set of projects.\n\nElements must be paths pointing to `Cargo.toml`, `rust-project.json`, `.rs` files (which\nwill be treated as standalone files) or JSON objects in `rust-project.json` format.",
                         "default": [],
                         "type": "array",
@@ -2766,7 +2790,7 @@
             {
                 "title": "Lru",
                 "properties": {
-                    "rust-analyzer.lru.capacity": {
+                    "verus-analyzer.lru.capacity": {
                         "markdownDescription": "Number of syntax trees rust-analyzer keeps in memory. Defaults to 128.",
                         "default": null,
                         "type": [
@@ -2781,7 +2805,7 @@
             {
                 "title": "Lru",
                 "properties": {
-                    "rust-analyzer.lru.query.capacities": {
+                    "verus-analyzer.lru.query.capacities": {
                         "markdownDescription": "The LRU capacity of the specified queries.",
                         "default": {},
                         "type": "object"
@@ -2791,7 +2815,7 @@
             {
                 "title": "Notifications",
                 "properties": {
-                    "rust-analyzer.notifications.cargoTomlNotFound": {
+                    "verus-analyzer.notifications.cargoTomlNotFound": {
                         "markdownDescription": "Show `can't find Cargo.toml` error message.",
                         "default": true,
                         "type": "boolean"
@@ -2799,9 +2823,9 @@
                 }
             },
             {
-                "title": "rust-analyzer",
+                "title": "verus-analyzer",
                 "properties": {
-                    "rust-analyzer.numThreads": {
+                    "verus-analyzer.numThreads": {
                         "markdownDescription": "The number of worker threads in the main loop. The default `null` means to pick\nautomatically.",
                         "default": null,
                         "anyOf": [
@@ -2831,8 +2855,8 @@
             {
                 "title": "Proc Macro",
                 "properties": {
-                    "rust-analyzer.procMacro.attributes.enable": {
-                        "markdownDescription": "Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.",
+                    "verus-analyzer.procMacro.attributes.enable": {
+                        "markdownDescription": "Expand attribute macros. Requires `#verus-analyzer.procMacro.enable#` to be set.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -2841,8 +2865,8 @@
             {
                 "title": "Proc Macro",
                 "properties": {
-                    "rust-analyzer.procMacro.enable": {
-                        "markdownDescription": "Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.",
+                    "verus-analyzer.procMacro.enable": {
+                        "markdownDescription": "Enable support for procedural macros, implies `#verus-analyzer.cargo.buildScripts.enable#`.",
                         "default": true,
                         "type": "boolean"
                     }
@@ -2851,7 +2875,7 @@
             {
                 "title": "Proc Macro",
                 "properties": {
-                    "rust-analyzer.procMacro.ignored": {
+                    "verus-analyzer.procMacro.ignored": {
                         "markdownDescription": "These proc-macros will be ignored when trying to expand them.\n\nThis config takes a map of crate names with the exported proc-macro names to ignore as values.",
                         "default": {},
                         "type": "object"
@@ -2861,7 +2885,7 @@
             {
                 "title": "Proc Macro",
                 "properties": {
-                    "rust-analyzer.procMacro.processes": {
+                    "verus-analyzer.procMacro.processes": {
                         "markdownDescription": "Number of proc-macro server processes to spawn.\n\nControls how many independent `proc-macro-srv` processes rust-analyzer\nruns in parallel to handle macro expansion.",
                         "default": 2,
                         "anyOf": [
@@ -2886,7 +2910,7 @@
             {
                 "title": "Proc Macro",
                 "properties": {
-                    "rust-analyzer.procMacro.server": {
+                    "verus-analyzer.procMacro.server": {
                         "markdownDescription": "Internal config, path to proc-macro server executable.",
                         "default": null,
                         "type": [
@@ -2899,7 +2923,7 @@
             {
                 "title": "Profiling",
                 "properties": {
-                    "rust-analyzer.profiling.memoryProfile": {
+                    "verus-analyzer.profiling.memoryProfile": {
                         "markdownDescription": "The path where to save memory profiling output.\n\n**Note:** Memory profiling is not enabled by default in rust-analyzer builds, you need to build\nfrom source for it.",
                         "default": null,
                         "type": [
@@ -2912,7 +2936,7 @@
             {
                 "title": "References",
                 "properties": {
-                    "rust-analyzer.references.excludeImports": {
+                    "verus-analyzer.references.excludeImports": {
                         "markdownDescription": "Exclude imports from find-all-references.",
                         "default": false,
                         "type": "boolean"
@@ -2922,7 +2946,7 @@
             {
                 "title": "References",
                 "properties": {
-                    "rust-analyzer.references.excludeTests": {
+                    "verus-analyzer.references.excludeTests": {
                         "markdownDescription": "Exclude tests from find-all-references and call-hierarchy.",
                         "default": false,
                         "type": "boolean"
@@ -2932,7 +2956,7 @@
             {
                 "title": "Rename",
                 "properties": {
-                    "rust-analyzer.rename.showConflicts": {
+                    "verus-analyzer.rename.showConflicts": {
                         "markdownDescription": "Whether to warn when a rename will cause conflicts (change the meaning of the code).",
                         "default": true,
                         "type": "boolean"
@@ -2942,7 +2966,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.bench.command": {
+                    "verus-analyzer.runnables.bench.command": {
                         "markdownDescription": "Subcommand used for bench runnables instead of `bench`.",
                         "default": "bench",
                         "type": "string"
@@ -2952,7 +2976,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.bench.overrideCommand": {
+                    "verus-analyzer.runnables.bench.overrideCommand": {
                         "markdownDescription": "Override the command used for bench runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nUse the placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::bench_func`.\n- `${exact}`: `--exact` for single benchmarks, empty for modules.\n- `${include_ignored}`: always empty for benchmarks.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `rust-analyzer.runnables.extraTestBinaryArgs`).",
                         "default": null,
                         "type": [
@@ -2968,7 +2992,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.command": {
+                    "verus-analyzer.runnables.command": {
                         "markdownDescription": "Command to be executed instead of 'cargo' for runnables.",
                         "default": null,
                         "type": [
@@ -2981,7 +3005,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.doctest.overrideCommand": {
+                    "verus-analyzer.runnables.doctest.overrideCommand": {
                         "markdownDescription": "Override the command used for doc-test runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nUse the placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::func`.\n- `${exact}`: always empty for doc-tests.\n- `${include_ignored}`: always empty for doc-tests.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `rust-analyzer.runnables.extraTestBinaryArgs`).",
                         "default": null,
                         "type": [
@@ -2997,7 +3021,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.extraArgs": {
+                    "verus-analyzer.runnables.extraArgs": {
                         "markdownDescription": "Additional arguments to be passed to cargo for runnables such as\ntests or binaries. For example, it may be `--release`.",
                         "default": [],
                         "type": "array",
@@ -3010,7 +3034,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.extraTestBinaryArgs": {
+                    "verus-analyzer.runnables.extraTestBinaryArgs": {
                         "markdownDescription": "Additional arguments to be passed through Cargo to launched tests, benchmarks, or\ndoc-tests.\n\nUnless the launched target uses a\n[custom test harness](https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-harness-field),\nthey will end up being interpreted as options to\n[`rustc`’s built-in test harness (“libtest”)](https://doc.rust-lang.org/rustc/tests/index.html#cli-arguments).",
                         "default": [
                             "--nocapture"
@@ -3025,7 +3049,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.test.command": {
+                    "verus-analyzer.runnables.test.command": {
                         "markdownDescription": "Subcommand used for test runnables instead of `test`.",
                         "default": "test",
                         "type": "string"
@@ -3035,7 +3059,7 @@
             {
                 "title": "Runnables",
                 "properties": {
-                    "rust-analyzer.runnables.test.overrideCommand": {
+                    "verus-analyzer.runnables.test.overrideCommand": {
                         "markdownDescription": "Override the command used for test runnables.\nThe first element of the array should be the program to execute (for example, `cargo`).\n\nAvailable placeholders:\n- `${package}`: package name.\n- `${target_arg}`: target option such as `--bin`, `--test`, `--lib`, etc.\n- `${target}`: target name (empty for `--lib`).\n- `${test_name}`: the test path filter, e.g. `module::test_func`.\n- `${exact}`: `--exact` for single tests, empty for modules.\n- `${include_ignored}`: `--include-ignored` for single tests, empty otherwise.\n- `${executable_args}`: all of the above binary args bundled together\n    (includes `rust-analyzer.runnables.extraTestBinaryArgs`).",
                         "default": null,
                         "type": [
@@ -3051,7 +3075,7 @@
             {
                 "title": "Rustc",
                 "properties": {
-                    "rust-analyzer.rustc.source": {
+                    "verus-analyzer.rustc.source": {
                         "markdownDescription": "Path to the Cargo.toml of the rust compiler workspace, for usage in rustc_private\nprojects, or \"discover\" to try to automatically find it if the `rustc-dev` component\nis installed.\n\nAny project which uses rust-analyzer with the rustcPrivate\ncrates must set `[package.metadata.rust-analyzer] rustc_private=true` to use it.\n\nThis option does not take effect until rust-analyzer is restarted.",
                         "default": null,
                         "type": [
@@ -3064,7 +3088,7 @@
             {
                 "title": "Rustfmt",
                 "properties": {
-                    "rust-analyzer.rustfmt.extraArgs": {
+                    "verus-analyzer.rustfmt.extraArgs": {
                         "markdownDescription": "Additional arguments to `rustfmt`.",
                         "default": [],
                         "type": "array",
@@ -3077,7 +3101,7 @@
             {
                 "title": "Rustfmt",
                 "properties": {
-                    "rust-analyzer.rustfmt.overrideCommand": {
+                    "verus-analyzer.rustfmt.overrideCommand": {
                         "markdownDescription": "Advanced option, fully override the command rust-analyzer uses for\nformatting. This should be the equivalent of `rustfmt` here, and\nnot that of `cargo fmt`. The file contents will be passed on the\nstandard input and the formatted result will be read from the\nstandard output.\n\nNote: The option must be specified as an array of command line arguments, with\nthe first argument being the name of the command to run.",
                         "default": null,
                         "type": [
@@ -3093,7 +3117,7 @@
             {
                 "title": "Rustfmt",
                 "properties": {
-                    "rust-analyzer.rustfmt.rangeFormatting.enable": {
+                    "verus-analyzer.rustfmt.rangeFormatting.enable": {
                         "markdownDescription": "Enables the use of rustfmt's unstable range formatting command for the\n`textDocument/rangeFormatting` request. The rustfmt option is unstable and only\navailable on a nightly build.",
                         "default": false,
                         "type": "boolean"
@@ -3103,7 +3127,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.comments.enable": {
+                    "verus-analyzer.semanticHighlighting.comments.enable": {
                         "markdownDescription": "Use semantic tokens for comments.\n\nIn some editors (e.g. vscode) semantic tokens override other highlighting grammars.\nBy disabling semantic tokens for comments, other grammars can be used to highlight\ntheir contents.",
                         "default": true,
                         "type": "boolean"
@@ -3113,7 +3137,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.doc.comment.inject.enable": {
+                    "verus-analyzer.semanticHighlighting.doc.comment.inject.enable": {
                         "markdownDescription": "Inject additional highlighting into doc comments.\n\nWhen enabled, rust-analyzer will highlight rust source in doc comments as well as intra\ndoc links.",
                         "default": true,
                         "type": "boolean"
@@ -3123,7 +3147,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.nonStandardTokens": {
+                    "verus-analyzer.semanticHighlighting.nonStandardTokens": {
                         "markdownDescription": "Emit non-standard tokens and modifiers\n\nWhen enabled, rust-analyzer will emit tokens and modifiers that are not part of the\nstandard set of semantic tokens.",
                         "default": true,
                         "type": "boolean"
@@ -3133,7 +3157,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.operator.enable": {
+                    "verus-analyzer.semanticHighlighting.operator.enable": {
                         "markdownDescription": "Use semantic tokens for operators.\n\nWhen disabled, rust-analyzer will emit semantic tokens only for operator tokens when\nthey are tagged with modifiers.",
                         "default": true,
                         "type": "boolean"
@@ -3143,7 +3167,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.operator.specialization.enable": {
+                    "verus-analyzer.semanticHighlighting.operator.specialization.enable": {
                         "markdownDescription": "Use specialized semantic tokens for operators.\n\nWhen enabled, rust-analyzer will emit special token types for operator tokens instead\nof the generic `operator` token type.",
                         "default": false,
                         "type": "boolean"
@@ -3153,7 +3177,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.punctuation.enable": {
+                    "verus-analyzer.semanticHighlighting.punctuation.enable": {
                         "markdownDescription": "Use semantic tokens for punctuation.\n\nWhen disabled, rust-analyzer will emit semantic tokens only for punctuation tokens when\nthey are tagged with modifiers or have a special role.",
                         "default": false,
                         "type": "boolean"
@@ -3163,7 +3187,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.punctuation.separate.macro.bang": {
+                    "verus-analyzer.semanticHighlighting.punctuation.separate.macro.bang": {
                         "markdownDescription": "When enabled, rust-analyzer will emit a punctuation semantic token for the `!` of macro\ncalls.",
                         "default": false,
                         "type": "boolean"
@@ -3173,7 +3197,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.punctuation.specialization.enable": {
+                    "verus-analyzer.semanticHighlighting.punctuation.specialization.enable": {
                         "markdownDescription": "Use specialized semantic tokens for punctuation.\n\nWhen enabled, rust-analyzer will emit special token types for punctuation tokens instead\nof the generic `punctuation` token type.",
                         "default": false,
                         "type": "boolean"
@@ -3183,7 +3207,7 @@
             {
                 "title": "Semantic Highlighting",
                 "properties": {
-                    "rust-analyzer.semanticHighlighting.strings.enable": {
+                    "verus-analyzer.semanticHighlighting.strings.enable": {
                         "markdownDescription": "Use semantic tokens for strings.\n\nIn some editors (e.g. vscode) semantic tokens override other highlighting grammars.\nBy disabling semantic tokens for strings, other grammars can be used to highlight\ntheir contents.",
                         "default": true,
                         "type": "boolean"
@@ -3193,7 +3217,7 @@
             {
                 "title": "Signature Info",
                 "properties": {
-                    "rust-analyzer.signatureInfo.detail": {
+                    "verus-analyzer.signatureInfo.detail": {
                         "markdownDescription": "Show full signature of the callable. Only shows parameters if disabled.",
                         "default": "full",
                         "type": "string",
@@ -3211,7 +3235,7 @@
             {
                 "title": "Signature Info",
                 "properties": {
-                    "rust-analyzer.signatureInfo.documentation.enable": {
+                    "verus-analyzer.signatureInfo.documentation.enable": {
                         "markdownDescription": "Show documentation.",
                         "default": true,
                         "type": "boolean"
@@ -3221,7 +3245,7 @@
             {
                 "title": "Typing",
                 "properties": {
-                    "rust-analyzer.typing.triggerChars": {
+                    "verus-analyzer.typing.triggerChars": {
                         "markdownDescription": "Specify the characters allowed to invoke special on typing triggers.\n\n- typing `=` after `let` tries to smartly add `;` if `=` is followed by an existing\n    expression\n- typing `=` between two expressions adds `;` when in statement position\n- typing `=` to turn an assignment into an equality comparison removes `;` when in\n    expression position\n- typing `.` in a chain method call auto-indents\n- typing `{` or `(` in front of an expression inserts a closing `}` or `)` after the\n    expression\n- typing `{` in a use item adds a closing `}` in the right place\n- typing `>` to complete a return type `->` will insert a whitespace after it\n- typing `<` in a path or type position inserts a closing `>` after the path or type.",
                         "default": "=.",
                         "type": [
@@ -3232,9 +3256,42 @@
                 }
             },
             {
+                "title": "Verus",
+                "properties": {
+                    "verus-analyzer.verus.enable": {
+                        "markdownDescription": "Run the Verus verifier when a Rust file is saved.",
+                        "default": true,
+                        "type": "boolean"
+                    }
+                }
+            },
+            {
+                "title": "Verus",
+                "properties": {
+                    "verus-analyzer.verus.extraArgs": {
+                        "markdownDescription": "Extra Verus arguments passed to verifier invocations.",
+                        "default": [],
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            {
+                "title": "Verus",
+                "properties": {
+                    "verus-analyzer.verus.reportAllErrorsEnable": {
+                        "markdownDescription": "Report verifier errors from the entire crate instead of restricting verification to the saved file's module.",
+                        "default": false,
+                        "type": "boolean"
+                    }
+                }
+            },
+            {
                 "title": "Vfs",
                 "properties": {
-                    "rust-analyzer.vfs.extraIncludes": {
+                    "verus-analyzer.vfs.extraIncludes": {
                         "markdownDescription": "Additional paths to include in the VFS. Generally for code that is\ngenerated or otherwise managed by a build system outside of Cargo,\nthough Cargo might be the eventual consumer.",
                         "default": [],
                         "type": "array",
@@ -3247,7 +3304,7 @@
             {
                 "title": "Workspace",
                 "properties": {
-                    "rust-analyzer.workspace.discoverConfig": {
+                    "verus-analyzer.workspace.discoverConfig": {
                         "markdownDescription": "Configure a command that rust-analyzer can invoke to\nobtain configuration.\n\nThis is an alternative to manually generating\n`rust-project.json`: it enables rust-analyzer to generate\nrust-project.json on the fly, and regenerate it when\nswitching or modifying projects.\n\nThis is an object with three fields:\n\n* `command`: the shell command to invoke\n\n* `filesToWatch`: which build system-specific files should\nbe watched to trigger regenerating the configuration\n\n* `progressLabel`: the name of the command, used in\nprogress indicators in the IDE\n\nHere's an example of a valid configuration:\n\n```json\n\"rust-analyzer.workspace.discoverConfig\": {\n        \"command\": [\n                \"rust-project\",\n                \"develop-json\",\n                \"{arg}\"\n        ],\n        \"progressLabel\": \"buck2/rust-project\",\n        \"filesToWatch\": [\n                \"BUCK\"\n        ]\n}\n```\n\n## Argument Substitutions\n\nIf `command` includes the argument `{arg}`, that argument will be substituted\nwith the JSON-serialized form of the following enum:\n\n```norun\n#[derive(PartialEq, Clone, Debug, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub enum DiscoverArgument {\n     Path(AbsPathBuf),\n     Buildfile(AbsPathBuf),\n}\n```\n\nrust-analyzer will use the path invocation to find and\ngenerate a `rust-project.json` and therefore a\nworkspace. Example:\n\n\n```norun\nrust-project develop-json '{ \"path\": \"myproject/src/main.rs\" }'\n```\n\nrust-analyzer will use build file invocations to update an\nexisting workspace. Example:\n\nOr with a build file and the configuration above:\n\n```norun\nrust-project develop-json '{ \"buildfile\": \"myproject/BUCK\" }'\n```\n\nAs a reference for implementors, buck2's `rust-project`\nwill likely be useful:\n<https://github.com/facebook/buck2/tree/main/integrations/rust-project>.\n\n## Discover Command Output\n\n**Warning**: This format is provisional and subject to change.\n\nThe discover command should output JSON objects to stdout,\none per line (JSONL format). These objects should correspond\nto this Rust data type:\n\n```norun\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(tag = \"kind\")]\n#[serde(rename_all = \"snake_case\")]\nenum DiscoverProjectData {\n        Finished { buildfile: Utf8PathBuf, project: ProjectJsonData },\n        Error { error: String, source: Option<String> },\n        Progress { message: String },\n}\n```\n\nFor example, a progress event:\n\n```json\n{\"kind\":\"progress\",\"message\":\"generating rust-project.json\"}\n```\n\nA finished event can look like this (expanded and\ncommented for readability):\n\n```json\n{\n        // the internally-tagged representation of the enum.\n        \"kind\": \"finished\",\n        // the file used by a non-Cargo build system to define\n        // a package or target.\n        \"buildfile\": \"rust-analyzer/BUCK\",\n        // the contents of a rust-project.json, elided for brevity\n        \"project\": {\n                \"sysroot\": \"foo\",\n                \"crates\": []\n        }\n}\n```\n\nOnly the finished event is required, but the other\nvariants are encouraged to give users more feedback about\nprogress or errors.\n\nStderr is not parsed as JSONL. It is treated as command log\noutput and forwarded to rust-analyzer's own logs.",
                         "default": null,
                         "anyOf": [
@@ -3281,7 +3338,7 @@
             {
                 "title": "Workspace",
                 "properties": {
-                    "rust-analyzer.workspace.symbol.search.excludeImports": {
+                    "verus-analyzer.workspace.symbol.search.excludeImports": {
                         "markdownDescription": "Exclude all imports from workspace symbol search.\n\nIn addition to regular imports (which are always excluded),\nthis option removes public imports (better known as re-exports)\nand removes imports that rename the imported symbol.",
                         "default": false,
                         "type": "boolean"
@@ -3291,7 +3348,7 @@
             {
                 "title": "Workspace",
                 "properties": {
-                    "rust-analyzer.workspace.symbol.search.kind": {
+                    "verus-analyzer.workspace.symbol.search.kind": {
                         "markdownDescription": "Workspace symbol search kind.",
                         "default": "only_types",
                         "type": "string",
@@ -3309,7 +3366,7 @@
             {
                 "title": "Workspace",
                 "properties": {
-                    "rust-analyzer.workspace.symbol.search.limit": {
+                    "verus-analyzer.workspace.symbol.search.limit": {
                         "markdownDescription": "Limits the number of items returned from a workspace symbol search (Defaults to 128).\nSome clients like vs-code issue new searches on result filtering and don't require all results to be returned in the initial search.\nOther clients requires all results upfront and might require a higher limit.",
                         "default": 128,
                         "type": "integer",
@@ -3320,7 +3377,7 @@
             {
                 "title": "Workspace",
                 "properties": {
-                    "rust-analyzer.workspace.symbol.search.scope": {
+                    "verus-analyzer.workspace.symbol.search.scope": {
                         "markdownDescription": "Workspace symbol search scope.",
                         "default": "workspace",
                         "type": "string",
@@ -3791,152 +3848,152 @@
         "menus": {
             "commandPalette": [
                 {
-                    "command": "rust-analyzer.viewHir",
+                    "command": "verus-analyzer.viewHir",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.viewFileText",
+                    "command": "verus-analyzer.viewFileText",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.expandMacro",
+                    "command": "verus-analyzer.expandMacro",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.matchingBrace",
+                    "command": "verus-analyzer.matchingBrace",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.parentModule",
+                    "command": "verus-analyzer.parentModule",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.childModules",
+                    "command": "verus-analyzer.childModules",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.joinLines",
+                    "command": "verus-analyzer.joinLines",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.run",
+                    "command": "verus-analyzer.run",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.debug",
+                    "command": "verus-analyzer.debug",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.newDebugConfig",
+                    "command": "verus-analyzer.newDebugConfig",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.analyzerStatus",
+                    "command": "verus-analyzer.analyzerStatus",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.memoryUsage",
+                    "command": "verus-analyzer.memoryUsage",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.newProject"
+                    "command": "verus-analyzer.newProject"
                 },
                 {
-                    "command": "rust-analyzer.reloadWorkspace",
+                    "command": "verus-analyzer.reloadWorkspace",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.restartServer",
+                    "command": "verus-analyzer.restartServer",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.onEnter",
+                    "command": "verus-analyzer.onEnter",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.ssr",
+                    "command": "verus-analyzer.ssr",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.serverVersion",
+                    "command": "verus-analyzer.serverVersion",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.openDocs",
+                    "command": "verus-analyzer.openDocs",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.openCargoToml",
+                    "command": "verus-analyzer.openCargoToml",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.viewMemoryLayout",
+                    "command": "verus-analyzer.viewMemoryLayout",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.toggleLSPLogs",
+                    "command": "verus-analyzer.toggleLSPLogs",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.openWalkthrough"
+                    "command": "verus-analyzer.openWalkthrough"
                 },
                 {
-                    "command": "rust-analyzer.syntaxTreeReveal",
+                    "command": "verus-analyzer.syntaxTreeReveal",
                     "when": "false"
                 },
                 {
-                    "command": "rust-analyzer.syntaxTreeCopy",
+                    "command": "verus-analyzer.syntaxTreeCopy",
                     "when": "false"
                 },
                 {
-                    "command": "rust-analyzer.syntaxTreeHideWhitespace",
+                    "command": "verus-analyzer.syntaxTreeHideWhitespace",
                     "when": "false"
                 },
                 {
-                    "command": "rust-analyzer.syntaxTreeShowWhitespace",
+                    "command": "verus-analyzer.syntaxTreeShowWhitespace",
                     "when": "false"
                 },
                 {
-                    "command": "rust-analyzer.getFailedObligations",
+                    "command": "verus-analyzer.getFailedObligations",
                     "when": "inRustProject"
                 },
                 {
-                    "command": "rust-analyzer.evaluatePredicate",
+                    "command": "verus-analyzer.evaluatePredicate",
                     "when": "inRustProject"
                 }
             ],
             "editor/context": [
                 {
-                    "command": "rust-analyzer.peekTests",
+                    "command": "verus-analyzer.peekTests",
                     "when": "inRustProject && editorTextFocus && editorLangId == rust",
                     "group": "navigation@1000"
                 },
                 {
-                    "command": "rust-analyzer.openDocs",
+                    "command": "verus-analyzer.openDocs",
                     "when": "inRustProject && editorTextFocus && editorLangId == rust",
                     "group": "navigation@1001"
                 }
             ],
             "view/title": [
                 {
-                    "command": "rust-analyzer.syntaxTreeHideWhitespace",
+                    "command": "verus-analyzer.syntaxTreeHideWhitespace",
                     "group": "navigation",
                     "when": "view == rustSyntaxTree && !rustSyntaxTree.hideWhitespace"
                 },
                 {
-                    "command": "rust-analyzer.syntaxTreeShowWhitespace",
+                    "command": "verus-analyzer.syntaxTreeShowWhitespace",
                     "group": "navigation",
                     "when": "view == rustSyntaxTree && rustSyntaxTree.hideWhitespace"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "rust-analyzer.syntaxTreeCopy",
+                    "command": "verus-analyzer.syntaxTreeCopy",
                     "group": "inline",
                     "when": "view == rustSyntaxTree"
                 },
                 {
-                    "command": "rust-analyzer.syntaxTreeReveal",
+                    "command": "verus-analyzer.syntaxTreeReveal",
                     "group": "inline",
                     "when": "view == rustSyntaxTree"
                 }
@@ -3948,7 +4005,7 @@
                     "icon": "$(package)",
                     "id": "rustDependencies",
                     "name": "Rust Dependencies",
-                    "when": "inRustProject && config.rust-analyzer.showDependenciesExplorer"
+                    "when": "inRustProject && config.verus-analyzer.showDependenciesExplorer"
                 }
             ],
             "rustSyntaxTreeContainer": [
@@ -3956,14 +4013,14 @@
                     "icon": "$(file-code)",
                     "id": "rustSyntaxTree",
                     "name": "Rust Syntax Tree",
-                    "when": "inRustProject && config.rust-analyzer.showSyntaxTree"
+                    "when": "inRustProject && config.verus-analyzer.showSyntaxTree"
                 }
             ]
         },
         "viewsWelcome": [
             {
                 "view": "explorer",
-                "contents": "Create a new Rust project.\n[Create Rust Project](command:rust-analyzer.newProject)",
+                "contents": "Create a new Rust project.\n[Create Rust Project](command:verus-analyzer.newProject)",
                 "when": "workspaceFolderCount == 0"
             }
         ],
@@ -3989,13 +4046,13 @@
         "walkthroughs": [
             {
                 "id": "landing",
-                "title": "Learn about rust-analyzer",
-                "description": "A brief introduction to get started with rust-analyzer. Learn about key features and resources to help you get the most out of the extension.",
+                "title": "Learn about verus-analyzer",
+                "description": "A brief introduction to get started with verus-analyzer. Learn about key features and resources to help you get the most out of the extension.",
                 "steps": [
                     {
                         "id": "create-project",
                         "title": "Create a Rust project",
-                        "description": "Start a new Cargo binary or library project from VS Code.\n\n[Create a Rust Project](command:rust-analyzer.newProject)",
+                        "description": "Start a new Cargo binary or library project from VS Code.\n\n[Create a Rust Project](command:verus-analyzer.newProject)",
                         "media": {
                             "markdown": "./walkthrough-create-project.md"
                         }
@@ -4003,7 +4060,7 @@
                     {
                         "id": "setup",
                         "title": "Useful Setup Tips",
-                        "description": "There are a couple of things you might want to configure upfront to your tastes. We'll name a few here but be sure to check out the docs linked below!\n\n**Marking library sources as readonly**\n\nAdding the snippet on the right to your settings.json will mark all Rust library sources as readonly.\n\n**Check on Save**\n\nBy default, rust-analyzer will run ``cargo check`` on your codebase when you save a file, rendering diagnostics emitted by ``cargo check`` within your code. This can potentially collide with other ``cargo`` commands running concurrently, blocking them from running for a certain amount of time. In these cases it is recommended to disable the ``rust-analyzer.checkOnSave`` configuration and running the ``rust-analyzer: Run flycheck`` command on-demand instead.",
+                        "description": "There are a couple of things you might want to configure upfront to your tastes. We'll name a few here but be sure to check out the docs linked below!\n\n**Marking library sources as readonly**\n\nAdding the snippet on the right to your settings.json will mark all Rust library sources as readonly.\n\n**Check on Save**\n\nBy default, verus-analyzer will run ``cargo check`` on your codebase when you save a file, rendering diagnostics emitted by ``cargo check`` within your code. This can potentially collide with other ``cargo`` commands running concurrently, blocking them from running for a certain amount of time. In these cases it is recommended to disable the ``verus-analyzer.checkOnSave`` configuration and running the ``verus-analyzer: Run flycheck`` command on-demand instead.",
                         "media": {
                             "markdown": "./walkthrough-setup-tips.md"
                         }
@@ -4011,10 +4068,10 @@
                     {
                         "id": "docs",
                         "title": "Visit the docs!",
-                        "description": "Confused about configurations? Want to learn more about rust-analyzer? Visit the [User Manual](https://rust-analyzer.github.io/book/)!",
+                        "description": "Confused about configurations? Want to learn more about verus-analyzer? Visit the [User Manual](https://rust-analyzer.github.io/book/)!",
                         "media": {
                             "image": "./icon.png",
-                            "altText": "rust-analyzer logo"
+                            "altText": "verus-analyzer logo"
                         },
                         "completionEvents": [
                             "onLink:https://rust-analyzer.github.io/book/"
@@ -4023,19 +4080,19 @@
                     {
                         "id": "faq",
                         "title": "FAQ",
-                        "description": "What are these code hints that are being inserted into my code?\n\nThese hints are called inlay hints which rust-analyzer support and are enabled by default in VSCode. If you wish to disable them you can do so via the ``editor.inlayHints.enabled`` setting.",
+                        "description": "What are these code hints that are being inserted into my code?\n\nThese hints are called inlay hints which verus-analyzer support and are enabled by default in VSCode. If you wish to disable them you can do so via the ``editor.inlayHints.enabled`` setting.",
                         "media": {
                             "image": "icon.png",
-                            "altText": "rust-analyzer logo"
+                            "altText": "verus-analyzer logo"
                         }
                     },
                     {
                         "id": "changelog",
                         "title": "Changelog",
-                        "description": "Stay up-to-date with the latest changes in rust-analyzer. Check out the changelog [here](https://rust-analyzer.github.io/thisweek)!",
+                        "description": "Stay up-to-date with the latest changes in verus-analyzer. Check out the changelog [here](https://rust-analyzer.github.io/thisweek)!",
                         "media": {
                             "image": "icon.png",
-                            "altText": "rust-analyzer logo"
+                            "altText": "verus-analyzer logo"
                         },
                         "completionEvents": [
                             "onLink:https://rust-analyzer.github.io/thisweek"

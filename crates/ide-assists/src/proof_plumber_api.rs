@@ -27,7 +27,7 @@
 //!
 //!
 //! For Verus syntax definition, read `ungram` file at `syntax` crate.
-//!  
+//!
 //! We use
 //! `syntax/src/tests/sourcegen_vst.rs` to auto-generate `syntax/src/ast/generated/vst_nodes.rs`
 //! hand-written pars are at `syntax/src/vst.rs`

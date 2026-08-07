@@ -36,7 +36,7 @@ impl Request for InternalTestingFetchConfigRequest {
     // Option is solely to circumvent Default bound.
     type Result = Option<InternalTestingFetchConfigResponse>;
     const METHOD: LspRequestMethod<'_> =
-        LspRequestMethod::new("rust-analyzer-internal/internalTestingFetchConfig");
+        LspRequestMethod::new("verus-analyzer-internal/internalTestingFetchConfig");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -51,7 +51,7 @@ pub enum AnalyzerStatusRequest {}
 impl Request for AnalyzerStatusRequest {
     type Params = AnalyzerStatusParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/analyzerStatus");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/analyzerStatus");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -73,7 +73,8 @@ pub enum FetchDependencyListRequest {}
 impl Request for FetchDependencyListRequest {
     type Params = FetchDependencyListParams;
     type Result = FetchDependencyListResult;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/fetchDependencyList");
+    const METHOD: LspRequestMethod<'_> =
+        LspRequestMethod::new("verus-analyzer/fetchDependencyList");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -92,7 +93,7 @@ pub enum MemoryUsageRequest {}
 impl Request for MemoryUsageRequest {
     type Params = ();
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/memoryUsage");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/memoryUsage");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -101,7 +102,7 @@ pub enum ReloadWorkspaceRequest {}
 impl Request for ReloadWorkspaceRequest {
     type Params = ();
     type Result = ();
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/reloadWorkspace");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/reloadWorkspace");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -110,7 +111,7 @@ pub enum RebuildProcMacrosRequest {}
 impl Request for RebuildProcMacrosRequest {
     type Params = ();
     type Result = ();
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/rebuildProcMacros");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/rebuildProcMacros");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -119,7 +120,7 @@ pub enum ViewSyntaxTreeRequest {}
 impl Request for ViewSyntaxTreeRequest {
     type Params = ViewSyntaxTreeParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/viewSyntaxTree");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/viewSyntaxTree");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -134,7 +135,7 @@ pub enum ViewHirRequest {}
 impl Request for ViewHirRequest {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/viewHir");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/viewHir");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -143,7 +144,7 @@ pub enum ViewMirRequest {}
 impl Request for ViewMirRequest {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/viewMir");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/viewMir");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -152,7 +153,7 @@ pub enum InterpretFunctionRequest {}
 impl Request for InterpretFunctionRequest {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/interpretFunction");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/interpretFunction");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -161,7 +162,7 @@ pub enum ViewFileTextRequest {}
 impl Request for ViewFileTextRequest {
     type Params = lsp_types::TextDocumentIdentifier;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/viewFileText");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/viewFileText");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -177,7 +178,7 @@ pub enum ViewCrateGraphRequest {}
 impl Request for ViewCrateGraphRequest {
     type Params = ViewCrateGraphParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/viewCrateGraph");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/viewCrateGraph");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -192,7 +193,7 @@ pub enum ViewItemTreeRequest {}
 impl Request for ViewItemTreeRequest {
     type Params = ViewItemTreeParams;
     type Result = String;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/viewItemTree");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/viewItemTree");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -322,7 +323,7 @@ pub enum ExpandMacroRequest {}
 impl Request for ExpandMacroRequest {
     type Params = ExpandMacroParams;
     type Result = Option<ExpandedMacro>;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/expandMacro");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/expandMacro");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -346,7 +347,7 @@ impl Request for ViewRecursiveMemoryLayoutRequest {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = Option<RecursiveMemoryLayout>;
     const METHOD: LspRequestMethod<'_> =
-        LspRequestMethod::new("rust-analyzer/viewRecursiveMemoryLayout");
+        LspRequestMethod::new("verus-analyzer/viewRecursiveMemoryLayout");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -374,7 +375,7 @@ pub enum CancelFlycheckNotification {}
 impl Notification for CancelFlycheckNotification {
     type Params = ();
     const METHOD: LspNotificationMethod<'_> =
-        LspNotificationMethod::new("rust-analyzer/cancelFlycheck");
+        LspNotificationMethod::new("verus-analyzer/cancelFlycheck");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -383,7 +384,7 @@ pub enum RunFlycheckNotification {}
 impl Notification for RunFlycheckNotification {
     type Params = RunFlycheckParams;
     const METHOD: LspNotificationMethod<'_> =
-        LspNotificationMethod::new("rust-analyzer/runFlycheck");
+        LspNotificationMethod::new("verus-analyzer/runFlycheck");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -392,7 +393,7 @@ pub enum ClearFlycheckNotification {}
 impl Notification for ClearFlycheckNotification {
     type Params = ();
     const METHOD: LspNotificationMethod<'_> =
-        LspNotificationMethod::new("rust-analyzer/clearFlycheck");
+        LspNotificationMethod::new("verus-analyzer/clearFlycheck");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -401,7 +402,7 @@ pub enum OpenServerLogsNotification {}
 impl Notification for OpenServerLogsNotification {
     type Params = ();
     const METHOD: LspNotificationMethod<'_> =
-        LspNotificationMethod::new("rust-analyzer/openServerLogs");
+        LspNotificationMethod::new("verus-analyzer/openServerLogs");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -534,7 +535,7 @@ pub enum RelatedTestsRequest {}
 impl Request for RelatedTestsRequest {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = Vec<TestInfo>;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/relatedTests");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/relatedTests");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -942,7 +943,7 @@ pub enum PredicateEvaluationStatus {
 impl Request for EvaluatePredicateRequest {
     type Params = EvaluatePredicateParams;
     type Result = EvaluatePredicateResult;
-    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("rust-analyzer/evaluatePredicate");
+    const METHOD: LspRequestMethod<'_> = LspRequestMethod::new("verus-analyzer/evaluatePredicate");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 
@@ -959,7 +960,7 @@ impl Request for GetFailedObligationsRequest {
     type Params = GetFailedObligationsParams;
     type Result = String;
     const METHOD: LspRequestMethod<'_> =
-        LspRequestMethod::new("rust-analyzer/getFailedObligations");
+        LspRequestMethod::new("verus-analyzer/getFailedObligations");
     const MESSAGE_DIRECTION: MessageDirection = MessageDirection::ClientToServer;
 }
 

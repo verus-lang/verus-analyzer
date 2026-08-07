@@ -1,3 +1,5 @@
+//! Adds a proof block to a Verus assertion.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},
@@ -67,13 +69,13 @@ mod tests {
             // proof to be modified below
             // `$0` indicates the cursor location
             "
-proof fn f() { 
+proof fn f() {
     ass$0ert(x == 3);
 }
             ",
             // modified proof below
             "
-proof fn f() { 
+proof fn f() {
     assert(x == 3) by {
         assert(x == 3);
     };
@@ -89,13 +91,13 @@ proof fn f() {
             // proof to be modified below
             // `$0` indicates the cursor location
             "
-spec fn pow2(e: nat) -> nat 
+spec fn pow2(e: nat) -> nat
     decreases(e),
 {
     if e == 0 { 1 } else { 2 * pow2((e - 1) as nat)}
 }
 
-proof fn lemma_pow2_unfold3(e: nat) 
+proof fn lemma_pow2_unfold3(e: nat)
     requires e > 3,
     ensures pow2(e) == pow2((e-3) as nat) * 8,
 {
@@ -104,13 +106,13 @@ proof fn lemma_pow2_unfold3(e: nat)
 ",
             // modified proof below
             "
-spec fn pow2(e: nat) -> nat 
+spec fn pow2(e: nat) -> nat
     decreases(e),
 {
     if e == 0 { 1 } else { 2 * pow2((e - 1) as nat)}
 }
 
-proof fn lemma_pow2_unfold3(e: nat) 
+proof fn lemma_pow2_unfold3(e: nat)
     requires e > 3,
     ensures pow2(e) == pow2((e-3) as nat) * 8,
 {

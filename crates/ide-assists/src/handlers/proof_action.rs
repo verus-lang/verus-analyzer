@@ -1,3 +1,5 @@
+//! Verus proof-oriented assists.
+
 pub(crate) mod convert_imply_to_if;
 pub(crate) mod insert_assert_by_block;
 pub(crate) mod insert_failing_postcondition;

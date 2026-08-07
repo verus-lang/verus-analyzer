@@ -1,3 +1,5 @@
+//! Rewrites a Verus implication assertion as a conditional assertion.
+
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use crate::{
     // utils::invert_boolean_expression,
@@ -68,32 +70,32 @@ mod tests {
         check_assist(
             imply_to_if,
             "
-fn test_imply_to_if(b: bool) -> (ret: u32) 
-    ensures 
+fn test_imply_to_if(b: bool) -> (ret: u32)
+    ensures
       b ==> ret == 2 && !b ==> ret == 1,
 {
     let mut ret: u32 = 1;
     if b {
         ret = ret + 1;
-    }  
+    }
     ass$0ert(b ==> ret == 2);
     ret
-}  
+}
 ",
             "
-fn test_imply_to_if(b: bool) -> (ret: u32) 
-    ensures 
+fn test_imply_to_if(b: bool) -> (ret: u32)
+    ensures
       b ==> ret == 2 && !b ==> ret == 1,
 {
     let mut ret: u32 = 1;
     if b {
         ret = ret + 1;
-    }  
+    }
     if b {
         assert(ret == 2);
     };
     ret
-}  
+}
 ",
         )
     }
@@ -107,7 +109,7 @@ fn octuple(x1: i8) -> (x8: i8)
 requires
     -16 <= x1,
     x1  < 16,
-ensures                 
+ensures
     x8 == 8 * x1,
 {
     let x2 = x1 + x1;
@@ -130,7 +132,7 @@ fn octuple(x1: i8) -> (x8: i8)
 requires
     -16 <= x1,
     x1  < 16,
-ensures                 
+ensures
     x8 == 8 * x1,
 {
     let x2 = x1 + x1;

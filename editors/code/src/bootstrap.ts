@@ -5,6 +5,7 @@ import { type Env, log, RUST_TOOLCHAIN_FILES, spawnAsync } from "./util";
 import type { PersistentState } from "./persistent_state";
 import { exec } from "child_process";
 import { TextDecoder } from "node:util";
+import { chmod } from "node:fs/promises";
 
 export async function bootstrap(
     context: vscode.ExtensionContext,
@@ -14,14 +15,14 @@ export async function bootstrap(
     const path = await getServer(context, config, state);
     if (!path) {
         throw new Error(
-            "rust-analyzer Language Server is not available. " +
-                "Please, ensure its [proper installation](https://rust-analyzer.github.io/book/installation.html).",
+            "verus-analyzer Language Server is not available. " +
+                "Please ensure the Verus Analyzer extension or server is installed correctly.",
         );
     }
 
     log.info("Using server binary at", path);
 
-    if (!isValidExecutable(path, config.serverExtraEnv)) {
+    if (!(await isValidExecutable(path, config.serverExtraEnv))) {
         throw new Error(
             `Failed to execute ${path} --version.` +
                 (config.serverPath
@@ -57,15 +58,15 @@ async function getServer(
     if (vscode.workspace.workspaceFolders) {
         for (const workspaceFolder of vscode.workspace.workspaceFolders) {
             // otherwise check if there is a toolchain override for the current vscode workspace
-            // and if the toolchain of this override has a rust-analyzer component
-            // if so, use the rust-analyzer component
+            // and if the toolchain of this override has a verus-analyzer component
+            // if so, use the verus-analyzer component
             // Check both rust-toolchain.toml and rust-toolchain files
             for (const toolchainFile of RUST_TOOLCHAIN_FILES) {
                 const toolchainUri = vscode.Uri.joinPath(workspaceFolder.uri, toolchainFile);
                 if (!(await hasToolchainFileWithRaDeclared(toolchainUri))) {
                     continue;
                 }
-                const res = await spawnAsync("rustup", ["which", "rust-analyzer"], {
+                const res = await spawnAsync("rustup", ["which", "verus-analyzer"], {
                     env: { ...process.env },
                     cwd: workspaceFolder.uri.fsPath,
                 });
@@ -84,11 +85,11 @@ async function getServer(
         return toolchainServerPath;
     }
 
-    if (packageJson.releaseTag === null) return "rust-analyzer";
+    if (packageJson.releaseTag === null) return "verus-analyzer";
 
     // finally, use the bundled one
     const ext = process.platform === "win32" ? ".exe" : "";
-    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `rust-analyzer${ext}`);
+    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `verus-analyzer${ext}`);
     const bundledExists = await fileExists(bundled);
     if (bundledExists) {
         let server = bundled;
@@ -108,16 +109,181 @@ async function getServer(
 
     await vscode.window.showErrorMessage(
         "Unfortunately we don't ship binaries for your platform yet. " +
-            "You need to manually clone the rust-analyzer repository and " +
+            "You need to manually clone the verus-analyzer repository and " +
             "run `cargo xtask install --server` to build the language server from sources. " +
             "If you feel that your platform should be supported, please create an issue " +
-            "about that [here](https://github.com/rust-lang/rust-analyzer/issues) and we " +
+            "about that [here](https://github.com/verus-lang/verus-analyzer/issues) and we " +
             "will consider it.",
     );
     return undefined;
 }
 
-// Given a path to a rust-analyzer executable, resolve its version and return it.
+type VerusRelease = {
+    assets: { name: string; browser_download_url: string }[];
+};
+
+export async function getVerus(
+    context: vscode.ExtensionContext,
+    config: Config,
+): Promise<string | undefined> {
+    const explicitPath = config.verusBinary;
+    if (explicitPath) {
+        const path = explicitPath.startsWith("~/")
+            ? os.homedir() + explicitPath.slice("~".length)
+            : explicitPath;
+        if (!(await isValidExecutable(path, {}))) {
+            throw new Error(`Configured Verus binary is not executable: ${path}`);
+        }
+        return path;
+    }
+
+    const executable = process.platform === "win32" ? "verus.exe" : "verus";
+    const installDir = vscode.Uri.joinPath(context.globalStorageUri, "verus");
+    const installedBinary = vscode.Uri.joinPath(installDir, executable);
+    if (await fileExists(installedBinary)) {
+        if (await isValidExecutable(installedBinary.fsPath, {})) {
+            return installedBinary.fsPath;
+        }
+        await vscode.workspace.fs.delete(installDir, { recursive: true, useTrash: false });
+    }
+
+    const platform = verusReleasePlatform();
+    if (!platform) {
+        void vscode.window.showErrorMessage(
+            `Verus does not publish a binary release for ${process.platform}/${process.arch}. ` +
+                "Set `verus-analyzer.verus.binary` to a locally built Verus executable.",
+        );
+        return undefined;
+    }
+
+    return vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: "Installing Verus",
+            cancellable: false,
+        },
+        async (progress) => {
+            progress.report({ message: "Finding the latest release" });
+            const releaseResponse = await fetch(
+                "https://api.github.com/repos/verus-lang/verus/releases/latest",
+                { headers: { Accept: "application/vnd.github+json" } },
+            );
+            if (!releaseResponse.ok) {
+                throw new Error(
+                    `GitHub returned ${releaseResponse.status} while locating Verus releases`,
+                );
+            }
+            const release = (await releaseResponse.json()) as VerusRelease;
+            const asset = release.assets.find((it) => it.name.includes(platform.assetMarker));
+            if (!asset) {
+                throw new Error(`No Verus release asset matched ${platform.assetMarker}`);
+            }
+
+            progress.report({ message: `Downloading ${asset.name}` });
+            const assetResponse = await fetch(asset.browser_download_url);
+            if (!assetResponse.ok) {
+                throw new Error(`Failed to download ${asset.name}: HTTP ${assetResponse.status}`);
+            }
+
+            await vscode.workspace.fs.createDirectory(context.globalStorageUri);
+            const archive = vscode.Uri.joinPath(context.globalStorageUri, asset.name);
+            const staging = vscode.Uri.joinPath(context.globalStorageUri, "verus-staging");
+            await vscode.workspace.fs.writeFile(
+                archive,
+                new Uint8Array(await assetResponse.arrayBuffer()),
+            );
+            await vscode.workspace.fs.delete(staging, { recursive: true, useTrash: false }).then(
+                () => undefined,
+                () => undefined,
+            );
+            await vscode.workspace.fs.createDirectory(staging);
+
+            progress.report({ message: "Extracting Verus" });
+            await extractArchive(archive.fsPath, staging.fsPath);
+            const extracted = vscode.Uri.joinPath(staging, platform.releaseDirectory);
+            if (!(await fileExists(extracted))) {
+                throw new Error(
+                    `The ${asset.name} archive did not contain ${platform.releaseDirectory}`,
+                );
+            }
+            await vscode.workspace.fs.delete(installDir, { recursive: true, useTrash: false }).then(
+                () => undefined,
+                () => undefined,
+            );
+            await vscode.workspace.fs.rename(extracted, installDir, { overwrite: true });
+            if (process.platform !== "win32") {
+                await chmod(installedBinary.fsPath, 0o755);
+            }
+            await vscode.workspace.fs.delete(archive, { useTrash: false });
+            await vscode.workspace.fs.delete(staging, { recursive: true, useTrash: false });
+
+            if (!(await isValidExecutable(installedBinary.fsPath, {}))) {
+                throw new Error(`Downloaded Verus binary failed its version check`);
+            }
+            return installedBinary.fsPath;
+        },
+    );
+}
+
+function verusReleasePlatform():
+    | { assetMarker: string; releaseDirectory: string }
+    | undefined {
+    if (process.platform === "win32" && process.arch === "x64") {
+        return { assetMarker: "x86-win", releaseDirectory: "verus-x86-win" };
+    }
+    if (process.platform === "darwin" && process.arch === "x64") {
+        return { assetMarker: "x86-macos", releaseDirectory: "verus-x86-macos" };
+    }
+    if (process.platform === "darwin" && process.arch === "arm64") {
+        return { assetMarker: "arm64-macos", releaseDirectory: "verus-arm64-macos" };
+    }
+    if (process.platform === "linux" && process.arch === "x64") {
+        return { assetMarker: "x86-linux", releaseDirectory: "verus-x86-linux" };
+    }
+    return undefined;
+}
+
+async function extractArchive(archive: string, destination: string): Promise<void> {
+    let attempts: [string, string[]][];
+    if (process.platform === "win32") {
+        attempts = [
+            [
+                "powershell.exe",
+                [
+                    "-NoProfile",
+                    "-Command",
+                    `Expand-Archive -LiteralPath '${archive.replaceAll("'", "''")}' -DestinationPath '${destination.replaceAll("'", "''")}' -Force`,
+                ],
+            ],
+        ];
+    } else if (archive.endsWith(".zip")) {
+        attempts =
+            process.platform === "darwin"
+                ? [
+                      ["ditto", ["-x", "-k", archive, destination]],
+                      ["unzip", ["-q", archive, "-d", destination]],
+                  ]
+                : [
+                      ["unzip", ["-q", archive, "-d", destination]],
+                      ["tar", ["-xf", archive, "-C", destination]],
+                  ];
+    } else {
+        attempts = [["tar", ["-xf", archive, "-C", destination]]];
+    }
+
+    for (const [command, args] of attempts) {
+        const result = await spawnAsync(command, args);
+        if (!result.error && result.status === 0) {
+            return;
+        }
+        log.warn(`Failed to extract Verus with ${command}`, result);
+    }
+    throw new Error(
+        `Could not extract ${archive}. Install an archive utility or configure verus.binary manually.`,
+    );
+}
+
+// Given a path to a verus-analyzer executable, resolve its version and return it.
 async function raVersionResolver(path: string): Promise<string | undefined> {
     const res = await spawnAsync(path, ["--version"]);
     if (!res.error && res.status === 0) {
@@ -127,7 +293,7 @@ async function raVersionResolver(path: string): Promise<string | undefined> {
     }
 }
 
-// Given a path to two rust-analyzer executables, return the earliest one by date.
+// Given a path to two verus-analyzer executables, return the earliest one by date.
 async function earliestToolchainPath(
     path0: string | undefined,
     path1: string,
@@ -152,15 +318,15 @@ async function earliestToolchainPath(
 //  Medium  - versioned
 //  Lowest  - stable
 // Example paths:
-//  nightly   - /Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/rust-analyzer
-//  versioned - /Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/rust-analyzer
-//  stable    - /Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rust-analyzer
+//  nightly   - /Users/myuser/.rustup/toolchains/nightly-2022-11-22-aarch64-apple-darwin/bin/verus-analyzer
+//  versioned - /Users/myuser/.rustup/toolchains/1.72.1-aarch64-apple-darwin/bin/verus-analyzer
+//  stable    - /Users/myuser/.rustup/toolchains/stable-aarch64-apple-darwin/bin/verus-analyzer
 async function orderFromPath(
     path: string,
     raVersionResolver: (path: string) => Promise<string | undefined>,
 ): Promise<string> {
     const raVersion = await raVersionResolver(path);
-    const raDate = raVersion?.match(/^rust-analyzer .*\(.* (\d{4}-\d{2}-\d{2})\)$/);
+    const raDate = raVersion?.match(/^verus-analyzer .*\(.* (\d{4}-\d{2}-\d{2})\)$/);
     if (raDate?.length === 2) {
         const precedence = path.includes("nightly-") ? "0" : "1";
         return "0-" + raDate[1] + "/" + precedence;
@@ -181,7 +347,7 @@ async function fileExists(uri: vscode.Uri) {
 // on one, while still stopping at the end of the array.
 const COMPONENTS_RE = /components\s*=\s*\[(?<components>[^\]]*)\]/;
 // TOML strings come in both quote flavours.
-const RA_COMPONENT_RE = /["']rust-analyzer["']/;
+const RA_COMPONENT_RE = /["']verus-analyzer["']/;
 
 function declaresRaComponent(toolchainFileContents: string): boolean {
     const components = toolchainFileContents.match(COMPONENTS_RE)?.groups?.["components"];
@@ -231,7 +397,7 @@ async function getNixOsServer(
     server: vscode.Uri,
 ) {
     await vscode.workspace.fs.createDirectory(globalStorageUri).then();
-    const dest = vscode.Uri.joinPath(globalStorageUri, `rust-analyzer${ext}`);
+    const dest = vscode.Uri.joinPath(globalStorageUri, `verus-analyzer${ext}`);
     let exists = await vscode.workspace.fs.stat(dest).then(
         () => true,
         () => false,
@@ -264,13 +430,13 @@ async function patchelf(dest: vscode.Uri): Promise<void> {
     await vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
-            title: "Patching rust-analyzer for NixOS",
+            title: "Patching verus-analyzer for NixOS",
         },
         async (progress, _) => {
             const expression = `
             {srcStr, pkgs ? import <nixpkgs> {}}:
                 pkgs.stdenv.mkDerivation {
-                    name = "rust-analyzer";
+                    name = "verus-analyzer";
                     src = /. + srcStr;
                     phases = [ "installPhase" "fixupPhase" ];
                     installPhase = "cp $src $out";

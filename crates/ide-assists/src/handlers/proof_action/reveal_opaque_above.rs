@@ -1,3 +1,5 @@
+//! Reveals an opaque Verus function before the selected assertion.
+
 use crate::{
     AssistId, AssistKind,
     assist_context::{AssistContext, Assists},

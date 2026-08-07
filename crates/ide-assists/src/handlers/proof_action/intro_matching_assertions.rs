@@ -1,3 +1,5 @@
+//! Introduces assertions for the arms of a Verus match expression.
+
 use std::vec;
 
 use crate::proof_plumber_api::vst_ext::vst_walk_expr;
@@ -222,7 +224,7 @@ fn main() {}
             intro_match,
             r#"
 use vstd::prelude::*;
-#[derive(PartialEq, Eq, Clone)] 
+#[derive(PartialEq, Eq, Clone)]
 #[is_variant]
 pub enum Message {
     Quit(bool),
@@ -238,7 +240,7 @@ spec fn message_well_formed(msg:Message) -> bool {
   }
 }
 
-fn update_msg(msg: Message) 
+fn update_msg(msg: Message)
   requires message_well_formed(msg)
 {
   let new_msg = match msg {
@@ -253,7 +255,7 @@ fn main() {}
 "#,
             r#"
 use vstd::prelude::*;
-#[derive(PartialEq, Eq, Clone)] 
+#[derive(PartialEq, Eq, Clone)]
 #[is_variant]
 pub enum Message {
     Quit(bool),
@@ -269,7 +271,7 @@ spec fn message_well_formed(msg:Message) -> bool {
   }
 }
 
-fn update_msg(msg: Message) 
+fn update_msg(msg: Message)
   requires message_well_formed(msg)
 {
   let new_msg = match msg {

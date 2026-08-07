@@ -1,3 +1,5 @@
+//! Reveals an opaque Verus function inside an assertion proof block.
+
 // use ide_db::syntax_helpers::node_ext::is_pattern_cond;
 use crate::{
     // utils::invert_boolean_expression,
@@ -85,7 +87,7 @@ spec fn opaque_fibo(n: nat) -> nat
     else { fibo((n - 2) as nat) + fibo((n - 1) as nat) }
 }
 
-proof fn test_opaque_fibo() 
+proof fn test_opaque_fibo()
 {
     assert(opaq$0ue_fibo(2) == 1);
 }
@@ -99,7 +101,7 @@ spec fn opaque_fibo(n: nat) -> nat
     else { fibo((n - 2) as nat) + fibo((n - 1) as nat) }
 }
 
-proof fn test_opaque_fibo() 
+proof fn test_opaque_fibo()
 {
     assert(opaque_fibo(2) == 1) by {
         reveal(opaque_fibo);

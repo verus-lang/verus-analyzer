@@ -1,4 +1,4 @@
-// defines VST handwritten nodes
+//! Handwritten support for generated Verus syntax tree nodes.
 
 use crate::AstNode;
 pub use crate::ast::{self, generated::vst_nodes::*, operators::BinaryOp};

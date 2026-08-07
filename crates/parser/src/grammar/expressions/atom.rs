@@ -80,15 +80,17 @@ pub(super) fn atom_expr(
     if p.at_contextual_kw(T![builtin]) && p.nth_at(1, T![#]) {
         return Some((builtin_expr(p)?, BlockLike::NotBlock));
     }
-    if p.at_contextual_kw(T![assert]) && !p.nth_at(1, T![!]) {
+    if p.at_contextual_kw(T![assert])
+        && (p.nth_at(1, T!['(']) || p.nth_at_contextual_kw(1, T![forall]))
+    {
         let m = p.start();
         return Some((verus::assert(p, m), BlockLike::NotBlock));
     }
-    if p.at_contextual_kw(T![assume]) && !p.nth_at(1, T![!]) {
+    if p.at_contextual_kw(T![assume]) && p.nth_at(1, T!['(']) {
         let m = p.start();
         return Some((verus::assume(p, m), BlockLike::NotBlock));
     }
-    if p.at_contextual_kw(T![final]) {
+    if p.at(T![final]) && p.nth_at(1, T!['(']) {
         let m = p.start();
         return Some((verus::final_expr(p, m), BlockLike::NotBlock));
     }

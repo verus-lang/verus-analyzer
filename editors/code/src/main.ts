@@ -16,7 +16,7 @@ export interface RustAnalyzerExtensionApi {
 
     // Allows adding a configuration override from another extension.
     // `extensionId` is used to only merge configuration override from present
-    // extensions. `configuration` is map of rust-analyzer-specific setting
+    // extensions. `configuration` is map of verus-analyzer-specific setting
     // overrides, e.g., `{"cargo.cfgs": ["foo", "bar"]}`.
     addConfiguration(extensionId: string, configuration: Record<string, unknown>): Promise<void>;
 }
@@ -35,7 +35,7 @@ export async function activate(
     // so we do it ourselves.
     const api = await activateServer(ctx).catch((err) => {
         void vscode.window.showErrorMessage(
-            `Cannot activate rust-analyzer extension: ${err.message}`,
+            `Cannot activate verus-analyzer extension: ${err.message}`,
         );
         throw err;
     });
@@ -163,7 +163,7 @@ function createCommands(): Record<string, CommandFactory> {
         rebuildProcMacros: { enabled: commands.rebuildProcMacros },
         newProject: {
             // Project creation is a pure VS Code-side workflow and should stay available even in
-            // empty windows before rust-analyzer has started or a Rust workspace exists.
+            // empty windows before verus-analyzer has started or a Rust workspace exists.
             enabled: commands.newProject,
             disabled: commands.newProject,
         },
@@ -230,7 +230,7 @@ function checkConflictingExtensions() {
     if (vscode.extensions.getExtension("rust-lang.rust")) {
         vscode.window
             .showWarningMessage(
-                `You have both the rust-analyzer (rust-lang.rust-analyzer) and Rust (rust-lang.rust) ` +
+                `You have both the verus-analyzer (rust-lang.verus-analyzer) and Rust (rust-lang.rust) ` +
                     "plugins enabled. These are known to conflict and cause various functions of " +
                     "both plugins to not work correctly. You should disable one of them.",
                 "Got it",

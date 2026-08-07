@@ -42,7 +42,7 @@ pub(crate) fn handle_work_done_progress_cancel(
     params: WorkDoneProgressCancelParams,
 ) -> anyhow::Result<()> {
     if let lsp_types::ProgressToken::String(s) = &params.token
-        && let Some(id) = s.strip_prefix("rust-analyzer/flycheck/")
+        && let Some(id) = s.strip_prefix("verus-analyzer/flycheck/")
         && let Ok(id) = id.parse::<u32>()
         && let Some(flycheck) = state.flycheck.get(id as usize)
     {

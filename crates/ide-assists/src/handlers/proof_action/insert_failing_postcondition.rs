@@ -1,3 +1,5 @@
+//! Inserts an assertion for a failing Verus postcondition.
+
 use crate::proof_plumber_api::verus_error::*;
 use crate::{AssistContext, AssistId, AssistKind, Assists};
 

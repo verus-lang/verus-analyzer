@@ -10,7 +10,7 @@ import {
 import type { Ctx } from "./ctx";
 import { unwrapUndefinable } from "./util";
 
-export const URI_SCHEME = "rust-analyzer-diagnostics-view";
+export const URI_SCHEME = "verus-analyzer-diagnostics-view";
 
 export class TextDocumentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
