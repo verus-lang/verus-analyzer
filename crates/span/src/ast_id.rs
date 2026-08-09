@@ -117,6 +117,10 @@ enum ErasedFileAstIdKind {
     /// Represents a fake [`ErasedFileAstId`] that should not be mapped down to macro expansion
     /// result.
     NoDownmap,
+    BroadcastGroup,
+    BroadcastUse,
+    VerusGlobal,
+    AssumeSpecification,
     /// Keep this last.
     Root,
 }
@@ -143,6 +147,10 @@ impl ErasedFileAstIdKind {
             ErasedFileAstIdKind::Impl => Some(SyntaxKind::IMPL),
             ErasedFileAstIdKind::BlockExpr => Some(SyntaxKind::BLOCK_EXPR),
             ErasedFileAstIdKind::AsmExpr => Some(SyntaxKind::ASM_EXPR),
+            ErasedFileAstIdKind::BroadcastGroup => Some(SyntaxKind::BROADCAST_GROUP),
+            ErasedFileAstIdKind::BroadcastUse => Some(SyntaxKind::BROADCAST_USE),
+            ErasedFileAstIdKind::VerusGlobal => Some(SyntaxKind::VERUS_GLOBAL),
+            ErasedFileAstIdKind::AssumeSpecification => Some(SyntaxKind::ASSUME_SPECIFICATION),
             ErasedFileAstIdKind::Fixup
             | ErasedFileAstIdKind::NoDownmap
             | ErasedFileAstIdKind::Root => None,
@@ -237,6 +245,10 @@ impl ErasedFileAstId {
             AsmExpr,
             Fixup,
             NoDownmap,
+            BroadcastGroup,
+            BroadcastUse,
+            VerusGlobal,
+            AssumeSpecification,
         )
     }
 
@@ -257,6 +269,7 @@ impl ErasedFileAstId {
             .or_else(|| use_ast_id(node, index_map))
             .or_else(|| impl_ast_id(node, index_map))
             .or_else(|| asm_expr_ast_id(node, index_map))
+            .or_else(|| verus_item_ast_id(node, index_map))
     }
 
     fn should_alloc(node: &SyntaxNode) -> Option<ErasedFileAstIdKind> {
@@ -269,6 +282,7 @@ impl ErasedFileAstId {
             .or_else(|| ast::Use::can_cast(kind).then_some(ErasedFileAstIdKind::Use))
             .or_else(|| ast::Impl::can_cast(kind).then_some(ErasedFileAstIdKind::Impl))
             .or_else(|| ast::AsmExpr::can_cast(kind).then_some(ErasedFileAstIdKind::AsmExpr))
+            .or_else(|| should_alloc_verus_item(kind))
     }
 
     #[inline]
@@ -438,6 +452,37 @@ fn impl_ast_id(
     }
 }
 
+macro_rules! register_verus_item_ast_id {
+    ($($ident:ident),+ $(,)?) => {
+        $(
+            impl AstIdNode for ast::$ident {}
+        )+
+
+        fn verus_item_ast_id(
+            node: &SyntaxNode,
+            index_map: &mut ErasedAstIdNextIndexMap,
+        ) -> Option<ErasedFileAstId> {
+            match_ast! {
+                match node {
+                    $(
+                        ast::$ident(_) => {
+                            Some(index_map.new_id(ErasedFileAstIdKind::$ident, ()))
+                        },
+                    )*
+                    _ => None,
+                }
+            }
+        }
+
+        fn should_alloc_verus_item(kind: SyntaxKind) -> Option<ErasedFileAstIdKind> {
+            $(if ast::$ident::can_cast(kind) { Some(ErasedFileAstIdKind::$ident) } else)* {
+                None
+            }
+        }
+    };
+}
+register_verus_item_ast_id!(BroadcastUse, VerusGlobal, AssumeSpecification);
+
 // Blocks aren't `AstIdNode`s deliberately, because unlike other nodes, not all blocks get their own
 // ast id, only if they have items. To account for that we have a different, fallible, API for blocks.
 // impl !AstIdNode for ast::BlockExpr {}
@@ -594,7 +639,8 @@ register_assoc_item_ast_id! {
     Const = |it: ast::Const| it.name(),
     Fn = |it: ast::Fn| it.name(),
     MacroCall = |it: ast::MacroCall| it.path().and_then(|path| path.segment()?.name_ref()),
-    TypeAlias = |it: ast::TypeAlias| it.name()
+    TypeAlias = |it: ast::TypeAlias| it.name(),
+    BroadcastGroup = |it: ast::BroadcastGroup| it.name()
 }
 
 /// Maps items' `SyntaxNode`s to `ErasedFileAstId`s and back.
@@ -689,6 +735,10 @@ impl AstIdMap {
                                         | ErasedFileAstIdKind::ExternBlock
                                         | ErasedFileAstIdKind::Use
                                         | ErasedFileAstIdKind::Impl
+                                        | ErasedFileAstIdKind::BroadcastGroup
+                                        | ErasedFileAstIdKind::BroadcastUse
+                                        | ErasedFileAstIdKind::VerusGlobal
+                                        | ErasedFileAstIdKind::AssumeSpecification
                                 );
                                 if let Some((
                                     last_block_node,
@@ -944,6 +994,12 @@ extern "C" {
 }
 static mut S: i32 = 0;
 const FOO: i32 = 0;
+broadcast group arithmetic {
+    lemma_add,
+}
+broadcast use lemma_add;
+global size_of usize == 8;
+assume_specification[external::function]();
         "#,
             Edition::CURRENT,
         )
@@ -968,6 +1024,10 @@ const FOO: i32 = 0;
                     | SyntaxKind::EXTERN_BLOCK
                     | SyntaxKind::STATIC
                     | SyntaxKind::CONST
+                    | SyntaxKind::BROADCAST_GROUP
+                    | SyntaxKind::BROADCAST_USE
+                    | SyntaxKind::VERUS_GLOBAL
+                    | SyntaxKind::ASSUME_SPECIFICATION
             ) {
                 continue;
             }

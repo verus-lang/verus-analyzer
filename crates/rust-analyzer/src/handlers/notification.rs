@@ -230,42 +230,43 @@ pub(crate) fn handle_did_change_configuration(
 ) -> anyhow::Result<()> {
     // As stated in https://github.com/microsoft/language-server-protocol/issues/676,
     // this notification's parameters should be ignored and the actual config queried separately.
-    state.send_request::<lsp_types::ConfigurationRequest>(
-        lsp_types::ConfigurationParams {
-            items: vec![lsp_types::ConfigurationItem {
-                scope_uri: None,
-                section: Some("rust-analyzer".to_owned()),
-            }],
-        },
-        |this, resp| {
-            tracing::debug!("config update response: '{:?}", resp);
-            let lsp_server::Response { error, result, .. } = resp;
+    state.send_request::<lsp_types::ConfigurationRequest>(configuration_params(), |this, resp| {
+        tracing::debug!("config update response: '{:?}", resp);
+        let lsp_server::Response { error, result, .. } = resp;
 
-            match (error, result) {
-                (Some(err), _) => {
-                    tracing::error!("failed to fetch the server settings: {:?}", err)
-                }
-                (None, Some(mut configs)) => {
-                    if let Some(json) = configs.get_mut(0) {
-                        let config = Config::clone(&*this.config);
-                        let mut change = ConfigChange::default();
-                        change.change_client_config(json.take());
+        match (error, result) {
+            (Some(err), _) => {
+                tracing::error!("failed to fetch the server settings: {:?}", err)
+            }
+            (None, Some(mut configs)) => {
+                if let Some(json) = configs.get_mut(0) {
+                    let config = Config::clone(&*this.config);
+                    let mut change = ConfigChange::default();
+                    change.change_client_config(json.take());
 
-                        let (config, e, _) = config.apply_change(change);
-                        this.config_errors = e.is_empty().not().then_some(e);
+                    let (config, e, _) = config.apply_change(change);
+                    this.config_errors = e.is_empty().not().then_some(e);
 
-                        // Client config changes necessitates .update_config method to be called.
-                        this.update_configuration(config);
-                    }
-                }
-                (None, None) => {
-                    tracing::error!("received empty server settings response from the client")
+                    // Client config changes necessitates .update_config method to be called.
+                    this.update_configuration(config);
                 }
             }
-        },
-    );
+            (None, None) => {
+                tracing::error!("received empty server settings response from the client")
+            }
+        }
+    });
 
     Ok(())
+}
+
+fn configuration_params() -> lsp_types::ConfigurationParams {
+    lsp_types::ConfigurationParams {
+        items: vec![lsp_types::ConfigurationItem {
+            scope_uri: None,
+            section: Some("verus-analyzer".to_owned()),
+        }],
+    }
 }
 
 pub(crate) fn handle_did_change_workspace_folders(
@@ -569,4 +570,14 @@ pub(crate) fn handle_abort_run_test(state: &mut GlobalState, _: ()) -> anyhow::R
         state.send_notification::<lsp_ext::EndRunTestNotification>(());
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn configuration_request_uses_verus_analyzer_section() {
+        let params = super::configuration_params();
+        assert_eq!(params.items.len(), 1);
+        assert_eq!(params.items[0].section.as_deref(), Some("verus-analyzer"));
+    }
 }

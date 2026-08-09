@@ -1284,6 +1284,27 @@ fn foo(x: &fn(&dyn Trait)) {}
     let _ = analysis.highlight(HL_CONFIG, file_id).unwrap();
 }
 
+#[test]
+fn highlight_verus_items_no_crash() {
+    let (analysis, file_id) = fixture::file(
+        r#"
+broadcast group arithmetic {
+    lemma_add,
+}
+broadcast use lemma_add;
+global size_of usize == 8;
+assume_specification[external::function]();
+
+trait BroadcastGroups {
+    broadcast group associated {
+        lemma_add,
+    }
+}
+"#,
+    );
+    let _ = analysis.highlight(HL_CONFIG, file_id).unwrap();
+}
+
 /// Highlights the code given by the `ra_fixture` argument, renders the
 /// result as HTML, and compares it with the HTML file given as `snapshot`.
 /// Note that the `snapshot` file is overwritten by the rendered HTML.

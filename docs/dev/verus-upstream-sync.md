@@ -1,5 +1,8 @@
 # Maintaining the Verus fork
 
+For the baseline, implementation decisions, and validation from the 2026 sync, see
+[2026 rust-analyzer sync summary](2026-rust-analyzer-sync.md).
+
 Keep upstream syncs separate from Verus feature work whenever possible. Start from a tagged archive
 of the previous fork, merge or rebase onto the selected rust-analyzer revision, and port the
 Verus-specific layers in dependency order:
