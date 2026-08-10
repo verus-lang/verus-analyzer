@@ -110,3 +110,67 @@ editor settings and documentation with:
 cargo test -p rust-analyzer --lib generate_package_json_config
 cargo test -p rust-analyzer --lib generate_config_documentation
 ```
+
+## Building a VSIX file
+
+This requires the `esbuild` tool to be installed.  On Mac OS, run `brew install esbuild`.
+
+You may also need to install the `vscode-languageclient` package via:
+```
+npm install vscode-languageclient
+```
+
+We include a build of the server in the VSIX file, so in the base of this repo, run:
+```
+cargo xtask dist --proof-action --client-patch-version 42
+```
+which will cause a copy of the server to be placed in `editors/code/server/`
+The number you pass in will be concatenated to "0.4" to form the extension's
+version number.  The actual value does not matter.  Part of this process modifies
+`verus-analyzer/editors/package.json`.  If you subsequently need to rebuild
+the server after making changes, you typically need to restore the `package.json` file
+to its original state, or else `cargo task dist` will panic.
+
+Now, in `verus-analyzer/editors/code`, run:
+```
+npx vsce package -o ../../dist/verus-analyzer-aarch64-apple-darwin.vsix --target darwin-arm64
+```
+You should update `aarch64-apple-darwin` as appropriate.  Choices include:
+  - `x86_64-unknown-linux-gnu`
+  - `aarch64-unknown-linux-gnu`
+  - `x86_64-pc-windows-msvc`
+  - `x86_64-apple-darwin`
+  - `aarch64-apple-darwin`
+
+You should also update the argument to `--target` appropriately.  Choices include:
+ - `win32-x64`
+ - `win32-arm64`
+ - `linux-x64`
+ - `linux-arm64`
+ - `linux-armhf`
+ - `alpine-x64`
+ - `alpine-arm64`
+ - `darwin-x64`
+ - `darwin-arm64`
+ - `web`
+If you don't pass the `--target` flag, the package will be used as a fallback
+for all platforms that have no platform-specific package.
+
+You can install the resulting `.vsix` file from the commandline.  In the base of the repo, run:
+```
+code --install-extension ./dist/verus-analyzer-[your-arch-choice].vsix
+```
+Or in VS Code, you can open the Extensions panel, click the '...' button in the upper-right
+portion of the panel, and select "Install from VSIX..."
+
+### Notes
+
+If you see this complaint:
+```
+Cannot find base config file "@tsconfig/strictest/tsconfig.json"
+```
+Try running:
+```
+npm install --save-dev @tsconfig/strictest
+yarn add --dev @tsconfig/strictest
+```

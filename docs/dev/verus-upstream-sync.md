@@ -15,8 +15,9 @@ Verus-specific layers in dependency order:
 6. Documentation and the complete test matrix in `CONTRIBUTING.md`.
 
 Do not replay old rust-analyzer files wholesale. Current upstream structure and APIs should remain
-the default; transplant only the behavior required for Verus. In particular, retain upstream CI,
-tests, and configuration unless a Verus requirement conflicts with them.
+the default; transplant only the behavior required for Verus.  In particular, retain upstream 
+tests and configuration unless a Verus requirement conflicts with them.
+However, do not retain upstream CI; we only want CI focused on verus-analyzer's tests and release.
 
 The main fork-specific surfaces are:
 
