@@ -1,58 +1,210 @@
-# verus-analyzer
+# <a href="https://verus-lang.github.io/verus/verus/logo.html"><img height="30px" src="https://verus-lang.github.io/verus/verus/assets/verus-color.svg" alt="Verus" /></a> Verus-Analyzer
+Verus-analyzer is a version of [rust-analyzer](https://github.com/rust-lang/rust-analyzer) that has
+been modified to provide IDE support for writing [Verus](https://github.com/verus-lang/verus) code 
+and proofs, including syntax support and various IDE features.
 
-verus-analyzer is a fork of [rust-analyzer](https://github.com/rust-lang/rust-analyzer) that adds
-IDE support for the [Verus](https://github.com/verus-lang/verus) verification language. It tracks
-current rust-analyzer while adding:
-
-- Parsing, highlighting, lowering, and analysis for Verus syntax.
-- Verus verification on save, with diagnostics shown in the editor.
-- Experimental proof actions for debugging failed proofs.
-- Automatic Verus installation in the VS Code extension.
-
-The project is experimental. Verus-specific analysis is not yet as complete as rust-analyzer's
-analysis of ordinary Rust.
+## WARNING!
+This software is **experimental** and subject to change; some features are likely broken.
+At present, it works best on small, self-contained Verus projects.  Anything more complex
+will likely fail.  You may file issues, but we do not currently have dedicated engineering
+support for `verus-analyzer`, so **your issue may not be addressed**.  Pull requests with
+fixes are always welcome, although it is unlikely they will be reviewed immediately.
 
 ## Quick Start
 
-Install the
-[verus-analyzer VS Code extension](https://marketplace.visualstudio.com/items?itemName=verus-lang.verus-analyzer)
-and open a Cargo project containing Verus code. The extension downloads the latest Verus release
-for supported platforms and runs the verifier whenever a Rust file is saved.
+### Requirements
 
-The most relevant settings are:
+The main requirement is that `verus-analyzer` expects you to "Open Folder..." on
+a directory containing a standard Rust project layout and metadata (`Cargo.toml`) file.
+`verus-analyzer` scans the project root (`src/lib.rs` or `src/main.rs`) and all files
+that are reachable from the root. If the file you are working on is not
+reachable from the project root, most of the IDE features like "Go to
+Definition" will not work. For example, if you have a file named `foo.rs`
+next to `main.rs`, but you do not import `foo.rs` in `main.rs`(i.e., you haven't added
+`mod foo` in `main.rs`), then the IDE features will not work for `foo.rs`.
 
-- `verus-analyzer.verus.enable`: enable verification on save.
-- `verus-analyzer.verus.binary`: use a specific Verus executable instead of downloading one.
-- `verus-analyzer.verus.extraArgs`: pass additional arguments to Verus.
-- `verus-analyzer.verus.reportAllErrorsEnable`: report errors from the whole crate instead of the
-  module containing the saved file.
-- `verus-analyzer.cargo.verusEnable`: run `cargo verus` instead of invoking Verus directly.
+As mentioned above, `verus-analyzer` also expects to find a `Cargo.toml` metadata file,
+as is in standard in Rust projects. For a small
+project, you could start by running `cargo new`, which will automatically generate a
+suitable `Cargo.toml` file for you. For a larger project, you could use a Rust
+[workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to
+manage multiple crates.
 
-Verus arguments can also be specified in a project manifest:
+### Installation
 
-```toml
-[package.metadata.verus.ide]
-extra_args = ["--rlimit", "20"]
+Please install the `verus-analyzer` extension via the Visual Studio Code extension marketplace.
+
+### Updating Verus
+
+When you install `verus-analyzer`, it automatically downloads the latest Verus release.
+The same thing happens when you install an updated version of `verus-analyzer`.  If you
+want to install a new version of Verus in between `verus-analyzer` updates, there are 
+two options.
+1. You can remove the `verus-analyzer` extension and then re-install it.
+2. You can manually download the latest [Verus release](https://github.com/verus-lang/verus/releases)
+   and use it to overwrite the version that `verus-analyzer` downloads.  This will be in your
+   VS Code extensions directory.  E.g., on MacOS, it will be something like 
+   `~/.vscode/extensions/verus-lang.verus-analyzer-0.3.246-darwin-arm64/verus`.
+
+---
+## Features and Details
+
+### 1. Verus Syntax
+We extended rust-analyzer's grammar for Verus-specific syntax. This means that it highlights reserved Verus keywords (e.g., `spec`, `proof`, `requires`, `ensures`). If a user types `prof` instead of `proof`, a syntax error will be generated.
+
+
+### 2. IDE features
+You can find more documentation of the IDE features by following these links.
+- [Go to Definition](https://rust-analyzer.github.io/manual.html#go-to-definition)
+- [Go to Type Declaration](https://rust-analyzer.github.io/manual.html#go-to-type-definition)
+- [Find all References](https://rust-analyzer.github.io/manual.html#find-all-references)
+- [Hover](https://rust-analyzer.github.io/manual.html#hover)
+
+#### 2.1 TODOs for IDE features
+- Code scanning is incomplete for Verus-specific items. To be specific, `requires`, `ensures`, `decreases`, `invariant`, `assert-by-block`, and `assert-forall-block` are not fully scanned for IDE purposes (e.g., you might not be able to use "Go to Definition" on a function mentioned in a `requires` or `ensures` expression, or "Find All References" might omit occurrences inside `requires` and `ensures` expressions).
+
+- Although Verus' custom operators are parsed, they are not registered for IDE purposes. For example, type inference around such operators might not work (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are Booleans).
+
+- `vstd` is not scanned by default; if you want to enable "Go to Definition" or auto-completion for `vstd`, you should add it as a dependency in your Cargo.toml file, e.g.,
+```
+[dependencies]
+vstd =           { git = "https://github.com/verus-lang/verus" }
+builtin =        { git = "https://github.com/verus-lang/verus" }
+builtin_macros = { git = "https://github.com/verus-lang/verus" }
 ```
 
+### 3. Running Verus
+
+Each time you save a file in your project, Verus should run and report proof failures and warnings in the IDE.
+
+#### Extra Arguments
+To pass extra arguments to Verus, add the following table to the `Cargo.toml` file for your Verus project:
+```
+[package.metadata.verus.ide]
+extra_args = "......"
+```
+where the quoted string is a list of space-separated Verus arguments, e.g., `extra_args = "--rlimit 20 --log-all"`.
+
+#### Using `cargo verus`
+
+By default, `verus-analyzer` directly invokes the Verus executable on the root of your crate. If you would
+instead prefer to have it invoke `cargo verus`, toggle the setting: "Verus-analyzer › Cargo: Verus Enable".
+
+#### Advanced Verus Developments
+Some advanced Verus projects (e.g., those making changes to `vstd`) may need to use `#[cfg(verus_keep_ghost)]`
+in their Verus files.  This will cause various `verus-analyzer` features (like Go To Definition) to stop working,
+since `verus-analyzer` won't recognize that `cfg` setting by default.  To address that, edit your VS Code `settings.json`
+file to add:
+```
+    "verus-analyzer.cargo.cfgs": {
+        "verus_keep_ghost": null,
+        "debug_assertions": null,
+        "miri": null
+    },
+```
+In the future, when we sync up with the latest version of `rust-analyzer`, you will need this setting instead:
+```
+    "verus-analyzer.cargo.cfgs": [
+        "debug_assertions",
+        "miri",
+        "verus_keep_ghost"
+    ],
+```
+since `rust-analyzer` changed the type it expects for this setting.
+
+---
+## Release Notes
+
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
+
+## Limitations
+- This is experimental software and subject to change.
+- It is intended to be used only for Verus code. 
+- `verus-analyzer` is designed to support VS Code, not as a library to support parsing or manipulating Verus code; for that, we suggest using the [Verus tree-sitter grammar](https://github.com/secure-foundations/tree-sitter-verus) or the [Verus fork of syn](https://github.com/verus-lang/verus/tree/main/dependencies/syn).
+- Multiple features of `rust-analyzer` might be broken or missing.
+- Syntax might not be updated to the latest version of Verus.
+
+## Misc
+- The `verus-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
+- The `Developer: Reload Window` command can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
+- Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in your workspace's settings can disable the syntax error messages in VS Code. You could also add `unresolved-module` to the above list to disable the error message for unresolved modules.
+- There is no proper support for `buildin`/`vstd`. However, in your project's `Cargo.toml` file, you can add `vstd` in `dependencices` or `dev-dependencies`, which might make `verus-analyzer` scan `vstd` and `builtin`. For example, you can try adding:
+```
+[dependencies]
+vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in the same directory
+```
+
+## Proc Macros
+
+You may run into an error like the following:
+```
+Failed spawning proc-macro server for workspace /home/user/Documents/verus/verus_test/Cargo.toml: Failed to run proc-macro server from path /home/user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/libexec/rust-analyzer-proc-macro-srv, error: Custom { kind: Other, error: "proc-macro server's api version (6) is newer than rust-analyzer's (4)" }
+```
+
+The problem is that the protocol that `rust-analyzer` uses to talk to the
+proc-macro server changes as Rust versions change. However, `verus-analyzer`
+evolves more slowly and hence can't talk to the proc-macro server in the latest
+versions of Rust.
+
+If your code doesn't use proc macros, then the simplest solution is to look in
+the settings for the extension and make sure they are disabled (e.g.,
+`"verus-analyzer.procMacro.enable": false,`).
+
+If your code does use proc macros, then you'll need to install an older Rust toolchain; specifically 1.79, e.g., `rustup toolchain install 1.79.0-aarch64-apple-darwin`. Then you'll need to add these settings to your VS Code `settings.json` file:
+```
+"verus-analyzer.server.extraEnv": { "RUSTUP_TOOLCHAIN": "1.79.0-aarch64-apple-darwin" },
+"verus-analyzer.procMacro.server": "/Users/username/.rustup/toolchains/1.79.0-aarch64-apple-darwin/libexec/rust-analyzer-proc-macro-srv",
+```
+(with appropriate edits to your toolchain and paths).
+
+
+---
 ## Proof Actions
 
-Proof actions are experimental code actions based on
-[Proof Plumber](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf). They appear as
-light-bulb actions near failed assertions, preconditions, and postconditions and automate common
-proof-debugging transformations.
+[Proof actions](https://www.andrew.cmu.edu/user/bparno/papers/proof-plumber.pdf) 
+are an **experimental** feature to assist developers when debugging proof failures.
+They show up as light bulb (💡) icons in the IDE when you hover over a failed proof.
+They are designed to automate many of the tedious, error-prone debugging steps that 
+developers previously did manually.  See below for some examples.  The framework
+is also designed to make it easy to write your own proof actions.  Indeed, the
+examples below only require ~30-180 lines of Rust code.
 
-## Development
+### Proof Action Demo
+[Source code](https://github.com/chanheec/proof-action-example)
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the Verus architecture and test matrix. The
-[rust-analyzer manual](https://rust-analyzer.github.io/book/) remains the reference for inherited
-editor features and internals.
+![](demo.gif)
 
-Questions about Verus-specific behavior belong in the
-[Verus Zulip](https://verus-lang.zulipchat.com/). Upstream rust-analyzer design discussions belong
-in the [rust-analyzer Zulip stream](https://rust-lang.zulipchat.com/#narrow/stream/185405-t-compiler.2Frust-analyzer).
+### Currently Enabled Proof Actions
 
-## License
+The "Hover over" column indicates where you should place your mouse cursor 
+so that a "light bulb" 💡 will appear and allow you to perform the corresponding
+proof action.  In the examples linked to below, the `$0` characters indicate
+where the user has positioned their mouse in the "before" version of the code,
+and below you can see the version after the proof action executes.
 
-verus-analyzer is distributed under the terms of the MIT and Apache 2.0 licenses. See
-[LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE](LICENSE-APACHE).
+| Hover over | Proof action | Examples |
+|------------|--------------|----------|
+| `assert` keyword | Move the current expression "up" one statement in the current function, adjusting it appropriately based on the statement it "moves past" (technically it applies one weakest-precondition step).  Currently only handles a subset of available Verus statements. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/weakest_pre_step.rs#L303) |
+| `assert` keyword | Convert `assert(A ==> B)` into `if A { assert(B); }` | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/convert_imply_to_if.rs#L71) |
+| `assert` keyword | Take an assertion containing a `forall` quantifier and an implication and introduce a [`forall ... implies ... by` statement](https://verus-lang.github.io/verus/guide/quantproofs.html#proving-forall-with-assert-by) where the quantified variables are in scope and the proof already assumes the left-hand side of the implication. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_forall_implies.rs#L98) |
+| `assert` keyword | Take an assertion containing a `forall` quantifier and introduce a `by` clause where the quantified variables are in scope. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_forall.rs#L71) |
+| `assert` keyword | Add a `by` block to an existing assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_assert_by_block.rs#L64) |
+| `assert` keyword | Add a `by` block containing `assume(false)`. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/intro_assume_false.rs#L66) |
+| `ensures` keyword | Introduce a failing ensures clause as an `assert` statement at the end of the current function | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_postcondition.rs#L92) |
+| `ensures` keyword | Take an ensures clause `A ==> B`, and move `A` to the requires clause, leaving `B` in the ensures clause. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_imply_ensures.rs#L75) |
+| function call | Introduce the function's precondition as an assumption in the caller's context. |[code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/insert_failing_precondition.rs#L64) |
+| function call inside an assertion | Convert the assertion into an `assert ... by` expression and reveal the selected function's definition inside the `by` block | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_in_by_block.rs#L76) |
+| function call inside an assertion | Add a reveal statement for this function above the current assertion. | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/reveal_opaque_above.rs#L78) |
+| `<=` | Split an assertion of `A <= B` into two assertions: `A < B` and `A <= B` | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/split_smaller_or_equal_to.rs#L118) |
+| sequence expression inside an `assert ... by` | Adds a clause saying that the sequence index is in bounds | [code](https://github.com/verus-lang/verus-analyzer/blob/55279b828ea54a79916b528567f3919f6eac6fc0/crates/ide-assists/src/handlers/proof_action/seq_index_inbound.rs#L99) |
+
+
+### Developing Your Own Proof Actions
+
+We encourage you to enhance the proof actions above and to develop your own proof actions.
+Pull requests are quite welcome.  Here are some steps to get started.
+
+1. Each of the proof actions linked above lives in an individual file in this [handlers folder](./crates/ide-assists/src/handlers/proof_action).
+2. Find the existing proof action most similar to your idea and copy it into a new file in that directory.  Update the names and code appropriately.  Note that each proof action is called on just about every single UI event, so it's important that your proof action exits quickly and cleanly when it doesn't apply.
+3. Add your new proof action to the long list in the `all()` function in the [ide-assists' crate's `lib.rs` file](crates/ide-assists/src/lib.rs).
+4. Follow the steps in [CONTRIBUTING.md](./CONTRIBUTING.md) to build and test your new proof action.
