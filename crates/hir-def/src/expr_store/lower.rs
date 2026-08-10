@@ -73,6 +73,7 @@ pub(super) fn lower_body(
     current_file_id: HirFileId,
     module: ModuleId,
     parameters: Option<ast::ParamList>,
+    contract_exprs: Vec<ast::Expr>,
     body: Option<ast::Expr>,
     is_async_fn: bool,
     is_gen_fn: bool,
@@ -101,7 +102,7 @@ pub(super) fn lower_body(
     // If #[rust_analyzer::skip] annotated, only construct enough information for the signature
     // and skip the body.
     if skip_body {
-        collector.with_expr_root(|collector| {
+        let body_expr = collector.with_expr_root(|collector| {
             if let Some(param_list) = parameters {
                 if let Some(self_param_syn) =
                     param_list.self_param().filter(|self_param| collector.check_cfg(self_param))
@@ -129,12 +130,18 @@ pub(super) fn lower_body(
         });
         let (store, source_map) = collector.store.finish();
         return (
-            Body { store, params: params.into_boxed_slice(), self_param },
+            Body {
+                store,
+                contract_exprs: Box::default(),
+                body_expr,
+                params: params.into_boxed_slice(),
+                self_param,
+            },
             BodySourceMap { self_param: source_map_self_param, store: source_map },
         );
     }
 
-    collector.with_expr_root(|collector| {
+    let body_expr = collector.with_expr_root(|collector| {
         if let Some(param_list) = parameters {
             if let Some(self_param_syn) =
                 param_list.self_param().filter(|it| collector.check_cfg(it))
@@ -191,10 +198,14 @@ pub(super) fn lower_body(
             is_gen_fn,
         )
     });
+    let contract_exprs = contract_exprs
+        .into_iter()
+        .map(|expr| collector.with_expr_root(|collector| collector.collect_expr(expr)))
+        .collect();
 
     let (store, source_map) = collector.store.finish();
     (
-        Body { store, params: params.into_boxed_slice(), self_param },
+        Body { store, contract_exprs, body_expr, params: params.into_boxed_slice(), self_param },
         BodySourceMap { self_param: source_map_self_param, store: source_map },
     )
 }

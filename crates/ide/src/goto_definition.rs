@@ -1486,6 +1486,92 @@ impl Foo {
     }
 
     #[test]
+    fn goto_definition_in_verus_function_contracts() {
+        check_name(
+            "test",
+            r#"
+struct NodeHelper;
+
+impl NodeHelper {
+    fn test(self) -> bool {
+        true
+    }
+
+    fn lemma_level_to_dep(self, level: u32)
+        requires
+            self.te$0st(),
+        ensures
+            Self::level_to_dep(level) == level,
+    {
+    }
+
+    fn level_to_dep(level: u32) -> u32 {
+        level
+    }
+}
+"#,
+        );
+
+        check_name(
+            "level_to_dep",
+            r#"
+struct NodeHelper;
+
+impl NodeHelper {
+    fn test(self) -> bool {
+        true
+    }
+
+    fn lemma_level_to_dep(self, level: u32)
+        requires
+            self.test(),
+        ensures
+            Self::dep_to_level(Self::level_to_de$0p(level)) == level,
+    {
+    }
+
+    fn level_to_dep(level: u32) -> u32 {
+        level
+    }
+
+    fn dep_to_level(dep: u32) -> u32 {
+        dep
+    }
+}
+"#,
+        );
+
+        check_name(
+            "dep_to_level",
+            r#"
+struct NodeHelper;
+
+impl NodeHelper {
+    fn test(self) -> bool {
+        true
+    }
+
+    fn lemma_level_to_dep(self, level: u32)
+        requires
+            self.test(),
+        ensures
+            Self::dep_to_le$0vel(Self::level_to_dep(level)) == level,
+    {
+    }
+
+    fn level_to_dep(level: u32) -> u32 {
+        level
+    }
+
+    fn dep_to_level(dep: u32) -> u32 {
+        dep
+    }
+}
+"#,
+        );
+    }
+
+    #[test]
     fn goto_definition_on_self_in_trait_impl() {
         check(
             r#"

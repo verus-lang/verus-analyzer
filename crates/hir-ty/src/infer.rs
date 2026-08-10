@@ -179,6 +179,9 @@ pub fn infer_query_with_inspect<'db>(
         }
     }
 
+    for &contract_expr in &body.contract_exprs {
+        ctx.infer_expr_no_expect(contract_expr, ExprIsRead::Yes);
+    }
     ctx.infer_body(body.root_expr());
 
     ctx.infer_mut_body(body.root_expr());

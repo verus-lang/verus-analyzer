@@ -171,6 +171,7 @@ impl ExprScopes {
         let mut visitor =
             ExprScopeVisitor { store: body, scopes: &mut scopes, scope: root, const_scope: root };
         body.params.iter().for_each(|param| visitor.on_pat(param.formal));
+        body.contract_exprs.iter().for_each(|&expr| visitor.on_expr(expr));
         visitor.on_expr(body.root_expr());
         scopes
     }

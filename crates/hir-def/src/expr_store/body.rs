@@ -5,7 +5,7 @@ use std::ops;
 use base_db::SourceDatabase;
 use hir_expand::{InFile, Lookup};
 use span::Edition;
-use syntax::ast;
+use syntax::{AstNode, ast};
 use triomphe::Arc;
 
 use crate::{
@@ -39,6 +39,8 @@ impl<Id: Copy> Param<Id> {
 #[derive(Debug, Eq, PartialEq)]
 pub struct Body {
     pub store: ExpressionStore,
+    pub contract_exprs: Box<[ExprId]>,
+    pub(crate) body_expr: ExprId,
     /// The patterns for the function's parameters. While the parameter types are
     /// part of the function signature, the patterns are not (they don't change
     /// the external type of the function).
@@ -93,6 +95,7 @@ impl Body {
     ) -> (Arc<Body>, BodySourceMap) {
         let _p = tracing::info_span!("body_with_source_map_query").entered();
         let mut params = None;
+        let mut contract_exprs = Vec::new();
 
         let mut is_async_fn = false;
         let mut is_gen_fn = false;
@@ -104,6 +107,7 @@ impl Body {
                     params = src.value.param_list();
                     is_async_fn = src.value.async_token().is_some();
                     is_gen_fn = src.value.gen_token().is_some();
+                    contract_exprs = function_contract_exprs(&src.value);
                     src.map(|it| it.body().map(ast::Expr::from))
                 }
                 DefWithBodyId::ConstId(c) => {
@@ -124,8 +128,17 @@ impl Body {
             }
         };
         let module = def.module(db);
-        let (body, source_map) =
-            lower_body(db, def, file_id, module, params, body, is_async_fn, is_gen_fn);
+        let (body, source_map) = lower_body(
+            db,
+            def,
+            file_id,
+            module,
+            params,
+            contract_exprs,
+            body,
+            is_async_fn,
+            is_gen_fn,
+        );
 
         (Arc::new(body), source_map)
     }
@@ -138,9 +151,7 @@ impl Body {
 
 impl Body {
     pub fn root_expr(&self) -> ExprId {
-        // A `Body` can also contain root expressions that aren't the body (in the param patterns),
-        // but the body always come last.
-        self.store.expr_roots().next_back().unwrap()
+        self.body_expr
     }
 
     /// Returns `true` if this is the formal or user-written self param.
@@ -180,6 +191,23 @@ impl Body {
     ) -> String {
         pretty::print_pat_hir(db, self, owner, pat, oneline, edition)
     }
+}
+
+fn function_contract_exprs(fn_: &ast::Fn) -> Vec<ast::Expr> {
+    let mut exprs = Vec::new();
+    exprs.extend(fn_.requires_clause().into_iter().flat_map(|it| it.exprs()));
+    exprs.extend(fn_.recommends_clause().into_iter().flat_map(|it| it.exprs()));
+    exprs.extend(fn_.ensures_clause().into_iter().flat_map(|it| it.exprs()));
+    exprs.extend(fn_.default_ensures_clause().into_iter().flat_map(|it| it.exprs()));
+    exprs.extend(fn_.returns_clause().and_then(|it| it.expr()));
+    exprs.extend(fn_.opens_invariants_clause().into_iter().flat_map(|it| it.exprs()));
+    exprs.extend(fn_.no_unwind_clause().and_then(|it| it.expr()));
+    if let Some(decreases) = fn_.signature_decreases() {
+        exprs.extend(decreases.decreases_clause().into_iter().flat_map(|it| it.exprs()));
+        exprs.extend(decreases.syntax().children().filter_map(ast::Expr::cast));
+    }
+    exprs.sort_by_key(|it| it.syntax().text_range().start());
+    exprs
 }
 
 impl BodySourceMap {

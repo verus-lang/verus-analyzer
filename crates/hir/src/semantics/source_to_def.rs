@@ -654,6 +654,23 @@ impl<'db> SourceToDefCtx<'db, '_> {
                     let child_offset = child.text_range().start();
                     let is_in_body =
                         it.body().is_some_and(|it| it.syntax().text_range().contains(child_offset));
+                    let is_in_contract = it
+                        .syntax()
+                        .children()
+                        .filter(|it| {
+                            matches!(
+                                it.kind(),
+                                syntax::SyntaxKind::REQUIRES_CLAUSE
+                                    | syntax::SyntaxKind::RECOMMENDS_CLAUSE
+                                    | syntax::SyntaxKind::ENSURES_CLAUSE
+                                    | syntax::SyntaxKind::DEFAULT_ENSURES_CLAUSE
+                                    | syntax::SyntaxKind::RETURNS_CLAUSE
+                                    | syntax::SyntaxKind::SIGNATURE_DECREASES
+                                    | syntax::SyntaxKind::OPENS_INVARIANTS_CLAUSE
+                                    | syntax::SyntaxKind::NO_UNWIND_CLAUSE
+                            )
+                        })
+                        .any(|it| it.text_range().contains(child_offset));
                     let in_param_pat = || {
                         it.param_list().is_some_and(|it| {
                             it.self_param()
@@ -670,7 +687,7 @@ impl<'db> SourceToDefCtx<'db, '_> {
                                     .any(|it| it.syntax().text_range().contains(child_offset))
                         })
                     };
-                    if is_in_body || in_param_pat() {
+                    if is_in_body || is_in_contract || in_param_pat() {
                         DefWithBodyId::from(def).into()
                     } else {
                         ChildContainer::GenericDefId(def.into())
