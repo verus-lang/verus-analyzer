@@ -814,6 +814,92 @@ fn closure_with_quantifier(map: Map) {
 }
 
 #[test]
+fn infer_verus_contract_expressions() {
+    check_types(
+        r#"
+fn measure(value: i32) -> i32 {
+    value
+}
+
+fn contract(flag: bool, value: i32) -> (result: i32)
+    requires
+        flag,
+     // ^^^^ bool
+    recommends
+        value > 0,
+     // ^^^^^^^^^ bool
+    ensures
+        flag,
+     // ^^^^ bool
+        result >= value,
+     // ^^^^^^ i32
+     // ^^^^^^^^^^^^^^^ bool
+    default_ensures
+        flag,
+     // ^^^^ bool
+    returns
+        value
+     // ^^^^^ i32
+    decreases
+        value
+     // ^^^^^ i32
+    when
+        flag
+     // ^^^^ bool
+    via
+        measure(value)
+     // ^^^^^^^^^^^^^^ i32
+    opens_invariants
+        [value]
+      // ^^^^^ i32
+    no_unwind when
+        flag
+     // ^^^^ bool
+{
+    value
+}
+"#,
+    );
+}
+
+#[test]
+fn infer_verus_expressions_and_proof_functions() {
+    check_types(
+        r#"
+enum Choice {
+    First(i32),
+    Second,
+}
+
+struct Bag;
+
+proof fn apply(function: proof_fn(i32) -> bool, value: i32) -> bool {
+    function(value)
+}
+
+proof fn expressions(choice: Choice, bag: Bag, value: i32, flag: bool) {
+    let asserted = assert(flag);
+     // ^^^^^^^^ ()
+    let assumed = assume(flag);
+     // ^^^^^^^ ()
+    let final_value = final(value);
+     // ^^^^^^^^^^^ i32
+    let is_choice = choice is Choice;
+     // ^^^^^^^^^ bool
+    let has_value = bag has value;
+     // ^^^^^^^^^ bool
+    let matches_choice = choice matches Choice::First(_);
+     // ^^^^^^^^^^^^^^ bool
+
+    let tracked predicate = proof_fn|input: i32| -> bool { input > 0 };
+    let accepted = apply(predicate, value);
+     // ^^^^^^^^ bool
+}
+"#,
+    );
+}
+
+#[test]
 fn infer_shift_op() {
     check_infer(
         r#"

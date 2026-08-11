@@ -74,6 +74,7 @@ pub(super) fn lower_body(
     module: ModuleId,
     parameters: Option<ast::ParamList>,
     contract_exprs: Vec<ast::Expr>,
+    return_type_pat: Option<ast::Pat>,
     body: Option<ast::Expr>,
     is_async_fn: bool,
     is_gen_fn: bool,
@@ -133,6 +134,7 @@ pub(super) fn lower_body(
             Body {
                 store,
                 contract_exprs: Box::default(),
+                return_type_pat: None,
                 body_expr,
                 params: params.into_boxed_slice(),
                 self_param,
@@ -141,6 +143,7 @@ pub(super) fn lower_body(
         );
     }
 
+    let mut lowered_return_type_pat = None;
     let body_expr = collector.with_expr_root(|collector| {
         if let Some(param_list) = parameters {
             if let Some(self_param_syn) =
@@ -180,6 +183,8 @@ pub(super) fn lower_body(
             }
         };
 
+        lowered_return_type_pat = return_type_pat.map(|pat| collector.collect_pat_top(Some(pat)));
+
         collector.collect(
             &mut self_param,
             &mut params,
@@ -205,7 +210,14 @@ pub(super) fn lower_body(
 
     let (store, source_map) = collector.store.finish();
     (
-        Body { store, contract_exprs, body_expr, params: params.into_boxed_slice(), self_param },
+        Body {
+            store,
+            contract_exprs,
+            return_type_pat: lowered_return_type_pat,
+            body_expr,
+            params: params.into_boxed_slice(),
+            self_param,
+        },
         BodySourceMap { self_param: source_map_self_param, store: source_map },
     )
 }

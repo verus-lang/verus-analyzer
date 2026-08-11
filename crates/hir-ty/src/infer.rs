@@ -179,6 +179,9 @@ pub fn infer_query_with_inspect<'db>(
         }
     }
 
+    if let Some(return_type_pat) = body.return_type_pat {
+        ctx.infer_top_pat(return_type_pat, ctx.return_ty, PatOrigin::Param);
+    }
     for &contract_expr in &body.contract_exprs {
         ctx.infer_expr_no_expect(contract_expr, ExprIsRead::Yes);
     }

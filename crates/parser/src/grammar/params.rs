@@ -18,23 +18,33 @@ pub(super) fn param_list_fn_ptr(p: &mut Parser<'_>) {
     list_(p, Flavor::FnPointer);
 }
 
+pub(super) fn param_list_proof_fn_ptr(p: &mut Parser<'_>) {
+    list_(p, Flavor::ProofFnPointer);
+}
+
 pub(super) fn param_list_closure(p: &mut Parser<'_>) {
     list_(p, Flavor::Closure);
+}
+
+pub(super) fn param_list_proof_closure(p: &mut Parser<'_>) {
+    list_(p, Flavor::ProofClosure);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Flavor {
     FnDef, // Includes trait fn params; omitted param idents are not supported
     FnPointer,
+    ProofFnPointer,
     Closure,
+    ProofClosure,
 }
 
 fn list_(p: &mut Parser<'_>, flavor: Flavor) {
     use Flavor::*;
 
     let (bra, ket) = match flavor {
-        Closure => (T![|], T![|]),
-        FnDef | FnPointer => (T!['('], T![')']),
+        Closure | ProofClosure => (T![|], T![|]),
+        FnDef | FnPointer | ProofFnPointer => (T!['('], T![')']),
     };
 
     let list_marker = p.start();
@@ -135,11 +145,30 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
                 types::type_(p);
             }
         }
+        Flavor::ProofFnPointer => {
+            if p.at_contextual_kw(T![tracked])
+                && !matches!(p.nth(1), T![,] | T![')'] | T![::] | T![<])
+            {
+                p.eat_contextual_kw(T![tracked]);
+            }
+            types::type_(p);
+        }
         // test closure_params
         // fn main() {
         //    let foo = |bar, baz: Baz, qux: Qux::Quux| ();
         // }
         Flavor::Closure => {
+            patterns::pattern_single(p);
+            if p.at(T![:]) && !p.at(T![::]) {
+                types::ascription(p);
+            }
+        }
+        Flavor::ProofClosure => {
+            if p.at_contextual_kw(T![tracked])
+                && !matches!(p.nth(1), T![:] | T![,] | T![|] | T![::] | T![@])
+            {
+                p.eat_contextual_kw(T![tracked]);
+            }
             patterns::pattern_single(p);
             if p.at(T![:]) && !p.at(T![::]) {
                 types::ascription(p);

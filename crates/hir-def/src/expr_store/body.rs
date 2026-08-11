@@ -40,6 +40,8 @@ impl<Id: Copy> Param<Id> {
 pub struct Body {
     pub store: ExpressionStore,
     pub contract_exprs: Box<[ExprId]>,
+    /// The optional named result pattern in a Verus return type.
+    pub return_type_pat: Option<PatId>,
     pub(crate) body_expr: ExprId,
     /// The patterns for the function's parameters. While the parameter types are
     /// part of the function signature, the patterns are not (they don't change
@@ -96,6 +98,7 @@ impl Body {
         let _p = tracing::info_span!("body_with_source_map_query").entered();
         let mut params = None;
         let mut contract_exprs = Vec::new();
+        let mut return_type_pat = None;
 
         let mut is_async_fn = false;
         let mut is_gen_fn = false;
@@ -105,6 +108,7 @@ impl Body {
                     let f = f.lookup(db);
                     let src = f.source(db);
                     params = src.value.param_list();
+                    return_type_pat = src.value.ret_type().and_then(|it| it.pat());
                     is_async_fn = src.value.async_token().is_some();
                     is_gen_fn = src.value.gen_token().is_some();
                     contract_exprs = function_contract_exprs(&src.value);
@@ -135,6 +139,7 @@ impl Body {
             module,
             params,
             contract_exprs,
+            return_type_pat,
             body,
             is_async_fn,
             is_gen_fn,

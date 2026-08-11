@@ -13,23 +13,24 @@ fn expect_kw(p: &mut Parser<'_>, kw: SyntaxKind) {
 }
 
 pub(super) fn at_contract_boundary(p: &Parser<'_>) -> bool {
-    p.at(EOF)
-        || p.at(T!['{'])
-        || p.at(T![;])
-        || p.at(T![']'])
-        || at_kw(p, T![requires])
-        || at_kw(p, T![recommends])
-        || at_kw(p, T![ensures])
-        || at_kw(p, T![default_ensures])
-        || at_kw(p, T![returns])
-        || at_kw(p, T![decreases])
-        || at_kw(p, T![opens_invariants])
-        || at_kw(p, T![no_unwind])
-        || at_kw(p, T![invariant])
-        || at_kw(p, T![invariant_except_break])
-        || at_kw(p, T![when])
-        || at_kw(p, T![via])
-        || at_kw(p, T![by])
+    nth_at_contract_boundary(p, 0)
+}
+
+fn nth_at_contract_boundary(p: &Parser<'_>, n: usize) -> bool {
+    matches!(p.nth(n), EOF | T!['{'] | T![;] | T![']'])
+        || p.nth_at_contextual_kw(n, T![requires])
+        || p.nth_at_contextual_kw(n, T![recommends])
+        || p.nth_at_contextual_kw(n, T![ensures])
+        || p.nth_at_contextual_kw(n, T![default_ensures])
+        || p.nth_at_contextual_kw(n, T![returns])
+        || p.nth_at_contextual_kw(n, T![decreases])
+        || p.nth_at_contextual_kw(n, T![opens_invariants])
+        || p.nth_at_contextual_kw(n, T![no_unwind])
+        || p.nth_at_contextual_kw(n, T![invariant])
+        || p.nth_at_contextual_kw(n, T![invariant_except_break])
+        || p.nth_at_contextual_kw(n, T![when])
+        || p.nth_at_contextual_kw(n, T![via])
+        || p.nth_at_contextual_kw(n, T![by])
 }
 
 fn expr_list(p: &mut Parser<'_>) {
@@ -49,7 +50,15 @@ pub(super) fn ret_type(p: &mut Parser<'_>) -> bool {
 
     let m = p.start();
     p.bump(T![->]);
-    eat_kw(p, T![tracked]);
+    if p.at_contextual_kw(T![tracked])
+        && !nth_at_contract_boundary(p, 1)
+        && !matches!(
+            p.nth(1),
+            EOF | T![,] | T![')'] | T!['}'] | T![>] | T![::] | T![<] | T![!] | T![where]
+        )
+    {
+        eat_kw(p, T![tracked]);
+    }
     if p.at(T!['('])
         && (p.nth_at(1, IDENT) && p.nth_at(2, T![:]) && !p.nth_at(2, T![::])
             || p.nth_at_contextual_kw(1, T![tracked]) && p.nth_at(2, IDENT) && p.nth_at(3, T![:]))
@@ -73,7 +82,7 @@ pub(super) fn proof_fn_type(p: &mut Parser<'_>) -> CompletedMarker {
     proof_fn_characteristics(p);
     generic_params::opt_generic_param_list(p);
     if p.at(T!['(']) {
-        params::param_list_fn_ptr(p);
+        params::param_list_proof_fn_ptr(p);
     } else {
         p.error("expected proof function parameters");
     }

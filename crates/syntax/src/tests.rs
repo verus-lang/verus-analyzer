@@ -55,6 +55,25 @@ verus! {
     spec const SPEC_VALUE: u64 = 7;
     exec const VALUE: u64 ensures VALUE == SPEC_VALUE { 7 }
     exec static STATIC_VALUE: u64 ensures true { 7 }
+
+    tracked struct Token<T> {
+        tracked value: T,
+    }
+
+    impl<T> Token<T> {
+        proof fn borrow(tracked &self) -> (tracked value: &T)
+            ensures *value == self.value,
+        {
+            &self.value
+        }
+    }
+
+    type Transform<T> = proof_fn[Send](tracked Token<T>) -> tracked Token<T>;
+
+    proof fn make_transform<T>() {
+        let tracked transform =
+            move proof_fn[Send]|tracked token: Token<T>| -> tracked Token<T> { token };
+    }
 }
 "#;
 

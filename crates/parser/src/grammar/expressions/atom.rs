@@ -664,7 +664,8 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(T![async]);
     p.eat(T![gen]);
     p.eat(T![move]);
-    if p.at_contextual_kw(T![proof_fn]) {
+    let is_proof_fn = p.at_contextual_kw(T![proof_fn]);
+    if is_proof_fn {
         verus::proof_fn(p);
     }
 
@@ -672,7 +673,11 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected `|`");
         return m.complete(p, CLOSURE_EXPR);
     }
-    params::param_list_closure(p);
+    if is_proof_fn {
+        params::param_list_proof_closure(p);
+    } else {
+        params::param_list_closure(p);
+    }
     let has_ret_type = verus::ret_type(p);
     if has_ret_type {
         // test_err closure_ret_recovery

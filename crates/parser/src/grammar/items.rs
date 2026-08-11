@@ -208,7 +208,8 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, is_in_extern: bool) -> Res
             || p.nth_at_contextual_kw(1, T![group])
             || p.nth_at_contextual_kw(1, T![spec])
             || p.nth_at_contextual_kw(1, T![proof])
-            || p.nth_at_contextual_kw(1, T![exec]))
+            || p.nth_at_contextual_kw(1, T![exec])
+            || p.nth_at_contextual_kw(1, T![axiom]))
         && p.eat_contextual_kw(T![broadcast])
     {
         has_mods = true;

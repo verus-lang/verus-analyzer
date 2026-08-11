@@ -87,6 +87,21 @@ fn f(mut matches: Matches) {
     matches.matches.sort_by(|a, b| {});
     let _ = matches!(matches.kind, Kind::Plain | Kind::Self_);
 }
+
+struct tracked;
+type Proof = proof_fn(tracked) -> i32;
+type ProofResult = proof_fn() -> tracked;
+
+mod tracked {
+    struct Value;
+}
+type QualifiedProof = proof_fn(tracked::Value) -> tracked::Value;
+
+fn proof_closure_parameter() {
+    let _ = proof_fn|tracked: i32| tracked;
+    let _ = proof_fn|tracked| tracked;
+    let _ = proof_fn|tracked @ _| tracked;
+}
 "#;
     let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
     assert!(!errors, "{actual}");
@@ -200,6 +215,66 @@ verus! {
     }
 }
 "#,
+        r#"
+verus! {
+    pub tracked struct Resource<T> {
+        tracked value: T,
+    }
+
+    impl<T> Resource<T> {
+        pub closed spec fn view(self) -> T {
+            self.value
+        }
+
+        pub proof fn borrow(tracked &self) -> (tracked value: &T)
+            ensures *value == self.value,
+        {
+            &self.value
+        }
+
+        pub axiom fn borrow_mut(tracked &mut self) -> tracked &mut T;
+    }
+
+    pub uninterp spec fn arbitrary<T>() -> T;
+
+    pub broadcast axiom fn extensional<T>(left: T, right: T)
+        ensures left === right,
+    ;
+
+    spec(checked) fn checked(value: int) -> nat
+        recommends value >= 0,
+        default_ensures true,
+    {
+        value as nat
+    }
+
+    proof fn apply<T, F>(
+        tracked function: proof_fn<F>(tracked T) -> tracked T,
+        tracked value: T,
+    ) -> (tracked result: T) {
+        function(value)
+    }
+
+    proof fn make<T>(tracked value: T) {
+        let tracked function = move proof_fn[Once]|tracked input: T| -> (tracked output: T)
+            requires true,
+            ensures true,
+        {
+            input
+        };
+        let tracked _ = function(value);
+    }
+
+    fn loop_contracts() {
+        loop
+            invariant true,
+            invariant_except_break true,
+            ensures true,
+            decreases 0,
+        {}
+    }
+}
+"#,
     ];
 
     for source in cases {
@@ -231,6 +306,40 @@ fn verus_operators(a: bool, b: bool) {
 "#;
     let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
     assert!(!errors, "{actual}");
+}
+
+#[test]
+fn incomplete_verus_syntax_recovers_to_following_items() {
+    let cases = [
+        r#"
+verus! {
+    proof fn incomplete(tracked value:) {}
+    fn after() {}
+}
+"#,
+        r#"
+verus! {
+    proof fn incomplete(value: int)
+        requires value >,
+    {}
+    fn after() {}
+}
+"#,
+        r#"
+verus! {
+    proof fn incomplete() {
+        let tracked function = proof_fn[Once]|tracked value:| -> tracked;
+    }
+    fn after() {}
+}
+"#,
+    ];
+
+    for source in cases {
+        let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+        assert!(errors, "expected errors in:\n{actual}");
+        assert!(actual.contains("IDENT \"after\""), "failed to recover in:\n{actual}");
+    }
 }
 
 fn parse(entry: TopEntryPoint, text: &str, edition: Edition) -> (String, bool) {
