@@ -123,6 +123,25 @@ impl<'t> Parser<'t> {
         }
     }
 
+    pub(crate) fn at_token_after_matching_paren(&self, n: usize, kind: SyntaxKind) -> bool {
+        assert_eq!(self.inp.kind(self.pos + n), T!['(']);
+
+        let mut depth = 0;
+        for pos in self.pos + n..self.inp.len() {
+            match self.inp.kind(pos) {
+                T!['('] => depth += 1,
+                T![')'] => {
+                    depth -= 1;
+                    if depth == 0 {
+                        return self.inp.kind(pos + 1) == kind;
+                    }
+                }
+                _ => {}
+            }
+        }
+        false
+    }
+
     /// Consume the next token if `kind` matches.
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
         if !self.at(kind) {

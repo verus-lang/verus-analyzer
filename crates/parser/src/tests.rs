@@ -284,6 +284,30 @@ verus! {
 }
 
 #[test]
+fn verus_named_tuple_return_type_parses() {
+    let source = r#"
+pub fn new() -> ((val, is_fresh): (u32, bool))
+    requires true,
+    ensures is_fresh,
+{
+    (0, true)
+}
+
+proof fn split() -> (tracked (left, right): (u32, bool))
+    ensures right,
+{
+    (0, true)
+}
+
+fn parenthesized_tuple() -> ((u32, bool)) {
+    (0, true)
+}
+"#;
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+}
+
+#[test]
 fn verus_repeated_operators_do_not_split_longer_rust_token_runs() {
     let source = r#"
 fn references(value: usize) {

@@ -858,6 +858,16 @@ fn contract(flag: bool, value: i32) -> (result: i32)
 {
     value
 }
+
+fn named_tuple() -> ((val, is_fresh): (u32, bool))
+    ensures
+        val > 0,
+     // ^^^ u32
+        is_fresh,
+     // ^^^^^^^^ bool
+{
+    (1, true)
+}
 "#,
     );
 }

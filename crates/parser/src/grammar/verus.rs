@@ -43,6 +43,15 @@ fn expr_list(p: &mut Parser<'_>) {
     }
 }
 
+fn at_named_ret_type(p: &Parser<'_>) -> bool {
+    if !p.at(T!['(']) {
+        return false;
+    }
+    let pat_start = if p.nth_at_contextual_kw(1, T![tracked]) { 2 } else { 1 };
+    p.nth_at(pat_start, IDENT) && p.nth_at(pat_start + 1, T![:]) && !p.nth_at(pat_start + 1, T![::])
+        || p.nth_at(pat_start, T!['(']) && p.at_token_after_matching_paren(pat_start, T![:])
+}
+
 pub(super) fn ret_type(p: &mut Parser<'_>) -> bool {
     if !p.at(T![->]) {
         return false;
@@ -59,10 +68,7 @@ pub(super) fn ret_type(p: &mut Parser<'_>) -> bool {
     {
         eat_kw(p, T![tracked]);
     }
-    if p.at(T!['('])
-        && (p.nth_at(1, IDENT) && p.nth_at(2, T![:]) && !p.nth_at(2, T![::])
-            || p.nth_at_contextual_kw(1, T![tracked]) && p.nth_at(2, IDENT) && p.nth_at(3, T![:]))
-    {
+    if at_named_ret_type(p) {
         p.bump(T!['(']);
         eat_kw(p, T![tracked]);
         patterns::pattern(p);
