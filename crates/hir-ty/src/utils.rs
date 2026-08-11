@@ -5,10 +5,12 @@ use std::iter::Enumerate;
 
 use base_db::target::{self, TargetData};
 use hir_def::{
-    EnumId, EnumVariantId, FunctionId, Lookup, TraitId, lang_item::LangItems,
-    signatures::FunctionSignature,
+    AdtId, EnumId, EnumVariantId, FunctionId, HasModule, Lookup, TraitId,
+    lang_item::LangItems,
+    signatures::{FunctionSignature, StructSignature},
 };
 use rustc_abi::TargetDataLayout;
+use rustc_type_ir::{InferTy, inherent::IntoKind};
 use span::Edition;
 
 use crate::{
@@ -17,10 +19,30 @@ use crate::{
     layout::{Layout, TagEncoding},
     lower::SupertraitsInfo,
     mir::pad16,
+    next_solver::{Ty, TyKind},
 };
 
 pub(crate) fn fn_traits(lang_items: &LangItems) -> impl Iterator<Item = TraitId> + '_ {
     [lang_items.Fn, lang_items.FnMut, lang_items.FnOnce].into_iter().flatten()
+}
+
+pub(crate) fn is_verus_integer(db: &dyn HirDatabase, ty: Ty<'_>) -> bool {
+    let Some((AdtId::StructId(id), _)) = ty.as_adt() else {
+        return false;
+    };
+    let is_verus_builtin = id
+        .module(db)
+        .krate(db)
+        .extra_data(db)
+        .display_name
+        .as_ref()
+        .is_some_and(|name| name.canonical_name().as_str() == "verus_builtin");
+    is_verus_builtin && matches!(StructSignature::of(db, id).name.as_str(), "int" | "nat")
+}
+
+pub(crate) fn is_integer_like(db: &dyn HirDatabase, ty: Ty<'_>) -> bool {
+    is_verus_integer(db, ty)
+        || matches!(ty.kind(), TyKind::Int(_) | TyKind::Uint(_) | TyKind::Infer(InferTy::IntVar(_)))
 }
 
 /// Returns an iterator over the direct super traits (including the trait itself).

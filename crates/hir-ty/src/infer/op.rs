@@ -18,6 +18,7 @@ use crate::{
         infer::traits::{Obligation, ObligationCause},
         obligation_ctxt::ObligationCtxt,
     },
+    utils::{is_integer_like, is_verus_integer},
 };
 
 impl<'db> InferenceContext<'db> {
@@ -184,6 +185,15 @@ impl<'db> InferenceContext<'db> {
             }
         };
         let lhs_ty = self.table.resolve_vars_with_obligations(lhs_ty);
+
+        if matches!(op, BinaryOp::CmpOp(_)) && is_verus_integer(self.db, lhs_ty) {
+            let rhs_ty = self.infer_expr_no_expect(rhs_expr, ExprIsRead::Yes);
+            let rhs_ty = self.table.resolve_vars_with_obligations(rhs_ty);
+            if !is_integer_like(self.db, rhs_ty) {
+                _ = self.demand_suptype(expr.into(), lhs_ty, rhs_ty);
+            }
+            return (lhs_ty, rhs_ty, self.types.types.bool);
+        }
 
         // N.B., as we have not yet type-checked the RHS, we don't have the
         // type at hand. Make a variable to represent it. The whole reason

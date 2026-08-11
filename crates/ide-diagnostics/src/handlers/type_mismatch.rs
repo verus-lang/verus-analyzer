@@ -491,6 +491,56 @@ mod tests {
     };
 
     #[test]
+    fn allows_verus_integer_comparisons_and_literals() {
+        check_diagnostics(
+            r#"
+//- minicore: derive, eq, ord
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::{int, nat};
+
+fn takes_int(_: int) {}
+
+spec fn compare(i: int, n: nat) -> bool {
+    takes_int(0);
+    i < n && n <= i && i == n
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+pub struct int;
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+pub struct nat;
+"#,
+        );
+    }
+
+    #[test]
+    fn rejects_non_verus_integer_comparisons_and_literals() {
+        check_diagnostics(
+            r#"
+//- minicore: derive, eq, ord
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+struct int;
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+struct nat;
+
+fn takes_int(_: int) {}
+
+fn compare(i: int, n: nat) -> bool {
+    takes_int(0);
+            //^ error: expected int, found i32
+    i == n
+       //^ error: expected int, found nat
+}
+"#,
+        );
+    }
+
+    #[test]
     fn missing_reference() {
         check_diagnostics(
             r#"

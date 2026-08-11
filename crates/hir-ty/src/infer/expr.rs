@@ -41,6 +41,7 @@ use crate::{
         },
         obligation_ctxt::ObligationCtxt,
     },
+    utils::is_verus_integer,
 };
 
 use super::{
@@ -892,6 +893,9 @@ impl<'db> InferenceContext<'db> {
                     tracing::debug!(?expected_ty);
                     let opt_ty = match expected_ty.as_ref().map(|it| it.kind()) {
                         Some(TyKind::Int(_) | TyKind::Uint(_)) => expected_ty,
+                        _ if expected_ty.is_some_and(|ty| is_verus_integer(self.db, ty)) => {
+                            expected_ty
+                        }
                         Some(TyKind::Char) => Some(self.types.types.u8),
                         Some(TyKind::RawPtr(..) | TyKind::FnDef(..) | TyKind::FnPtr(..)) => {
                             Some(self.types.types.usize)
@@ -904,6 +908,9 @@ impl<'db> InferenceContext<'db> {
                     let expected_ty = expected.to_option(&self.table);
                     let opt_ty = match expected_ty.as_ref().map(|it| it.kind()) {
                         Some(TyKind::Int(_) | TyKind::Uint(_)) => expected_ty,
+                        _ if expected_ty.is_some_and(|ty| is_verus_integer(self.db, ty)) => {
+                            expected_ty
+                        }
                         Some(TyKind::Char) => Some(self.types.types.u8),
                         Some(TyKind::RawPtr(..) | TyKind::FnDef(..) | TyKind::FnPtr(..)) => {
                             Some(self.types.types.usize)
