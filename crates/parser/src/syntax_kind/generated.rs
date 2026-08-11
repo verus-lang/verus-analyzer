@@ -203,6 +203,7 @@ pub enum SyntaxKind {
     UNINTERP_KW,
     UNION_KW,
     VERUS_KW,
+    VERUS__KW,
     VIA_KW,
     WHEN_KW,
     YEET_KW,
@@ -840,6 +841,7 @@ impl SyntaxKind {
             UNINTERP_KW => "uninterp",
             UNION_KW => "union",
             VERUS_KW => "verus",
+            VERUS__KW => "verus_",
             VIA_KW => "via",
             WHEN_KW => "when",
             YEET_KW => "yeet",
@@ -994,6 +996,7 @@ impl SyntaxKind {
             UNINTERP_KW => true,
             UNION_KW => true,
             VERUS_KW => true,
+            VERUS__KW => true,
             VIA_KW => true,
             WHEN_KW => true,
             YEET_KW => true,
@@ -1136,6 +1139,7 @@ impl SyntaxKind {
             UNINTERP_KW => true,
             UNION_KW => true,
             VERUS_KW => true,
+            VERUS__KW => true,
             VIA_KW => true,
             WHEN_KW => true,
             YEET_KW => true,
@@ -1352,6 +1356,7 @@ impl SyntaxKind {
             "uninterp" => UNINTERP_KW,
             "union" => UNION_KW,
             "verus" => VERUS_KW,
+            "verus_" => VERUS__KW,
             "via" => VIA_KW,
             "when" => WHEN_KW,
             "yeet" => YEET_KW,
@@ -1586,6 +1591,7 @@ macro_rules ! T_ {
     [uninterp] => { $ crate :: SyntaxKind :: UNINTERP_KW };
     [union] => { $ crate :: SyntaxKind :: UNION_KW };
     [verus] => { $ crate :: SyntaxKind :: VERUS_KW };
+    [verus_] => { $ crate :: SyntaxKind :: VERUS__KW };
     [via] => { $ crate :: SyntaxKind :: VIA_KW };
     [when] => { $ crate :: SyntaxKind :: WHEN_KW };
     [yeet] => { $ crate :: SyntaxKind :: YEET_KW };

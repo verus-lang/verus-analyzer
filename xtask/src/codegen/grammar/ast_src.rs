@@ -137,6 +137,7 @@ const CONTEXTUAL_KEYWORDS: &[&str] = &[
     "null",
     // Verus keywords remain contextual so valid Rust identifiers continue to parse.
     "verus",
+    "verus_",
     "group",
     "any",
     "none",

@@ -93,6 +93,15 @@ fn f(mut matches: Matches) {
 }
 
 #[test]
+fn verus_macro_alias_is_a_transparent_item_wrapper() {
+    let source = "verus_! { spec fn f() {} }";
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+    assert!(actual.lines().any(|line| line.trim() == "FN"), "{actual}");
+    assert!(!actual.contains("MACRO_CALL"), "{actual}");
+}
+
+#[test]
 fn verus_syntax_extensions_parse() {
     let cases = [
         r#"

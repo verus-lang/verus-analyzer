@@ -46,7 +46,11 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
 ]);
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool, is_in_extern: bool) {
-    if p.at_contextual_kw(T![verus]) && p.nth_at(1, T![!]) && p.nth_at(2, T!['{']) {
+    // vstd aliases `verus` as `verus_` in files that verusfmt cannot yet handle.
+    if (p.at_contextual_kw(T![verus]) || p.at_contextual_kw(T![verus_]))
+        && p.nth_at(1, T![!])
+        && p.nth_at(2, T!['{'])
+    {
         p.bump_remap(T![verus]);
         p.bump(T![!]);
         p.bump(T!['{']);

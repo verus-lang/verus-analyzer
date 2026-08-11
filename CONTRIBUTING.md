@@ -57,6 +57,23 @@ The server runs Verus when a Rust file is saved. `verus.enable` controls this be
 filtering, and `cargo.verusEnable` selects `cargo-verus` instead of direct invocation. The VS Code
 extension sets `VERUS_BINARY_PATH` for the server process.
 
+## Reproducing VS Code diagnostics from the CLI
+
+Use the exact server binary reported in the `verus-analyzer Extension` output, and run it from the
+project root with the same environment as VS Code:
+
+```bash
+/path/to/extension/server/verus-analyzer --version
+CARGO_NET_OFFLINE=true /path/to/extension/server/verus-analyzer \
+  diagnostics /absolute/path/to/project/src/file.rs
+```
+
+Only set `CARGO_NET_OFFLINE` when VS Code uses the same setting or the local Cargo cache requires it.
+Do not pass `--disable-build-scripts` or `--disable-proc-macros` unless the corresponding VS Code
+features are also disabled; both are enabled by default and can change the crate graph and
+diagnostics. Check command warnings as well: if `cargo metadata` fails and falls back to
+`--no-deps`, a clean diagnostic result does not match a successfully loaded VS Code workspace.
+
 ## Verus test matrix
 
 Run focused tests while developing:
