@@ -1375,6 +1375,56 @@ impl<'db> ExprCollector<'db> {
         }
     }
 
+    fn collect_chained_comparison(&mut self, expr: &ast::BinExpr) -> Option<ExprId> {
+        if !is_chainable_comparison(expr.op_kind()) {
+            return None;
+        }
+
+        // `a < b <= c` parses as `(a < b) <= c`; collect that left spine so each
+        // adjacent pair can be lowered as a comparison.
+        let mut comparisons = vec![expr.clone()];
+        let mut first_operand = expr.lhs()?;
+        while let ast::Expr::BinExpr(lhs) = &first_operand {
+            if !is_chainable_comparison(lhs.op_kind()) {
+                break;
+            }
+            comparisons.push(lhs.clone());
+            first_operand = lhs.lhs()?;
+        }
+        if comparisons.len() < 2 {
+            return None;
+        }
+
+        comparisons.reverse();
+        let mut previous_operand = self.collect_expr(first_operand);
+        let mut result = None;
+        for comparison in comparisons {
+            let op = comparison.op_kind();
+            let rhs = self.collect_expr_opt(comparison.rhs());
+            let ptr = AstPtr::new(&ast::Expr::BinExpr(comparison));
+            let comparison = match result {
+                None => self.alloc_expr(Expr::BinaryOp { lhs: previous_operand, rhs, op }, ptr),
+                Some(_) => self.alloc_expr_desugared_with_ptr(
+                    Expr::BinaryOp { lhs: previous_operand, rhs, op },
+                    ptr,
+                ),
+            };
+            previous_operand = rhs;
+            result = Some(match result {
+                None => comparison,
+                Some(lhs) => self.alloc_expr(
+                    Expr::BinaryOp {
+                        lhs,
+                        rhs: comparison,
+                        op: Some(ast::BinaryOp::LogicOp(ast::LogicOp::And)),
+                    },
+                    ptr,
+                ),
+            });
+        }
+        result
+    }
+
     /// Returns `None` if and only if the expression is `#[cfg]`d out.
     fn maybe_collect_expr(&mut self, expr: ast::Expr) -> Option<ExprId> {
         if !self.check_cfg(&expr) {
@@ -1802,6 +1852,9 @@ impl<'db> ExprCollector<'db> {
                 closure
             }),
             ast::Expr::BinExpr(e) => {
+                if let Some(expr) = self.collect_chained_comparison(&e) {
+                    return Some(expr);
+                }
                 let op = e.op_kind();
                 if let Some(ast::BinaryOp::Assignment { op: None }) = op {
                     let target = self.collect_expr_as_pat_opt(e.lhs());
@@ -3660,6 +3713,16 @@ impl<'db> ExprCollector<'db> {
             Default::default()
         }
     }
+}
+
+fn is_chainable_comparison(op: Option<ast::BinaryOp>) -> bool {
+    matches!(
+        op,
+        Some(
+            ast::BinaryOp::CmpOp(ast::CmpOp::Ord { .. })
+                | ast::BinaryOp::CmpOp(ast::CmpOp::Eq { negated: false })
+        )
+    )
 }
 
 fn comma_follows_token(t: Option<syntax::SyntaxToken>) -> bool {

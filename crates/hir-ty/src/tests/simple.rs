@@ -747,6 +747,21 @@ fn test() -> bool {
 }
 
 #[test]
+fn infer_verus_chained_comparisons() {
+    check_no_mismatches(
+        r#"
+spec fn in_range(value: i32) -> bool {
+    1 <= value <= 4
+}
+
+spec fn mixed_chain(value: i32) -> bool {
+    0 < value <= 4 > 3 >= 2 == 2
+}
+"#,
+    );
+}
+
+#[test]
 fn infer_shift_op() {
     check_infer(
         r#"
