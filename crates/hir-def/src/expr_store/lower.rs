@@ -51,8 +51,8 @@ use crate::{
     hir::{
         Array, Binding, BindingAnnotation, BindingId, BindingProblems, CaptureBy, ClosureKind,
         CoroutineKind, CoroutineSource, Expr, ExprId, Item, Label, LabelId, Literal, LoopSource,
-        MatchArm, Movability, OffsetOf, Pat, PatId, RecordFieldPat, RecordLitField, RecordSpread,
-        Statement, generics::GenericParams,
+        MatchArm, Movability, OffsetOf, Pat, PatId, QuantifierKind, RecordFieldPat, RecordLitField,
+        RecordSpread, Statement, generics::GenericParams,
     },
     item_scope::BuiltinShadowMode,
     item_tree::FieldsShape,
@@ -1431,6 +1431,50 @@ impl<'db> ExprCollector<'db> {
             return None;
         }
         let syntax_ptr = AstPtr::new(&expr);
+
+        if let ast::Expr::ClosureExpr(e) = &expr {
+            let quantifier_kind = if e.forall_token().is_some() {
+                Some(QuantifierKind::Forall)
+            } else if e.exists_token().is_some() {
+                Some(QuantifierKind::Exists)
+            } else if e.choose_token().is_some() {
+                Some(QuantifierKind::Choose)
+            } else {
+                None
+            };
+            if let Some(quantifier_kind) = quantifier_kind {
+                return Some(self.with_label_rib(RibKind::Closure, |this| {
+                    let mut args = Vec::new();
+                    let mut arg_types = Vec::new();
+                    if let Some(pl) = e.param_list() {
+                        let num_params = pl.params().count();
+                        args.reserve_exact(num_params);
+                        arg_types.reserve_exact(num_params);
+                        for param in pl.params() {
+                            if !this.check_cfg(&param) {
+                                continue;
+                            }
+
+                            let pat = this.collect_pat_top(param.pat());
+                            let type_ref =
+                                param.ty().map(|it| this.lower_type_ref_disallow_impl_trait(it));
+                            args.push(pat);
+                            arg_types.push(type_ref);
+                        }
+                    }
+                    let body = this.collect_expr_opt(e.body());
+                    this.alloc_expr(
+                        Expr::Quantifier {
+                            args: args.into(),
+                            arg_types: arg_types.into(),
+                            body,
+                            quantifier_kind,
+                        },
+                        syntax_ptr,
+                    )
+                }));
+            }
+        }
 
         // FIXME: Move some of these arms out into separate methods for clarity
         Some(match expr {

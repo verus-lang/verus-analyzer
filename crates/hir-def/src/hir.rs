@@ -420,6 +420,12 @@ pub enum Expr {
         closure_kind: ClosureKind,
         capture_by: CaptureBy,
     },
+    Quantifier {
+        args: Box<[PatId]>,
+        arg_types: Box<[Option<TypeRefId>]>,
+        body: ExprId,
+        quantifier_kind: QuantifierKind,
+    },
     Tuple {
         exprs: Box<[ExprId]>,
     },
@@ -494,6 +500,7 @@ impl Expr {
             Expr::Become { .. }
             | Expr::Break { .. }
             | Expr::Closure { .. }
+            | Expr::Quantifier { .. }
             | Expr::Return { .. }
             | Expr::Yeet { .. }
             | Expr::Yield { .. } => ExprPrecedence::Jump,
@@ -670,6 +677,13 @@ pub enum ClosureKind {
     OldCoroutine(Movability),
     Coroutine { kind: CoroutineKind, source: CoroutineSource },
     CoroutineClosure(CoroutineKind),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum QuantifierKind {
+    Forall,
+    Exists,
+    Choose,
 }
 
 /// In the case of a coroutine created as part of an async/gen construct,

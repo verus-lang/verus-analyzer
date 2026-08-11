@@ -484,6 +484,7 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
             | Expr::Assume { .. }
             | Expr::Final { .. }
             | Expr::View { .. }
+            | Expr::Quantifier { .. }
             | Expr::Is { .. }
             | Expr::Has { .. }
             | Expr::Arrow { .. }

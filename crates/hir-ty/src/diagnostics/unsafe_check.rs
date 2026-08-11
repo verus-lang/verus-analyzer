@@ -421,7 +421,7 @@ impl<'db> UnsafeVisitor<'db> {
             &Expr::Let { pat, .. } => {
                 self.walk_pats_top(std::iter::once(pat), current);
             }
-            Expr::Closure { args, .. } => {
+            Expr::Closure { args, .. } | Expr::Quantifier { args, .. } => {
                 self.walk_pats_top(args.iter().copied(), current);
             }
             _ => {}

@@ -713,6 +713,10 @@ impl<'a, 'db, D: Delegate<'db>> ExprUseVisitor<'a, 'db, D> {
                 self.walk_captures(expr);
             }
 
+            Expr::Quantifier { body, .. } => {
+                self.consume_expr(body)?;
+            }
+
             Expr::Yield { expr: value } | Expr::Yeet { expr: value } => {
                 if let Some(value) = value {
                     self.consume_expr(value)?;

@@ -355,6 +355,14 @@ impl StoreVisitor for ExprScopeVisitor<'_> {
                     this.on_expr(*body);
                 });
             }
+            Expr::Quantifier { args, arg_types, body, quantifier_kind: _ } => {
+                arg_types.iter().for_each(|type_ref| self.on_type_opt(*type_ref));
+                let scope = self.scopes.new_scope(self.scope);
+                self.with_scope(scope, |this| {
+                    this.on_pats(args);
+                    this.on_expr(*body);
+                });
+            }
             Expr::Match { expr, arms } => {
                 self.on_expr(*expr);
                 for arm in arms.iter() {

@@ -8,8 +8,8 @@ use hir_def::{
     expr_store::path::{GenericArgs as HirGenericArgs, Path},
     hir::{
         Array, AsmOperand, AsmOptions, BinaryOp, BindingAnnotation, Expr, ExprId,
-        ExprOrPatIdPacked, InlineAsmKind, LabelId, LoopSource, Pat, PatId, RecordLitField,
-        RecordSpread, Statement, UnaryOp,
+        ExprOrPatIdPacked, InlineAsmKind, LabelId, LoopSource, Pat, PatId, QuantifierKind,
+        RecordLitField, RecordSpread, Statement, UnaryOp,
     },
     resolver::ValueNs,
     signatures::VariantFields,
@@ -249,6 +249,7 @@ impl<'db> InferenceContext<'db> {
             | Expr::If { .. }
             | Expr::Match { .. }
             | Expr::Closure { .. }
+            | Expr::Quantifier { .. }
             | Expr::Block { .. }
             | Expr::Array(..)
             | Expr::Break { .. }
@@ -505,6 +506,33 @@ impl<'db> InferenceContext<'db> {
                     tgt_expr,
                     expected,
                 ),
+            Expr::Quantifier { args, arg_types, body, quantifier_kind } => {
+                let arg_tys = args
+                    .iter()
+                    .zip(arg_types)
+                    .map(|(&arg, &arg_type)| {
+                        arg_type
+                            .map(|type_ref| {
+                                let ty = self.make_body_ty(type_ref);
+                                self.insert_type_vars_shallow(ty)
+                            })
+                            .unwrap_or_else(|| self.table.next_ty_var(arg.into()))
+                    })
+                    .collect::<Vec<_>>();
+                for (&arg, &arg_ty) in args.iter().zip(&arg_tys) {
+                    self.infer_top_pat(arg, arg_ty, PatOrigin::Param);
+                }
+                self.infer_expr_coerce_never(
+                    *body,
+                    &Expectation::HasType(self.types.types.bool),
+                    ExprIsRead::Yes,
+                );
+                match quantifier_kind {
+                    QuantifierKind::Forall | QuantifierKind::Exists => self.types.types.bool,
+                    QuantifierKind::Choose if arg_tys.len() == 1 => arg_tys[0],
+                    QuantifierKind::Choose => Ty::new_tup(self.interner(), &arg_tys),
+                }
+            }
             Expr::Call { callee, args, .. } => self.infer_call(tgt_expr, *callee, args, expected),
             Expr::MethodCall { receiver, args, method_name, generic_args } => self
                 .infer_method_call(

@@ -770,6 +770,11 @@ impl ExpressionStore {
                 arg_types.iter().for_each(|arg_type| visitor.on_type_opt(*arg_type));
                 visitor.on_type_opt(*ret_type);
             }
+            Expr::Quantifier { args, arg_types, body, quantifier_kind: _ } => {
+                visitor.on_expr(*body);
+                visitor.on_pats(args);
+                arg_types.iter().for_each(|arg_type| visitor.on_type_opt(*arg_type));
+            }
             Expr::BinaryOp { lhs, rhs, op: _ } => {
                 visitor.on_expr(*lhs);
                 visitor.on_expr(*rhs);

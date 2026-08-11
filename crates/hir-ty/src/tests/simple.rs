@@ -762,6 +762,58 @@ spec fn mixed_chain(value: i32) -> bool {
 }
 
 #[test]
+fn infer_verus_quantifiers() {
+    let fixture = r#"
+//- minicore: index
+use core::ops::Index;
+
+struct Map;
+
+impl Map {
+    fn contains_key(&self, key: i32) -> bool {
+        loop {}
+    }
+}
+
+impl Index<i32> for Map {
+    type Output = i32;
+
+    fn index(&self, key: i32) -> &i32 {
+        loop {}
+    }
+}
+
+spec fn all_values_are_positive(map: &Map) -> bool {
+    forall|key| map.contains_key(key) ==>
+        map[key] > 0
+     // ^^^^^^^^ type: i32
+}
+
+spec fn has_positive_value(map: &Map) -> bool {
+    exists|key| map.contains_key(key) && map[key] > 0
+}
+
+spec fn choose_key(map: &Map) -> i32 {
+    choose|key| map.contains_key(key)
+}
+
+spec fn choose_pair(map: &Map) -> (i32, bool) {
+    choose|key, present| map.contains_key(key) == present
+}
+
+proof fn assert_all_values_are_positive(map: &Map) {
+    assert forall|key| map.contains_key(key) ==> map[key] > 0 by {}
+}
+
+fn closure_with_quantifier(map: Map) {
+    let predicate = || forall|key| map.contains_key(key);
+    let _: bool = predicate();
+}
+"#;
+    check(fixture);
+}
+
+#[test]
 fn infer_shift_op() {
     check_infer(
         r#"

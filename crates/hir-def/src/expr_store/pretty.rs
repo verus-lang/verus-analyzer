@@ -19,7 +19,7 @@ use crate::{
     expr_store::path::{GenericArg, GenericArgs},
     hir::{
         Array, BindingAnnotation, CaptureBy, ClosureKind, CoroutineKind, Literal, Movability,
-        RecordSpread, Statement,
+        QuantifierKind, RecordSpread, Statement,
         generics::{GenericParams, WherePredicate},
     },
     lang_item::LangItemTarget,
@@ -825,6 +825,26 @@ impl Printer<'_> {
                     self.whitespace();
                 }
                 self.print_expr(body);
+            }
+            Expr::Quantifier { args, arg_types, body, quantifier_kind } => {
+                match quantifier_kind {
+                    QuantifierKind::Forall => w!(self, "forall"),
+                    QuantifierKind::Exists => w!(self, "exists"),
+                    QuantifierKind::Choose => w!(self, "choose"),
+                }
+                w!(self, "|");
+                for (i, (pat, ty)) in args.iter().zip(arg_types.iter()).enumerate() {
+                    if i != 0 {
+                        w!(self, ", ");
+                    }
+                    self.print_pat(*pat);
+                    if let Some(ty) = ty {
+                        w!(self, ": ");
+                        self.print_type_ref(*ty);
+                    }
+                }
+                w!(self, "| ");
+                self.print_expr(*body);
             }
             Expr::Tuple { exprs } => {
                 w!(self, "(");
