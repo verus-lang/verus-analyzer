@@ -4,7 +4,7 @@ use std::{iter::repeat_with, mem};
 
 use either::Either;
 use hir_def::{
-    AdtId, FieldId, TupleFieldId, TupleId, VariantId,
+    AdtId, FieldId, Lookup, TupleFieldId, TupleId, VariantId,
     expr_store::path::{GenericArgs as HirGenericArgs, Path},
     hir::{
         Array, AsmOperand, AsmOptions, BinaryOp, BindingAnnotation, Expr, ExprId,
@@ -13,6 +13,7 @@ use hir_def::{
     },
     resolver::ValueNs,
     signatures::VariantFields,
+    src::HasSource,
 };
 use hir_def::{FunctionId, hir::ClosureKind};
 use hir_expand::name::Name;
@@ -834,6 +835,19 @@ impl<'db> InferenceContext<'db> {
                         );
                         self.table.select_obligations_where_possible();
                         trait_element_ty
+                    }
+                    None if let Some((spec_index_ty, element_ty)) =
+                        self.lookup_verus_spec_index(tgt_expr, *base, base_t) =>
+                    {
+                        self.demand_coerce(
+                            *index,
+                            idx_t,
+                            spec_index_ty,
+                            AllowTwoPhase::No,
+                            ExprIsRead::Yes,
+                        );
+                        self.table.select_obligations_where_possible();
+                        element_ty
                     }
                     None => {
                         self.push_diagnostic(InferenceDiagnostic::CannotIndexInto {
@@ -1797,6 +1811,43 @@ impl<'db> InferenceContext<'db> {
                 (ty, Either::Left(field_id), adjustments, false)
             }
         })
+    }
+
+    fn lookup_verus_spec_index(
+        &mut self,
+        expr: ExprId,
+        base_expr: ExprId,
+        base_ty: Ty<'db>,
+    ) -> Option<(Ty<'db>, Ty<'db>)> {
+        let pick =
+            self.lookup_probe(expr, base_expr, Name::new_root("spec_index"), base_ty).ok()?;
+        let CandidateId::FunctionId(function) = pick.item else {
+            return None;
+        };
+        let source = function.lookup(self.db).source(self.db);
+        if !source.value.fn_mode().is_some_and(|mode| mode.spec_token().is_some()) {
+            return None;
+        }
+
+        let (method, visible) = self
+            .lookup_method_including_private(
+                base_ty,
+                Name::new_root("spec_index"),
+                None,
+                base_expr,
+                expr,
+            )
+            .ok()?;
+        if !visible {
+            return None;
+        }
+
+        // This is a value-producing Verus operation, not Rust's place-producing Index trait.
+        self.result.method_resolutions.remove(&expr);
+        let [_, index_ty] = method.sig.inputs_and_output.inputs() else {
+            return None;
+        };
+        Some((*index_ty, method.sig.output()))
     }
 
     fn infer_field_access(

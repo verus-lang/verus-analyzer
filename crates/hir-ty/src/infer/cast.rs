@@ -1,9 +1,9 @@
 //! Type cast logic. Basically coercion + additional casts.
 
 use hir_def::{
-    AdtId,
+    AdtId, HasModule,
     hir::ExprId,
-    signatures::{TraitFlags, TraitSignature},
+    signatures::{StructSignature, TraitFlags, TraitSignature},
 };
 use rustc_ast_ir::Mutability;
 use rustc_hash::FxHashSet;
@@ -145,6 +145,10 @@ impl<'db> CastCheck<'db> {
         }
 
         if self.expr_ty.references_non_lt_error() || self.cast_ty.references_non_lt_error() {
+            return Ok(());
+        }
+
+        if is_verus_integer_cast(ctx.db, self.expr_ty, self.cast_ty) {
             return Ok(());
         }
 
@@ -497,6 +501,34 @@ impl<'db> CastCheck<'db> {
             _ => Err(CastError::IllegalCast),
         }
     }
+}
+
+fn is_verus_integer_cast(db: &dyn HirDatabase, from: Ty<'_>, to: Ty<'_>) -> bool {
+    fn is_verus_integer(db: &dyn HirDatabase, ty: Ty<'_>) -> bool {
+        let Some((AdtId::StructId(id), _)) = ty.as_adt() else {
+            return false;
+        };
+        let is_verus_builtin = id
+            .module(db)
+            .krate(db)
+            .extra_data(db)
+            .display_name
+            .as_ref()
+            .is_some_and(|name| name.canonical_name().as_str() == "verus_builtin");
+        is_verus_builtin && matches!(StructSignature::of(db, id).name.as_str(), "int" | "nat")
+    }
+
+    fn is_integer(db: &dyn HirDatabase, ty: Ty<'_>) -> bool {
+        is_verus_integer(db, ty)
+            || matches!(
+                ty.kind(),
+                TyKind::Int(_) | TyKind::Uint(_) | TyKind::Infer(InferTy::IntVar(_))
+            )
+    }
+
+    (is_verus_integer(db, from) || is_verus_integer(db, to))
+        && is_integer(db, from)
+        && is_integer(db, to)
 }
 
 /// The kind of pointer and associated metadata (thin, length or vtable) - we

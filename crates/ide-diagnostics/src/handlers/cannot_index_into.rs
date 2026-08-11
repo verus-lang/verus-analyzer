@@ -74,4 +74,45 @@ fn f(x: Bag) {
 "#,
         );
     }
+
+    #[test]
+    fn allows_verus_spec_indexing() {
+        check_diagnostics(
+            r#"
+#[allow(non_camel_case_types)]
+struct int;
+struct Seq<A>(A);
+
+impl<A> Seq<A> {
+    spec fn spec_index(self, _: int) -> A {
+        loop {}
+    }
+}
+
+spec fn f(seq: Seq<i32>, i: int) -> i32 {
+    seq[i]
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn ordinary_spec_index_method_does_not_enable_indexing() {
+        check_diagnostics(
+            r#"
+struct Bag;
+
+impl Bag {
+    fn spec_index(self, _: i32) -> i32 {
+        0
+    }
+}
+
+fn f(bag: Bag) -> i32 {
+    bag[0]
+  //^^^^^^ error: cannot index into a value of type `Bag`
+}
+"#,
+        );
+    }
 }

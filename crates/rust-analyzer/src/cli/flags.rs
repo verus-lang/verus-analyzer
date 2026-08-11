@@ -119,7 +119,7 @@ xflags::xflags! {
         }
 
         cmd diagnostics {
-            /// Directory with Cargo.toml or rust-project.json.
+            /// Directory with Cargo.toml or rust-project.json, or a Rust source file.
             required path: PathBuf
 
             /// Don't run build scripts or load `OUT_DIR` values by running `cargo check` before analysis.

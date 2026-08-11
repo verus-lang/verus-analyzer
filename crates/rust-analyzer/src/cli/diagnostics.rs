@@ -23,12 +23,19 @@ impl flags::Diagnostics {
         handle.join()
     }
     fn run_(self, verbosity: Verbosity) -> anyhow::Result<()> {
+        let current_dir = std::env::current_dir()?;
+        let only_file = self.path.is_file().then(|| {
+            let path = current_dir.join(&self.path);
+            vfs::VfsPath::from(vfs::AbsPathBuf::assert_utf8(path))
+        });
         let cargo_config = CargoConfig {
             sysroot: Some(RustLibSource::Discover),
             all_targets: true,
             ..Default::default()
         };
-        let with_proc_macro_server = if let Some(p) = &self.proc_macro_srv {
+        let with_proc_macro_server = if self.disable_proc_macros {
+            ProcMacroServerChoice::None
+        } else if let Some(p) = &self.proc_macro_srv {
             let path = vfs::AbsPathBuf::assert_utf8(std::env::current_dir()?.join(p));
             ProcMacroServerChoice::Explicit(path)
         } else {
@@ -51,15 +58,29 @@ impl flags::Diagnostics {
         let mut visited_files = FxHashSet::default();
         let min_severity = self.severity.unwrap_or(flags::Severity::Weak);
 
+        let mut diagnostics_config = DiagnosticsConfig::test_sample();
+        diagnostics_config.proc_macros_enabled = true;
+        diagnostics_config.proc_attr_macros_enabled = true;
+        diagnostics_config.disable_experimental = true;
+        diagnostics_config.style_lints = false;
+
         let work = all_modules(db)
             .into_iter()
             .filter(|module| {
                 let file_id = module.definition_source_file_id(db).original_file(db);
+                if let Some(only_file) = &only_file {
+                    return _vfs.file_path(file_id.file_id(db)) == only_file;
+                }
                 let source_root = db.file_source_root(file_id.file_id(db)).source_root_id(db);
                 let source_root = db.source_root(source_root).source_root(db);
                 !source_root.is_library
             })
             .collect::<Vec<_>>();
+        if work.is_empty()
+            && let Some(only_file) = only_file
+        {
+            anyhow::bail!("{} is not a module in the loaded workspace", only_file);
+        }
 
         let mut bar = if verbosity.is_quiet() {
             ProgressReport::hidden()
@@ -79,7 +100,7 @@ impl flags::Diagnostics {
                     .to_owned();
                 for diagnostic in analysis
                     .full_diagnostics(
-                        &DiagnosticsConfig::test_sample(),
+                        &diagnostics_config,
                         AssistResolveStrategy::None,
                         file_id.file_id(db),
                     )

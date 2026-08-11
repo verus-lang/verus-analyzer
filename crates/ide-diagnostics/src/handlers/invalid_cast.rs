@@ -131,6 +131,43 @@ mod tests {
     use crate::tests::{check_diagnostics, check_diagnostics_with_disabled};
 
     #[test]
+    fn allows_verus_integer_cast() {
+        check_diagnostics(
+            r#"
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::{int, nat};
+
+spec fn f(value: nat) -> int {
+    value as int
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+pub struct int;
+#[allow(non_camel_case_types)]
+pub struct nat;
+"#,
+        );
+    }
+
+    #[test]
+    fn ordinary_int_and_nat_structs_do_not_enable_casts() {
+        check_diagnostics(
+            r#"
+#[allow(non_camel_case_types)]
+struct int;
+#[allow(non_camel_case_types)]
+struct nat;
+
+fn f(value: nat) -> int {
+    value as int
+  //^^^^^^^^^^^^ error: non-primitive cast: `nat` as `int`
+}
+"#,
+        );
+    }
+
+    #[test]
     fn cast_as_bool() {
         check_diagnostics(
             r#"
