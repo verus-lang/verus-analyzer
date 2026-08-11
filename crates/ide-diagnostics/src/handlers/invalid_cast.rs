@@ -151,6 +151,29 @@ pub struct nat;
     }
 
     #[test]
+    fn allows_payload_free_enum_cast_to_verus_integer() {
+        check_diagnostics(
+            r#"
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::int;
+
+#[repr(u32)]
+enum State {
+    Ready,
+}
+
+spec fn state_value(state: State) -> int {
+    state as int
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+pub struct int;
+"#,
+        );
+    }
+
+    #[test]
     fn ordinary_int_and_nat_structs_do_not_enable_casts() {
         check_diagnostics(
             r#"

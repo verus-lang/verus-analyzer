@@ -105,7 +105,7 @@ use crate::{
         infer::{InferCtxt, ObligationInspector, traits::ObligationCause},
     },
     solver_errors::SolverDiagnostic,
-    utils::TargetFeatureIsSafeInTarget,
+    utils::{TargetFeatureIsSafeInTarget, is_integer_like},
 };
 
 // This lint has a false positive here. See the link below for details.
@@ -1342,6 +1342,7 @@ pub(crate) struct InferenceContext<'db> {
     pub(crate) generic_def: GenericDefId,
     pub(crate) store: &'db ExpressionStore,
     pub(crate) lowering_mode: LoweringMode,
+    pub(crate) is_verus_non_exec: bool,
     /// Generally you should not resolve things via this resolver. Instead create a TyLoweringContext
     /// and resolve the path via its methods. This will ensure proper error reporting.
     pub(crate) resolver: Resolver<'db>,
@@ -1443,6 +1444,12 @@ impl<'db> InferenceContext<'db> {
         let trait_env = db.trait_environment(generic_def);
         let table = unify::InferenceTable::new(db, trait_env, resolver.krate(), owner);
         let types = crate::next_solver::default_types(db);
+        let is_verus_non_exec = match generic_def {
+            GenericDefId::FunctionId(function) => {
+                FunctionSignature::of(db, function).is_verus_non_exec()
+            }
+            _ => false,
+        };
         InferenceContext {
             result: InferenceResult::new(types.types.error),
             return_ty: types.types.error, // set in collect_* calls
@@ -1473,6 +1480,7 @@ impl<'db> InferenceContext<'db> {
             deferred_call_resolutions: FxHashMap::default(),
             defined_anon_consts: RefCell::new(ThinVec::new()),
             lowering_mode,
+            is_verus_non_exec,
         }
     }
 
@@ -2222,6 +2230,14 @@ impl<'db> InferenceContext<'db> {
         expected: Ty<'db>,
         found: Ty<'db>,
     ) {
+        let resolved_expected = self.resolve_vars_if_possible(expected);
+        let resolved_found = self.resolve_vars_if_possible(found);
+        if self.is_verus_non_exec
+            && is_integer_like(self.db, resolved_expected)
+            && is_integer_like(self.db, resolved_found)
+        {
+            return;
+        }
         if self.result.nodes_with_type_mismatches.get_or_insert_default().insert(node) {
             self.diagnostics.push(InferenceDiagnostic::TypeMismatch {
                 node,

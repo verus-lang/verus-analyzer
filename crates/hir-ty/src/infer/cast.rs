@@ -506,8 +506,10 @@ impl<'db> CastCheck<'db> {
 
 fn is_verus_integer_cast(db: &dyn HirDatabase, from: Ty<'_>, to: Ty<'_>) -> bool {
     (is_verus_integer(db, from) || is_verus_integer(db, to))
-        && is_integer_like(db, from)
-        && is_integer_like(db, to)
+        && (is_integer_like(db, from)
+            || matches!(CastTy::from_ty(db, from), Some(CastTy::Int(Int::CEnum))))
+        && (is_integer_like(db, to)
+            || matches!(CastTy::from_ty(db, to), Some(CastTy::Int(Int::CEnum))))
 }
 
 /// The kind of pointer and associated metadata (thin, length or vtable) - we

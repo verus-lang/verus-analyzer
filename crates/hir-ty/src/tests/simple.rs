@@ -898,6 +898,31 @@ fn caller(input: u32) -> u32 {
 }
 
 #[test]
+fn infer_tracked_parameter_in_struct_literal() {
+    check_no_mismatches(
+        r#"
+struct Tickets;
+
+impl Tickets {
+    spec fn count(&self) -> usize {
+        0
+    }
+}
+
+struct Entry {
+    id: usize,
+}
+
+proof fn make_entry(tracked tickets: &mut Tickets) {
+    let tracked entry = Entry {
+        id: tickets.count(),
+    };
+}
+"#,
+    );
+}
+
+#[test]
 fn infer_verus_expressions_and_proof_functions() {
     check_types(
         r#"

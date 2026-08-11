@@ -1419,6 +1419,27 @@ fn f<'de, T: Deserialize<'de>>() {
 }
 
 #[test]
+fn highlight_verus_logically_atomic_call() {
+    let (analysis, file_id) = fixture::file(
+        r#"
+fn atomic(value: u32) -> u32 {
+    value
+}
+
+fn caller(input: u32) -> u32 {
+    atomic(input) 'retry: atomically loop |update| -> (au: bool) {
+        let _ = update(input);
+        let flag = au;
+        break 'retry;
+    }
+}
+"#
+        .trim(),
+    );
+    let _ = analysis.highlight(HL_CONFIG, file_id).unwrap();
+}
+
+#[test]
 fn test_asm_highlighting() {
     check_highlighting(
         r#"

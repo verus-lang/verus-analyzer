@@ -517,6 +517,96 @@ pub struct nat;
     }
 
     #[test]
+    fn allows_mixed_primitive_integer_comparisons_in_proof_functions() {
+        check_diagnostics(
+            r#"
+//- minicore: derive, eq, ord
+proof fn compare(left: usize, right: u64) -> bool {
+    left < right
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn allows_integer_coercions_in_proof_functions() {
+        check_diagnostics(
+            r#"
+//- minicore: derive, eq, ord
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::nat;
+
+struct Ticket {
+    id: nat,
+}
+
+spec fn count() -> usize {
+    0
+}
+
+fn takes_nat(_: nat) {}
+
+proof fn use_integer_coercions() {
+    let _ = Ticket { id: count() };
+    let index = choose|i| 0 <= i;
+    takes_nat(index);
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+pub struct nat;
+"#,
+        );
+    }
+
+    #[test]
+    fn rejects_integer_coercions_in_exec_functions() {
+        check_diagnostics(
+            r#"
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::nat;
+
+fn takes_nat(_: nat) {}
+
+fn use_integer_coercion(value: usize) {
+    takes_nat(value);
+            //^^^^^ error: expected nat, found usize
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+pub struct nat;
+"#,
+        );
+    }
+
+    #[test]
+    fn matches_binding_is_available_to_following_conjuncts() {
+        check_diagnostics(
+            r#"
+//- minicore: derive, eq
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+enum Outcome {
+    Positive(i32),
+    Other,
+}
+
+fn is_positive(result: Result<Outcome, ()>) -> bool {
+    result matches Result::Ok(result) && match result {
+        Outcome::Positive(value) => value > 0,
+        Outcome::Other => false,
+    }
+}
+"#,
+        );
+    }
+
+    #[test]
     fn rejects_non_verus_integer_comparisons_and_literals() {
         check_diagnostics(
             r#"

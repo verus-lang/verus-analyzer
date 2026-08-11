@@ -606,6 +606,7 @@ bitflags! {
         const EXPLICIT_SAFE = 1 << 12;
         const HAS_LEGACY_CONST_GENERICS = 1 << 13;
         const RUSTC_INTRINSIC = 1 << 14;
+        const VERUS_NON_EXEC = 1 << 15;
     }
 }
 
@@ -678,6 +679,9 @@ impl FunctionSignature {
         }
         if source.value.body().is_some() {
             flags.insert(FnFlags::HAS_BODY);
+        }
+        if source.value.fn_mode().is_some_and(|mode| mode.exec_token().is_none()) {
+            flags.insert(FnFlags::VERUS_NON_EXEC);
         }
 
         let name = as_name_opt(source.value.name());
@@ -762,6 +766,10 @@ impl FunctionSignature {
 
     pub fn is_varargs(&self) -> bool {
         self.flags.contains(FnFlags::HAS_VARARGS)
+    }
+
+    pub fn is_verus_non_exec(&self) -> bool {
+        self.flags.contains(FnFlags::VERUS_NON_EXEC)
     }
 
     pub fn has_target_feature(&self) -> bool {

@@ -4017,7 +4017,9 @@ impl<'db> LocalSource<'db> {
 impl<'db> Local<'db> {
     pub fn is_param(self, db: &dyn HirDatabase) -> bool {
         // FIXME: This parses!
-        let src = self.primary_source(db);
+        let Some(src) = self.try_primary_source(db) else {
+            return false;
+        };
         match src.source.value {
             Either::Left(pat) => pat
                 .syntax()
@@ -4119,6 +4121,10 @@ impl<'db> Local<'db> {
 
     /// The leftmost definition for this local. Example: `let (a$0, _) | (_, a) = it;`
     pub fn primary_source(self, db: &dyn HirDatabase) -> LocalSource<'db> {
+        self.try_primary_source(db).expect("local has no source")
+    }
+
+    fn try_primary_source(self, db: &dyn HirDatabase) -> Option<LocalSource<'db>> {
         let b;
         let (_, source_map) = match self.parent {
             ExpressionStoreOwnerId::Signature(generic_def_id) => {
@@ -4130,10 +4136,10 @@ impl<'db> Local<'db> {
                     && let Some(source) = b.1.self_param_syntax()
                 {
                     let root = source.file_syntax(db);
-                    return LocalSource {
+                    return Some(LocalSource {
                         local: self,
                         source: source.map(|ast| Either::Right(ast.to_node(&root))),
-                    };
+                    });
                 }
                 (&b.0.store, &b.1.store)
             }
@@ -4141,21 +4147,17 @@ impl<'db> Local<'db> {
                 ExpressionStore::with_source_map(db, def.into())
             }
         };
-        source_map
-            .patterns_for_binding(self.binding_id)
-            .first()
-            .map(|&definition| {
-                let src = source_map.pat_syntax(definition).unwrap(); // Hmm...
-                let root = src.file_syntax(db);
-                LocalSource {
-                    local: self,
-                    source: src.map(|ast| match ast.to_node(&root) {
-                        Either::Right(ast::Pat::IdentPat(it)) => Either::Left(it),
-                        _ => unreachable!("local with non ident-pattern"),
-                    }),
-                }
+        source_map.patterns_for_binding(self.binding_id).first().and_then(|&definition| {
+            let src = source_map.pat_syntax(definition).ok()?;
+            let root = src.file_syntax(db);
+            Some(LocalSource {
+                local: self,
+                source: src.map(|ast| match ast.to_node(&root) {
+                    Either::Right(ast::Pat::IdentPat(it)) => Either::Left(it),
+                    _ => unreachable!("local with non ident-pattern"),
+                }),
             })
-            .unwrap()
+        })
     }
 }
 

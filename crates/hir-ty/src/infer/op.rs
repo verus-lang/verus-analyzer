@@ -89,6 +89,14 @@ impl<'db> InferenceContext<'db> {
                 let (lhs_ty, rhs_ty, return_ty) =
                     self.infer_overloaded_binop(expr, lhs_expr, rhs_expr, op);
 
+                if matches!(op, BinaryOp::CmpOp(_))
+                    && self.is_verus_non_exec
+                    && is_integer_like(self.db, lhs_ty)
+                    && is_integer_like(self.db, rhs_ty)
+                {
+                    return self.types.types.bool;
+                }
+
                 // Supply type inference hints if relevant. Probably these
                 // hints should be enforced during select as part of the
                 // `consider_unification_despite_ambiguity` routine, but this
@@ -186,12 +194,16 @@ impl<'db> InferenceContext<'db> {
         };
         let lhs_ty = self.table.resolve_vars_with_obligations(lhs_ty);
 
-        if matches!(op, BinaryOp::CmpOp(_)) && is_verus_integer(self.db, lhs_ty) {
+        if matches!(op, BinaryOp::CmpOp(_))
+            && is_integer_like(self.db, lhs_ty)
+            && (self.is_verus_non_exec || is_verus_integer(self.db, lhs_ty))
+        {
             let rhs_ty = self.infer_expr_no_expect(rhs_expr, ExprIsRead::Yes);
             let rhs_ty = self.table.resolve_vars_with_obligations(rhs_ty);
-            if !is_integer_like(self.db, rhs_ty) {
-                _ = self.demand_suptype(expr.into(), lhs_ty, rhs_ty);
+            if is_integer_like(self.db, rhs_ty) {
+                return (lhs_ty, rhs_ty, self.types.types.bool);
             }
+            _ = self.demand_suptype(expr.into(), lhs_ty, rhs_ty);
             return (lhs_ty, rhs_ty, self.types.types.bool);
         }
 

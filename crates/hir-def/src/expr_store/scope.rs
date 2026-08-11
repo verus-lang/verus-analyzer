@@ -405,6 +405,11 @@ impl StoreVisitor for ExprScopeVisitor<'_> {
                 self.scope = self.scopes.new_scope(self.scope);
                 self.on_pat(pat);
             }
+            &Expr::Matches { expr, pat } => {
+                self.on_expr(expr);
+                self.scope = self.scopes.new_scope(self.scope);
+                self.on_pat(pat);
+            }
             _ => self.store.visit_expr_children(expr, self),
         }
     }
@@ -848,6 +853,19 @@ fn test() {
             100,
         );
     }
+
+    #[test]
+    fn matches_chains_can_reference_pattern_bindings() {
+        do_check_local_name(
+            r#"
+fn test(result: (i32,)) -> bool {
+    result matches (result,) && res$0ult > 0
+}
+"#,
+            54,
+        );
+    }
+
     #[test]
     fn pattern_const_block_expressions_have_scopes() {
         do_check(
