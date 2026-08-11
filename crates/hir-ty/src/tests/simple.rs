@@ -873,6 +873,31 @@ fn named_tuple() -> ((val, is_fresh): (u32, bool))
 }
 
 #[test]
+fn infer_verus_logically_atomic_call() {
+    check_types(
+        r#"
+fn atomic(value: u32) -> u32 {
+    value
+}
+
+fn caller(input: u32) -> u32 {
+    let result = atomic(input) 'retry: atomically loop |update| -> (au: bool)
+        invariant input > 0,
+               // ^^^^^ u32
+    {
+        let _ = update(input);
+        let flag = au;
+                // ^^ bool
+        break 'retry;
+    };
+    result
+ // ^^^^^^ u32
+}
+"#,
+    );
+}
+
+#[test]
 fn infer_verus_expressions_and_proof_functions() {
     check_types(
         r#"

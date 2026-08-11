@@ -546,6 +546,9 @@ fn call_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(T!['(']));
     let m = lhs.precede(p);
     arg_list(p);
+    if verus::at_atomically_block(p) {
+        verus::atomically_block(p);
+    }
     m.complete(p, CALL_EXPR)
 }
 
@@ -607,6 +610,9 @@ fn method_call_expr<const FLOAT_RECOVERY: bool>(
         //     foo.bar::<i32>;
         // }
         p.error("expected argument list");
+    }
+    if verus::at_atomically_block(p) {
+        verus::atomically_block(p);
     }
     m.complete(p, METHOD_CALL_EXPR)
 }

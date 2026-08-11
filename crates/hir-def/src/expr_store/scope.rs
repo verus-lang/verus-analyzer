@@ -370,6 +370,17 @@ impl StoreVisitor for ExprScopeVisitor<'_> {
                     this.on_expr(*body);
                 });
             }
+            Expr::AtomicCall(call) => {
+                self.on_expr(call.call);
+                self.on_type_opt(call.atomic_update_type);
+                let scope = self.scopes.new_labeled_scope(self.scope, call.label);
+                self.with_scope(scope, |this| {
+                    this.on_pat(call.update);
+                    this.on_pat_opt(call.atomic_update);
+                    this.on_exprs(&call.clauses);
+                    this.on_expr(call.body);
+                });
+            }
             Expr::Match { expr, arms } => {
                 self.on_expr(*expr);
                 for arm in arms.iter() {

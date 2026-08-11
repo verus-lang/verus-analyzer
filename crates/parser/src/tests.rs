@@ -308,6 +308,52 @@ fn parenthesized_tuple() -> ((u32, bool)) {
 }
 
 #[test]
+fn verus_logical_atomicity_syntax_parses() {
+    let source = r#"
+fn atomic_function(px: PX) -> (py: PY)
+    atomically (atomic_update) {
+        type PredType,
+        (ax: AX) -> (ay: AY),
+        requires atomic_pre(px, ax),
+        ensures atomic_post(px, ax, ay),
+        outer_mask any / [namespace(px)],
+        inner_mask [namespace(py)],
+    },
+    requires private_pre(px),
+    ensures private_post(px, ax, ay, py),
+{
+    consume(atomic_update)
+}
+
+fn empty_atomic_spec()
+    atomically (atomic_update) {},
+{
+    consume(atomic_update)
+}
+
+fn caller() {
+    let py = atomic_function(px) 'retry: atomically loop |update| -> (au: AtomicUpdate)
+        invariant_except_break can_retry(),
+        invariant valid(),
+        ensures done(),
+    {
+        let ay = update(ax);
+        if ready() {
+            break 'retry;
+        }
+        continue 'retry;
+    };
+
+    receiver.atomic_method() atomically |update,| -> (au) {
+        update(ax);
+    };
+}
+"#;
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+}
+
+#[test]
 fn verus_repeated_operators_do_not_split_longer_rust_token_runs() {
     let source = r#"
 fn references(value: usize) {

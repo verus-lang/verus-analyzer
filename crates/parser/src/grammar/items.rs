@@ -561,6 +561,9 @@ fn parse_verus_contracts(p: &mut Parser<'_>) {
     if p.at_contextual_kw(T![by]) {
         verus::prover(p);
     }
+    if p.at_contextual_kw(T![atomically]) {
+        verus::atomic_spec(p);
+    }
     if p.at_contextual_kw(T![requires]) {
         verus::requires(p);
     }

@@ -127,6 +127,7 @@ pub enum SyntaxKind {
     ASSUME_KW,
     ASSUME_SPECIFICATION_KW,
     ASYNC_KW,
+    ATOMICALLY_KW,
     ATT_SYNTAX_KW,
     AUTO_KW,
     AWAIT_KW,
@@ -160,6 +161,7 @@ pub enum SyntaxKind {
     IMPLIES_KW,
     INCLUDE_BYTES_KW,
     INLATEOUT_KW,
+    INNER_MASK_KW,
     INOUT_KW,
     INVARIANT_EXCEPT_BREAK_KW,
     INVARIANT_KW,
@@ -181,6 +183,7 @@ pub enum SyntaxKind {
     OPENS_INVARIANTS_KW,
     OPEN_KW,
     OPTIONS_KW,
+    OUTER_MASK_KW,
     OUT_KW,
     PATTERN_TYPE_KW,
     PRESERVES_FLAGS_KW,
@@ -245,6 +248,13 @@ pub enum SyntaxKind {
     ASSOC_TYPE_ARG,
     ASSUME_EXPR,
     ASSUME_SPECIFICATION,
+    ATOMICALLY_BLOCK,
+    ATOMIC_PERM_CLAUSE,
+    ATOMIC_PERM_FIELD,
+    ATOMIC_PERM_TUPLE,
+    ATOMIC_PRED_TYPE_CLAUSE,
+    ATOMIC_RETURN_TYPE,
+    ATOMIC_SPEC,
     ATTR,
     AWAIT_EXPR,
     BECOME_EXPR,
@@ -299,8 +309,10 @@ pub enum SyntaxKind {
     INCLUDE_BYTES_EXPR,
     INDEX_EXPR,
     INFER_TYPE,
+    INNER_MASK_CLAUSE,
     INVARIANT_CLAUSE,
     INVARIANT_EXCEPT_BREAK_CLAUSE,
+    INVARIANT_NAME_SET,
     IS_EXPR,
     ITEM_LIST,
     KEY_VALUE_META,
@@ -338,6 +350,7 @@ pub enum SyntaxKind {
     OFFSET_OF_EXPR,
     OPENS_INVARIANTS_CLAUSE,
     OR_PAT,
+    OUTER_MASK_CLAUSE,
     PARAM,
     PARAM_LIST,
     PARENTHESIZED_ARG_LIST,
@@ -465,6 +478,13 @@ impl SyntaxKind {
             | ASSOC_TYPE_ARG
             | ASSUME_EXPR
             | ASSUME_SPECIFICATION
+            | ATOMICALLY_BLOCK
+            | ATOMIC_PERM_CLAUSE
+            | ATOMIC_PERM_FIELD
+            | ATOMIC_PERM_TUPLE
+            | ATOMIC_PRED_TYPE_CLAUSE
+            | ATOMIC_RETURN_TYPE
+            | ATOMIC_SPEC
             | ATTR
             | AWAIT_EXPR
             | BECOME_EXPR
@@ -519,8 +539,10 @@ impl SyntaxKind {
             | INCLUDE_BYTES_EXPR
             | INDEX_EXPR
             | INFER_TYPE
+            | INNER_MASK_CLAUSE
             | INVARIANT_CLAUSE
             | INVARIANT_EXCEPT_BREAK_CLAUSE
+            | INVARIANT_NAME_SET
             | IS_EXPR
             | ITEM_LIST
             | KEY_VALUE_META
@@ -558,6 +580,7 @@ impl SyntaxKind {
             | OFFSET_OF_EXPR
             | OPENS_INVARIANTS_CLAUSE
             | OR_PAT
+            | OUTER_MASK_CLAUSE
             | PARAM
             | PARAM_LIST
             | PARENTHESIZED_ARG_LIST
@@ -768,6 +791,7 @@ impl SyntaxKind {
             ASSERT_KW => "assert",
             ASSUME_KW => "assume",
             ASSUME_SPECIFICATION_KW => "assume_specification",
+            ATOMICALLY_KW => "atomically",
             ATT_SYNTAX_KW => "att_syntax",
             AUTO_KW => "auto",
             AXIOM_KW => "axiom",
@@ -799,6 +823,7 @@ impl SyntaxKind {
             IMPLIES_KW => "implies",
             INCLUDE_BYTES_KW => "include_bytes",
             INLATEOUT_KW => "inlateout",
+            INNER_MASK_KW => "inner_mask",
             INOUT_KW => "inout",
             INVARIANT_KW => "invariant",
             INVARIANT_EXCEPT_BREAK_KW => "invariant_except_break",
@@ -821,6 +846,7 @@ impl SyntaxKind {
             OPENS_INVARIANTS_KW => "opens_invariants",
             OPTIONS_KW => "options",
             OUT_KW => "out",
+            OUTER_MASK_KW => "outer_mask",
             PATTERN_TYPE_KW => "pattern_type",
             PRESERVES_FLAGS_KW => "preserves_flags",
             PROOF_KW => "proof",
@@ -923,6 +949,7 @@ impl SyntaxKind {
             ASSERT_KW => true,
             ASSUME_KW => true,
             ASSUME_SPECIFICATION_KW => true,
+            ATOMICALLY_KW => true,
             ATT_SYNTAX_KW => true,
             AUTO_KW => true,
             AXIOM_KW => true,
@@ -954,6 +981,7 @@ impl SyntaxKind {
             IMPLIES_KW => true,
             INCLUDE_BYTES_KW => true,
             INLATEOUT_KW => true,
+            INNER_MASK_KW => true,
             INOUT_KW => true,
             INVARIANT_KW => true,
             INVARIANT_EXCEPT_BREAK_KW => true,
@@ -976,6 +1004,7 @@ impl SyntaxKind {
             OPENS_INVARIANTS_KW => true,
             OPTIONS_KW => true,
             OUT_KW => true,
+            OUTER_MASK_KW => true,
             PATTERN_TYPE_KW => true,
             PRESERVES_FLAGS_KW => true,
             PROOF_KW => true,
@@ -1066,6 +1095,7 @@ impl SyntaxKind {
             ASSERT_KW => true,
             ASSUME_KW => true,
             ASSUME_SPECIFICATION_KW => true,
+            ATOMICALLY_KW => true,
             ATT_SYNTAX_KW => true,
             AUTO_KW => true,
             AXIOM_KW => true,
@@ -1097,6 +1127,7 @@ impl SyntaxKind {
             IMPLIES_KW => true,
             INCLUDE_BYTES_KW => true,
             INLATEOUT_KW => true,
+            INNER_MASK_KW => true,
             INOUT_KW => true,
             INVARIANT_KW => true,
             INVARIANT_EXCEPT_BREAK_KW => true,
@@ -1119,6 +1150,7 @@ impl SyntaxKind {
             OPENS_INVARIANTS_KW => true,
             OPTIONS_KW => true,
             OUT_KW => true,
+            OUTER_MASK_KW => true,
             PATTERN_TYPE_KW => true,
             PRESERVES_FLAGS_KW => true,
             PROOF_KW => true,
@@ -1283,6 +1315,7 @@ impl SyntaxKind {
             "assert" => ASSERT_KW,
             "assume" => ASSUME_KW,
             "assume_specification" => ASSUME_SPECIFICATION_KW,
+            "atomically" => ATOMICALLY_KW,
             "att_syntax" => ATT_SYNTAX_KW,
             "auto" => AUTO_KW,
             "axiom" => AXIOM_KW,
@@ -1314,6 +1347,7 @@ impl SyntaxKind {
             "implies" => IMPLIES_KW,
             "include_bytes" => INCLUDE_BYTES_KW,
             "inlateout" => INLATEOUT_KW,
+            "inner_mask" => INNER_MASK_KW,
             "inout" => INOUT_KW,
             "invariant" => INVARIANT_KW,
             "invariant_except_break" => INVARIANT_EXCEPT_BREAK_KW,
@@ -1336,6 +1370,7 @@ impl SyntaxKind {
             "opens_invariants" => OPENS_INVARIANTS_KW,
             "options" => OPTIONS_KW,
             "out" => OUT_KW,
+            "outer_mask" => OUTER_MASK_KW,
             "pattern_type" => PATTERN_TYPE_KW,
             "preserves_flags" => PRESERVES_FLAGS_KW,
             "proof" => PROOF_KW,
@@ -1518,6 +1553,7 @@ macro_rules ! T_ {
     [assert] => { $ crate :: SyntaxKind :: ASSERT_KW };
     [assume] => { $ crate :: SyntaxKind :: ASSUME_KW };
     [assume_specification] => { $ crate :: SyntaxKind :: ASSUME_SPECIFICATION_KW };
+    [atomically] => { $ crate :: SyntaxKind :: ATOMICALLY_KW };
     [att_syntax] => { $ crate :: SyntaxKind :: ATT_SYNTAX_KW };
     [auto] => { $ crate :: SyntaxKind :: AUTO_KW };
     [axiom] => { $ crate :: SyntaxKind :: AXIOM_KW };
@@ -1549,6 +1585,7 @@ macro_rules ! T_ {
     [implies] => { $ crate :: SyntaxKind :: IMPLIES_KW };
     [include_bytes] => { $ crate :: SyntaxKind :: INCLUDE_BYTES_KW };
     [inlateout] => { $ crate :: SyntaxKind :: INLATEOUT_KW };
+    [inner_mask] => { $ crate :: SyntaxKind :: INNER_MASK_KW };
     [inout] => { $ crate :: SyntaxKind :: INOUT_KW };
     [invariant] => { $ crate :: SyntaxKind :: INVARIANT_KW };
     [invariant_except_break] => { $ crate :: SyntaxKind :: INVARIANT_EXCEPT_BREAK_KW };
@@ -1571,6 +1608,7 @@ macro_rules ! T_ {
     [opens_invariants] => { $ crate :: SyntaxKind :: OPENS_INVARIANTS_KW };
     [options] => { $ crate :: SyntaxKind :: OPTIONS_KW };
     [out] => { $ crate :: SyntaxKind :: OUT_KW };
+    [outer_mask] => { $ crate :: SyntaxKind :: OUTER_MASK_KW };
     [pattern_type] => { $ crate :: SyntaxKind :: PATTERN_TYPE_KW };
     [preserves_flags] => { $ crate :: SyntaxKind :: PRESERVES_FLAGS_KW };
     [proof] => { $ crate :: SyntaxKind :: PROOF_KW };

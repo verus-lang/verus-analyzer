@@ -485,6 +485,7 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
             | Expr::Final { .. }
             | Expr::View { .. }
             | Expr::Quantifier { .. }
+            | Expr::AtomicCall(_)
             | Expr::Is { .. }
             | Expr::Has { .. }
             | Expr::Arrow { .. }

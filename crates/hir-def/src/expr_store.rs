@@ -775,6 +775,24 @@ impl ExpressionStore {
                 visitor.on_pats(args);
                 arg_types.iter().for_each(|arg_type| visitor.on_type_opt(*arg_type));
             }
+            Expr::AtomicCall(call) => {
+                let crate::hir::AtomicCall {
+                    call,
+                    body,
+                    update,
+                    atomic_update,
+                    atomic_update_type,
+                    clauses,
+                    label: _,
+                    is_loop: _,
+                } = &**call;
+                visitor.on_expr(*call);
+                visitor.on_pat(*update);
+                visitor.on_pat_opt(*atomic_update);
+                visitor.on_type_opt(*atomic_update_type);
+                visitor.on_exprs(clauses);
+                visitor.on_expr(*body);
+            }
             Expr::BinaryOp { lhs, rhs, op: _ } => {
                 visitor.on_expr(*lhs);
                 visitor.on_expr(*rhs);

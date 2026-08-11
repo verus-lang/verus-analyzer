@@ -28,6 +28,9 @@ fn nth_at_contract_boundary(p: &Parser<'_>, n: usize) -> bool {
         || p.nth_at_contextual_kw(n, T![no_unwind])
         || p.nth_at_contextual_kw(n, T![invariant])
         || p.nth_at_contextual_kw(n, T![invariant_except_break])
+        || p.nth_at_contextual_kw(n, T![atomically])
+        || p.nth_at_contextual_kw(n, T![outer_mask])
+        || p.nth_at_contextual_kw(n, T![inner_mask])
         || p.nth_at_contextual_kw(n, T![when])
         || p.nth_at_contextual_kw(n, T![via])
         || p.nth_at_contextual_kw(n, T![by])
@@ -380,6 +383,141 @@ pub(super) fn no_unwind(p: &mut Parser<'_>) -> CompletedMarker {
         expressions::expr_no_struct(p);
     }
     m.complete(p, NO_UNWIND_CLAUSE)
+}
+
+pub(super) fn atomic_spec(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    expect_kw(p, T![atomically]);
+    p.expect(T!['(']);
+    name(p);
+    p.expect(T![')']);
+    p.expect(T!['{']);
+    if p.at(T![type]) {
+        let clause = p.start();
+        p.bump(T![type]);
+        name(p);
+        p.expect(T![,]);
+        clause.complete(p, ATOMIC_PRED_TYPE_CLAUSE);
+    }
+    if p.at(T!['(']) {
+        atomic_perm_clause(p);
+    }
+    if at_kw(p, T![requires]) {
+        requires(p);
+    }
+    if at_kw(p, T![ensures]) {
+        ensures(p);
+    }
+    if at_kw(p, T![outer_mask]) {
+        invariant_mask_clause(p, T![outer_mask], OUTER_MASK_CLAUSE);
+    }
+    if at_kw(p, T![inner_mask]) {
+        invariant_mask_clause(p, T![inner_mask], INNER_MASK_CLAUSE);
+    }
+    p.expect(T!['}']);
+    p.eat(T![,]);
+    m.complete(p, ATOMIC_SPEC)
+}
+
+fn atomic_perm_clause(p: &mut Parser<'_>) {
+    let m = p.start();
+    atomic_perm_tuple(p);
+    if p.eat(T![->]) {
+        atomic_perm_tuple(p);
+    }
+    p.eat(T![,]);
+    m.complete(p, ATOMIC_PERM_CLAUSE);
+}
+
+fn atomic_perm_tuple(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(T!['(']);
+    while !p.at(EOF) && !p.at(T![')']) {
+        let field = p.start();
+        name(p);
+        p.expect(T![:]);
+        types::type_no_bounds(p);
+        field.complete(p, ATOMIC_PERM_FIELD);
+        if !p.eat(T![,]) {
+            break;
+        }
+    }
+    p.expect(T![')']);
+    m.complete(p, ATOMIC_PERM_TUPLE);
+}
+
+fn invariant_mask_clause(p: &mut Parser<'_>, keyword: SyntaxKind, kind: SyntaxKind) {
+    let m = p.start();
+    expect_kw(p, keyword);
+    invariant_name_set(p);
+    p.eat(T![,]);
+    m.complete(p, kind);
+}
+
+fn invariant_name_set(p: &mut Parser<'_>) {
+    let m = p.start();
+    if eat_kw(p, T![any]) {
+        if p.eat(T![/]) {
+            invariant_name_list(p);
+        }
+    } else if !eat_kw(p, T![none]) {
+        if p.at(T!['[']) {
+            invariant_name_list(p);
+        } else {
+            expressions::expr_no_struct(p);
+        }
+    }
+    m.complete(p, INVARIANT_NAME_SET);
+}
+
+fn invariant_name_list(p: &mut Parser<'_>) {
+    p.bump(T!['[']);
+    if !p.at(T![']']) {
+        expr_list(p);
+    }
+    p.expect(T![']']);
+}
+
+pub(super) fn at_atomically_block(p: &Parser<'_>) -> bool {
+    at_kw(p, T![atomically])
+        || p.at(LIFETIME_IDENT) && p.nth_at(1, T![:]) && p.nth_at_contextual_kw(2, T![atomically])
+}
+
+pub(super) fn atomically_block(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    if p.at(LIFETIME_IDENT) {
+        let label = p.start();
+        lifetime(p);
+        p.expect(T![:]);
+        label.complete(p, LABEL);
+    }
+    expect_kw(p, T![atomically]);
+    p.eat(T![loop]);
+    p.expect(T![|]);
+    name(p);
+    p.eat(T![,]);
+    p.expect(T![|]);
+    if p.at(T![->]) {
+        atomic_return_type(p);
+    }
+    loop_clauses(p);
+    expressions::block_expr(p);
+    m.complete(p, ATOMICALLY_BLOCK)
+}
+
+fn atomic_return_type(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(T![->]);
+    if p.eat(T!['(']) {
+        patterns::pattern(p);
+        if p.eat(T![:]) {
+            types::type_no_bounds(p);
+        }
+        p.expect(T![')']);
+    } else {
+        types::type_no_bounds(p);
+    }
+    m.complete(p, ATOMIC_RETURN_TYPE);
 }
 
 pub(super) fn loop_clauses(p: &mut Parser<'_>) {

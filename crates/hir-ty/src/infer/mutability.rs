@@ -215,6 +215,11 @@ impl<'db> InferenceContext<'db> {
             Expr::Quantifier { body, .. } => {
                 self.infer_mut_expr(*body, Mutability::Not);
             }
+            Expr::AtomicCall(call) => {
+                self.infer_mut_expr(call.call, Mutability::Not);
+                self.infer_mut_not_expr_iter(call.clauses.iter().copied());
+                self.infer_mut_expr(call.body, Mutability::Not);
+            }
             Expr::Tuple { exprs } | Expr::Array(Array::ElementList { elements: exprs }) => {
                 self.infer_mut_not_expr_iter(exprs.iter().copied());
             }

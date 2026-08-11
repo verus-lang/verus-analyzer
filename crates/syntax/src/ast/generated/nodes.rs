@@ -379,6 +379,126 @@ impl AssumeSpecification {
         support::token(&self.syntax, T![assume_specification])
     }
 }
+pub struct AtomicPermClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AtomicPermClause {
+    #[inline]
+    pub fn input(&self) -> Option<AtomicPermTuple> { support::child(&self.syntax) }
+    #[inline]
+    pub fn output(&self) -> Option<AtomicPermTuple> { support::child(&self.syntax) }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    #[inline]
+    pub fn thin_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![->]) }
+}
+pub struct AtomicPermField {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for AtomicPermField {}
+impl AtomicPermField {
+    #[inline]
+    pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
+}
+pub struct AtomicPermTuple {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AtomicPermTuple {
+    #[inline]
+    pub fn fields(&self) -> AstChildren<AtomicPermField> { support::children(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+}
+pub struct AtomicPredTypeClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for AtomicPredTypeClause {}
+impl AtomicPredTypeClause {
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    #[inline]
+    pub fn type_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![type]) }
+}
+pub struct AtomicReturnType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AtomicReturnType {
+    #[inline]
+    pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn thin_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![->]) }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
+}
+pub struct AtomicSpec {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for AtomicSpec {}
+impl AtomicSpec {
+    #[inline]
+    pub fn atomic_perm_clause(&self) -> Option<AtomicPermClause> { support::child(&self.syntax) }
+    #[inline]
+    pub fn atomic_pred_type_clause(&self) -> Option<AtomicPredTypeClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ensures_clause(&self) -> Option<EnsuresClause> { support::child(&self.syntax) }
+    #[inline]
+    pub fn inner_mask_clause(&self) -> Option<InnerMaskClause> { support::child(&self.syntax) }
+    #[inline]
+    pub fn outer_mask_clause(&self) -> Option<OuterMaskClause> { support::child(&self.syntax) }
+    #[inline]
+    pub fn requires_clause(&self) -> Option<RequiresClause> { support::child(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn l_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['{']) }
+    #[inline]
+    pub fn r_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['}']) }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    #[inline]
+    pub fn atomically_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![atomically])
+    }
+}
+pub struct AtomicallyBlock {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AtomicallyBlock {
+    #[inline]
+    pub fn atomic_return_type(&self) -> Option<AtomicReturnType> { support::child(&self.syntax) }
+    #[inline]
+    pub fn label(&self) -> Option<Label> { support::child(&self.syntax) }
+    #[inline]
+    pub fn loop_clauses(&self) -> AstChildren<LoopClause> { support::children(&self.syntax) }
+    #[inline]
+    pub fn update_fn(&self) -> Option<Name> { support::child(&self.syntax) }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    #[inline]
+    pub fn atomically_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![atomically])
+    }
+    #[inline]
+    pub fn loop_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![loop]) }
+    #[inline]
+    pub fn l_pipe(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![|]) }
+    #[inline]
+    pub fn r_pipe(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![|]) }
+}
 pub struct Attr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -515,6 +635,8 @@ pub struct CallExpr {
 impl ast::HasArgList for CallExpr {}
 impl ast::HasAttrs for CallExpr {}
 impl CallExpr {
+    #[inline]
+    pub fn atomically_block(&self) -> Option<AtomicallyBlock> { support::child(&self.syntax) }
     #[inline]
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
 }
@@ -877,6 +999,8 @@ impl Fn {
     #[inline]
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
     #[inline]
+    pub fn atomic_spec(&self) -> Option<AtomicSpec> { support::child(&self.syntax) }
+    #[inline]
     pub fn default_ensures_clause(&self) -> Option<DefaultEnsuresClause> {
         support::child(&self.syntax)
     }
@@ -1171,6 +1295,19 @@ impl InferType {
     #[inline]
     pub fn underscore_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![_]) }
 }
+pub struct InnerMaskClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl InnerMaskClause {
+    #[inline]
+    pub fn invariant_name_set(&self) -> Option<InvariantNameSet> { support::child(&self.syntax) }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    #[inline]
+    pub fn inner_mask_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![inner_mask])
+    }
+}
 pub struct InvariantClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1192,6 +1329,25 @@ impl InvariantExceptBreakClause {
     pub fn invariant_except_break_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![invariant_except_break])
     }
+}
+pub struct InvariantNameSet {
+    pub(crate) syntax: SyntaxNode,
+}
+impl InvariantNameSet {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> { support::children(&self.syntax) }
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
+    #[inline]
+    pub fn slash(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![/]) }
+    #[inline]
+    pub fn any_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![any]) }
+    #[inline]
+    pub fn none_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![none]) }
 }
 pub struct IsExpr {
     pub(crate) syntax: SyntaxNode,
@@ -1482,6 +1638,8 @@ impl ast::HasAttrs for MethodCallExpr {}
 impl ast::HasGenericArgs for MethodCallExpr {}
 impl MethodCallExpr {
     #[inline]
+    pub fn atomically_block(&self) -> Option<AtomicallyBlock> { support::child(&self.syntax) }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
     #[inline]
     pub fn receiver(&self) -> Option<Expr> { support::child(&self.syntax) }
@@ -1622,6 +1780,19 @@ impl OrPat {
     pub fn pats(&self) -> AstChildren<Pat> { support::children(&self.syntax) }
     #[inline]
     pub fn pipe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![|]) }
+}
+pub struct OuterMaskClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OuterMaskClause {
+    #[inline]
+    pub fn invariant_name_set(&self) -> Option<InvariantNameSet> { support::child(&self.syntax) }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
+    #[inline]
+    pub fn outer_mask_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![outer_mask])
+    }
 }
 pub struct Param {
     pub(crate) syntax: SyntaxNode,
@@ -3812,6 +3983,230 @@ impl fmt::Debug for AssumeSpecification {
         f.debug_struct("AssumeSpecification").field("syntax", &self.syntax).finish()
     }
 }
+impl AstNode for AtomicPermClause {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMIC_PERM_CLAUSE
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMIC_PERM_CLAUSE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicPermClause {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicPermClause {}
+impl PartialEq for AtomicPermClause {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicPermClause {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicPermClause {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicPermClause").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for AtomicPermField {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMIC_PERM_FIELD
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMIC_PERM_FIELD }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicPermField {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicPermField {}
+impl PartialEq for AtomicPermField {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicPermField {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicPermField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicPermField").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for AtomicPermTuple {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMIC_PERM_TUPLE
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMIC_PERM_TUPLE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicPermTuple {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicPermTuple {}
+impl PartialEq for AtomicPermTuple {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicPermTuple {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicPermTuple {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicPermTuple").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for AtomicPredTypeClause {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMIC_PRED_TYPE_CLAUSE
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMIC_PRED_TYPE_CLAUSE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicPredTypeClause {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicPredTypeClause {}
+impl PartialEq for AtomicPredTypeClause {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicPredTypeClause {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicPredTypeClause {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicPredTypeClause").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for AtomicReturnType {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMIC_RETURN_TYPE
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMIC_RETURN_TYPE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicReturnType {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicReturnType {}
+impl PartialEq for AtomicReturnType {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicReturnType {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicReturnType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicReturnType").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for AtomicSpec {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMIC_SPEC
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMIC_SPEC }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicSpec {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicSpec {}
+impl PartialEq for AtomicSpec {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicSpec {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicSpec {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicSpec").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for AtomicallyBlock {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        ATOMICALLY_BLOCK
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATOMICALLY_BLOCK }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for AtomicallyBlock {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for AtomicallyBlock {}
+impl PartialEq for AtomicallyBlock {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for AtomicallyBlock {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for AtomicallyBlock {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AtomicallyBlock").field("syntax", &self.syntax).finish()
+    }
+}
 impl AstNode for Attr {
     #[inline]
     fn kind() -> SyntaxKind
@@ -5540,6 +5935,38 @@ impl fmt::Debug for InferType {
         f.debug_struct("InferType").field("syntax", &self.syntax).finish()
     }
 }
+impl AstNode for InnerMaskClause {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        INNER_MASK_CLAUSE
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INNER_MASK_CLAUSE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for InnerMaskClause {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for InnerMaskClause {}
+impl PartialEq for InnerMaskClause {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for InnerMaskClause {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for InnerMaskClause {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("InnerMaskClause").field("syntax", &self.syntax).finish()
+    }
+}
 impl AstNode for InvariantClause {
     #[inline]
     fn kind() -> SyntaxKind
@@ -5602,6 +6029,38 @@ impl Clone for InvariantExceptBreakClause {
 impl fmt::Debug for InvariantExceptBreakClause {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("InvariantExceptBreakClause").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for InvariantNameSet {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        INVARIANT_NAME_SET
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INVARIANT_NAME_SET }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for InvariantNameSet {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for InvariantNameSet {}
+impl PartialEq for InvariantNameSet {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for InvariantNameSet {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for InvariantNameSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("InvariantNameSet").field("syntax", &self.syntax).finish()
     }
 }
 impl AstNode for IsExpr {
@@ -6786,6 +7245,38 @@ impl Clone for OrPat {
 impl fmt::Debug for OrPat {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("OrPat").field("syntax", &self.syntax).finish()
+    }
+}
+impl AstNode for OuterMaskClause {
+    #[inline]
+    fn kind() -> SyntaxKind
+    where
+        Self: Sized,
+    {
+        OUTER_MASK_CLAUSE
+    }
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == OUTER_MASK_CLAUSE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) { Some(Self { syntax }) } else { None }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl hash::Hash for OuterMaskClause {
+    fn hash<H: hash::Hasher>(&self, state: &mut H) { self.syntax.hash(state); }
+}
+impl Eq for OuterMaskClause {}
+impl PartialEq for OuterMaskClause {
+    fn eq(&self, other: &Self) -> bool { self.syntax == other.syntax }
+}
+impl Clone for OuterMaskClause {
+    fn clone(&self) -> Self { Self { syntax: self.syntax.clone() } }
+}
+impl fmt::Debug for OuterMaskClause {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OuterMaskClause").field("syntax", &self.syntax).finish()
     }
 }
 impl AstNode for Param {
@@ -11668,6 +12159,9 @@ impl AstNode for AnyHasName {
             kind,
             ASM_OPERAND_NAMED
                 | ASSERT_EXPR
+                | ATOMIC_PERM_FIELD
+                | ATOMIC_PRED_TYPE_CLAUSE
+                | ATOMIC_SPEC
                 | BROADCAST_GROUP
                 | CONST
                 | CONST_PARAM
@@ -11719,6 +12213,18 @@ impl From<AsmOperandNamed> for AnyHasName {
 impl From<AssertExpr> for AnyHasName {
     #[inline]
     fn from(node: AssertExpr) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<AtomicPermField> for AnyHasName {
+    #[inline]
+    fn from(node: AtomicPermField) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<AtomicPredTypeClause> for AnyHasName {
+    #[inline]
+    fn from(node: AtomicPredTypeClause) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<AtomicSpec> for AnyHasName {
+    #[inline]
+    fn from(node: AtomicSpec) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<BroadcastGroup> for AnyHasName {
     #[inline]
@@ -12187,6 +12693,41 @@ impl std::fmt::Display for AssumeSpecification {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for AtomicPermClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AtomicPermField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AtomicPermTuple {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AtomicPredTypeClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AtomicReturnType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AtomicSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AtomicallyBlock {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for Attr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -12457,12 +12998,22 @@ impl std::fmt::Display for InferType {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for InnerMaskClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for InvariantClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
 impl std::fmt::Display for InvariantExceptBreakClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for InvariantNameSet {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -12648,6 +13199,11 @@ impl std::fmt::Display for OpensInvariantsClause {
     }
 }
 impl std::fmt::Display for OrPat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for OuterMaskClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

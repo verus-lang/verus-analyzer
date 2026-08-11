@@ -49,10 +49,10 @@ use crate::{
         path::{AssociatedTypeBinding, GenericArg, GenericArgs, GenericArgsParentheses, Path},
     },
     hir::{
-        Array, Binding, BindingAnnotation, BindingId, BindingProblems, CaptureBy, ClosureKind,
-        CoroutineKind, CoroutineSource, Expr, ExprId, Item, Label, LabelId, Literal, LoopSource,
-        MatchArm, Movability, OffsetOf, Pat, PatId, QuantifierKind, RecordFieldPat, RecordLitField,
-        RecordSpread, Statement, generics::GenericParams,
+        Array, AtomicCall, Binding, BindingAnnotation, BindingId, BindingProblems, CaptureBy,
+        ClosureKind, CoroutineKind, CoroutineSource, Expr, ExprId, Item, Label, LabelId, Literal,
+        LoopSource, MatchArm, Movability, OffsetOf, Pat, PatId, QuantifierKind, RecordFieldPat,
+        RecordLitField, RecordSpread, Statement, generics::GenericParams,
     },
     item_scope::BuiltinShadowMode,
     item_tree::FieldsShape,
@@ -1621,7 +1621,12 @@ impl<'db> ExprCollector<'db> {
                 } else {
                     Box::default()
                 };
-                self.alloc_expr(Expr::Call { callee, args }, syntax_ptr)
+                let atomic_block = e.atomically_block();
+                let call = self.alloc_expr(Expr::Call { callee, args }, syntax_ptr);
+                match atomic_block {
+                    Some(block) => self.collect_atomic_call(syntax_ptr, call, block),
+                    None => call,
+                }
             }
             ast::Expr::MethodCallExpr(e) => {
                 let receiver = self.collect_expr_opt(e.receiver());
@@ -1637,10 +1642,15 @@ impl<'db> ExprCollector<'db> {
                         self.lower_generic_args(it, &mut Self::impl_trait_error_allocator)
                     })
                     .map(Box::new);
-                self.alloc_expr(
+                let atomic_block = e.atomically_block();
+                let call = self.alloc_expr(
                     Expr::MethodCall { receiver, method_name, args, generic_args },
                     syntax_ptr,
-                )
+                );
+                match atomic_block {
+                    Some(block) => self.collect_atomic_call(syntax_ptr, call, block),
+                    None => call,
+                }
             }
             ast::Expr::MatchExpr(e) => {
                 let expr = self.collect_expr_opt(e.expr());
@@ -2888,6 +2898,60 @@ impl<'db> ExprCollector<'db> {
             }
             None => self.collect_block_opt(expr),
         }
+    }
+
+    fn collect_atomic_call(
+        &mut self,
+        syntax_ptr: AstPtr<ast::Expr>,
+        call: ExprId,
+        block: ast::AtomicallyBlock,
+    ) -> ExprId {
+        let update = self.collect_name_binding(block.update_fn());
+        let (atomic_update, atomic_update_type) = block
+            .atomic_return_type()
+            .map(|ret| {
+                (
+                    ret.pat().map(|pat| self.collect_pat_top(Some(pat))),
+                    ret.ty().map(|ty| self.lower_type_ref_disallow_impl_trait(ty)),
+                )
+            })
+            .unwrap_or_default();
+        let clauses = block
+            .loop_clauses()
+            .flat_map(|clause| match clause {
+                ast::LoopClause::DecreasesClause(it) => it.exprs().collect_vec(),
+                ast::LoopClause::EnsuresClause(it) => it.exprs().collect_vec(),
+                ast::LoopClause::InvariantClause(it) => it.exprs().collect_vec(),
+                ast::LoopClause::InvariantExceptBreakClause(it) => it.exprs().collect_vec(),
+            })
+            .map(|expr| self.collect_expr(expr))
+            .collect();
+        let label = block.label().map(|label| {
+            (self.hygiene_id_for(label.syntax().text_range()), self.collect_label(label))
+        });
+        let body = self.collect_labelled_block_opt(label, block.body());
+        self.alloc_expr(
+            Expr::AtomicCall(Box::new(AtomicCall {
+                call,
+                body,
+                update,
+                atomic_update,
+                atomic_update_type,
+                clauses,
+                label: label.map(|it| it.1),
+                is_loop: block.loop_token().is_some(),
+            })),
+            syntax_ptr,
+        )
+    }
+
+    fn collect_name_binding(&mut self, name: Option<ast::Name>) -> PatId {
+        let Some(name) = name else { return self.missing_pat() };
+        let hygiene = self.hygiene_id_for(name.syntax().text_range());
+        let binding = self.alloc_binding(name.as_name(), BindingAnnotation::Unannotated, hygiene);
+        let pat = self.alloc_pat_desugared(Pat::Bind { id: binding, subpat: None });
+        self.add_definition_to_binding(binding, pat);
+        pat
     }
 
     fn collect_extern_fn_param(&mut self, pat: Option<ast::Pat>) -> PatId {

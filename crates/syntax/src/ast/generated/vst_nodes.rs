@@ -225,6 +225,76 @@ pub struct AssumeSpecification {
     pub cst: Option<super::nodes::AssumeSpecification>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicPermClause {
+    pub input: Box<AtomicPermTuple>,
+    pub thin_arrow_token: bool,
+    pub output: Option<Box<AtomicPermTuple>>,
+    pub comma_token: bool,
+    pub cst: Option<super::nodes::AtomicPermClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicPermField {
+    pub name: Box<Name>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub cst: Option<super::nodes::AtomicPermField>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicPermTuple {
+    pub l_paren_token: bool,
+    pub fields: Vec<AtomicPermField>,
+    pub r_paren_token: bool,
+    pub cst: Option<super::nodes::AtomicPermTuple>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicPredTypeClause {
+    pub type_token: bool,
+    pub name: Box<Name>,
+    pub comma_token: bool,
+    pub cst: Option<super::nodes::AtomicPredTypeClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicReturnType {
+    pub thin_arrow_token: bool,
+    pub l_paren_token: bool,
+    pub pat: Option<Box<Pat>>,
+    pub colon_token: bool,
+    pub ty: Option<Box<Type>>,
+    pub r_paren_token: bool,
+    pub cst: Option<super::nodes::AtomicReturnType>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicSpec {
+    pub atomically_token: bool,
+    pub l_paren_token: bool,
+    pub name: Box<Name>,
+    pub r_paren_token: bool,
+    pub l_curly_token: bool,
+    pub atomic_pred_type_clause: Option<Box<AtomicPredTypeClause>>,
+    pub atomic_perm_clause: Option<Box<AtomicPermClause>>,
+    pub requires_clause: Option<Box<RequiresClause>>,
+    pub ensures_clause: Option<Box<EnsuresClause>>,
+    pub outer_mask_clause: Option<Box<OuterMaskClause>>,
+    pub inner_mask_clause: Option<Box<InnerMaskClause>>,
+    pub r_curly_token: bool,
+    pub comma_token: bool,
+    pub cst: Option<super::nodes::AtomicSpec>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AtomicallyBlock {
+    pub label: Option<Box<Label>>,
+    pub atomically_token: bool,
+    pub loop_token: bool,
+    pub l_pipe: Option<String>,
+    pub update_fn: Box<Name>,
+    pub comma_token: bool,
+    pub r_pipe: Option<String>,
+    pub atomic_return_type: Option<Box<AtomicReturnType>>,
+    pub loop_clauses: Vec<LoopClause>,
+    pub body: Box<BlockExpr>,
+    pub cst: Option<super::nodes::AtomicallyBlock>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Attr {
     pub pound_token: bool,
     pub excl_token: bool,
@@ -305,6 +375,7 @@ pub struct CallExpr {
     pub attrs: Vec<Attr>,
     pub expr: Box<Expr>,
     pub arg_list: Box<ArgList>,
+    pub atomically_block: Option<Box<AtomicallyBlock>>,
     pub cst: Option<super::nodes::CallExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -544,6 +615,7 @@ pub struct Fn {
     pub ret_type: Option<Box<RetType>>,
     pub where_clause: Option<Box<WhereClause>>,
     pub prover: Option<Box<Prover>>,
+    pub atomic_spec: Option<Box<AtomicSpec>>,
     pub requires_clause: Option<Box<RequiresClause>>,
     pub recommends_clause: Option<Box<RecommendsClause>>,
     pub ensures_clause: Option<Box<EnsuresClause>>,
@@ -703,6 +775,13 @@ pub struct InferType {
     pub cst: Option<super::nodes::InferType>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InnerMaskClause {
+    pub inner_mask_token: bool,
+    pub invariant_name_set: Box<InvariantNameSet>,
+    pub comma_token: bool,
+    pub cst: Option<super::nodes::InnerMaskClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InvariantClause {
     pub invariant_token: bool,
     pub exprs: Vec<Expr>,
@@ -713,6 +792,17 @@ pub struct InvariantExceptBreakClause {
     pub invariant_except_break_token: bool,
     pub exprs: Vec<Expr>,
     pub cst: Option<super::nodes::InvariantExceptBreakClause>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InvariantNameSet {
+    pub any_token: bool,
+    pub slash: Option<String>,
+    pub l_brack_token: bool,
+    pub exprs: Vec<Expr>,
+    pub r_brack_token: bool,
+    pub none_token: bool,
+    pub expr: Option<Box<Expr>>,
+    pub cst: Option<super::nodes::InvariantNameSet>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsExpr {
@@ -910,6 +1000,7 @@ pub struct MethodCallExpr {
     pub name_ref: Box<NameRef>,
     pub generic_arg_list: Option<Box<GenericArgList>>,
     pub arg_list: Box<ArgList>,
+    pub atomically_block: Option<Box<AtomicallyBlock>>,
     pub cst: Option<super::nodes::MethodCallExpr>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -991,6 +1082,13 @@ pub struct OrPat {
     pub pipe_token: bool,
     pub pats: Vec<Pat>,
     pub cst: Option<super::nodes::OrPat>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OuterMaskClause {
+    pub outer_mask_token: bool,
+    pub invariant_name_set: Box<InvariantNameSet>,
+    pub comma_token: bool,
+    pub cst: Option<super::nodes::OuterMaskClause>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Param {
@@ -2422,6 +2520,172 @@ impl TryFrom<super::nodes::AssumeSpecification> for AssumeSpecification {
         })
     }
 }
+impl TryFrom<super::nodes::AtomicPermClause> for AtomicPermClause {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicPermClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            input: Box::new(
+                item.input()
+                    .ok_or(format!("{}", stringify!(input)))
+                    .map(|it| AtomicPermTuple::try_from(it))??,
+            ),
+            thin_arrow_token: item.thin_arrow_token().is_some(),
+            output: match item.output() {
+                Some(it) => Some(Box::new(AtomicPermTuple::try_from(it)?)),
+                None => None,
+            },
+            comma_token: item.comma_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AtomicPermField> for AtomicPermField {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicPermField) -> Result<Self, Self::Error> {
+        Ok(Self {
+            name: Box::new(
+                item.name()
+                    .ok_or(format!("{}", stringify!(name)))
+                    .map(|it| Name::try_from(it))??,
+            ),
+            colon_token: item.colon_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AtomicPermTuple> for AtomicPermTuple {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicPermTuple) -> Result<Self, Self::Error> {
+        Ok(Self {
+            l_paren_token: item.l_paren_token().is_some(),
+            fields: item
+                .fields()
+                .into_iter()
+                .map(AtomicPermField::try_from)
+                .collect::<Result<Vec<AtomicPermField>, String>>()?,
+            r_paren_token: item.r_paren_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AtomicPredTypeClause> for AtomicPredTypeClause {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicPredTypeClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            type_token: item.type_token().is_some(),
+            name: Box::new(
+                item.name()
+                    .ok_or(format!("{}", stringify!(name)))
+                    .map(|it| Name::try_from(it))??,
+            ),
+            comma_token: item.comma_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AtomicReturnType> for AtomicReturnType {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicReturnType) -> Result<Self, Self::Error> {
+        Ok(Self {
+            thin_arrow_token: item.thin_arrow_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            pat: match item.pat() {
+                Some(it) => Some(Box::new(Pat::try_from(it)?)),
+                None => None,
+            },
+            colon_token: item.colon_token().is_some(),
+            ty: match item.ty() {
+                Some(it) => Some(Box::new(Type::try_from(it)?)),
+                None => None,
+            },
+            r_paren_token: item.r_paren_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AtomicSpec> for AtomicSpec {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicSpec) -> Result<Self, Self::Error> {
+        Ok(Self {
+            atomically_token: item.atomically_token().is_some(),
+            l_paren_token: item.l_paren_token().is_some(),
+            name: Box::new(
+                item.name()
+                    .ok_or(format!("{}", stringify!(name)))
+                    .map(|it| Name::try_from(it))??,
+            ),
+            r_paren_token: item.r_paren_token().is_some(),
+            l_curly_token: item.l_curly_token().is_some(),
+            atomic_pred_type_clause: match item.atomic_pred_type_clause() {
+                Some(it) => Some(Box::new(AtomicPredTypeClause::try_from(it)?)),
+                None => None,
+            },
+            atomic_perm_clause: match item.atomic_perm_clause() {
+                Some(it) => Some(Box::new(AtomicPermClause::try_from(it)?)),
+                None => None,
+            },
+            requires_clause: match item.requires_clause() {
+                Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
+                None => None,
+            },
+            ensures_clause: match item.ensures_clause() {
+                Some(it) => Some(Box::new(EnsuresClause::try_from(it)?)),
+                None => None,
+            },
+            outer_mask_clause: match item.outer_mask_clause() {
+                Some(it) => Some(Box::new(OuterMaskClause::try_from(it)?)),
+                None => None,
+            },
+            inner_mask_clause: match item.inner_mask_clause() {
+                Some(it) => Some(Box::new(InnerMaskClause::try_from(it)?)),
+                None => None,
+            },
+            r_curly_token: item.r_curly_token().is_some(),
+            comma_token: item.comma_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::AtomicallyBlock> for AtomicallyBlock {
+    type Error = String;
+    fn try_from(item: super::nodes::AtomicallyBlock) -> Result<Self, Self::Error> {
+        Ok(Self {
+            label: match item.label() {
+                Some(it) => Some(Box::new(Label::try_from(it)?)),
+                None => None,
+            },
+            atomically_token: item.atomically_token().is_some(),
+            loop_token: item.loop_token().is_some(),
+            l_pipe: item.l_pipe().map(|it| it.text().to_string()),
+            update_fn: Box::new(
+                item.update_fn()
+                    .ok_or(format!("{}", stringify!(update_fn)))
+                    .map(|it| Name::try_from(it))??,
+            ),
+            comma_token: item.comma_token().is_some(),
+            r_pipe: item.r_pipe().map(|it| it.text().to_string()),
+            atomic_return_type: match item.atomic_return_type() {
+                Some(it) => Some(Box::new(AtomicReturnType::try_from(it)?)),
+                None => None,
+            },
+            loop_clauses: item
+                .loop_clauses()
+                .into_iter()
+                .map(LoopClause::try_from)
+                .collect::<Result<Vec<LoopClause>, String>>()?,
+            body: Box::new(
+                item.body()
+                    .ok_or(format!("{}", stringify!(body)))
+                    .map(|it| BlockExpr::try_from(it))??,
+            ),
+            cst: Some(item.clone()),
+        })
+    }
+}
 impl TryFrom<super::nodes::Attr> for Attr {
     type Error = String;
     fn try_from(item: super::nodes::Attr) -> Result<Self, Self::Error> {
@@ -2624,6 +2888,10 @@ impl TryFrom<super::nodes::CallExpr> for CallExpr {
                     .ok_or(format!("{}", stringify!(arg_list)))
                     .map(|it| ArgList::try_from(it))??,
             ),
+            atomically_block: match item.atomically_block() {
+                Some(it) => Some(Box::new(AtomicallyBlock::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -3210,6 +3478,10 @@ impl TryFrom<super::nodes::Fn> for Fn {
                 Some(it) => Some(Box::new(Prover::try_from(it)?)),
                 None => None,
             },
+            atomic_spec: match item.atomic_spec() {
+                Some(it) => Some(Box::new(AtomicSpec::try_from(it)?)),
+                None => None,
+            },
             requires_clause: match item.requires_clause() {
                 Some(it) => Some(Box::new(RequiresClause::try_from(it)?)),
                 None => None,
@@ -3585,6 +3857,21 @@ impl TryFrom<super::nodes::InferType> for InferType {
         Ok(Self { underscore_token: item.underscore_token().is_some(), cst: Some(item.clone()) })
     }
 }
+impl TryFrom<super::nodes::InnerMaskClause> for InnerMaskClause {
+    type Error = String;
+    fn try_from(item: super::nodes::InnerMaskClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            inner_mask_token: item.inner_mask_token().is_some(),
+            invariant_name_set: Box::new(
+                item.invariant_name_set()
+                    .ok_or(format!("{}", stringify!(invariant_name_set)))
+                    .map(|it| InvariantNameSet::try_from(it))??,
+            ),
+            comma_token: item.comma_token().is_some(),
+            cst: Some(item.clone()),
+        })
+    }
+}
 impl TryFrom<super::nodes::InvariantClause> for InvariantClause {
     type Error = String;
     fn try_from(item: super::nodes::InvariantClause) -> Result<Self, Self::Error> {
@@ -3609,6 +3896,28 @@ impl TryFrom<super::nodes::InvariantExceptBreakClause> for InvariantExceptBreakC
                 .into_iter()
                 .map(Expr::try_from)
                 .collect::<Result<Vec<Expr>, String>>()?,
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::InvariantNameSet> for InvariantNameSet {
+    type Error = String;
+    fn try_from(item: super::nodes::InvariantNameSet) -> Result<Self, Self::Error> {
+        Ok(Self {
+            any_token: item.any_token().is_some(),
+            slash: item.slash().map(|it| it.text().to_string()),
+            l_brack_token: item.l_brack_token().is_some(),
+            exprs: item
+                .exprs()
+                .into_iter()
+                .map(Expr::try_from)
+                .collect::<Result<Vec<Expr>, String>>()?,
+            r_brack_token: item.r_brack_token().is_some(),
+            none_token: item.none_token().is_some(),
+            expr: match item.expr() {
+                Some(it) => Some(Box::new(Expr::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -4144,6 +4453,10 @@ impl TryFrom<super::nodes::MethodCallExpr> for MethodCallExpr {
                     .ok_or(format!("{}", stringify!(arg_list)))
                     .map(|it| ArgList::try_from(it))??,
             ),
+            atomically_block: match item.atomically_block() {
+                Some(it) => Some(Box::new(AtomicallyBlock::try_from(it)?)),
+                None => None,
+            },
             cst: Some(item.clone()),
         })
     }
@@ -4304,6 +4617,21 @@ impl TryFrom<super::nodes::OrPat> for OrPat {
                 .into_iter()
                 .map(Pat::try_from)
                 .collect::<Result<Vec<Pat>, String>>()?,
+            cst: Some(item.clone()),
+        })
+    }
+}
+impl TryFrom<super::nodes::OuterMaskClause> for OuterMaskClause {
+    type Error = String;
+    fn try_from(item: super::nodes::OuterMaskClause) -> Result<Self, Self::Error> {
+        Ok(Self {
+            outer_mask_token: item.outer_mask_token().is_some(),
+            invariant_name_set: Box::new(
+                item.invariant_name_set()
+                    .ok_or(format!("{}", stringify!(invariant_name_set)))
+                    .map(|it| InvariantNameSet::try_from(it))??,
+            ),
+            comma_token: item.comma_token().is_some(),
             cst: Some(item.clone()),
         })
     }
@@ -7046,6 +7374,240 @@ impl std::fmt::Display for AssumeSpecification {
         write!(f, "{s}")
     }
 }
+impl std::fmt::Display for AtomicPermClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.input.to_string());
+        s.push_str(" ");
+        if self.thin_arrow_token {
+            let mut tmp = stringify!(thin_arrow_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.output {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AtomicPermField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AtomicPermTuple {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.fields.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AtomicPredTypeClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.type_token {
+            let mut tmp = stringify!(type_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AtomicReturnType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.thin_arrow_token {
+            let mut tmp = stringify!(thin_arrow_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.pat {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.colon_token {
+            let mut tmp = stringify!(colon_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ty {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AtomicSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.atomically_token {
+            let mut tmp = stringify!(atomically_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.l_paren_token {
+            let mut tmp = stringify!(l_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.name.to_string());
+        s.push_str(" ");
+        if self.r_paren_token {
+            let mut tmp = stringify!(r_paren_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.l_curly_token {
+            let mut tmp = stringify!(l_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.atomic_pred_type_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.atomic_perm_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.requires_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.ensures_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.outer_mask_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.inner_mask_clause {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.r_curly_token {
+            let mut tmp = stringify!(r_curly_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for AtomicallyBlock {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if let Some(it) = &self.label {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        if self.atomically_token {
+            let mut tmp = stringify!(atomically_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.loop_token {
+            let mut tmp = stringify!(loop_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.l_pipe {
+            s.push_str(&it);
+            s.push_str(" ");
+        }
+        s.push_str(&self.update_fn.to_string());
+        s.push_str(" ");
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.r_pipe {
+            s.push_str(&it);
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.atomic_return_type {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
+        s.push_str(
+            &self.loop_clauses.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "),
+        );
+        s.push_str(&self.body.to_string());
+        s.push_str(" ");
+        write!(f, "{s}")
+    }
+}
 impl std::fmt::Display for Attr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
@@ -7292,6 +7854,10 @@ impl std::fmt::Display for CallExpr {
         s.push_str(" ");
         s.push_str(&self.arg_list.to_string());
         s.push_str(" ");
+        if let Some(it) = &self.atomically_block {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -8044,6 +8610,10 @@ impl std::fmt::Display for Fn {
             s.push_str(&it.to_string());
             s.push_str(" ");
         }
+        if let Some(it) = &self.atomic_spec {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         if let Some(it) = &self.requires_clause {
             s.push_str(&it.to_string());
             s.push_str(" ");
@@ -8544,6 +9114,26 @@ impl std::fmt::Display for InferType {
         write!(f, "{s}")
     }
 }
+impl std::fmt::Display for InnerMaskClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.inner_mask_token {
+            let mut tmp = stringify!(inner_mask_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.invariant_name_set.to_string());
+        s.push_str(" ");
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        write!(f, "{s}")
+    }
+}
 impl std::fmt::Display for InvariantClause {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
@@ -8567,6 +9157,45 @@ impl std::fmt::Display for InvariantExceptBreakClause {
             s.push_str(" ");
         }
         s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for InvariantNameSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.any_token {
+            let mut tmp = stringify!(any_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.slash {
+            s.push_str(&it);
+            s.push_str(" ");
+        }
+        if self.l_brack_token {
+            let mut tmp = stringify!(l_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.exprs.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        if self.r_brack_token {
+            let mut tmp = stringify!(r_brack_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if self.none_token {
+            let mut tmp = stringify!(none_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        if let Some(it) = &self.expr {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -9052,6 +9681,10 @@ impl std::fmt::Display for MethodCallExpr {
         }
         s.push_str(&self.arg_list.to_string());
         s.push_str(" ");
+        if let Some(it) = &self.atomically_block {
+            s.push_str(&it.to_string());
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -9303,6 +9936,26 @@ impl std::fmt::Display for OrPat {
             s.push_str(" ");
         }
         s.push_str(&self.pats.iter().map(|it| it.to_string()).collect::<Vec<String>>().join(" "));
+        write!(f, "{s}")
+    }
+}
+impl std::fmt::Display for OuterMaskClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        if self.outer_mask_token {
+            let mut tmp = stringify!(outer_mask_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
+        s.push_str(&self.invariant_name_set.to_string());
+        s.push_str(" ");
+        if self.comma_token {
+            let mut tmp = stringify!(comma_token).to_string();
+            tmp.truncate(tmp.len() - 6);
+            s.push_str(token_ascii(&tmp));
+            s.push_str(" ");
+        }
         write!(f, "{s}")
     }
 }
@@ -12822,6 +13475,82 @@ impl AssumeSpecification {
         }
     }
 }
+impl AtomicPermClause {
+    pub fn new(input: AtomicPermTuple) -> Self {
+        Self {
+            input: Box::new(input),
+            thin_arrow_token: false,
+            output: None,
+            comma_token: false,
+            cst: None,
+        }
+    }
+}
+impl AtomicPermField {
+    pub fn new(name: Name) -> Self {
+        Self { name: Box::new(name), colon_token: true, ty: None, cst: None }
+    }
+}
+impl AtomicPermTuple {
+    pub fn new() -> Self {
+        Self { l_paren_token: true, fields: vec![], r_paren_token: true, cst: None }
+    }
+}
+impl AtomicPredTypeClause {
+    pub fn new(name: Name) -> Self {
+        Self { type_token: true, name: Box::new(name), comma_token: true, cst: None }
+    }
+}
+impl AtomicReturnType {
+    pub fn new() -> Self {
+        Self {
+            thin_arrow_token: true,
+            l_paren_token: false,
+            pat: None,
+            colon_token: false,
+            ty: None,
+            r_paren_token: false,
+            cst: None,
+        }
+    }
+}
+impl AtomicSpec {
+    pub fn new(name: Name) -> Self {
+        Self {
+            atomically_token: true,
+            l_paren_token: true,
+            name: Box::new(name),
+            r_paren_token: true,
+            l_curly_token: true,
+            atomic_pred_type_clause: None,
+            atomic_perm_clause: None,
+            requires_clause: None,
+            ensures_clause: None,
+            outer_mask_clause: None,
+            inner_mask_clause: None,
+            r_curly_token: true,
+            comma_token: false,
+            cst: None,
+        }
+    }
+}
+impl AtomicallyBlock {
+    pub fn new(update_fn: Name, body: BlockExpr) -> Self {
+        Self {
+            label: None,
+            atomically_token: true,
+            loop_token: false,
+            l_pipe: None,
+            update_fn: Box::new(update_fn),
+            comma_token: false,
+            r_pipe: None,
+            atomic_return_type: None,
+            loop_clauses: vec![],
+            body: Box::new(body),
+            cst: None,
+        }
+    }
+}
 impl Attr {
     pub fn new() -> Self {
         Self {
@@ -12916,7 +13645,13 @@ impl CallExpr {
     where
         ET0: Into<Expr>,
     {
-        Self { attrs: vec![], expr: Box::new(expr.into()), arg_list: Box::new(arg_list), cst: None }
+        Self {
+            attrs: vec![],
+            expr: Box::new(expr.into()),
+            arg_list: Box::new(arg_list),
+            atomically_block: None,
+            cst: None,
+        }
     }
 }
 impl CastExpr {
@@ -13187,6 +13922,7 @@ impl Fn {
             ret_type: None,
             where_clause: None,
             prover: None,
+            atomic_spec: None,
             requires_clause: None,
             recommends_clause: None,
             ensures_clause: None,
@@ -13371,11 +14107,35 @@ impl IncludeBytesExpr {
 impl InferType {
     pub fn new() -> Self { Self { underscore_token: true, cst: None } }
 }
+impl InnerMaskClause {
+    pub fn new(invariant_name_set: InvariantNameSet) -> Self {
+        Self {
+            inner_mask_token: true,
+            invariant_name_set: Box::new(invariant_name_set),
+            comma_token: false,
+            cst: None,
+        }
+    }
+}
 impl InvariantClause {
     pub fn new() -> Self { Self { invariant_token: true, exprs: vec![], cst: None } }
 }
 impl InvariantExceptBreakClause {
     pub fn new() -> Self { Self { invariant_except_break_token: true, exprs: vec![], cst: None } }
+}
+impl InvariantNameSet {
+    pub fn new() -> Self {
+        Self {
+            any_token: false,
+            slash: None,
+            l_brack_token: false,
+            exprs: vec![],
+            r_brack_token: false,
+            none_token: false,
+            expr: None,
+            cst: None,
+        }
+    }
 }
 impl IsExpr {
     pub fn new<ET0>(expr: ET0) -> Self
@@ -13591,6 +14351,7 @@ impl MethodCallExpr {
             name_ref: Box::new(name_ref),
             generic_arg_list: None,
             arg_list: Box::new(arg_list),
+            atomically_block: None,
             cst: None,
         }
     }
@@ -13672,6 +14433,16 @@ impl OpensInvariantsClause {
 }
 impl OrPat {
     pub fn new() -> Self { Self { pipe_token: false, pats: vec![], cst: None } }
+}
+impl OuterMaskClause {
+    pub fn new(invariant_name_set: InvariantNameSet) -> Self {
+        Self {
+            outer_mask_token: true,
+            invariant_name_set: Box::new(invariant_name_set),
+            comma_token: false,
+            cst: None,
+        }
+    }
 }
 impl Param {
     pub fn new() -> Self {

@@ -235,7 +235,7 @@ Fn =
  Attr* Visibility? Publish?
  'default'? 'const'? 'async'? 'gen'? 'unsafe'? 'safe'? Abi? 'broadcast'? FnMode?
  'fn' Name GenericParamList? ParamList RetType? WhereClause?
- Prover? RequiresClause? RecommendsClause? EnsuresClause? DefaultEnsuresClause?
+ Prover? AtomicSpec? RequiresClause? RecommendsClause? EnsuresClause? DefaultEnsuresClause?
  ReturnsClause? SignatureDecreases? OpensInvariantsClause? NoUnwindClause?
  (body:BlockExpr | ';')
 
@@ -593,13 +593,13 @@ RecordExprField =
   Attr* (NameRef ':')? Expr
 
 CallExpr =
-  Attr* Expr ArgList
+  Attr* Expr ArgList AtomicallyBlock?
 
 ArgList =
   '(' args:(Expr (',' Expr)* ','?)? ')'
 
 MethodCallExpr =
-  Attr* receiver:Expr '.' NameRef GenericArgList? ArgList
+  Attr* receiver:Expr '.' NameRef GenericArgList? ArgList AtomicallyBlock?
 
 FieldExpr =
   Attr* Expr '.' NameRef
@@ -863,6 +863,43 @@ FnMode =
 
 DataMode =
   'ghost' | 'tracked'
+
+AtomicSpec =
+  'atomically' '(' Name ')' '{'
+    AtomicPredTypeClause? AtomicPermClause? RequiresClause? EnsuresClause?
+    OuterMaskClause? InnerMaskClause?
+  '}' ','?
+
+AtomicPredTypeClause =
+  'type' Name ','
+
+AtomicPermClause =
+  input:AtomicPermTuple ('->' output:AtomicPermTuple)? ','?
+
+AtomicPermTuple =
+  '(' fields:(AtomicPermField (',' AtomicPermField)* ','?)? ')'
+
+AtomicPermField =
+  Name ':' Type
+
+OuterMaskClause =
+  'outer_mask' InvariantNameSet ','?
+
+InnerMaskClause =
+  'inner_mask' InvariantNameSet ','?
+
+InvariantNameSet =
+  'any' (slash:'/' '[' (Expr (',' Expr)* ','?)? ']')?
+| 'none'
+| '[' (Expr (',' Expr)* ','?)? ']'
+| Expr
+
+AtomicallyBlock =
+  Label? 'atomically' 'loop'? l_pipe:'|' update_fn:Name ','? r_pipe:'|' AtomicReturnType?
+  LoopClause* body:BlockExpr
+
+AtomicReturnType =
+  '->' (('(' Pat (':' Type)? ')') | Type)
 
 RequiresClause =
   'requires' (Expr (',' Expr)* ','?)

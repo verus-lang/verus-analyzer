@@ -74,6 +74,29 @@ verus! {
         let tracked transform =
             move proof_fn[Send]|tracked token: Token<T>| -> tracked Token<T> { token };
     }
+
+    fn atomic_function(value: u64) -> (result: u64)
+        atomically (atomic_update) {
+            type AtomicPredicate,
+            (input: u64) -> (output: u64),
+            requires input == value,
+            ensures output >= input,
+            outer_mask any / [value],
+            inner_mask none,
+        },
+        ensures result == output,
+    {
+        result
+    }
+
+    fn call_atomic() {
+        atomic_function(0) 'retry: atomically loop |update| -> (au: AtomicUpdate)
+            invariant true,
+        {
+            update(0);
+            break 'retry;
+        };
+    }
 }
 "#;
 

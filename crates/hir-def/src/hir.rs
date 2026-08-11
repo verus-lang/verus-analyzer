@@ -426,6 +426,7 @@ pub enum Expr {
         body: ExprId,
         quantifier_kind: QuantifierKind,
     },
+    AtomicCall(Box<AtomicCall>),
     Tuple {
         exprs: Box<[ExprId]>,
     },
@@ -470,7 +471,8 @@ impl Expr {
             | Expr::Index { .. }
             | Expr::Is { .. }
             | Expr::Matches { .. }
-            | Expr::MethodCall { .. } => ExprPrecedence::Postfix,
+            | Expr::MethodCall { .. }
+            | Expr::AtomicCall(_) => ExprPrecedence::Postfix,
 
             Expr::Let { .. } | Expr::UnaryOp { .. } | Expr::Ref { .. } => ExprPrecedence::Prefix,
 
@@ -516,6 +518,18 @@ impl Expr {
             Expr::Range { .. } => ExprPrecedence::Range,
         }
     }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct AtomicCall {
+    pub call: ExprId,
+    pub body: ExprId,
+    pub update: PatId,
+    pub atomic_update: Option<PatId>,
+    pub atomic_update_type: Option<TypeRefId>,
+    pub clauses: Box<[ExprId]>,
+    pub label: Option<LabelId>,
+    pub is_loop: bool,
 }
 
 /// The loop type that yielded an `Expr::Loop`.

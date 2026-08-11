@@ -247,6 +247,7 @@ impl<'db> InferenceContext<'db> {
             Expr::Field { .. } | Expr::Arrow { .. } | Expr::Index { .. } => true,
             Expr::Call { .. }
             | Expr::MethodCall { .. }
+            | Expr::AtomicCall(_)
             | Expr::Tuple { .. }
             | Expr::If { .. }
             | Expr::Match { .. }
@@ -534,6 +535,53 @@ impl<'db> InferenceContext<'db> {
                     QuantifierKind::Choose if arg_tys.len() == 1 => arg_tys[0],
                     QuantifierKind::Choose => Ty::new_tup(self.interner(), &arg_tys),
                 }
+            }
+            Expr::AtomicCall(call) => {
+                let call_ty = self.infer_expr(call.call, expected, is_read);
+                self.infer_top_pat(call.update, self.types.types.error, PatOrigin::Param);
+
+                if let Some(atomic_update) = call.atomic_update {
+                    let atomic_update_ty = call
+                        .atomic_update_type
+                        .map(|type_ref| {
+                            let ty = self.make_body_ty(type_ref);
+                            self.insert_type_vars_shallow(ty)
+                        })
+                        .unwrap_or_else(|| self.table.next_ty_var(atomic_update.into()));
+                    self.infer_top_pat(atomic_update, atomic_update_ty, PatOrigin::Param);
+                }
+
+                for &clause in &call.clauses {
+                    self.infer_expr_coerce_never(
+                        clause,
+                        &Expectation::HasType(self.types.types.bool),
+                        ExprIsRead::Yes,
+                    );
+                }
+
+                if call.is_loop {
+                    let pre_loop_diverges = self.diverges;
+                    self.diverges = Diverges::Maybe;
+                    let (breaks, ()) =
+                        self.with_breakable_ctx(BreakableKind::Loop, None, call.label, |this| {
+                            this.infer_expr_suptype_coerce_never(
+                                call.body,
+                                &Expectation::HasType(this.types.types.unit),
+                                ExprIsRead::No,
+                            );
+                        });
+                    let loop_diverges =
+                        if breaks.may_break { Diverges::Maybe } else { Diverges::Always };
+                    self.diverges = pre_loop_diverges | loop_diverges;
+                } else {
+                    self.infer_expr_suptype_coerce_never(
+                        call.body,
+                        &Expectation::HasType(self.types.types.unit),
+                        ExprIsRead::No,
+                    );
+                }
+
+                call_ty
             }
             Expr::Call { callee, args, .. } => self.infer_call(tgt_expr, *callee, args, expected),
             Expr::MethodCall { receiver, args, method_name, generic_args } => self

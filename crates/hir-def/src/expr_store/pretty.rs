@@ -616,6 +616,36 @@ impl Printer<'_> {
                 }
                 w!(self, ")");
             }
+            Expr::AtomicCall(call) => {
+                self.print_expr(call.call);
+                self.whitespace();
+                if let Some(label) = call.label {
+                    w!(self, "{}: ", self.store[label].name.display(self.db, self.edition));
+                }
+                w!(self, "atomically ");
+                if call.is_loop {
+                    w!(self, "loop ");
+                }
+                w!(self, "|");
+                self.print_pat(call.update);
+                w!(self, "|");
+                if let Some(atomic_update) = call.atomic_update {
+                    w!(self, " -> (");
+                    self.print_pat(atomic_update);
+                    if let Some(ty) = call.atomic_update_type {
+                        w!(self, ": ");
+                        self.print_type_ref(ty);
+                    }
+                    w!(self, ")");
+                }
+                for clause in &call.clauses {
+                    self.whitespace();
+                    self.print_expr(*clause);
+                    w!(self, ",");
+                }
+                self.whitespace();
+                self.print_expr(call.body);
+            }
             Expr::Match { expr, arms } => {
                 w!(self, "match ");
                 self.print_expr(*expr);

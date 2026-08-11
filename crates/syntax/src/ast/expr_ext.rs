@@ -7,8 +7,8 @@ use crate::{
     SyntaxKind::{self, *},
     SyntaxNode, SyntaxToken, T,
     ast::{
-        self, ArgList, AstChildren, AstNode, BlockExpr, ClosureExpr, Const, Expr, Fn,
-        FormatArgsArg, FormatArgsExpr, MacroDef, Static, TokenTree,
+        self, ArgList, AstChildren, AstNode, AtomicallyBlock, BlockExpr, ClosureExpr, Const, Expr,
+        Fn, FormatArgsArg, FormatArgsExpr, MacroDef, Static, TokenTree,
         operators::{ArithOp, BinaryOp, CmpOp, LogicOp, Ordering, RangeOp, UnaryOp},
         support,
     },
@@ -513,6 +513,11 @@ impl MacroDef {
 
 impl ClosureExpr {
     pub fn body(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+}
+impl AtomicallyBlock {
+    pub fn body(&self) -> Option<BlockExpr> {
         support::child(&self.syntax)
     }
 }

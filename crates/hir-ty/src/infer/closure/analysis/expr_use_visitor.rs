@@ -717,6 +717,14 @@ impl<'a, 'db, D: Delegate<'db>> ExprUseVisitor<'a, 'db, D> {
                 self.consume_expr(body)?;
             }
 
+            Expr::AtomicCall(ref call) => {
+                self.consume_expr(call.call)?;
+                for &clause in &call.clauses {
+                    self.consume_expr(clause)?;
+                }
+                self.consume_expr(call.body)?;
+            }
+
             Expr::Yield { expr: value } | Expr::Yeet { expr: value } => {
                 if let Some(value) = value {
                     self.consume_expr(value)?;

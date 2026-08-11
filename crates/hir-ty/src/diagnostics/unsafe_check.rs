@@ -424,6 +424,9 @@ impl<'db> UnsafeVisitor<'db> {
             Expr::Closure { args, .. } | Expr::Quantifier { args, .. } => {
                 self.walk_pats_top(args.iter().copied(), current);
             }
+            Expr::AtomicCall(call) => {
+                self.walk_pats_top(std::iter::once(call.update).chain(call.atomic_update), current);
+            }
             _ => {}
         }
 
