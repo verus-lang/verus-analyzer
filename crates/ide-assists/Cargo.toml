@@ -37,7 +37,6 @@ test-utils.workspace = true
 
 [features]
 in-rust-tree = []
-proof-action = []
 verus-integration-tests = []
 
 [lints]

@@ -139,7 +139,7 @@ npm install vscode-languageclient
 
 We include a build of the server in the VSIX file, so in the base of this repo, run:
 ```
-cargo xtask dist --proof-action --client-patch-version 42
+cargo xtask dist --client-patch-version 42
 ```
 which will cause a copy of the server to be placed in `editors/code/server/`
 The number you pass in will be concatenated to "0.4" to form the extension's
