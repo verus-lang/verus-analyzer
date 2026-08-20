@@ -131,6 +131,7 @@ cargo test -p rust-analyzer --lib generate_config_documentation
 ## Building a VSIX file
 
 This requires the `esbuild` tool to be installed.  On Mac OS, run `brew install esbuild`.
+Running `npm install esbuild` in `editors/code` may also work.
 
 You may also need to install the `vscode-languageclient` package via:
 ```
@@ -179,6 +180,11 @@ code --install-extension ./dist/verus-analyzer-[your-arch-choice].vsix
 ```
 Or in VS Code, you can open the Extensions panel, click the '...' button in the upper-right
 portion of the panel, and select "Install from VSIX..."
+
+To automate removing the old version of the extension, run:
+```
+code --uninstall-extension verus-lang.verus-analyzer
+```
 
 ### Notes
 
