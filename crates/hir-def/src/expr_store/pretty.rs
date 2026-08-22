@@ -584,6 +584,15 @@ impl Printer<'_> {
                 w!(self, "loop ");
                 self.print_expr(*body);
             }
+            Expr::LoopClauses { clauses, body } => {
+                w!(self, "loop clauses ");
+                for clause in clauses {
+                    self.print_expr(*clause);
+                    w!(self, ", ");
+                }
+                w!(self, " ");
+                self.print_expr(*body);
+            }
             Expr::Call { callee, args } => {
                 self.print_expr_in(prec, *callee);
                 w!(self, "(");
@@ -917,10 +926,14 @@ impl Printer<'_> {
             Expr::Const(id) => {
                 w!(self, "const {{ /* {id:?} */ }}");
             }
-            Expr::Assert { condition, body } => {
+            Expr::Assert { condition, requirements, body } => {
                 w!(self, "assert(");
                 self.print_expr(*condition);
                 w!(self, ")");
+                for requirement in requirements {
+                    w!(self, " requires ");
+                    self.print_expr(*requirement);
+                }
                 if let Some(body) = body {
                     w!(self, " by ");
                     self.print_expr(*body);

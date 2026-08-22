@@ -1455,36 +1455,7 @@ impl<'db> ExprCollector<'db> {
                 None
             };
             if let Some(quantifier_kind) = quantifier_kind {
-                return Some(self.with_label_rib(RibKind::Closure, |this| {
-                    let mut args = Vec::new();
-                    let mut arg_types = Vec::new();
-                    if let Some(pl) = e.param_list() {
-                        let num_params = pl.params().count();
-                        args.reserve_exact(num_params);
-                        arg_types.reserve_exact(num_params);
-                        for param in pl.params() {
-                            if !this.check_cfg(&param) {
-                                continue;
-                            }
-
-                            let pat = this.collect_pat_top(param.pat());
-                            let type_ref =
-                                param.ty().map(|it| this.lower_type_ref_disallow_impl_trait(it));
-                            args.push(pat);
-                            arg_types.push(type_ref);
-                        }
-                    }
-                    let body = this.collect_expr_opt(e.body());
-                    this.alloc_expr(
-                        Expr::Quantifier {
-                            args: args.into(),
-                            arg_types: arg_types.into(),
-                            body,
-                            quantifier_kind,
-                        },
-                        syntax_ptr,
-                    )
-                }));
+                return Some(self.collect_quantifier(e.clone(), None, quantifier_kind, syntax_ptr));
             }
         }
 
@@ -1610,7 +1581,15 @@ impl<'db> ExprCollector<'db> {
                     (self.hygiene_id_for(label.syntax().text_range()), self.collect_label(label))
                 });
                 let body = self.collect_labelled_block_opt(label, e.loop_body());
-                self.alloc_expr(Expr::Loop { body, label: label.map(|it| it.1), source: LoopSource::Loop }, syntax_ptr)
+                let body = self.collect_loop_clauses(e.loop_clauses(), body);
+                self.alloc_expr(
+                    Expr::Loop {
+                        body,
+                        label: label.map(|it| it.1),
+                        source: LoopSource::Loop,
+                    },
+                    syntax_ptr,
+                )
             }
             ast::Expr::WhileExpr(e) => self.collect_while_loop(syntax_ptr, e),
             ast::Expr::ForExpr(e) => self.collect_for_loop(syntax_ptr, e),
@@ -2015,11 +1994,36 @@ impl<'db> ExprCollector<'db> {
             ast::Expr::IncludeBytesExpr(_) => self.alloc_expr(Expr::IncludeBytes, syntax_ptr),
             ast::Expr::AssertExpr(e) => {
                 let condition = self.collect_expr_opt(e.expr());
+                let requirements = e
+                    .requires_clause()
+                    .into_iter()
+                    .flat_map(|clause| clause.exprs())
+                    .map(|expr| self.collect_expr(expr))
+                    .collect();
                 let body = e.block_expr().map(|block| self.collect_block(block));
-                self.alloc_expr(Expr::Assert { condition, body }, syntax_ptr)
+                self.alloc_expr(Expr::Assert { condition, requirements, body }, syntax_ptr)
             }
             ast::Expr::AssertForallExpr(e) => {
-                let closure = self.collect_expr_opt(e.closure_expr().map(ast::Expr::ClosureExpr));
+                let conclusion = e.implies_token().and_then(|implies| {
+                    e.syntax()
+                        .children()
+                        .filter_map(ast::Expr::cast)
+                        .find(|expr| {
+                            expr.syntax().text_range().start() >= implies.text_range().end()
+                        })
+                });
+                let closure = e
+                    .closure_expr()
+                    .map(|closure| {
+                        let ptr = AstPtr::new(&ast::Expr::ClosureExpr(closure.clone()));
+                        self.collect_quantifier(
+                            closure,
+                            conclusion,
+                            QuantifierKind::Forall,
+                            ptr,
+                        )
+                    })
+                    .unwrap_or_else(|| self.missing_expr());
                 let body = self.collect_block_opt(e.block_expr());
                 self.alloc_expr(Expr::AssertForall { closure, body }, syntax_ptr)
             }
@@ -2056,6 +2060,52 @@ impl<'db> ExprCollector<'db> {
                 let pat = self.collect_pat_top(e.pat());
                 self.alloc_expr(Expr::Matches { expr, pat }, syntax_ptr)
             }
+        })
+    }
+
+    fn collect_quantifier(
+        &mut self,
+        closure: ast::ClosureExpr,
+        conclusion: Option<ast::Expr>,
+        quantifier_kind: QuantifierKind,
+        syntax_ptr: ExprPtr,
+    ) -> ExprId {
+        self.with_label_rib(RibKind::Closure, |this| {
+            let mut args = Vec::new();
+            let mut arg_types = Vec::new();
+            if let Some(param_list) = closure.param_list() {
+                let num_params = param_list.params().count();
+                args.reserve_exact(num_params);
+                arg_types.reserve_exact(num_params);
+                for param in param_list.params() {
+                    if !this.check_cfg(&param) {
+                        continue;
+                    }
+
+                    let pat = this.collect_pat_top(param.pat());
+                    let type_ref = param.ty().map(|it| this.lower_type_ref_disallow_impl_trait(it));
+                    args.push(pat);
+                    arg_types.push(type_ref);
+                }
+            }
+            let mut body = this.collect_expr_opt(closure.body());
+            if let Some(conclusion) = conclusion {
+                let rhs = this.collect_expr(conclusion);
+                body = this.alloc_expr_desugared(Expr::BinaryOp {
+                    lhs: body,
+                    rhs,
+                    op: Some(ast::BinaryOp::LogicOp(ast::LogicOp::Imply)),
+                });
+            }
+            this.alloc_expr(
+                Expr::Quantifier {
+                    args: args.into(),
+                    arg_types: arg_types.into(),
+                    body,
+                    quantifier_kind,
+                },
+                syntax_ptr,
+            )
         })
     }
 
@@ -2449,8 +2499,9 @@ impl<'db> ExprCollector<'db> {
             Expr::If { condition, then_branch: body, else_branch: Some(break_expr) },
             syntax_ptr,
         );
+        let body = self.collect_loop_clauses(e.loop_clauses(), if_expr);
         self.alloc_expr(
-            Expr::Loop { body: if_expr, label: label.map(|it| it.1), source: LoopSource::While },
+            Expr::Loop { body, label: label.map(|it| it.1), source: LoopSource::While },
             syntax_ptr,
         )
     }
@@ -2505,7 +2556,10 @@ impl<'db> ExprCollector<'db> {
         let some_arm = MatchArm {
             pat: self.alloc_pat_desugared(some_pat),
             guard: None,
-            expr: self.with_opt_labeled_rib(label, |this| this.collect_expr_opt(loop_body)),
+            expr: self.with_opt_labeled_rib(label, |this| {
+                let body = this.collect_expr_opt(loop_body);
+                this.collect_loop_clauses(e.loop_clauses(), body)
+            }),
         };
         let iter_name = self.generate_new_name();
         let iter_expr = self
@@ -2552,6 +2606,27 @@ impl<'db> ExprCollector<'db> {
             },
             syntax_ptr,
         )
+    }
+
+    fn collect_loop_clauses(
+        &mut self,
+        clauses: impl Iterator<Item = ast::LoopClause>,
+        body: ExprId,
+    ) -> ExprId {
+        let clauses: Box<[ExprId]> = clauses
+            .flat_map(|clause| match clause {
+                ast::LoopClause::DecreasesClause(it) => it.exprs().collect_vec(),
+                ast::LoopClause::EnsuresClause(it) => it.exprs().collect_vec(),
+                ast::LoopClause::InvariantClause(it) => it.exprs().collect_vec(),
+                ast::LoopClause::InvariantExceptBreakClause(it) => it.exprs().collect_vec(),
+            })
+            .map(|expr| self.collect_expr(expr))
+            .collect();
+        if clauses.is_empty() {
+            body
+        } else {
+            self.alloc_expr_desugared(Expr::LoopClauses { clauses, body })
+        }
     }
 
     /// Desugar `ast::TryExpr` from: `<expr>?` into:

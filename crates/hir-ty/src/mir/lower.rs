@@ -696,6 +696,9 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
                     Ok(())
                 })
             }
+            Expr::LoopClauses { body, clauses: _ } => {
+                self.lower_expr_to_place(*body, place, current)
+            }
             Expr::Call { callee, args, .. } => {
                 if let Some((func_id, generic_args)) = self.infer.method_resolution(expr_id) {
                     let ty = Ty::new_fn_def(

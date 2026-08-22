@@ -275,6 +275,7 @@ pub enum Expr {
     Missing,
     Assert {
         condition: ExprId,
+        requirements: Box<[ExprId]>,
         body: Option<ExprId>,
     },
     AssertForall {
@@ -333,6 +334,10 @@ pub enum Expr {
         body: ExprId,
         label: Option<LabelId>,
         source: LoopSource,
+    },
+    LoopClauses {
+        clauses: Box<[ExprId]>,
+        body: ExprId,
     },
     Call {
         callee: ExprId,
@@ -454,6 +459,7 @@ impl Expr {
             | Expr::If { .. }
             | Expr::Literal(_)
             | Expr::Loop { .. }
+            | Expr::LoopClauses { .. }
             | Expr::Match { .. }
             | Expr::Missing
             | Expr::Path(_)

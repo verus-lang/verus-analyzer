@@ -663,8 +663,9 @@ impl ExpressionStore {
         // Do not use `..` patterns or field accesses here, only destructuring, to ensure we cover all cases
         // (we've had multiple bugs with this in the past).
         match &self[expr_id] {
-            Expr::Assert { condition, body } => {
+            Expr::Assert { condition, requirements, body } => {
                 visitor.on_expr(*condition);
+                visitor.on_exprs(requirements);
                 visitor.on_expr_opt(*body);
             }
             Expr::AssertForall { closure, body } => {
@@ -732,6 +733,10 @@ impl ExpressionStore {
                 visitor.on_expr_opt(*tail);
             }
             Expr::Loop { body, label: _, source: _ } => visitor.on_expr(*body),
+            Expr::LoopClauses { clauses, body } => {
+                visitor.on_exprs(clauses);
+                visitor.on_expr(*body);
+            }
             Expr::Call { callee, args } => {
                 visitor.on_expr(*callee);
                 visitor.on_exprs(args);

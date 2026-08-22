@@ -503,8 +503,11 @@ impl<'a, 'db, D: Delegate<'db>> ExprUseVisitor<'a, 'db, D> {
         self.walk_adjustment(expr)?;
 
         match self.cx.store[expr] {
-            Expr::Assert { condition, body } => {
+            Expr::Assert { condition, ref requirements, body } => {
                 self.consume_expr(condition)?;
+                for requirement in requirements.iter().copied() {
+                    self.consume_expr(requirement)?;
+                }
                 if let Some(body) = body {
                     self.consume_expr(body)?;
                 }
@@ -651,6 +654,13 @@ impl<'a, 'db, D: Delegate<'db>> ExprUseVisitor<'a, 'db, D> {
 
             Expr::Loop { body: blk, .. } => {
                 self.walk_expr(blk)?;
+            }
+
+            Expr::LoopClauses { ref clauses, body } => {
+                for clause in clauses.iter().copied() {
+                    self.consume_expr(clause)?;
+                }
+                self.walk_expr(body)?;
             }
 
             Expr::UnaryOp { expr: lhs, .. } => {

@@ -261,6 +261,7 @@ impl<'db> InferenceContext<'db> {
             | Expr::Become { .. }
             | Expr::Let { .. }
             | Expr::Loop { .. }
+            | Expr::LoopClauses { .. }
             | Expr::InlineAsm(..)
             | Expr::OffsetOf(..)
             | Expr::Literal(..)
@@ -342,12 +343,19 @@ impl<'db> InferenceContext<'db> {
         tracing::trace!(?expr);
         let ty = match expr {
             Expr::Missing => self.err_ty(),
-            Expr::Assert { condition, body } => {
+            Expr::Assert { condition, requirements, body } => {
                 self.infer_expr_coerce_never(
                     *condition,
                     &Expectation::HasType(self.types.types.bool),
                     ExprIsRead::Yes,
                 );
+                for requirement in requirements {
+                    self.infer_expr_coerce_never(
+                        *requirement,
+                        &Expectation::HasType(self.types.types.bool),
+                        ExprIsRead::Yes,
+                    );
+                }
                 if let Some(body) = body {
                     self.infer_expr(
                         *body,
@@ -498,6 +506,12 @@ impl<'db> InferenceContext<'db> {
                     self.diverges = Diverges::Always;
                 }
                 breaks.coerce.map(|c| c.complete(self)).unwrap_or(self.types.types.unit)
+            }
+            Expr::LoopClauses { clauses, body } => {
+                for clause in clauses {
+                    self.infer_expr_no_expect(*clause, ExprIsRead::Yes);
+                }
+                self.infer_expr(*body, expected, is_read)
             }
             Expr::Closure { body, args, ret_type, arg_types, closure_kind, capture_by: _ } => self
                 .infer_closure(

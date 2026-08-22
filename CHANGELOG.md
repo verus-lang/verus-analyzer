@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-### Changed
+- Add scanning support for loop invariant, ensures, and decreases clauses; assert-by requires; assert-forall implies conclusions
+
+### 2026-08-22
 
 - Synchronized with rust-analyzer at `ece721d6cd`.
 - Ported Verus syntax, analysis, verifier integration, proof actions, and VS Code installation to

@@ -1572,6 +1572,235 @@ impl NodeHelper {
     }
 
     #[test]
+    fn goto_definition_in_verus_function_decreases() {
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn function_contracts(self)
+        requires self.predicate(),
+        ensures self.predicate(),
+        decreases self.predic$0ate(),
+    {
+    }
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_definition_in_verus_loop_contracts() {
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn loop_contracts(self) {
+        loop
+            invariant self.predic$0ate(),
+            ensures self.predicate(),
+            decreases self.predicate(),
+        {
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn loop_contracts(self) {
+        loop
+            invariant self.predicate(),
+            ensures self.predic$0ate(),
+            decreases self.predicate(),
+        {
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn loop_contracts(self) {
+        loop
+            invariant self.predicate(),
+            ensures self.predicate(),
+            decreases self.predic$0ate(),
+        {
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn while_contracts(self) {
+        while true
+            invariant self.predic$0ate(),
+        {
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "predicate",
+            r#"
+//- minicore: iterator, builtin_impls
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+}
+
+fn for_contracts(helpers: [Helper; 1]) {
+    for helper in helpers
+        invariant helper.predic$0ate(),
+    {
+    }
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_definition_in_verus_assert_by_block() {
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn assert_by(self) {
+        assert(self.predicate()) by
+            requires self.predicate(),
+        {
+            self.predic$0ate();
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn assert_by(self) {
+        assert(self.predicate()) by
+            requires self.predic$0ate(),
+        {
+            self.predicate();
+        }
+    }
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn goto_definition_in_verus_assert_forall_block() {
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn assert_forall(self) {
+        assert forall|x: bool| self.predicate() implies self.predicate() by {
+            Self::predic$0ate(self);
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "predicate",
+            r#"
+struct Helper;
+
+impl Helper {
+    fn predicate(self) -> bool {
+        true
+    }
+
+    fn assert_forall(self) {
+        assert forall|x: bool| self.predicate() implies Self::predic$0ate(self) by {
+            self.predicate();
+        }
+    }
+}
+"#,
+        );
+
+        check_name(
+            "x",
+            r#"
+fn assert_forall() {
+    assert forall|x: bool| true implies x$0 by {
+    }
+}
+"#,
+        );
+    }
+
+    #[test]
     fn goto_definition_on_self_in_trait_impl() {
         check(
             r#"
