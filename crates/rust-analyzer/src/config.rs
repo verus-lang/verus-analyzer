@@ -1057,8 +1057,12 @@ config_data! {
         verus_enable: bool = true,
         /// Extra Verus arguments passed to verifier invocations.
         verus_extraArgs: Vec<String> = vec![],
-        /// Report verifier errors from the entire crate instead of restricting verification to the saved file's module.
-        verus_reportAllErrorsEnable: bool = false,
+        /// Verification scope used when a Rust file is saved.
+        ///
+        /// `module` verifies only the saved file's module. `crate` verifies the entire crate and
+        /// reports all errors.
+        verus_verificationScope | verus_reportAllErrorsEnable: VerusVerificationScopeDef =
+            VerusVerificationScopeDef::Module,
 
         /// Additional paths to include in the VFS. Generally for code that is
         /// generated or otherwise managed by a build system outside of Cargo,
@@ -2648,7 +2652,14 @@ impl Config {
             Some(_) | None if *self.verus_enable(source_root) => FlycheckConfig::VerusCommand {
                 verus_args: self.verus_extraArgs(source_root).clone(),
                 cargo_verus_enable: *self.cargo_verusEnable(source_root),
-                report_all_errors: *self.verus_reportAllErrorsEnable(source_root),
+                verification_scope: match self.verus_verificationScope(source_root) {
+                    VerusVerificationScopeDef::Module => {
+                        crate::flycheck::VerusVerificationScope::Module
+                    }
+                    VerusVerificationScopeDef::Crate => {
+                        crate::flycheck::VerusVerificationScope::Crate
+                    }
+                },
                 cargo_options: cargo_options(),
             },
             Some(_) | None => FlycheckConfig::Automatic {
@@ -3112,6 +3123,37 @@ enum CargoFeaturesDef {
 pub(crate) enum InvocationStrategy {
     Once,
     PerWorkspace,
+}
+
+#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+enum VerusVerificationScopeDef {
+    Module,
+    Crate,
+}
+
+impl<'de> Deserialize<'de> for VerusVerificationScopeDef {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Repr {
+            Scope(String),
+            ReportAllErrors(bool),
+        }
+
+        match Repr::deserialize(deserializer)? {
+            Repr::Scope(scope) if scope == "module" => Ok(Self::Module),
+            Repr::Scope(scope) if scope == "crate" => Ok(Self::Crate),
+            Repr::Scope(scope) => {
+                Err(serde::de::Error::unknown_variant(&scope, &["module", "crate"]))
+            }
+            Repr::ReportAllErrors(false) => Ok(Self::Module),
+            Repr::ReportAllErrors(true) => Ok(Self::Crate),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -4046,6 +4088,14 @@ fn field_props(field: &str, ty: &str, doc: &[&str], default: &str) -> serde_json
                 or even only different than the default. Enabling this is not recommended."
             ],
         },
+        "VerusVerificationScopeDef" => set! {
+            "type": "string",
+            "enum": ["module", "crate"],
+            "enumDescriptions": [
+                "Verify only the module containing the saved file.",
+                "Verify the entire crate and report all errors.",
+            ],
+        },
         "Option<CheckOnSaveTargets>" => set! {
             "anyOf": [
                 {
@@ -4479,6 +4529,49 @@ mod tests {
                 == Some(Utf8PathBuf::from("other_folder"))
         ));
     }
+
+    #[test]
+    fn verus_verification_scope() {
+        let mut config =
+            Config::new(AbsPathBuf::assert(project_root()), Default::default(), vec![], None);
+
+        assert!(matches!(
+            config.flycheck(None),
+            FlycheckConfig::VerusCommand {
+                verification_scope: crate::flycheck::VerusVerificationScope::Module,
+                ..
+            }
+        ));
+
+        let mut change = ConfigChange::default();
+        change.change_client_config(serde_json::json!({
+            "verus": { "verificationScope": "crate" }
+        }));
+        (config, _, _) = config.apply_change(change);
+
+        assert!(matches!(
+            config.flycheck(None),
+            FlycheckConfig::VerusCommand {
+                verification_scope: crate::flycheck::VerusVerificationScope::Crate,
+                ..
+            }
+        ));
+
+        let mut change = ConfigChange::default();
+        change.change_client_config(serde_json::json!({
+            "verus": { "reportAllErrorsEnable": true }
+        }));
+        (config, _, _) = config.apply_change(change);
+
+        assert!(matches!(
+            config.flycheck(None),
+            FlycheckConfig::VerusCommand {
+                verification_scope: crate::flycheck::VerusVerificationScope::Crate,
+                ..
+            }
+        ));
+    }
+
     #[test]
     fn postfix_snippet_item_scope_is_invalid() {
         let mut config =

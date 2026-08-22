@@ -53,9 +53,9 @@ Verus support is intentionally layered on top of current rust-analyzer:
 - Verus installation and editor integration live in `editors/code`.
 
 The server runs Verus when a Rust file is saved. `verus.enable` controls this behavior,
-`verus.extraArgs` adds verifier arguments, `verus.reportAllErrorsEnable` disables per-module
-filtering, and `cargo.verusEnable` selects `cargo-verus` instead of direct invocation. The VS Code
-extension sets `VERUS_BINARY_PATH` for the server process.
+`verus.extraArgs` adds verifier arguments, `verus.verificationScope` selects module or crate
+verification, and `cargo.verusEnable` selects `cargo-verus` instead of direct invocation. The VS
+Code extension sets `VERUS_BINARY_PATH` for the server process.
 
 ## Reproducing VS Code diagnostics from the CLI
 

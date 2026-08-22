@@ -3302,10 +3302,18 @@
             {
                 "title": "Verus",
                 "properties": {
-                    "verus-analyzer.verus.reportAllErrorsEnable": {
-                        "markdownDescription": "Report verifier errors from the entire crate instead of restricting verification to the saved file's module.",
-                        "default": false,
-                        "type": "boolean"
+                    "verus-analyzer.verus.verificationScope": {
+                        "markdownDescription": "Verification scope used when a Rust file is saved.\n\n`module` verifies only the saved file's module. `crate` verifies the entire crate and\nreports all errors.",
+                        "default": "module",
+                        "type": "string",
+                        "enum": [
+                            "module",
+                            "crate"
+                        ],
+                        "enumDescriptions": [
+                            "Verify only the module containing the saved file.",
+                            "Verify the entire crate and report all errors."
+                        ]
                     }
                 }
             },

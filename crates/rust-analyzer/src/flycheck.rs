@@ -38,6 +38,12 @@ pub(crate) enum InvocationStrategy {
     PerWorkspace,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum VerusVerificationScope {
+    Module,
+    Crate,
+}
+
 /// Data needed to construct a `cargo` command invocation, e.g. for flycheck or running a test.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct CargoOptions {
@@ -158,7 +164,7 @@ pub(crate) enum FlycheckConfig {
         verus_args: Vec<String>,
         cargo_verus_enable: bool,
         cargo_options: CargoOptions,
-        report_all_errors: bool,
+        verification_scope: VerusVerificationScope,
     },
 }
 
@@ -1016,7 +1022,7 @@ impl FlycheckActor {
                 verus_args,
                 cargo_verus_enable,
                 cargo_options,
-                report_all_errors,
+                verification_scope,
             } => {
                 let saved_file = saved_file?;
                 let command = if *cargo_verus_enable {
@@ -1025,10 +1031,10 @@ impl FlycheckActor {
                         saved_file,
                         verus_args,
                         cargo_options,
-                        *report_all_errors,
+                        *verification_scope,
                     )
                 } else {
-                    self.verus_command(saved_file, verus_args, *report_all_errors)
+                    self.verus_command(saved_file, verus_args, *verification_scope)
                 }?;
                 Some((command, FlycheckCommandOrigin::Verus))
             }
@@ -1041,7 +1047,7 @@ impl FlycheckActor {
         saved_file: &AbsPath,
         verus_args: &[String],
         cargo_options: &CargoOptions,
-        report_all_errors: bool,
+        verification_scope: VerusVerificationScope,
     ) -> Option<Command> {
         let project_dir = find_verus_project_dir(saved_file.as_ref())
             .unwrap_or_else(|| AsRef::<Path>::as_ref(&*self.root).to_path_buf());
@@ -1072,9 +1078,7 @@ impl FlycheckActor {
         cmd.arg("--");
         cmd.args(verus_args);
         cmd.args(verus_manifest_extra_args(&project_dir.join("Cargo.toml")));
-        if !report_all_errors {
-            cmd.args(verus_module_args(saved_file.as_ref(), &project_dir)?);
-        }
+        cmd.args(verus_verification_args(saved_file.as_ref(), &project_dir, verification_scope)?);
         Some(cmd)
     }
 
@@ -1082,7 +1086,7 @@ impl FlycheckActor {
         &self,
         saved_file: &AbsPath,
         verus_args: &[String],
-        report_all_errors: bool,
+        verification_scope: VerusVerificationScope,
     ) -> Option<Command> {
         let saved_file: &Path = saved_file.as_ref();
         let project_dir = find_verus_project_dir(saved_file);
@@ -1113,8 +1117,8 @@ impl FlycheckActor {
         }
         if let Some(project_dir) = project_dir.as_deref() {
             cmd.args(verus_manifest_extra_args(&project_dir.join("Cargo.toml")));
-            if !report_all_errors && input_file != saved_file {
-                cmd.args(verus_module_args(saved_file, project_dir)?);
+            if input_file != saved_file {
+                cmd.args(verus_verification_args(saved_file, project_dir, verification_scope)?);
             }
         }
         cmd.args(["--", "--error-format=json"]);
@@ -1202,6 +1206,17 @@ fn find_verus_project_dir(file: &Path) -> Option<PathBuf> {
     file.parent()?.ancestors().find(|dir| dir.join("Cargo.toml").is_file()).map(Path::to_path_buf)
 }
 
+fn verus_verification_args(
+    file: &Path,
+    project_dir: &Path,
+    scope: VerusVerificationScope,
+) -> Option<Vec<String>> {
+    match scope {
+        VerusVerificationScope::Module => verus_module_args(file, project_dir),
+        VerusVerificationScope::Crate => Some(Vec::new()),
+    }
+}
+
 fn verus_module_args(file: &Path, project_dir: &Path) -> Option<Vec<String>> {
     let relative = file.strip_prefix(project_dir.join("src")).ok()?;
     if relative == Path::new("main.rs") || relative == Path::new("lib.rs") {
@@ -1271,6 +1286,14 @@ mod tests {
         assert_eq!(
             verus_module_args(Path::new("/workspace/src/foo/mod.rs"), root),
             Some(vec!["--verify-module".to_owned(), "foo".to_owned()])
+        );
+        assert_eq!(
+            verus_verification_args(
+                Path::new("/workspace/src/foo/mod.rs"),
+                root,
+                VerusVerificationScope::Crate,
+            ),
+            Some(Vec::new())
         );
     }
 

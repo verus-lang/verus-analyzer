@@ -1695,11 +1695,14 @@ Default: `[]`
 Extra Verus arguments passed to verifier invocations.
 
 
-## verus-analyzer.verus.reportAllErrorsEnable {#verus.reportAllErrorsEnable}
+## verus-analyzer.verus.verificationScope {#verus.verificationScope}
 
-Default: `false`
+Default: `"module"`
 
-Report verifier errors from the entire crate instead of restricting verification to the saved file's module.
+Verification scope used when a Rust file is saved.
+
+`module` verifies only the saved file's module. `crate` verifies the entire crate and
+reports all errors.
 
 
 ## verus-analyzer.vfs.extraIncludes {#vfs.extraIncludes}

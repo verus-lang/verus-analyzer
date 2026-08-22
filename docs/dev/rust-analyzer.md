@@ -140,7 +140,7 @@ The current implementation:
 - Uses `VERUS_BINARY_PATH` when supplied and otherwise falls back to `verus` on `PATH`.
 - Finds the enclosing Cargo project and chooses its `src/main.rs` or `src/lib.rs` when needed.
 - Restricts verification to the module containing the saved file unless
-  `verus.reportAllErrorsEnable` is set.
+  `verus.verificationScope` is set to `crate`.
 - Reads extra verifier arguments from `[package.metadata.verus.ide]` with a TOML parser rather than
   scanning manifest lines.
 - Preserves normal Cargo target, feature, environment, and package selection behavior for
@@ -334,5 +334,3 @@ the newly added Verus version parser test is part of that harness.
 
 For the baseline, implementation decisions, and validation from the 2026 sync, see
 [2026 rust-analyzer sync summary](2026-rust-analyzer-sync.md).
-
-
