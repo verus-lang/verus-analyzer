@@ -902,13 +902,13 @@ AtomicReturnType =
   '->' (('(' Pat (':' Type)? ')') | Type)
 
 RequiresClause =
-  'requires' (Expr (',' Expr)* ','?)
+  'requires' (Expr (',' Expr)* ','?)?
 
 EnsuresClause =
-  'ensures' (Expr (',' Expr)* ','?)
+  'ensures' (Expr (',' Expr)* ','?)?
 
 DefaultEnsuresClause =
-  'default_ensures' (Expr (',' Expr)* ','?)
+  'default_ensures' (Expr (',' Expr)* ','?)?
 
 ReturnsClause =
   'returns' Expr
@@ -920,16 +920,16 @@ LoopClause =
 | DecreasesClause
 
 InvariantClause =
-  'invariant' (Expr (',' Expr)* ','?)
+  'invariant' (Expr (',' Expr)* ','?)?
 
 InvariantExceptBreakClause =
-  'invariant_except_break' (Expr (',' Expr)* ','?)
+  'invariant_except_break' (Expr (',' Expr)* ','?)?
 
 RecommendsClause =
-  'recommends' (Expr (',' Expr)* ','?) ('via' Expr)?
+  'recommends' (Expr (',' Expr)* ','?)? ('via' Expr)?
 
 DecreasesClause =
-  'decreases' (Expr (',' Expr)* ','?)
+  'decreases' (Expr (',' Expr)* ','?)?
 
 OpensInvariantsClause =
   'opens_invariants' ('none' | 'any' | '[' (Expr (',' Expr)* ','?)? ']' | Expr)

@@ -308,6 +308,42 @@ fn parenthesized_tuple() -> ((u32, bool)) {
 }
 
 #[test]
+fn empty_verus_clause_lists_parse() {
+    let source = r#"
+fn empty_requires()
+    requires
+{}
+
+fn empty_recommends()
+    recommends
+{}
+
+fn empty_ensures()
+    ensures
+{}
+
+fn empty_default_ensures()
+    default_ensures
+{}
+
+fn empty_decreases()
+    decreases
+{}
+
+fn empty_loop_clauses() {
+    loop
+        invariant
+        invariant_except_break
+        ensures
+        decreases
+    {}
+}
+"#;
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+}
+
+#[test]
 fn verus_logical_atomicity_syntax_parses() {
     let source = r#"
 fn atomic_function(px: PX) -> (py: PY)

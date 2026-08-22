@@ -4,6 +4,8 @@
 
 - Add scanning support for loop invariant, ensures, and decreases clauses; assert-by requires; assert-forall implies conclusions
 - Improve inference for Verus's triple-or and triple-and operators.
+- Add clearer configuration setting for controlling which code is verified when a file is saved.
+- Support empty requires, ensures, etc. clauses
 
 ### 2026-08-22
 
