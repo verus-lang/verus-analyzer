@@ -24,8 +24,8 @@ next to `main.rs`, but you do not import `foo.rs` in `main.rs`(i.e., you haven't
 `mod foo` in `main.rs`), then the IDE features will not work for `foo.rs`.
 
 As mentioned above, `verus-analyzer` also expects to find a `Cargo.toml` metadata file,
-as is in standard in Rust projects. For a small
-project, you could start by running `cargo new`, which will automatically generate a
+as is standard in Rust projects. For a small
+project, you could start by running `cargo verus new`, which will automatically generate a
 suitable `Cargo.toml` file for you. For a larger project, you could use a Rust
 [workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html) to
 manage multiple crates.
@@ -42,9 +42,8 @@ want to install a new version of Verus in between `verus-analyzer` updates, ther
 two options.
 1. You can remove the `verus-analyzer` extension and then re-install it.
 2. You can manually download the latest [Verus release](https://github.com/verus-lang/verus/releases)
-   and use it to overwrite the version that `verus-analyzer` downloads.  This will be in your
-   VS Code extensions directory.  E.g., on MacOS, it will be something like 
-   `~/.vscode/extensions/verus-lang.verus-analyzer-0.3.246-darwin-arm64/verus`.
+   and edit the extension setting for "verus-analyzer.verus.verusBinary" to point to your
+   downloaded version.
 
 ---
 ## Features and Details
@@ -61,16 +60,15 @@ You can find more documentation of the IDE features by following these links.
 - [Hover](https://rust-analyzer.github.io/manual.html#hover)
 
 #### 2.1 TODOs for IDE features
-- Code scanning is incomplete for Verus-specific items. To be specific, `requires`, `ensures`, `decreases`, `invariant`, `assert-by-block`, and `assert-forall-block` are not fully scanned for IDE purposes (e.g., you might not be able to use "Go to Definition" on a function mentioned in a `requires` or `ensures` expression, or "Find All References" might omit occurrences inside `requires` and `ensures` expressions).
+- Code scanning is incomplete for Verus-specific items. To be specific, `decreases`, `invariant`, `assert-by-block`, and `assert-forall-block` are not fully scanned for IDE purposes.
 
 - Although Verus' custom operators are parsed, they are not registered for IDE purposes. For example, type inference around such operators might not work (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are Booleans).
 
-- `vstd` is not scanned by default; if you want to enable "Go to Definition" or auto-completion for `vstd`, you should add it as a dependency in your Cargo.toml file, e.g.,
+- `vstd` is not scanned by default; if you want to enable "Go to Definition" or auto-completion for `vstd`, you should add it as a dependency in your Cargo.toml file, either using `cargo add vstd` or by pointing
+ at the "bleeding edge" version via: 
 ```
 [dependencies]
 vstd =           { git = "https://github.com/verus-lang/verus" }
-builtin =        { git = "https://github.com/verus-lang/verus" }
-builtin_macros = { git = "https://github.com/verus-lang/verus" }
 ```
 
 ### 3. Running Verus
@@ -96,21 +94,12 @@ in their Verus files.  This will cause various `verus-analyzer` features (like G
 since `verus-analyzer` won't recognize that `cfg` setting by default.  To address that, edit your VS Code `settings.json`
 file to add:
 ```
-    "verus-analyzer.cargo.cfgs": {
-        "verus_keep_ghost": null,
-        "debug_assertions": null,
-        "miri": null
-    },
-```
-In the future, when we sync up with the latest version of `rust-analyzer`, you will need this setting instead:
-```
     "verus-analyzer.cargo.cfgs": [
         "debug_assertions",
         "miri",
         "verus_keep_ghost"
     ],
 ```
-since `rust-analyzer` changed the type it expects for this setting.
 
 ---
 ## Release Notes
@@ -128,11 +117,6 @@ See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 - The `verus-analyzer: Clear flycheck diagnostics` command can be used to clear the error messages in VS Code
 - The `Developer: Reload Window` command can be used to reload VS Code and the verus-analyzer server instead of closing and reopening VS Code
 - Setting `"rust-analyzer.diagnostics.disabled": ["syntax-error"]` in your workspace's settings can disable the syntax error messages in VS Code. You could also add `unresolved-module` to the above list to disable the error message for unresolved modules.
-- There is no proper support for `buildin`/`vstd`. However, in your project's `Cargo.toml` file, you can add `vstd` in `dependencices` or `dev-dependencies`, which might make `verus-analyzer` scan `vstd` and `builtin`. For example, you can try adding:
-```
-[dependencies]
-vstd = { path = "../verus/source/vstd"}  # assuming verus and the project are in the same directory
-```
 
 ## Proc Macros
 
@@ -143,14 +127,16 @@ Failed spawning proc-macro server for workspace /home/user/Documents/verus/verus
 
 The problem is that the protocol that `rust-analyzer` uses to talk to the
 proc-macro server changes as Rust versions change. However, `verus-analyzer`
-evolves more slowly and hence can't talk to the proc-macro server in the latest
+evolves more slowly and hence can't always talk to the proc-macro server in the latest
 versions of Rust.
 
 If your code doesn't use proc macros, then the simplest solution is to look in
 the settings for the extension and make sure they are disabled (e.g.,
 `"verus-analyzer.procMacro.enable": false,`).
 
-If your code does use proc macros, then you'll need to install an older Rust toolchain; specifically 1.79, e.g., `rustup toolchain install 1.79.0-aarch64-apple-darwin`. Then you'll need to add these settings to your VS Code `settings.json` file:
+If your code does use proc macros, then you'll need to install an older Rust toolchain
+(e.g., for 1.79, use `rustup toolchain install 1.79.0-aarch64-apple-darwin`). 
+Then you'll need to add these settings to your VS Code `settings.json` file:
 ```
 "verus-analyzer.server.extraEnv": { "RUSTUP_TOOLCHAIN": "1.79.0-aarch64-apple-darwin" },
 "verus-analyzer.procMacro.server": "/Users/username/.rustup/toolchains/1.79.0-aarch64-apple-darwin/libexec/rust-analyzer-proc-macro-srv",
