@@ -2,17 +2,16 @@
 
 ## Unreleased
 
-- Add scanning support for loop invariant, ensures, and decreases clauses; assert-by requires; assert-forall implies conclusions
+### 2026-08-22
+
+- Synchronized with rust-analyzer at `ece721d6cd`.
+- Improve Go-To-Definition support
+- Add scanning support for loop invariant, ensures, and decreases clauses;
+  assert-by requires; assert-forall implies conclusions
 - Improve inference for Verus's triple-or and triple-and operators.
 - Add clearer configuration setting for controlling which code is verified when a file is saved.
 - Support empty requires, ensures, etc. clauses
 
-### 2026-08-22
-
-- Synchronized with rust-analyzer at `ece721d6cd`.
-- Ported Verus syntax, analysis, verifier integration, proof actions, and VS Code installation to
-  current rust-analyzer APIs.
-- Restored fork CI, release packaging, and verifier-backed proof-action coverage.
 
 ## 2026-07-29
 
