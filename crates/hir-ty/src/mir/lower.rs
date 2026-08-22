@@ -1051,6 +1051,12 @@ impl<'a, 'db> MirLowerCtx<'a, 'db> {
                 );
                 Ok(Some(current))
             }
+            Expr::UnaryOp {
+                op: hir_def::hir::UnaryOp::BigAnd | hir_def::hir::UnaryOp::BigOr,
+                ..
+            } => {
+                not_supported!("Verus prefix logical operator")
+            }
             Expr::BinaryOp { lhs, rhs, op } => {
                 let op: BinaryOp = op.ok_or(MirLowerError::IncompleteExpr)?;
                 let is_builtin = 'b: {

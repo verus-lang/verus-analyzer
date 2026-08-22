@@ -20,6 +20,10 @@ pub enum UnaryOp {
     Not,
     /// `-`
     Neg,
+    /// `&&&`
+    BigAnd,
+    /// `|||`
+    BigOr,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

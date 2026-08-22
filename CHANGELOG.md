@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add scanning support for loop invariant, ensures, and decreases clauses; assert-by requires; assert-forall implies conclusions
+- Improve inference for Verus's triple-or and triple-and operators.
 
 ### 2026-08-22
 

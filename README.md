@@ -61,8 +61,6 @@ You can find more documentation of the IDE features by following these links.
 
 #### 2.1 TODOs for IDE features
 
-- Although Verus' custom operators are parsed, they are not registered for IDE purposes. For example, type inference around such operators might not work (e.g., `A ==> B` is parsed as `implies(A, B)`, but the IDE might not be able to infer that `A` and `B` are Booleans).
-
 - `vstd` is not scanned by default; if you want to enable "Go to Definition" or auto-completion for `vstd`, you should add it as a dependency in your Cargo.toml file, either using `cargo add vstd` or by pointing
  at the "bleeding edge" version via: 
 ```

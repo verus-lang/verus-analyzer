@@ -960,6 +960,31 @@ proof fn expressions(choice: Choice, bag: Bag, value: i32, flag: bool) {
 }
 
 #[test]
+fn infer_verus_logical_operators() {
+    check_types(
+        r#"
+fn prefix_and() {
+   &&& prefix_and_operand;
+// ^^^^^^^^^^^^^^^^^^^^^^ bool
+//     ^^^^^^^^^^^^^^^^^^ bool
+}
+
+fn prefix_or() {
+   ||| prefix_or_operand;
+// ^^^^^^^^^^^^^^^^^^^^^ bool
+//     ^^^^^^^^^^^^^^^^^ bool
+}
+
+fn implication() {
+   imply_left ==> imply_right;
+// ^^^^^^^^^^ bool
+//                ^^^^^^^^^^^ bool
+}
+"#,
+    );
+}
+
+#[test]
 fn infer_shift_op() {
     check_infer(
         r#"

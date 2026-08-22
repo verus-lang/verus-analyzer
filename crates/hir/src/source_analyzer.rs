@@ -876,6 +876,7 @@ impl<'db> SourceAnalyzer<'db> {
             }
             ast::UnaryOp::Not => (lang_items.Not?, lang_items.Not_not?),
             ast::UnaryOp::Neg => (lang_items.Neg?, lang_items.Neg_neg?),
+            ast::UnaryOp::BigAnd | ast::UnaryOp::BigOr => return None,
         };
 
         let ty = self.ty_of_expr(prefix_expr.expr()?)?;

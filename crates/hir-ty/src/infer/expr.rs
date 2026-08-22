@@ -1484,9 +1484,19 @@ impl<'db> InferenceContext<'db> {
         expected: &Expectation<'db>,
         expr: ExprId,
     ) -> Ty<'db> {
+        if matches!(unop, UnaryOp::BigAnd | UnaryOp::BigOr) {
+            self.infer_expr_coerce(
+                oprnd,
+                &Expectation::HasType(self.types.types.bool),
+                ExprIsRead::Yes,
+            );
+            return self.types.types.bool;
+        }
+
         let expected_inner = match unop {
             UnaryOp::Not | UnaryOp::Neg => expected,
             UnaryOp::Deref => &Expectation::None,
+            UnaryOp::BigAnd | UnaryOp::BigOr => unreachable!(),
         };
         let mut oprnd_t = self.infer_expr_inner(oprnd, expected_inner, ExprIsRead::Yes);
 
@@ -1517,6 +1527,7 @@ impl<'db> InferenceContext<'db> {
                     oprnd_t = result;
                 }
             }
+            UnaryOp::BigAnd | UnaryOp::BigOr => unreachable!(),
         }
         oprnd_t
     }

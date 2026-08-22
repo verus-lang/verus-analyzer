@@ -393,6 +393,9 @@ impl<'db> InferenceContext<'db> {
             UnaryOp::Not => (self.lang_items.Not_not, self.lang_items.Not),
             UnaryOp::Neg => (self.lang_items.Neg_neg, self.lang_items.Neg),
             UnaryOp::Deref => panic!("Deref is not overloadable"),
+            UnaryOp::BigAnd | UnaryOp::BigOr => {
+                unreachable!("Verus prefix logical operators are not overloadable")
+            }
         };
         (method, trait_lang_item)
     }

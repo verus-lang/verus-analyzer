@@ -163,6 +163,8 @@ impl ast::PrefixExpr {
             T![*] => UnaryOp::Deref,
             T![!] => UnaryOp::Not,
             T![-] => UnaryOp::Neg,
+            T![&&&] => UnaryOp::BigAnd,
+            T![|||] => UnaryOp::BigOr,
             _ => return None,
         };
         Some(res)
