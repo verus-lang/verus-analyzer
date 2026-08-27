@@ -72,6 +72,26 @@ vstd =           { git = "https://github.com/verus-lang/verus" }
 
 Each time you save a file in your project, Verus should run and report proof failures and warnings in the IDE.
 
+### 4. Running [`verusfmt`](https://github.com/verus-lang/verusfmt/)
+
+To run the Verus code formatter, make sure you have `verusfmt` version 0.7.3 or later available
+on your PATH.  Then edit your `settings.json` file to include:
+```
+  {
+    "verus-analyzer.rustfmt.overrideCommand": ["verusfmt"]
+  }
+```
+If you want to pass arguments to the `verusfmt` invocation, add them to the list above; e.g.,
+```
+  {
+    "verus-analyzer.rustfmt.overrideCommand": [
+      "verusfmt",
+      "--edition",
+      "2024"
+    ]
+  }
+```
+
 #### Extra Arguments
 To pass extra arguments to Verus, add the following table to the `Cargo.toml` file for your Verus project:
 ```
