@@ -2,9 +2,18 @@
 
 ## Unreleased
 
-### 2026-08-22
+## 2026-09-01
 
-- Synchronized with rust-analyzer at `ece721d6cd`.
+### Changed
+
+- Addressed various regressions from the recent merge with rust-analyzer
+- When verus-analyzer is configured to use cargo-verus *and* to only
+  verify the current module/file, run with `cargo verus focus`.
+
+## 2026-08-22
+
+### Added
+
 - Improve Go-To-Definition support
 - Add scanning support for loop invariant, ensures, and decreases clauses;
   assert-by requires; assert-forall implies conclusions
@@ -12,6 +21,9 @@
 - Add clearer configuration setting for controlling which code is verified when a file is saved.
 - Support empty requires, ensures, etc. clauses
 
+### Changed
+
+- Synchronized with rust-analyzer at `ece721d6cd`.
 
 ## 2026-07-29
 
