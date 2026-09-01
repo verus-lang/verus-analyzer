@@ -133,7 +133,7 @@ place.
 `FlycheckConfig::VerusCommand` supports two execution modes:
 
 - Direct `verus` execution.
-- `cargo-verus verify` when `cargo.verusEnable` is set.
+- `cargo-verus focus` for module verification or `cargo-verus verify` for crate verification when `cargo.verusEnable` is set.
 
 The current implementation:
 

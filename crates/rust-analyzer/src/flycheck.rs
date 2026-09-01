@@ -1059,7 +1059,11 @@ impl FlycheckActor {
             .unwrap_or_else(|| PathBuf::from("cargo-verus"));
         let mut cmd = Command::new(cargo_verus);
         cmd.current_dir(&project_dir);
-        cmd.args(["verify", "--message-format=json"]);
+        cmd.arg(match verification_scope {
+            VerusVerificationScope::Module => "focus",
+            VerusVerificationScope::Crate => "verify",
+        });
+        cmd.arg("--message-format=json");
 
         let package_repr = match scope {
             FlycheckScope::Package { package: PackageSpecifier::Cargo { package_id }, .. } => {
@@ -1294,6 +1298,72 @@ mod tests {
                 VerusVerificationScope::Crate,
             ),
             Some(Vec::new())
+        );
+    }
+
+    #[test]
+    fn cargo_verus_subcommand_matches_verification_scope() {
+        let root = AbsPathBuf::assert(test_utils::project_root());
+        let saved_file = root.join("src/foo.rs");
+        let cargo_options = CargoOptions {
+            subcommand: "check".to_owned(),
+            target_tuples: Vec::new(),
+            all_targets: false,
+            set_test: false,
+            no_default_features: false,
+            all_features: false,
+            features: Vec::new(),
+            extra_args: Vec::new(),
+            extra_test_bin_args: Vec::new(),
+            extra_env: FxHashMap::default(),
+            config_path: None,
+            target_dir_config: TargetDirectoryConfig::default(),
+        };
+        let (sender, _) = unbounded();
+        let actor = FlycheckActor::new(
+            0,
+            0,
+            sender,
+            FlycheckConfig::VerusCommand {
+                verus_args: Vec::new(),
+                cargo_verus_enable: true,
+                cargo_options: cargo_options.clone(),
+                verification_scope: VerusVerificationScope::Module,
+            },
+            FlycheckConfigJson::default(),
+            None,
+            root,
+            None,
+            None,
+            None,
+        );
+
+        let module_command = actor
+            .cargo_verus_command(
+                &FlycheckScope::Workspace,
+                &saved_file,
+                &[],
+                &cargo_options,
+                VerusVerificationScope::Module,
+            )
+            .unwrap();
+        assert_eq!(
+            module_command.get_args().collect_vec(),
+            ["focus", "--message-format=json", "--", "--verify-module", "foo"]
+        );
+
+        let crate_command = actor
+            .cargo_verus_command(
+                &FlycheckScope::Workspace,
+                &saved_file,
+                &[],
+                &cargo_options,
+                VerusVerificationScope::Crate,
+            )
+            .unwrap();
+        assert_eq!(
+            crate_command.get_args().collect_vec(),
+            ["verify", "--message-format=json", "--"]
         );
     }
 
