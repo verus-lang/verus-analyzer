@@ -110,6 +110,7 @@ pub(super) struct CastCheck<'db> {
     source_expr: ExprId,
     expr_ty: Ty<'db>,
     cast_ty: Ty<'db>,
+    in_verus_spec_context: bool,
 }
 
 impl<'db> CastCheck<'db> {
@@ -118,8 +119,9 @@ impl<'db> CastCheck<'db> {
         source_expr: ExprId,
         expr_ty: Ty<'db>,
         cast_ty: Ty<'db>,
+        in_verus_spec_context: bool,
     ) -> Self {
-        Self { expr, source_expr, expr_ty, cast_ty }
+        Self { expr, source_expr, expr_ty, cast_ty, in_verus_spec_context }
     }
 
     pub(super) fn check(
@@ -150,6 +152,13 @@ impl<'db> CastCheck<'db> {
         }
 
         if is_verus_integer_cast(ctx.db, self.expr_ty, self.cast_ty) {
+            return Ok(());
+        }
+
+        if self.in_verus_spec_context
+            && matches!(self.cast_ty.kind(), TyKind::Char)
+            && is_integer_like(ctx.db, self.expr_ty)
+        {
             return Ok(());
         }
 

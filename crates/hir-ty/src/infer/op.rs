@@ -90,7 +90,7 @@ impl<'db> InferenceContext<'db> {
                     self.infer_overloaded_binop(expr, lhs_expr, rhs_expr, op);
 
                 if matches!(op, BinaryOp::CmpOp(_))
-                    && self.is_verus_non_exec
+                    && self.in_verus_spec_context
                     && is_integer_like(self.db, lhs_ty)
                     && is_integer_like(self.db, rhs_ty)
                 {
@@ -196,7 +196,7 @@ impl<'db> InferenceContext<'db> {
 
         if matches!(op, BinaryOp::CmpOp(_))
             && is_integer_like(self.db, lhs_ty)
-            && (self.is_verus_non_exec || is_verus_integer(self.db, lhs_ty))
+            && (self.in_verus_spec_context || is_verus_integer(self.db, lhs_ty))
         {
             let rhs_ty = self.infer_expr_no_expect(rhs_expr, ExprIsRead::Yes);
             let rhs_ty = self.table.resolve_vars_with_obligations(rhs_ty);

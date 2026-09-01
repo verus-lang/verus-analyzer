@@ -16,7 +16,8 @@ use rustc_hash::FxHashSet;
 
 use crate::{
     Adt, AssocItem, BuiltinType, GenericDef, GenericParam, HasAttrs, HasVisibility, Impl,
-    ModuleDef, ScopeDef, Type, TypeParam, term_search::Expr,
+    ModuleDef, ScopeDef, Type, TypeParam,
+    term_search::{Expr, could_unify},
 };
 
 use super::{LookupTable, NewTypesKey, TermSearchCtx};
@@ -57,7 +58,7 @@ pub(super) fn trivial<'a, 'lt, 'db, DB: HirDatabase>(
 
         lookup.insert(ty.clone(), std::iter::once(expr.clone()));
 
-        ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(expr)
+        could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(expr)
     })
 }
 
@@ -107,7 +108,7 @@ pub(super) fn assoc_const<'a, 'lt, 'db, DB: HirDatabase>(
 
             lookup.insert(ty.clone(), std::iter::once(expr.clone()));
 
-            ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(expr)
+            could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(expr)
         })
 }
 
@@ -249,7 +250,7 @@ pub(super) fn data_constructor<'a, 'lt, 'db, DB: HirDatabase>(
             Adt::Union(_) => None,
         })
         .filter_map(|(ty, exprs)| {
-            ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(exprs)
+            could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(exprs)
         })
         .flatten()
 }
@@ -383,7 +384,7 @@ pub(super) fn free_function<'a, 'lt, 'db, DB: HirDatabase>(
         })
         .flatten()
         .filter_map(|(ty, exprs)| {
-            ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(exprs)
+            could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(exprs)
         })
         .flatten()
 }
@@ -462,7 +463,7 @@ pub(super) fn impl_method<'a, 'lt, 'db, DB: HirDatabase>(
             let ret_ty = it.ret_type(db).instantiate(ty.type_arguments());
 
             // Ignore functions that do not change the type
-            if ty.instantiate_with_errors().could_unify_with_deeply(db, &ret_ty) {
+            if could_unify(db, &ty.instantiate_with_errors(), &ret_ty) {
                 return None;
             }
 
@@ -502,7 +503,7 @@ pub(super) fn impl_method<'a, 'lt, 'db, DB: HirDatabase>(
             Some((ret_ty, fn_exprs))
         })
         .filter_map(|(ty, exprs)| {
-            ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(exprs)
+            could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(exprs)
         })
         .flatten()
 }
@@ -545,7 +546,7 @@ pub(super) fn struct_projection<'a, 'lt, 'db, DB: HirDatabase>(
             })
         })
         .filter_map(|(ty, exprs)| {
-            ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(exprs)
+            could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(exprs)
         })
         .flatten()
 }
@@ -580,7 +581,7 @@ pub(super) fn famous_types<'a, 'lt, 'db, DB: HirDatabase>(
     .inspect(|exprs| {
         lookup.insert(exprs.ty(db), std::iter::once(exprs.clone()));
     })
-    .filter(|expr| expr.ty(db).instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal))
+    .filter(|expr| could_unify(db, &expr.ty(db).instantiate_with_errors(), &ctx.goal))
 }
 
 /// # Impl static method (without self type) tactic
@@ -681,7 +682,7 @@ pub(super) fn impl_static_method<'a, 'lt, 'db, DB: HirDatabase>(
             Some((ret_ty, fn_exprs))
         })
         .filter_map(|(ty, exprs)| {
-            ty.instantiate_with_errors().could_unify_with_deeply(db, &ctx.goal).then_some(exprs)
+            could_unify(db, &ty.instantiate_with_errors(), &ctx.goal).then_some(exprs)
         })
         .flatten()
 }
@@ -740,9 +741,6 @@ pub(super) fn make_tuple<'a, 'lt, 'db, DB: HirDatabase>(
         })
         .flatten()
         .filter_map(|expr| {
-            expr.ty(db)
-                .instantiate_with_errors()
-                .could_unify_with_deeply(db, &ctx.goal)
-                .then_some(expr)
+            could_unify(db, &expr.ty(db).instantiate_with_errors(), &ctx.goal).then_some(expr)
         })
 }

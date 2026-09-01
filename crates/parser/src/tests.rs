@@ -344,6 +344,30 @@ fn empty_loop_clauses() {
 }
 
 #[test]
+fn verus_clause_inner_attributes_parse() {
+    let source = r#"
+spec fn predicate() -> bool;
+
+proof fn all_triggers()
+    requires
+        #![auto]
+        predicate(),
+    ensures
+        #![all_triggers]
+        predicate(),
+{}
+
+proof fn inferred_self<T: Trait>(value: T)
+    ensures
+        #![all_triggers]
+        <_ as Trait>::predicate(&value),
+{}
+"#;
+    let (actual, errors) = parse(TopEntryPoint::SourceFile, source, Edition::CURRENT);
+    assert!(!errors, "{actual}");
+}
+
+#[test]
 fn verus_logical_atomicity_syntax_parses() {
     let source = r#"
 fn atomic_function(px: PX) -> (py: PY)

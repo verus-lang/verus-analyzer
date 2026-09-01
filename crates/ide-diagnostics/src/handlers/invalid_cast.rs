@@ -1186,6 +1186,29 @@ fn foo() {
     }
 
     #[test]
+    fn allows_primitive_integer_to_char_cast_in_verus_contract() {
+        check_diagnostics(
+            r#"
+fn scalar_char(value: u32)
+    ensures (value as char) as u32 == value,
+{}
+"#,
+        );
+    }
+
+    #[test]
+    fn rejects_u32_to_char_cast_in_rust_code() {
+        check_diagnostics(
+            r#"
+fn scalar_char(value: u32) {
+    value as char;
+  //^^^^^^^^^^^^^ error: only `u8` can be cast as `char`, not u32
+}
+"#,
+        );
+    }
+
+    #[test]
     fn cast_isize_to_infer_pointer() {
         check_diagnostics(
             r#"

@@ -6529,6 +6529,10 @@ impl<'db> Type<'db> {
         hir_ty::could_unify_deeply(db, env, &tys)
     }
 
+    pub(crate) fn has_compatible_owner(&self, other: &Type<'db>) -> bool {
+        self.owner.unify(other.owner).is_some()
+    }
+
     pub fn could_coerce_to(&self, db: &'db dyn HirDatabase, to: &Type<'db>) -> bool {
         self.owner.must_unify(to.owner);
         let env = self.param_env(db);

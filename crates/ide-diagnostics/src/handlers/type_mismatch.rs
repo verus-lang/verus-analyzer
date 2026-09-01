@@ -529,6 +529,69 @@ proof fn compare(left: usize, right: u64) -> bool {
     }
 
     #[test]
+    fn allows_integer_comparisons_in_exec_function_contracts() {
+        check_diagnostics(
+            r#"
+//- minicore: derive, eq, ord
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::{int, nat};
+
+verus! {
+
+spec fn to_nat(value: nat) -> nat { value }
+spec fn to_int(value: nat) -> int { value as int }
+
+fn equal_nat(value: usize) -> (result: usize)
+    ensures result == to_nat(value as nat),
+{ value }
+
+fn equal_int(value: usize) -> (result: usize)
+    ensures result == to_int(value as nat),
+{ value }
+
+fn less_equal(value: usize) -> (result: usize)
+    ensures result <= to_nat(value as nat),
+{ value }
+
+fn equal_u64(value: u64) -> (result: u64)
+    ensures result == to_nat(value as nat),
+{ value }
+
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+pub struct int;
+#[allow(non_camel_case_types)]
+#[derive(PartialEq, PartialOrd)]
+pub struct nat;
+"#,
+        );
+    }
+
+    #[test]
+    fn verus_bullet_operators_apply_to_complete_expressions() {
+        check_diagnostics(
+            r#"
+//- /main.rs crate:main deps:verus_builtin
+use verus_builtin::int;
+
+spec fn predicates(value: u16, signed: i128) -> bool {
+    &&& value & 0xff < 256
+    &&& signed as int >= -1
+    ||| value & 0xff < 256
+    ||| value > 3
+}
+
+//- /verus_builtin.rs crate:verus_builtin
+#[allow(non_camel_case_types)]
+pub struct int;
+"#,
+        );
+    }
+
+    #[test]
     fn allows_integer_coercions_in_proof_functions() {
         check_diagnostics(
             r#"

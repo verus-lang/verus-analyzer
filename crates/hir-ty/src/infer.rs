@@ -182,9 +182,12 @@ pub fn infer_query_with_inspect<'db>(
     if let Some(return_type_pat) = body.return_type_pat {
         ctx.infer_top_pat(return_type_pat, ctx.return_ty, PatOrigin::Param);
     }
+    let body_is_verus_spec = ctx.in_verus_spec_context;
+    ctx.in_verus_spec_context = true;
     for &contract_expr in &body.contract_exprs {
         ctx.infer_expr_no_expect(contract_expr, ExprIsRead::Yes);
     }
+    ctx.in_verus_spec_context = body_is_verus_spec;
     ctx.infer_body(body.root_expr());
 
     ctx.infer_mut_body(body.root_expr());
@@ -1342,7 +1345,7 @@ pub(crate) struct InferenceContext<'db> {
     pub(crate) generic_def: GenericDefId,
     pub(crate) store: &'db ExpressionStore,
     pub(crate) lowering_mode: LoweringMode,
-    pub(crate) is_verus_non_exec: bool,
+    pub(crate) in_verus_spec_context: bool,
     /// Generally you should not resolve things via this resolver. Instead create a TyLoweringContext
     /// and resolve the path via its methods. This will ensure proper error reporting.
     pub(crate) resolver: Resolver<'db>,
@@ -1444,7 +1447,7 @@ impl<'db> InferenceContext<'db> {
         let trait_env = db.trait_environment(generic_def);
         let table = unify::InferenceTable::new(db, trait_env, resolver.krate(), owner);
         let types = crate::next_solver::default_types(db);
-        let is_verus_non_exec = match generic_def {
+        let in_verus_spec_context = match generic_def {
             GenericDefId::FunctionId(function) => {
                 FunctionSignature::of(db, function).is_verus_non_exec()
             }
@@ -1480,7 +1483,7 @@ impl<'db> InferenceContext<'db> {
             deferred_call_resolutions: FxHashMap::default(),
             defined_anon_consts: RefCell::new(ThinVec::new()),
             lowering_mode,
-            is_verus_non_exec,
+            in_verus_spec_context,
         }
     }
 
@@ -2232,7 +2235,7 @@ impl<'db> InferenceContext<'db> {
     ) {
         let resolved_expected = self.resolve_vars_if_possible(expected);
         let resolved_found = self.resolve_vars_if_possible(found);
-        if self.is_verus_non_exec
+        if self.in_verus_spec_context
             && is_integer_like(self.db, resolved_expected)
             && is_integer_like(self.db, resolved_found)
         {

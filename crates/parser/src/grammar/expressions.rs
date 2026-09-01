@@ -349,16 +349,16 @@ const LHS_FIRST: TokenSet =
 
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
-    let kind = match p.current() {
+    let (kind, operand_bp) = match p.current() {
         T![&] if p.at(T![&&&]) => {
             m = p.start();
             p.bump(T![&&&]);
-            PREFIX_EXPR
+            (PREFIX_EXPR, 2)
         }
         T![|] if p.at(T![|||]) => {
             m = p.start();
             p.bump(T![|||]);
-            PREFIX_EXPR
+            (PREFIX_EXPR, 2)
         }
         // test ref_expr
         // fn foo() {
@@ -387,7 +387,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
             } else {
                 p.eat(T![mut]);
             }
-            REF_EXPR
+            (REF_EXPR, 255)
         }
         // test unary_expr
         // fn foo() {
@@ -398,7 +398,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         T![*] | T![!] | T![-] => {
             m = p.start();
             p.bump_any();
-            PREFIX_EXPR
+            (PREFIX_EXPR, 255)
         }
         _ => {
             // test full_range_expr
@@ -436,7 +436,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         }
     };
     // parse the interior of the unary expression
-    expr_bp(p, None, r, 255);
+    expr_bp(p, None, r, operand_bp);
     let cm = m.complete(p, kind);
     Some((cm, BlockLike::NotBlock))
 }

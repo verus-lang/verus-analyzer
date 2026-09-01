@@ -12,6 +12,10 @@ pub use expr::Expr;
 
 mod tactics;
 
+fn could_unify<'db>(db: &'db dyn HirDatabase, lhs: &Type<'db>, rhs: &Type<'db>) -> bool {
+    lhs.has_compatible_owner(rhs) && lhs.could_unify_with_deeply(db, rhs)
+}
+
 /// Key for lookup table to query new types reached.
 #[derive(Debug, Hash, PartialEq, Eq)]
 enum NewTypesKey {
@@ -111,11 +115,8 @@ impl<'db> LookupTable<'db> {
 
     /// Find all `Expr`s that unify with the `ty`
     fn find(&mut self, db: &'db dyn HirDatabase, ty: &Type<'db>) -> Option<Vec<Expr<'db>>> {
-        let res = self
-            .data
-            .iter()
-            .find(|(t, _)| t.could_unify_with_deeply(db, ty))
-            .map(|(t, tts)| tts.exprs(t));
+        let res =
+            self.data.iter().find(|(t, _)| could_unify(db, t, ty)).map(|(t, tts)| tts.exprs(t));
 
         if res.is_none() {
             self.types_wishlist.insert(ty.clone());
@@ -139,14 +140,12 @@ impl<'db> LookupTable<'db> {
         let res = self
             .data
             .iter()
-            .find(|(t, _)| t.could_unify_with_deeply(db, ty))
+            .find(|(t, _)| could_unify(db, t, ty))
             .map(|(t, it)| it.exprs(t))
             .or_else(|| {
                 self.data
                     .iter()
-                    .find(|(t, _)| {
-                        t.add_reference(db, Mutability::Shared).could_unify_with_deeply(db, ty)
-                    })
+                    .find(|(t, _)| could_unify(db, &t.add_reference(db, Mutability::Shared), ty))
                     .map(|(t, it)| {
                         it.exprs(t)
                             .into_iter()

@@ -40,11 +40,13 @@ fn expr_list(p: &mut Parser<'_>) {
     if at_contract_boundary(p) {
         return;
     }
+    attributes::inner_attrs(p);
     expressions::expr_no_struct(p);
     while p.eat(T![,]) {
         if at_contract_boundary(p) {
             break;
         }
+        attributes::inner_attrs(p);
         expressions::expr_no_struct(p);
     }
 }

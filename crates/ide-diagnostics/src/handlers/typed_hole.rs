@@ -130,6 +130,56 @@ fn main() {
     }
 
     #[test]
+    fn typed_hole_in_proof_function_does_not_panic() {
+        check_diagnostics(
+            r#"
+verus! {
+
+struct S;
+struct Source;
+
+impl Source {
+    fn into_s(&self) -> S { S }
+}
+
+proof fn proof() {
+    let value: S = _;
+                 //^ 💡 error: invalid `_` expression, expected type `S`
+}
+
+}
+"#,
+        );
+    }
+
+    #[test]
+    fn inner_attribute_with_inferred_self_does_not_panic() {
+        check_diagnostics(
+            r#"
+verus! {
+
+trait Predicate {
+    spec fn holds(&self) -> bool;
+}
+
+struct Value;
+
+impl Predicate for Value {
+    open spec fn holds(&self) -> bool { true }
+}
+
+proof fn lemma(value: Value)
+    ensures
+        #![all_triggers]
+        <_ as Predicate>::holds(&value),
+{}
+
+}
+"#,
+        );
+    }
+
+    #[test]
     fn integer_ty_var() {
         check_diagnostics(
             r#"

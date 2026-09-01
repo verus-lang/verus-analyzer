@@ -778,7 +778,13 @@ impl<'db> InferenceContext<'db> {
                 let cast_ty = self.make_body_ty(*type_ref);
                 let expr_ty =
                     self.infer_expr(*expr, &Expectation::Castable(cast_ty), ExprIsRead::Yes);
-                self.deferred_cast_checks.push(CastCheck::new(tgt_expr, *expr, expr_ty, cast_ty));
+                self.deferred_cast_checks.push(CastCheck::new(
+                    tgt_expr,
+                    *expr,
+                    expr_ty,
+                    cast_ty,
+                    self.in_verus_spec_context,
+                ));
                 cast_ty
             }
             Expr::Ref { expr, rawness, mutability } => self.infer_ref_expr(
