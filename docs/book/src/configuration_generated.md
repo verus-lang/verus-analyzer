@@ -123,7 +123,8 @@ Default:
 ```json
 [
   "debug_assertions",
-  "miri"
+  "miri",
+  "verus_keep_ghost"
 ]
 ```
 

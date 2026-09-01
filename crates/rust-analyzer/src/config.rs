@@ -830,7 +830,7 @@ config_data! {
         /// To enable a name with a value, use `"key=value"`.
         /// To disable, prefix the entry with a `!`.
         cargo_cfgs: Vec<String> = {
-            vec!["debug_assertions".into(), "miri".into()]
+            vec!["debug_assertions".into(), "miri".into(), "verus_keep_ghost".into()]
         },
         /// Path to a `.cargo/config.toml` style file to pass to cargo via `--config`
         /// for every cargo invocation (metadata, build scripts, config discovery).
@@ -4406,6 +4406,17 @@ mod tests {
 
     fn remove_ws(text: &str) -> String {
         text.replace(char::is_whitespace, "")
+    }
+
+    #[test]
+    fn verus_keep_ghost_enabled_by_default() {
+        let config =
+            Config::new(AbsPathBuf::assert(project_root()), Default::default(), vec![], None);
+        let mut cfgs = cfg::CfgOptions::default();
+
+        config.cargo(None).cfg_overrides.apply(&mut cfgs, "test_crate");
+
+        assert!(cfgs.check_atom(&CfgAtom::Flag(Symbol::intern("verus_keep_ghost"))));
     }
 
     #[test]

@@ -106,17 +106,9 @@ By default, `verus-analyzer` directly invokes the Verus executable on the root o
 instead prefer to have it invoke `cargo verus`, toggle the setting: "Verus-analyzer › Cargo: Verus Enable".
 
 #### Advanced Verus Developments
-Some advanced Verus projects (e.g., those making changes to `vstd`) may need to use `#[cfg(verus_keep_ghost)]`
-in their Verus files.  This will cause various `verus-analyzer` features (like Go To Definition) to stop working,
-since `verus-analyzer` won't recognize that `cfg` setting by default.  To address that, edit your VS Code `settings.json`
-file to add:
-```
-    "verus-analyzer.cargo.cfgs": [
-        "debug_assertions",
-        "miri",
-        "verus_keep_ghost"
-    ],
-```
+`verus-analyzer` enables `verus_keep_ghost` by default so that IDE features can analyze
+ghost declarations and generated implementations. You can customize the active cfgs with
+the `verus-analyzer.cargo.cfgs` setting.
 
 ---
 ## Release Notes

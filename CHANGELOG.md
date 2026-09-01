@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Add `verus_keep_ghost` to the default set of cargo cfgs to pass
+
 ## 2026-09-01
 
 ### Changed
