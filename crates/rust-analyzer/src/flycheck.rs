@@ -1063,7 +1063,6 @@ impl FlycheckActor {
             VerusVerificationScope::Module => "focus",
             VerusVerificationScope::Crate => "verify",
         });
-        cmd.arg("--message-format=json");
 
         let package_repr = match scope {
             FlycheckScope::Package { package: PackageSpecifier::Cargo { package_id }, .. } => {
@@ -1079,6 +1078,7 @@ impl FlycheckActor {
             self.toolchain_version.as_ref(),
         );
         cmd.args(&cargo_options.extra_args);
+        cmd.arg("--message-format=json");
         cmd.arg("--");
         cmd.args(verus_args);
         cmd.args(verus_manifest_extra_args(&project_dir.join("Cargo.toml")));
