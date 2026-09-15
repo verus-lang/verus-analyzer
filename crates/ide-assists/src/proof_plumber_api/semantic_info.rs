@@ -59,7 +59,7 @@ impl<'a, 'db> AssistContext<'a, 'db> {
         None
     }
 
-    /// Get the struct deinition of a pat
+    /// Get the struct definition of a pat
     pub(crate) fn type_of_pat_struct(&self, pat: &vst::Pat) -> Option<vst::Struct> {
         let sema: &Semantics<'_, ide_db::RootDatabase> = &self.sema;
         let hir_ty: Vec<hir::Type<'_>> =

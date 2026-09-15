@@ -67,7 +67,7 @@ impl<'a, 'db> AssistContext<'a, 'db> {
         // let verify_root_flag = "--verify-root"; // TODO: figure out the surrounding module of `token`
         // let func_name = vst_fn.name.to_string();
 
-        // REIVEW: instead of writing to a file in the tmp directory, consider using `memfd_create` for an anonymous file
+        // REVIEW: instead of writing to a file in the tmp directory, consider using `memfd_create` for an anonymous file
         // refer to `man memfd_create` or `dev/shm`
         // REVIEW: Is this true? In linux, set env TMPDIR to set the tmp directory. Otherwise, it fails
         let tmp_dir = tempfile::TempDir::new().ok()?;

@@ -30,6 +30,9 @@ fn main() {
     )
     .with_config(serde_json::json!({
         "checkOnSave": true,
+        "verus": {
+            "enable": false,
+        },
     }))
     .server()
     .wait_until_workspace_is_loaded();
@@ -63,6 +66,9 @@ fn main() {
     )
     .with_config(serde_json::json!({
         "checkOnSave": true,
+        "verus": {
+            "enable": false,
+        },
     }))
     .server()
     .wait_until_workspace_is_loaded();

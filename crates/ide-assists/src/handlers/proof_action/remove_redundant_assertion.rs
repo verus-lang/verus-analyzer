@@ -23,7 +23,7 @@ use syntax::{
 /// However, it initially invokes Verus once, to check if the proof succeeds
 ///
 /// As proof actions usually automatically adds a bunch of "redundant" assertions
-/// to dignose proof failures, this assertion supports the "clean up" process after debugging.
+/// to diagnose proof failures, this assertion supports the "clean up" process after debugging.
 pub(crate) fn remove_dead_assertions(acc: &mut Assists, ctx: &AssistContext<'_, '_>) -> Option<()> {
     // trigger on `proof` keyword
     let _ = ctx.at_this_token(T![proof])?;

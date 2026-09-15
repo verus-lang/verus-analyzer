@@ -96,13 +96,12 @@ pub(super) fn atom_expr(
         let m = p.start();
         return Some((verus::final_expr(p, m), BlockLike::NotBlock));
     }
-    if p.at_contextual_kw(T![forall])
+    if (p.at_contextual_kw(T![forall])
         || p.at_contextual_kw(T![exists])
-        || p.at_contextual_kw(T![choose])
+        || p.at_contextual_kw(T![choose]))
+        && p.nth_at(1, T![|])
     {
-        if p.nth_at(1, T![|]) {
-            return Some((verus::closure_expr(p, None, r.forbid_structs), BlockLike::NotBlock));
-        }
+        return Some((verus::closure_expr(p, None, r.forbid_structs), BlockLike::NotBlock));
     }
     if p.at_contextual_kw(T![proof_fn]) {
         return Some((closure_expr(p), BlockLike::NotBlock));

@@ -146,20 +146,30 @@ jobs:
 
       - name: Install latest Verus release
         run: |
-          VERUS_URL="$(
+          VERUS_RELEASE="$(
             curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
               -H 'Accept: application/vnd.github+json' \
-              https://api.github.com/repos/verus-lang/verus/releases/latest |
-              jq -r 'first(.assets[] | select(.name | contains("x86-linux")) | .browser_download_url)'
+              https://api.github.com/repos/verus-lang/verus/releases/latest
           )"
-          test -n "$VERUS_URL"
+          VERUS_TAG="$(jq -er '.tag_name' <<< "$VERUS_RELEASE")"
+          VERUS_URL="$(
+            jq -er 'first(.assets[] | select(.name | contains("x86-linux")) | .browser_download_url)' \
+              <<< "$VERUS_RELEASE"
+          )"
           curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
             "$VERUS_URL" -o verus.zip
           unzip -q verus.zip
           VERUS_BINARY_PATH="$GITHUB_WORKSPACE/verus-x86-linux/verus"
-          VERUS_TOOLCHAIN="$("$VERUS_BINARY_PATH" --version | sed -n 's/^  Toolchain: //p')"
+          curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \
+            "https://raw.githubusercontent.com/verus-lang/verus/$VERUS_TAG/rust-toolchain.toml" \
+            -o verus-rust-toolchain.toml
+          VERUS_TOOLCHAIN="$(
+            sed -n 's/^[[:space:]]*channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*$/\1/p' \
+              verus-rust-toolchain.toml
+          )"
           test -n "$VERUS_TOOLCHAIN"
           rustup toolchain install "$VERUS_TOOLCHAIN"
+          "$VERUS_BINARY_PATH" --version
           echo "VERUS_BINARY_PATH=$VERUS_BINARY_PATH" >> "$GITHUB_ENV"
 
       - name: Test verifier-backed proof actions

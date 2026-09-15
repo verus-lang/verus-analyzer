@@ -22,7 +22,7 @@ pub(crate) fn insert_reveal(acc: &mut Assists, ctx: &AssistContext<'_, '_>) -> O
 
     acc.add(
         AssistId("insert_reveal", AssistKind::RefactorRewrite, None),
-        "Reveal function above the asserttion",
+        "Reveal function above the assertion",
         assert_expr.syntax().text_range(),
         |edit| {
             edit.replace(assert_expr.syntax().text_range(), result);
