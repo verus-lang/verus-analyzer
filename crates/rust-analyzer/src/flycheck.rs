@@ -1063,7 +1063,6 @@ impl FlycheckActor {
             VerusVerificationScope::Module => "focus",
             VerusVerificationScope::Crate => "verify",
         });
-        cmd.arg("--message-format=json");
 
         let package_repr = match scope {
             FlycheckScope::Package { package: PackageSpecifier::Cargo { package_id }, .. } => {
@@ -1079,6 +1078,7 @@ impl FlycheckActor {
             self.toolchain_version.as_ref(),
         );
         cmd.args(&cargo_options.extra_args);
+        cmd.arg("--message-format=json");
         cmd.arg("--");
         cmd.args(verus_args);
         cmd.args(verus_manifest_extra_args(&project_dir.join("Cargo.toml")));
@@ -1302,7 +1302,7 @@ mod tests {
     }
 
     #[test]
-    fn cargo_verus_subcommand_matches_verification_scope() {
+    fn cargo_verus_command_arguments() {
         let root = AbsPathBuf::assert(test_utils::project_root());
         let saved_file = root.join("src/foo.rs");
         let cargo_options = CargoOptions {
@@ -1340,7 +1340,12 @@ mod tests {
 
         let module_command = actor
             .cargo_verus_command(
-                &FlycheckScope::Workspace,
+                &FlycheckScope::Package {
+                    package: PackageSpecifier::Cargo {
+                        package_id: Arc::new(PackageId { repr: "foo".to_owned() }),
+                    },
+                    workspace_deps: None,
+                },
                 &saved_file,
                 &[],
                 &cargo_options,
@@ -1349,7 +1354,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             module_command.get_args().collect_vec(),
-            ["focus", "--message-format=json", "--", "--verify-module", "foo"]
+            ["focus", "-p", "foo", "--message-format=json", "--", "--verify-module", "foo"]
         );
 
         let crate_command = actor
