@@ -141,8 +141,12 @@ export async function getVerus(
     const installDir = vscode.Uri.joinPath(context.globalStorageUri, "verus");
     const installedBinary = vscode.Uri.joinPath(installDir, executable);
     if (await fileExists(installedBinary)) {
-        if (await isValidExecutable(installedBinary.fsPath, {})) {
+        const result = await checkExecutable(installedBinary.fsPath, {});
+        if (result.status === 0) {
             return installedBinary.fsPath;
+        }
+        if (requiredVerusToolchain(result)) {
+            throw new Error(verusVersionCheckError(result));
         }
         await vscode.workspace.fs.delete(installDir, { recursive: true, useTrash: false });
     }
@@ -217,8 +221,9 @@ export async function getVerus(
             await vscode.workspace.fs.delete(archive, { useTrash: false });
             await vscode.workspace.fs.delete(staging, { recursive: true, useTrash: false });
 
-            if (!(await isValidExecutable(installedBinary.fsPath, {}))) {
-                throw new Error(`Downloaded Verus binary failed its version check`);
+            const result = await checkExecutable(installedBinary.fsPath, {});
+            if (result.status !== 0) {
+                throw new Error(verusVersionCheckError(result));
             }
             return installedBinary.fsPath;
         },
@@ -264,6 +269,29 @@ function parseVerusVersionInfo(output: string): VerusVersionInfo {
         version: /^\s*Version:\s*(\S.*?)\s*$/m.exec(output)?.[1],
         toolchain: /^\s*Toolchain:\s*(\S.*?)\s*$/m.exec(output)?.[1],
     };
+}
+
+type ExecutableCheckResult = Awaited<ReturnType<typeof spawnAsync>>;
+
+function requiredVerusToolchain(result: ExecutableCheckResult): string | undefined {
+    const output = `${result.stderr}\n${result.stdout}`;
+    return /required rust toolchain\s+([^\s"'`]+)\s+not found/i.exec(output)?.[1];
+}
+
+function verusVersionCheckError(result: ExecutableCheckResult): string {
+    const toolchain = requiredVerusToolchain(result);
+    if (toolchain) {
+        return (
+            `Verus requires Rust toolchain ${toolchain}, but it is not installed. ` +
+            `Install it with \`rustup toolchain install ${toolchain}\`.`
+        );
+    }
+
+    const detail = result.stderr.trim() || result.stdout.trim() || result.error?.message;
+    if (detail) {
+        return `Verus failed to run \`--version\`: ${detail}`;
+    }
+    return `Verus failed to run \`--version\` (exit status ${result.status ?? "unknown"}).`;
 }
 
 function verusReleasePlatform(): { assetMarker: string; releaseDirectory: string } | undefined {
@@ -405,6 +433,11 @@ async function hasToolchainFileWithRaDeclared(uri: vscode.Uri): Promise<boolean>
 }
 
 export async function isValidExecutable(path: string, extraEnv: Env): Promise<boolean> {
+    const res = await checkExecutable(path, extraEnv);
+    return res.status === 0;
+}
+
+async function checkExecutable(path: string, extraEnv: Env): Promise<ExecutableCheckResult> {
     log.debug("Checking availability of a binary at", path);
 
     const newEnv = { ...process.env };
@@ -424,7 +457,7 @@ export async function isValidExecutable(path: string, extraEnv: Env): Promise<bo
     } else {
         log.info(path, "--version:", res);
     }
-    return res.status === 0;
+    return res;
 }
 
 async function getNixOsServer(
@@ -515,4 +548,5 @@ export const _private = {
     earliestToolchainPath,
     orderFromPath,
     parseVerusVersionInfo,
+    verusVersionCheckError,
 };

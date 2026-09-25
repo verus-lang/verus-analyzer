@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+
+## 2026-09-24
+
+### Changed
+- Improved error handling when checking Verus versions
+
+## 2026-09-15
+
 ### Added
 - Add `verus_keep_ghost` to the default set of cargo cfgs to pass
 

@@ -20,6 +20,31 @@ export async function getTests(ctx: Context) {
                 toolchain: undefined,
             });
         });
+
+        suite.addTest("Reports a missing Verus Rust toolchain", async () => {
+            const result = {
+                stdout: "",
+                stderr: "required rust toolchain 1.98.1-aarch64-apple-darwin not found\n",
+                status: 1,
+            };
+            assert.equal(
+                _private.verusVersionCheckError(result),
+                "Verus requires Rust toolchain 1.98.1-aarch64-apple-darwin, but it is not installed. " +
+                    "Install it with `rustup toolchain install 1.98.1-aarch64-apple-darwin`.",
+            );
+        });
+
+        suite.addTest("Includes stderr from other Verus version failures", async () => {
+            const result = {
+                stdout: "",
+                stderr: "dyld: Library not loaded: libexample.dylib\n",
+                status: 1,
+            };
+            assert.equal(
+                _private.verusVersionCheckError(result),
+                "Verus failed to run `--version`: dyld: Library not loaded: libexample.dylib",
+            );
+        });
     });
 
     await ctx.suite("Bootstrap/Select toolchain RA", (suite) => {
